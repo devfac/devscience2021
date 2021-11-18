@@ -8,6 +8,8 @@ from .crud_anne_univ import anne_univ
 from .crud_semestre_valide import semetre_valide
 from .crud_ancien_etudiant import ancien_etudiant
 from .crud_nouveau_etudiant import nouveau_etudiant
+from .crud_matier_ue import matier_ue
+from .crud_matier_ec import matier_ec
 # For a new basic set of CRUD operations you could just do
 
 # from .base import CRUDBase

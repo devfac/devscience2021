@@ -10,6 +10,7 @@ from app.db.session import engine
 
 
 def create(schemas):
+        # table des anciens etudiants
         base =  MetaData()
         ancien_etudiant = Table("ancien_etudiant",base,
             Column("uuid",UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
@@ -37,6 +38,7 @@ def create(schemas):
             Column("semestre_grand",String),
             schema=schemas
         )
+        # table des nouveaux etudiants
         nouveau_etudiant = Table("nouveau_etudiant",base,
             Column("uuid",UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
             Column("num_insc",String, unique=True),
@@ -71,5 +73,35 @@ def create(schemas):
             Column("uuid_parcours",UUID(as_uuid=True)),
             schema=schemas
         )
+
+        # table des unité d'enseignements
+        unite_enseing = Table("unite_enseing",base,
+            Column("uuid",UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+            Column("title",String),
+            Column("value",String),
+            Column("credit",Integer),
+            Column("semestre",String),
+            Column("uuid_parcours",UUID(as_uuid=True)),
+            Column("uuid_mention",UUID(as_uuid=True)),
+            schema=schemas
+        )
+
+        # table des elements costitutif
+        element_const = Table("element_const",base,
+            Column("uuid",UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+            Column("title",String),
+            Column("value",String),
+            Column("poids",Float),
+            Column("value_ue",String),
+            Column("utilisateur",String),
+            Column("semestre",String),
+            Column("uuid_parcours",UUID(as_uuid=True)),
+            Column("uuid_mention",UUID(as_uuid=True)),
+            schema=schemas
+        )
+
+
+        unite_enseing.create(engine)
+        element_const.create(engine)
         ancien_etudiant.create(engine)
         nouveau_etudiant.create(engine)

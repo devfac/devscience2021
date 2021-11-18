@@ -49,11 +49,8 @@ def create_annee_universitaire(
             anne_univ = crud.anne_univ.create(db=db, obj_in=anne_univ_in)
             try:
                 schem_et = create_anne(anne_univ.title)
-                matier_et = create_matier(anne_univ.title)
                 engine.execute(CreateSchema(schem_et))
-                engine.execute(CreateSchema(matier_et))
                 models.etudiant.create(schem_et)
-                models.create_table()
                 reponse = "Success"
             except sqlalchemy.exc.ProgrammingError:
                 reponse = "Erreur"

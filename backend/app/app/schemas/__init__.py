@@ -1,3 +1,4 @@
+from re import I
 from .item import Item, ItemCreate, ItemInDB, ItemUpdate
 from .msg import Msg
 from .token import Token, TokenPayload
@@ -10,3 +11,5 @@ from .anne_univ import AnneUnivCreate, AnneUniv, AnneUnivUpdate, AnneUnivInDB
 from .semestre_valide import SemestreValide, SemestreValideInDB, SemestreValideCreate, SemestreValideUpdate
 from .etudiant import EtudiantAncien, EtudiantAncienCreate,EtudiantAncienUpdate,EtudiantAncienInDB
 from .etudiant import EtudiantNouveau, EtudiantNouveauCreate, EtudiantNouveauUpdate, EtudiantNouveauInDB
+from .matier import MatierEC, MatierECCreate, MatierECInDB, MatierECUpdate
+from .matier import MatierUE, MatierUECreate, MatierUEInDB, MatierUEUpdate

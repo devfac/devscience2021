@@ -8,4 +8,4 @@ from .semestre import Semestre
 from .anne_univ import AnneUniv
 from .semestre_valide import SemestreValide
 from .etudiant import create
-from .test import create_table
+from .matier import create
