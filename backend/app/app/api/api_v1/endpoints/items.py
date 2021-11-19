@@ -41,7 +41,7 @@ def create_item(
     return item
 
 
-@router.put("/{id}", response_model=schemas.Item)
+@router.put("/", response_model=schemas.Item)
 def update_item(
     *,
     db: Session = Depends(deps.get_db),
@@ -61,7 +61,7 @@ def update_item(
     return item
 
 
-@router.get("/{id}", response_model=schemas.Item)
+@router.get("/", response_model=schemas.Item)
 def read_item(
     *,
     db: Session = Depends(deps.get_db),
@@ -79,7 +79,7 @@ def read_item(
     return item
 
 
-@router.delete("/{id}", response_model=schemas.Item)
+@router.delete("/", response_model=schemas.Item)
 def delete_item(
     *,
     db: Session = Depends(deps.get_db),

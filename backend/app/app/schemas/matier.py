@@ -32,11 +32,13 @@ class MatierECCreate(MatiertBase):
     uuid_mention: UUID
 
 
-class MatierUEUpdate(MatiertBase):
+class MatierUEUpdate(BaseModel):
+    uuid: Optional[UUID]
     credit: Optional[int]
 
 
-class MatierECUpdate(MatiertBase):
+class MatierECUpdate(BaseModel):
+    uuid: Optional[UUID]
     poids: Optional[float]
     value_ue: Optional[str]
     utilisateur: Optional[str]

@@ -12,7 +12,7 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.get("/{schema}", response_model=List[schemas.MatierUE])
+@router.get("/", response_model=List[schemas.MatierUE])
 def read_ue(
     *,
     db: Session = Depends(deps.get_db),
@@ -25,7 +25,7 @@ def read_ue(
     matier_ue = crud.matier_ue.get_all(schema=schema)
     return matier_ue
 
-@router.post("/{schema}", response_model=List[schemas.MatierUE])
+@router.post("/", response_model=List[schemas.MatierUE])
 def create_ue(
     *,
     db: Session = Depends(deps.get_db),
@@ -37,18 +37,17 @@ def create_ue(
     Create unité d'enseingement.
     """
     ue_in.uuid = uuid.uuid4()
-    ue = crud.matier_ue.get_by_title(schema=schema, 
-        title=ue_in.title, semestre=ue_in.semestre,uuid_parcours=ue_in.uuid_parcours)
+    ue = crud.matier_ue.get_by_value(schema=schema, 
+        value=ue_in.value, semestre=ue_in.semestre,uuid_parcours=ue_in.uuid_parcours)
     if ue:
         raise HTTPException(status_code=404, detail="U.E already exists")
     ue = crud.matier_ue.create_ue(schema=schema, obj_in=ue_in)
     return ue
 
-@router.put("/update_ue/{uuid}", response_model=List[schemas.MatierUE])
+@router.put("/update_ue/", response_model=List[schemas.MatierUE])
 def update_ue(
     *,
     db: Session = Depends(deps.get_db),
-    uuid: str,
     schema: str,
     ue_in: schemas.MatierUEUpdate,
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -56,13 +55,13 @@ def update_ue(
     """
     Update unité d'enseingement.
     """
-    ue = crud.matier_ue.get_by_title(schema=schema, 
-        title=ue_in.title, semestre=ue_in.semestre,uuid_parcours=ue_in.uuid_parcours)
+    ue = crud.matier_ue.get_by_uuid(schema=schema, uuid=ue_in.uuid)
     if not ue:
         raise HTTPException(status_code=404, detail="U.E not found")
-    ue = crud.matier_ue.update_ue(schema=schema,uuid=uuid, obj_in=ue_in)
+    ue = crud.matier_ue.update_ue(schema=schema, obj_in=ue_in)
     return ue
 
+@router.delete("/delete_ue/", response_model=List[schemas.MatierUE])
 def delete_ue(
     *,
     db: Session = Depends(deps.get_db),

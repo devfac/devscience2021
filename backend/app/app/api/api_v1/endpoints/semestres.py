@@ -43,7 +43,7 @@ def create_semestre(
     return semetre
 
 
-@router.put("/{id}", response_model=schemas.Semestre)
+@router.put("/", response_model=schemas.Semestre)
 def update_semestre(
     *,
     db: Session = Depends(deps.get_db),
@@ -63,7 +63,7 @@ def update_semestre(
     return semetre
 
 
-@router.get("/{uuid}", response_model=schemas.Semestre)
+@router.get("/", response_model=schemas.Semestre)
 def read_semestre(
     *,
     db: Session = Depends(deps.get_db),
@@ -81,7 +81,7 @@ def read_semestre(
     return semetre
 
 
-@router.delete("/{uuid}", response_model=schemas.Semestre)
+@router.delete("/", response_model=schemas.Semestre)
 def delete_semestre(
     *,
     db: Session = Depends(deps.get_db),

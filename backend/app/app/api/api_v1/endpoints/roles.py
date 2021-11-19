@@ -43,7 +43,7 @@ def create_role(
     return role
 
 
-@router.put("/{id}", response_model=schemas.Role)
+@router.put("/", response_model=schemas.Role)
 def update_role(
     *,
     db: Session = Depends(deps.get_db),
@@ -63,7 +63,7 @@ def update_role(
     return role
 
 
-@router.get("/{uuid}", response_model=schemas.Role)
+@router.get("/", response_model=schemas.Role)
 def read_role(
     *,
     db: Session = Depends(deps.get_db),
@@ -81,7 +81,7 @@ def read_role(
     return role
 
 
-@router.delete("/{uuid}", response_model=schemas.Role)
+@router.delete("/", response_model=schemas.Role)
 def delete_role(
     *,
     db: Session = Depends(deps.get_db),

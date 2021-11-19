@@ -43,7 +43,7 @@ def create_mention(
     return mention
 
 
-@router.put("/{id}", response_model=schemas.Mention)
+@router.put("/", response_model=schemas.Mention)
 def update_mention(
     *,
     db: Session = Depends(deps.get_db),
@@ -63,7 +63,7 @@ def update_mention(
     return mention
 
 
-@router.get("/{uuid}", response_model=schemas.Mention)
+@router.get("/", response_model=schemas.Mention)
 def read_item(
     *,
     db: Session = Depends(deps.get_db),
@@ -81,7 +81,7 @@ def read_item(
     return mention
 
 
-@router.delete("/{uuid}", response_model=schemas.Mention)
+@router.delete("/", response_model=schemas.Mention)
 def delete_mention(
     *,
     db: Session = Depends(deps.get_db),

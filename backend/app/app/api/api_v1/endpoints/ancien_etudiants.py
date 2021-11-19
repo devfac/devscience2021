@@ -12,7 +12,7 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.get("/{schema}", response_model=List[schemas.EtudiantAncien])
+@router.get("/", response_model=List[schemas.EtudiantAncien])
 def read_etudiant_ancienne(
     *,
     db: Session = Depends(deps.get_db),
@@ -31,7 +31,7 @@ def read_etudiant_ancienne(
             list_et.append(et)
     return list_et
 
-@router.post("/{schema}", response_model=List[schemas.EtudiantAncien])
+@router.post("/", response_model=List[schemas.EtudiantAncien])
 def create_etudiant_ancien(
     *,
     db: Session = Depends(deps.get_db),
@@ -55,7 +55,7 @@ def create_etudiant_ancien(
             list_et.append(et)
     return list_et
 
-@router.put("/update_etudiant/{num_carte}", response_model=List[schemas.EtudiantAncien])
+@router.put("/update_etudiant/", response_model=List[schemas.EtudiantAncien])
 def update_etudiant(
     *,
     db: Session = Depends(deps.get_db),
@@ -79,7 +79,7 @@ def update_etudiant(
             list_et.append(et)
     return list_et
 
-@router.get("/by_num/{schema}", response_model=schemas.EtudiantAncien)
+@router.get("/by_num/", response_model=schemas.EtudiantAncien)
 def read_etudiant_by_num_carte(
     *,
     schema: str,
@@ -94,7 +94,7 @@ def read_etudiant_by_num_carte(
         raise HTTPException(status_code=404, detail="Etudiant not found")
     return etudiant
 
-@router.get("/by_mention/{schema}", response_model=List[schemas.EtudiantAncien])
+@router.get("/by_mention/", response_model=List[schemas.EtudiantAncien])
 def read_etudiant_by_mention(
     *,
     db: Session = Depends(deps.get_db),
@@ -114,7 +114,7 @@ def read_etudiant_by_mention(
             list_et.append(et)
     return list_et
 
-@router.get("/by_parcours/{schema}", response_model=List[schemas.EtudiantAncien])
+@router.get("/by_parcours/", response_model=List[schemas.EtudiantAncien])
 def read_etudiant_by_parcours(
     *,
     db: Session = Depends(deps.get_db),
@@ -134,7 +134,7 @@ def read_etudiant_by_parcours(
             list_et.append(et)
     return list_et
 
-@router.get("/by_semetre_and_mention/{schema}", response_model=List[schemas.EtudiantAncien])
+@router.get("/by_semetre_and_mention/", response_model=List[schemas.EtudiantAncien])
 def read_etudiant_by_semstre_and_mention(
     *,
     db: Session = Depends(deps.get_db),
@@ -156,7 +156,7 @@ def read_etudiant_by_semstre_and_mention(
             list_et.append(et)
     return list_et
 
-@router.get("/by_etat/{schema}", response_model=List[schemas.EtudiantAncien])
+@router.get("/by_etat/", response_model=List[schemas.EtudiantAncien])
 def read_etudiant_by_etat(
     *,
     db: Session = Depends(deps.get_db),
@@ -176,7 +176,7 @@ def read_etudiant_by_etat(
             list_et.append(et)
     return list_et
 
-@router.get("/by_etat_and_moyenne/{schema}", response_model=List[schemas.EtudiantAncien])
+@router.get("/by_etat_and_moyenne/", response_model=List[schemas.EtudiantAncien])
 def read_etudiant_by_etat_and_moyenne(
     *,
     db: Session = Depends(deps.get_db),
@@ -197,7 +197,7 @@ def read_etudiant_by_etat_and_moyenne(
             list_et.append(et)
     return list_et
 
-@router.get("/by_class/{schema}", response_model=List[schemas.EtudiantAncien])
+@router.get("/by_class/", response_model=List[schemas.EtudiantAncien])
 def read_etudiant_by_class(
     *,
     db: Session = Depends(deps.get_db),
@@ -219,7 +219,7 @@ def read_etudiant_by_class(
             list_et.append(et)
     return list_et
 
-@router.delete("/{num_carte}", response_model=List[schemas.EtudiantAncien])
+@router.delete("/", response_model=List[schemas.EtudiantAncien])
 def delete_etudiant(
     *,
     db: Session = Depends(deps.get_db),

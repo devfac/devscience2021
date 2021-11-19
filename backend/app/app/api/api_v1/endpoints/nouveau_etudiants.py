@@ -13,7 +13,7 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.get("/{schema}", response_model=List[Any])
+@router.get("/", response_model=List[Any])
 def read_etudiant_nouveau(*,
     schema: str,
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -26,7 +26,7 @@ def read_etudiant_nouveau(*,
     return etudiant
 
 
-@router.post("/{schema}", response_model=List[Any])
+@router.post("/", response_model=List[Any])
 def create_etudiant_nouveau(
     *,
     etudiant_in: schemas.EtudiantNouveauCreate,
@@ -41,7 +41,7 @@ def create_etudiant_nouveau(
     return etudiant
 
 
-@router.put("/update_etudiant/{num_insc}", response_model=List[Any])
+@router.put("/update_etudiant/", response_model=List[Any])
 def update_etudiant(
     *,
     num_insc: str,
@@ -59,7 +59,7 @@ def update_etudiant(
     return etudiant
 
 
-@router.get("/by_num_insc/{schema}", response_model=Any)
+@router.get("/by_num_insc/", response_model=Any)
 def read_etudiant_by_num_carte(
     *,
     schema: str,
@@ -74,7 +74,7 @@ def read_etudiant_by_num_carte(
         raise HTTPException(status_code=404, detail="Etudiant not found")
     return etudiant
 
-@router.get("/by_mention/{schema}", response_model=List[Any])
+@router.get("/by_mention/", response_model=List[Any])
 def read_etudiant_by_mention(
     *,
     schema: str,
@@ -88,7 +88,7 @@ def read_etudiant_by_mention(
     
     return etudiant
 
-@router.get("/by_parcours/{schema}", response_model=List[Any])
+@router.get("/by_parcours/", response_model=List[Any])
 def read_etudiant_by_mention(
     *,
     schema: str,
@@ -102,7 +102,7 @@ def read_etudiant_by_mention(
     return etudiant
 
 
-@router.delete("/{num_insc}", response_model=List[Any])
+@router.delete("/", response_model=List[Any])
 def delete_etudiant_nouveau(
     *,
     db: Session = Depends(deps.get_db),

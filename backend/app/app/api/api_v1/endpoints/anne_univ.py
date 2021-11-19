@@ -64,7 +64,7 @@ def create_annee_universitaire(
     return anne_univ
 
 
-@router.put("/{id}", response_model=schemas.AnneUniv)
+@router.put("/", response_model=schemas.AnneUniv)
 def update_annee_universitaire(
     *,
     db: Session = Depends(deps.get_db),
@@ -84,7 +84,7 @@ def update_annee_universitaire(
     return anne_univ
 
 
-@router.get("/{uuid}", response_model=schemas.AnneUniv)
+@router.get("/", response_model=schemas.AnneUniv)
 def read_annee_universitaire(
     *,
     db: Session = Depends(deps.get_db),
@@ -102,7 +102,7 @@ def read_annee_universitaire(
     return anne_univ
 
 
-@router.delete("/{uuid}", response_model=schemas.AnneUniv)
+@router.delete("/", response_model=schemas.AnneUniv)
 def delete_annee_universitaire(
     *,
     db: Session = Depends(deps.get_db),

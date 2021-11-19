@@ -14,12 +14,10 @@ from app.db.session import engine
 
 class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
 
-    def update_ue(self,schema: str, uuid: str, obj_in: MatierUEUpdate) -> Optional[MatierUE]:
-        obj_in.uuid = uuid
+    def update_ue(self,schema: str, obj_in: MatierUEUpdate) -> Optional[MatierUE]:
         obj_in_data = jsonable_encoder(obj_in)
         update = text(f""" UPDATE "{schema}"."unite_enseing" SET 
-                title=:title,value=:value,credit=:credit,semestre=:semestre,
-                uuid_parcours=:uuid_parcours,uuid_mention=:uuid_mention
+                credit=:credit
                 WHERE uuid = :uuid 
             """)
         select = text(f"""
@@ -42,14 +40,14 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
            return row
 
 
-    def get_by_title(self, schema: str, title: str, semestre:str, uuid_parcours:UUID) -> Optional[MatierUE]:
+    def get_by_value(self, schema: str, value: str, semestre:str, uuid_parcours:UUID) -> Optional[MatierUE]:
         select = text(f"""
-        SELECT * FROM "{schema}"."unite_enseing" WHERE title= :title 
+        SELECT * FROM "{schema}"."unite_enseing" WHERE value= :value 
         AND semestre= :semestre AND uuid_parcours= :uuid_parcours
         """)
         with engine.begin() as con:
            row = con.execute(select, 
-           {"uuid_parcours":uuid_parcours,"semestre":semestre, "title":title}).fetchone()
+           {"uuid_parcours":uuid_parcours,"semestre":semestre, "value":value}).fetchone()
            return row
 
 

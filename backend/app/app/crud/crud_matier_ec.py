@@ -14,32 +14,40 @@ from app.db.session import engine
 
 class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
 
-    def update_ec(self,schema: str, uuid: str, obj_in: MatierECUpdate) -> Optional[MatierEC]:
-        obj_in.uuid = uuid
+    def update_ec(self,schema: str, obj_in: MatierECUpdate) -> Optional[MatierEC]:
         obj_in_data = jsonable_encoder(obj_in)
-        update = text(f""" UPDATE "{schema}"."element_const" SET 
-                title=:title,value=:value,poids=:poids,semestre=:semestre,value_ec=:value_ec,
-                utilisateur=:utilisateur,uuid_parcours=:uuid_parcours,uuid_mention=:uuid_mention
+        update = text(f""" UPDATE "{schema}"."element_const" SET poids=:poids,value_ue=:value_ue,
+                utilisateur=:utilisateur
                 WHERE uuid = :uuid 
             """)
         select = text(f"""
         SELECT * FROM "{schema}"."element_const" """)
         with engine.begin() as con:
-            con.execute(update,obj_in_data)
+            con.execute(update,obj_in_data) 
         with engine.begin() as con2:
            row = con2.execute(select).fetchall()
         return row
 
 
-    def get_by_class(self, schema: str, uuid_parcours: UUID, semestre: str) -> Optional[MatierEC]:
+    def get_by_uuid(self, schema: str, uuid: UUID) -> Optional[MatierEC]:
         select = text(f"""
-        SELECT * FROM "{schema}"."element_const" WHERE uuid_parcours= :uuid_parcours 
-        AND semestre =: semestre
+        SELECT * FROM "{schema}"."element_const" WHERE uuid= :uuid
+        """)
+        with engine.begin() as con:
+           row = con.execute(select, {"uuid":uuid}).fetchone()
+           return row
+
+
+    def get_by_value(self, schema: str, value: str, semestre:str, uuid_parcours:UUID) -> Optional[MatierEC]:
+        select = text(f"""
+        SELECT * FROM "{schema}"."element_const" WHERE value= :value 
+        AND semestre= :semestre AND uuid_parcours= :uuid_parcours
         """)
         with engine.begin() as con:
            row = con.execute(select, 
-           {"uuid_parcours":uuid_parcours,"semestre":semestre}).fetchall()
+           {"uuid_parcours":uuid_parcours,"semestre":semestre, "value":value}).fetchone()
            return row
+
 
     def create_ec(self,schema: str, obj_in: MatierECCreate) -> Optional[MatierEC]:
         obj_in_data = jsonable_encoder(obj_in)
@@ -57,6 +65,7 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
            row = con2.execute(select).fetchall()
         return row
 
+
     def get_all(self,schema: str) -> Optional[MatierEC]:
         insert = text(f"""
         SELECT * FROM "{schema}"."element_const"
@@ -64,6 +73,7 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         with engine.begin() as con:
            row = con.execute(insert).fetchall()
            return row
+
 
     def delete_ec(self,schema: str, uuid: str) -> Optional[MatierEC]:
         delete = text(f"""

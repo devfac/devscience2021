@@ -117,7 +117,7 @@ def create_user_open(
     return user
 
 
-@router.get("/{user_id}", response_model=schemas.User)
+@router.get("/", response_model=schemas.User)
 def read_user_by_id(
     user_id: int,
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -136,7 +136,7 @@ def read_user_by_id(
     return user
 
 
-@router.put("/{user_id}", response_model=schemas.User)
+@router.put("/", response_model=schemas.User)
 def update_user(
     *,
     db: Session = Depends(deps.get_db),

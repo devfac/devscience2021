@@ -41,7 +41,7 @@ def create_semestre_valide(
     return semetre_valide
 
 
-@router.put("/{num_carte}", response_model=schemas.SemestreValide)
+@router.put("/", response_model=schemas.SemestreValide)
 def update_semestre_valide(
     *,
     db: Session = Depends(deps.get_db),
@@ -59,7 +59,7 @@ def update_semestre_valide(
     return semetre_valide
 
 
-@router.get("/{num_carte}", response_model=schemas.SemestreValide)
+@router.get("/", response_model=schemas.SemestreValide)
 def read_semestre(
     *,
     db: Session = Depends(deps.get_db),
@@ -75,7 +75,7 @@ def read_semestre(
     return semetre_valide
 
 
-@router.delete("/{uuid}", response_model=schemas.SemestreValide)
+@router.delete("/", response_model=schemas.SemestreValide)
 def delete_semestre_valide(
     *,
     db: Session = Depends(deps.get_db),
