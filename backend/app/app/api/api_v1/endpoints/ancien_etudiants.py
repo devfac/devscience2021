@@ -3,11 +3,12 @@ from typing import Any, List
 import uuid, json
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, File
 from sqlalchemy.orm import Session
 from app.utils import UUIDEncoder
 from app import crud, models, schemas
 from app.api import deps
+from fastapi.responses import FileResponse
 
 router = APIRouter()
 

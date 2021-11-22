@@ -18,3 +18,4 @@ api_router.include_router(matier_ec.router, prefix="/matier_ec", tags=["élémen
 api_router.include_router(ancien_etudiants.router, prefix="/ancien_etudiants", tags=["ancien etudiants"])
 api_router.include_router(nouveau_etudiants.router, prefix="/nouveau_etudiants", tags=["nouveaux etudiants"])
 api_router.include_router(semestre_valide.router, prefix="/semestre_valide", tags=["semestre valide"])
+# api_router.include_router(scolarites.router, prefix="/scolarites", tags=["scolarites"])

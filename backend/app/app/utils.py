@@ -155,3 +155,4 @@ class UUIDEncoder(json.JSONEncoder):
         if isinstance(obj, UUID):
             return obj.hex
         return json.JSONEncoder.default(self, obj)
+
