@@ -16,22 +16,20 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
 
     def update_ec(self,schema: str, obj_in: MatierECUpdate) -> Optional[MatierEC]:
         obj_in_data = jsonable_encoder(obj_in)
-        update = text(f""" UPDATE "{schema}"."element_const" SET poids=:poids,value_ue=:value_ue,
-                utilisateur=:utilisateur
-                WHERE uuid = :uuid 
-            """)
-        select = text(f"""
-        SELECT * FROM "{schema}"."element_const" """)
-        with engine.begin() as con:
-            con.execute(update,obj_in_data) 
-        with engine.begin() as con2:
-           row = con2.execute(select).fetchall()
-        return row
+        metadata = MetaData(schema=schema, bind=engine)
+        conn = engine.connect()
+        table = Table("element_const", metadata,autoload=True)
+        ins = table.insert().values(obj_in_data)
+        conn.execute(ins)
+        sel = table.select()
+        result = conn.execute(sel)
+        out = result.fetchall()
+        return out
 
 
     def get_by_value_ue(self,schema: str, value: str, semestre:str, uuid_parcours:UUID) -> Optional[MatierEC]:
         metadata = MetaData(schema=schema, bind=engine)
-        table = Table(f"element_const", metadata,autoload=True)
+        table = Table("element_const", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(table.c.value == value)
@@ -45,7 +43,7 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
 
     def get_by_value(self,schema: str, value: str, semestre:str, uuid_parcours:UUID) -> Optional[MatierEC]:
         metadata = MetaData(schema=schema, bind=engine)
-        table = Table(f"element_const", metadata,autoload=True)
+        table = Table("element_const", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(table.c.value == value)
@@ -56,10 +54,22 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.close()
         return out
 
+
+    def get_by_uuid(self,schema: str, uuid:UUID) -> Optional[MatierEC]:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table("element_const", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(table.columns.uuid == uuid)
+        result = conn.execute(sel)
+        out = result.fetchone()
+        conn.close()
+        return out
+
     def get_by_schema(self,schema: str,obj_in: MatierECCreate)-> Optional[List[MatierEC]]:
         obj_in_data = jsonable_encoder(obj_in)
         metadata = MetaData(schema=schema, bind=engine)
-        table = Table(f"element_const", metadata,autoload=True)
+        table = Table("element_const", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(table.c.value == obj_in_data['value'])
@@ -75,7 +85,7 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         obj_in_data = jsonable_encoder(obj_in)
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
-        table = Table(f"element_const", metadata,autoload=True)
+        table = Table("element_const", metadata,autoload=True)
         ins = table.insert().values(obj_in_data)
         conn.execute(ins)
         sel = table.select()
@@ -87,7 +97,7 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
     def get_all(self,schema: str) -> Optional[List[MatierEC]]:
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
-        table = Table(f"element_const", metadata,autoload=True)
+        table = Table("element_const", metadata,autoload=True)
         sel = table.select()
         result = conn.execute(sel)
         out = result.fetchall()
@@ -96,16 +106,15 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
 
 
     def delete_ec(self,schema: str, uuid: str) -> Optional[MatierEC]:
-        delete = text(f"""
-        DELETE FROM "{schema}"."element_const" WHERE uuid = :uuid
-        """)
-        select = text(f"""
-        SELECT * FROM "{schema}"."element_const" """)
-        with engine.begin() as con:
-           con.execute(delete, {"uuid":uuid})
-        with engine.begin() as con2:
-           row = con2.execute(select).fetchall()
-           return row
+        metadata = MetaData(schema=schema, bind=engine)
+        conn = engine.connect()
+        table = Table("element_const", metadata,autoload=True)
+        sel = table.delete().where(table.columns.uuid == uuid)
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
+
         
 
 
