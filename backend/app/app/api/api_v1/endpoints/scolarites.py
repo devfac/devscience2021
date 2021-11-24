@@ -13,8 +13,8 @@ def certificat(
     *,
     db: Session = Depends(deps.get_db),
     num_carte: str,
-    schema: str,
-    current_user: models.User = Depends(deps.get_current_active_user),
+    #schema: str,
+    #current_user: models.User = Depends(deps.get_current_active_user),
     ) -> Any:
     data = {"nom":"RALAITSIMANOLAKAVANA","prenom":"Henri Franck",
             "date_naiss":"07 octobre 1995 ", "lieu_naiss":" Fianarantsoa",

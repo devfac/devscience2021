@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 from pydantic import BaseModel
 
@@ -74,3 +74,22 @@ class MatierEC(MatierECInDBBase):
 # Additional properties stored in DB
 class MatierECInDB(MatierECInDBBase):
     pass
+
+
+class MatierUniEc(BaseModel):
+    name:Optional[str]
+    note:float
+    poids: float
+
+class MatierUniUe(BaseModel):
+    name:Optional[str]
+    note:Optional[float]
+    credit: Optional[int]
+    ec:Optional[List[MatierUniEc]]
+
+class MatierUni(BaseModel):
+    num_carte:Optional[str]
+    moyenne:Optional[float]
+    ue:Optional[List[MatierUniUe]]
+
+

@@ -9,3 +9,4 @@ from .anne_univ import AnneUniv
 from .semestre_valide import SemestreValide
 from .etudiant import create
 from .matier import create
+from .note import create_note

@@ -7,6 +7,7 @@ import uuid
 from sqlalchemy.sql.schema import ForeignKey, MetaData, Table
 from sqlalchemy.sql.sqltypes import Float
 from app.db.session import engine
+from sqlalchemy.engine.reflection import Inspector
 
 
 def create(schemas):
@@ -100,8 +101,40 @@ def create(schemas):
             schema=schemas
         )
 
+        # table notes des elements costitutif
+        note_element_const = Table("note_element_const",base,
+            Column("uuid",UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+            Column("num_carte",String),
+            schema=schemas
+        )
+
+        # table notes des unité d'enseignements
+        note_unite_enseing = Table("note_unite_enseing",base,
+            Column("uuid",UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+            Column("num_carte",String),
+            schema=schemas
+        )
 
         unite_enseing.create(engine)
         element_const.create(engine)
         ancien_etudiant.create(engine)
         nouveau_etudiant.create(engine)
+        note_element_const.create(engine)
+        note_unite_enseing.create(engine)
+
+        
+def add_column(schemas, table_name, column):
+    column_name = column.compile(dialect=engine.dialect)
+    column_type = column.type.compile(engine.dialect)
+    engine.execute(f'ALTER TABLE {schemas}.{table_name} ADD COLUMN {column_name} {column_type}' )
+
+def array_column(schemas, table_name, matiers):
+    for matier in range(matiers):
+        column = Column(matier,Float)
+        add_column(schemas=schemas,table_name=table_name,column=column)
+
+
+"""
+inspector = Inspector.from_engine(engine)
+table_name in inpector.get_table_name()
+"""
