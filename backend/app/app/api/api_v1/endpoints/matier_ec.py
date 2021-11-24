@@ -24,6 +24,41 @@ def read_ec(
     matier_ec = crud.matier_ec.get_all(schema=schema)
     return matier_ec
 
+
+@router.get("/by_value_ue", response_model=List[schemas.MatierEC])
+def read_by_value_ue(
+    *,
+    db: Session = Depends(deps.get_db),
+    schema: str,
+    value:str,
+    semestre:str,
+    uuid_parcours:str,
+    current_user: models.User = Depends(deps.get_current_active_user),
+    ) -> Any:
+    """
+    Retrieve élément constitutif by value_ue.
+    """
+    matier_ec = crud.matier_ec.get_by_value_ue(schema=schema, 
+        value=value, semestre=semestre, uuid_parcours=uuid_parcours)
+    return matier_ec
+
+@router.get("/by_value", response_model=schemas.MatierEC)
+def read_by_value(
+    *,
+    db: Session = Depends(deps.get_db),
+    schema: str,
+    value:str,
+    semestre:str,
+    uuid_parcours:str,
+    current_user: models.User = Depends(deps.get_current_active_user),
+    ) -> Any:
+    """
+    Retrieve élément constitutif by value_ue.
+    """
+    matier_ec = crud.matier_ec.get_by_value_ue(schema=schema, 
+        value=value, semestre=semestre, uuid_parcours=uuid_parcours)
+    return matier_ec
+
 @router.post("/", response_model=List[schemas.MatierEC])
 def create_ec(
     *,
@@ -36,9 +71,8 @@ def create_ec(
     Create élément constitutif.
     """
     ec_in.uuid = uuid.uuid4()
-    ec = crud.matier_ec.get_by_value(schema=schema, 
-        value=ec_in.value, semestre=ec_in.semestre,uuid_parcours=ec_in.uuid_parcours)
-    if ec:
+    matier_ec = crud.matier_ec.get_by_schema(schema=schema, obj_in=ec_in)
+    if matier_ec:
         raise HTTPException(status_code=404, detail="E.C already exists")
     ec = crud.matier_ec.create_ec(schema=schema, obj_in=ec_in)
     return ec

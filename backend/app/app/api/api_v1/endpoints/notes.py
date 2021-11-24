@@ -28,20 +28,24 @@ def create_table_note(
     """
    
     if crud.user.is_superuser(current_user):
-        anne_univ = crud.anne_univ.get_by_title(db, title=anne_univ_in.title)
-        if not anne_univ:
-            anne_univ = crud.anne_univ.create(db=db, obj_in=anne_univ_in)
+        test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours)
+        if not test_note:
+            matiers = [];
+            ues = crud.matier_ue.get_all(schema=schemas)
+            for ue in enumerate(ues):
+                matiers.append(ue)
+                ecs = crud.matier_ec.get_by_value_ue(schema=schemas, value_ue=ue)
+                for ec in enumerate(ecs):
+                    matiers.append(ec)
             try:
-                schem_et = create_anne(anne_univ.title)
-                engine.execute(CreateSchema(schem_et))
-                models.note.create_note()
+                models.note.create_table_note(schemas=schemas, parcours=parcours, matiers=matiers)
                 reponse = "Success"
             except sqlalchemy.exc.ProgrammingError:
                 reponse = "Erreur"
         else:
             raise HTTPException(
             status_code=400,
-            detail=f"{anne_univ.title} already exists in the system.",
+            detail=f"note_{semestre}_{parcours} already exists in the system.",
         )
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")

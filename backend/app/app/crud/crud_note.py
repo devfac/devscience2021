@@ -34,7 +34,6 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         db.close()
         return out
 
-
     def update_note(self,db:Session,schema: str, semestre:str, parcours:str, num_carte:str, obj_in:str) -> Optional[MatierEC]:
         obj_in_data = jsonable_encoder(obj_in)
         metadata = MetaData(schema=schema, bind=engine)
@@ -50,7 +49,17 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         db.close()
         return out
 
-    def read_by_num_carte(self,db:Session,schema: str, semestre:str, parcours:str, num_carte:str, obj_in:str) -> Any:
+    def read_by_num_carte(self,db:Session,schema: str, semestre:str, parcours:str, num_carte:str) -> Any:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table(f"note_{semestre}_{parcours}", metadata,autoload=True)
+        sel = table.select()
+        sel = sel.where(table.c.num_carte == num_carte)
+        result = db.execute(sel)
+        out = result.fetchone()
+        db.close()
+        return out
+
+    def read_ue_moyenne(self,db:Session,schema: str, semestre:str, parcours:str, num_carte:str, obj_in:str) -> Any:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table(f"note_{semestre}_{parcours}", metadata,autoload=True)
         sel = table.select()

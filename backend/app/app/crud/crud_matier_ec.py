@@ -6,7 +6,7 @@ from sqlalchemy.inspection import inspect
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData,  Table, select, insert, update, delete
 from app.crud.base import CRUDBase
 from app.schemas.matier import MatierECUpdate, MatierECCreate,MatierEC
 from app.db.session import engine
@@ -29,50 +29,70 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         return row
 
 
-    def get_by_uuid(self, schema: str, uuid: UUID) -> Optional[MatierEC]:
-        select = text(f"""
-        SELECT * FROM "{schema}"."element_const" WHERE uuid= :uuid
-        """)
-        with engine.begin() as con:
-           row = con.execute(select, {"uuid":uuid}).fetchone()
-           return row
+    def get_by_value_ue(self,schema: str, value: str, semestre:str, uuid_parcours:UUID) -> Optional[MatierEC]:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table(f"element_const", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(table.c.value == value)
+        sel = sel.where(table.c.semestre == semestre)
+        sel = sel.where(table.c.uuid_parcours == uuid_parcours)
+        result = conn.execute(sel)
+        out = result.fetchone()
+        conn.close()
+        return out
 
 
-    def get_by_value(self, schema: str, value: str, semestre:str, uuid_parcours:UUID) -> Optional[MatierEC]:
-        select = text(f"""
-        SELECT * FROM "{schema}"."element_const" WHERE value= :value 
-        AND semestre= :semestre AND uuid_parcours= :uuid_parcours
-        """)
-        with engine.begin() as con:
-           row = con.execute(select, 
-           {"uuid_parcours":uuid_parcours,"semestre":semestre, "value":value}).fetchone()
-           return row
+    def get_by_value(self,schema: str, value: str, semestre:str, uuid_parcours:UUID) -> Optional[MatierEC]:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table(f"element_const", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(table.c.value == value)
+        sel = sel.where(table.c.semestre == semestre)
+        sel = sel.where(table.c.uuid_parcours == uuid_parcours)
+        result = conn.execute(sel)
+        out = result.fetchone()
+        conn.close()
+        return out
 
-
-    def create_ec(self,schema: str, obj_in: MatierECCreate) -> Optional[MatierEC]:
+    def get_by_schema(self,schema: str,obj_in: MatierECCreate)-> Optional[List[MatierEC]]:
         obj_in_data = jsonable_encoder(obj_in)
-        insert = text(f"""
-        INSERT INTO "{schema}"."element_const" (
-            "uuid", "title", "value", "poids", "semestre","value_ue","utilisateur", "uuid_parcours", "uuid_mention")
-            VALUES
-            (:uuid,:title,:value,:poids,:value_ue,:utilisateur,:semestre,:uuid_parcours,:uuid_mention);
-         """)
-        select = text(f"""
-        SELECT * FROM "{schema}"."element_const" """)
-        with engine.begin() as con:
-            con.execute(insert,obj_in_data)
-        with engine.begin() as con2:
-           row = con2.execute(select).fetchall()
-        return row
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table(f"element_const", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(table.c.value == obj_in_data['value'])
+        sel = sel.where(table.c.semestre == obj_in_data['semestre'])
+        sel = sel.where(table.c.uuid_parcours == obj_in_data['uuid_parcours'])
+        result = conn.execute(sel)
+        out = result.fetchone()
+        conn.close()
+        return out
 
 
-    def get_all(self,schema: str) -> Optional[MatierEC]:
-        insert = text(f"""
-        SELECT * FROM "{schema}"."element_const"
-        """)
-        with engine.begin() as con:
-           row = con.execute(insert).fetchall()
-           return row
+    def create_ec(self,schema: str, obj_in: MatierECCreate) -> Optional[List[MatierEC]]:
+        obj_in_data = jsonable_encoder(obj_in)
+        metadata = MetaData(schema=schema, bind=engine)
+        conn = engine.connect()
+        table = Table(f"element_const", metadata,autoload=True)
+        ins = table.insert().values(obj_in_data)
+        conn.execute(ins)
+        sel = table.select()
+        result = conn.execute(sel)
+        out = result.fetchall()
+        return out
+
+
+    def get_all(self,schema: str) -> Optional[List[MatierEC]]:
+        metadata = MetaData(schema=schema, bind=engine)
+        conn = engine.connect()
+        table = Table(f"element_const", metadata,autoload=True)
+        sel = table.select()
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
 
 
     def delete_ec(self,schema: str, uuid: str) -> Optional[MatierEC]:
