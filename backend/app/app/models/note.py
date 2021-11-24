@@ -9,7 +9,7 @@ from app.db.session import engine
 from sqlalchemy.engine.reflection import Inspector
 
 
-def create_note(schemas, parcours, semestre, matiers):
+def create_table_note(schemas, parcours, semestre, matiers):
         base =  MetaData()
         # table notes
         note = Table(f"note_{semestre}_{parcours}",base,
@@ -25,7 +25,7 @@ def create_note(schemas, parcours, semestre, matiers):
                 add_column(schemas=schemas,table_name=f"note_{semestre}e_{parcours}",column=column_ec)
             
 
-def drop_note(schemas, parcours, semestre):
+def drop_table_note(schemas, parcours, semestre):
         base =  MetaData(schema=schemas)
         # table notes
         note = Table(f"note_{semestre}_{parcours}",base,autoload=True
