@@ -20,7 +20,7 @@ def create_table_note(schemas, parcours, semestre, matiers) -> bool:
         )
         note.create(engine)
         for indexn,value_ue in enumerate(matiers):
-            column_ue = Column(f"{value_ue}",Float)
+            column_ue = Column(f"{value_ue}",Float,default=0.0)
             add_column(schemas=schemas,table_name=f"note_{semestre.lower()}_{parcours.lower()}",column=column_ue)
         return True
     except:

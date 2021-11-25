@@ -59,7 +59,6 @@ def delete_table_note(
     schemas: str,
     semestre: str,
     parcours:str,
-    uuid_parcours:str,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """

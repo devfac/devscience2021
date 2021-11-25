@@ -62,7 +62,7 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
     def get_by_class(self, schema: str, uuid_parcours: UUID, uuid_mention: UUID, semestre: str) -> Optional[EtudiantAncien]:
         select = text(f"""
         SELECT * FROM "{schema}"."ancien_etudiant" WHERE uuid_parcours= :uuid_parcours 
-        AND uuid_mention =: uuid_mention AND (semetre_petit= :semetrse OR semestre_grand =: semestre)
+        AND uuid_mention= :uuid_mention AND (semestre_petit= :semestre OR semestre_grand= :semestre)
         """)
         with engine.begin() as con:
            row = con.execute(select, 
