@@ -26,6 +26,18 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         out = result.fetchall()
         return out
 
+    def get_by_class(self, schema: str, uuid_parcours: UUID, semestre: str) -> Optional[MatierEC]:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table("element_const", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(table.c.semestre == semestre)
+        sel = sel.where(table.c.uuid_parcours == uuid_parcours)
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
+
 
     def get_by_value_ue(self,schema: str, value: str, semestre:str, uuid_parcours:UUID) -> Optional[MatierEC]:
         metadata = MetaData(schema=schema, bind=engine)
@@ -108,11 +120,13 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
     def delete_ec(self,schema: str, uuid: str) -> Optional[MatierEC]:
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
-        table = Table("element_const", metadata,autoload=True)
-        sel = table.delete().where(table.columns.uuid == uuid)
+        table = Table(f"element_const", metadata,autoload=True)
+        dele = table.delete()
+        dele = dele.where(table.columns.uuid == uuid)
+        conn.execute(dele)
+        sel = table.select()
         result = conn.execute(sel)
         out = result.fetchall()
-        conn.close()
         return out
 
         

@@ -35,7 +35,7 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
         sel = sel.where(table.c.semestre == semestre)
         sel = sel.where(table.c.uuid_parcours == uuid_parcours)
         result = conn.execute(sel)
-        out = result.fetchone()
+        out = result.fetchall()
         conn.close()
         return out
 

@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.api import deps
+from app.utils import decode_text
 
 router = APIRouter()
 
@@ -59,6 +60,22 @@ def read_by_value(
         value=value, semestre=semestre, uuid_parcours=uuid_parcours)
     return matier_ec
 
+@router.get("/by_uuid", response_model=schemas.MatierEC)
+def read_by_uuid(
+    *,
+    db: Session = Depends(deps.get_db),
+    schema: str,
+    uuid:str,
+    current_user: models.User = Depends(deps.get_current_active_user),
+    ) -> Any:
+    """
+    Retrieve élément constitutif by uuid.
+    """
+    matier_ec = crud.matier_ec.get_by_uuid(schema=schema, uuid=uuid)
+    if not matier_ec:
+        raise HTTPException(status_code=404, detail="E.C not found")
+    return matier_ec
+
 @router.post("/", response_model=List[schemas.MatierEC])
 def create_ec(
     *,
@@ -71,6 +88,7 @@ def create_ec(
     Create élément constitutif.
     """
     ec_in.uuid = uuid.uuid4()
+    ec_in.value = decode_text(ec_in.title)
     matier_ec = crud.matier_ec.get_by_schema(schema=schema, obj_in=ec_in)
     if matier_ec:
         raise HTTPException(status_code=404, detail="E.C already exists")
@@ -98,8 +116,8 @@ def update_ec(
 def delete_ec(
     *,
     db: Session = Depends(deps.get_db),
-    uuid: UUID,
     schema: str,
+    uuid:str,
     current_user: models.User = Depends(deps.get_current_active_user),
     ) -> Any:
     """

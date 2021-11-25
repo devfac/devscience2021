@@ -13,6 +13,7 @@ import requests
 import json
 from uuid import UUID
 from app.core.config import settings
+from unidecode import unidecode
 
 
 def send_email(
@@ -118,9 +119,10 @@ def create_anne(anne:str):
     ann = "anne_"+anne[0:4]+"_"+anne[5:9]
     return ann
 
-def create_matier(anne:str):
-    matier = "matier"+anne[0:4]+"_"+anne[5:9]
-    return matier
+def decode_text(text:str) -> str:
+     strd = text.replace(" ","_")
+     return unidecode(strd)
+
 
 def send_new_account(email_to: str, password: str) -> str:
     smtp_server = settings.SMTP_SERVER

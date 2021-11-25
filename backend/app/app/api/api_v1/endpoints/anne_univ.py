@@ -9,7 +9,7 @@ from app import crud, models, schemas
 from app.api import deps
 from app.db.session import engine
 from sqlalchemy.sql.ddl import CreateSchema
-from app.utils import create_anne, create_matier
+from app.utils import create_anne
 from app.core.config import settings
 
 router = APIRouter()
