@@ -9,20 +9,21 @@ from app.db.session import engine
 from sqlalchemy.engine.reflection import Inspector
 
 
-def create_table_note(schemas, parcours, semestre, matiers):
+def create_table_note(schemas, parcours, semestre, matiers) -> bool:
+    try:
         base =  MetaData()
         # table notes
-        note = Table(f"note_{semestre}_{parcours}",base,
+        note = Table(f"note_{semestre.lower()}_{parcours.lower()}",base,
             Column("num_carte",String, primary_key=True),
             schema=schemas
         )
         note.create(engine)
-        for value_ue in enumerate(matiers['ue']):
-            column_ue = Column(f"ue_{value_ue['name']}",Float)
-            add_column(schemas=schemas,table_name=f"note_{semestre}_{parcours}",column=column_ue)
-            for value_ec in enumerate(value_ue['ec']):
-                column_ec = Column(f"ec_{value_ec['name']}",Float)
-                add_column(schemas=schemas,table_name=f"note_{semestre}e_{parcours}",column=column_ec)
+        for indexn,value_ue in enumerate(matiers):
+            column_ue = Column(f"{value_ue}",Float)
+            add_column(schemas=schemas,table_name=f"note_{semestre.lower()}_{parcours.lower()}",column=column_ue)
+        return True
+    except:
+        return False
             
 
 def drop_table_note(schemas, parcours, semestre):

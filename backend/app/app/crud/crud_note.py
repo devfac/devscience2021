@@ -16,7 +16,8 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
     def check_table_exist(self,schemas:str, semestre:str, parcours:str) -> bool:
         metadata = MetaData(bind=engine, schema=schemas)
         for table in metadata.sorted_tables:
-            if table.name == f"note_{semestre}_{parcours}":
+            print(table.name)
+            if table.name == f"note_{semestre.lower()}_{parcours.lower()}":
                 return True
         return False
 

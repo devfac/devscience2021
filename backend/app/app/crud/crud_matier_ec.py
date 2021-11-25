@@ -39,16 +39,16 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         return out
 
 
-    def get_by_value_ue(self,schema: str, value: str, semestre:str, uuid_parcours:UUID) -> Optional[MatierEC]:
+    def get_by_value_ue(self,schema: str, value_ue: str, semestre:str, uuid_parcours:UUID) -> Optional[MatierEC]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("element_const", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(table.c.value == value)
+        sel = sel.where(table.c.value_ue == value_ue)
         sel = sel.where(table.c.semestre == semestre)
         sel = sel.where(table.c.uuid_parcours == uuid_parcours)
         result = conn.execute(sel)
-        out = result.fetchone()
+        out = result.fetchall()
         conn.close()
         return out
 
@@ -128,8 +128,5 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         result = conn.execute(sel)
         out = result.fetchall()
         return out
-
-        
-
 
 matier_ec = CRUDMatierEC(MatierEC)

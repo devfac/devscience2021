@@ -5,7 +5,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.utils import UUIDEncoder
+from app.utils import UUIDEncoder, decode_text
 from app import crud, models, schemas
 from app.api import deps
 
@@ -37,12 +37,12 @@ def create_ue(
     Create unité d'enseingement.
     """
     ue_in.uuid = uuid.uuid4()
-    ue = crud.matier_ue.get_by_value(schema=schema, 
-        value=ue_in.value, semestre=ue_in.semestre,uuid_parcours=ue_in.uuid_parcours)
-    if ue:
+    ue_in.value = decode_text(ue_in.title)
+    matier_ue = crud.matier_ue.get_by_schema(schema=schema, obj_in=ue_in)
+    if matier_ue:
         raise HTTPException(status_code=404, detail="U.E already exists")
-    ue = crud.matier_ue.create_ue(schema=schema, obj_in=ue_in)
-    return ue
+    matier_ue = crud.matier_ue.create_ue(schema=schema, obj_in=ue_in)
+    return matier_ue
 
 @router.put("/update_ue/", response_model=List[schemas.MatierUE])
 def update_ue(

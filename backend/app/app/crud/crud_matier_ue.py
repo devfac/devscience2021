@@ -27,7 +27,7 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
         return out
 
 
-    def get_by_class(self, schema: str, uuid_parcours: UUID, semestre: str) -> Optional[MatierUE]:
+    def get_by_class(self, schema: str, uuid_parcours: str, semestre: str) -> Optional[List[MatierUE]]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("unite_enseing", metadata,autoload=True)
         conn = engine.connect()
@@ -39,8 +39,22 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
         conn.close()
         return out
 
+    def get_by_schema(self,schema: str,obj_in: MatierUECreate)-> Optional[List[MatierUE]]:
+        obj_in_data = jsonable_encoder(obj_in)
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table("unite_enseing", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(table.c.value == obj_in_data['value'])
+        sel = sel.where(table.c.semestre == obj_in_data['semestre'])
+        sel = sel.where(table.c.uuid_parcours == obj_in_data['uuid_parcours'])
+        result = conn.execute(sel)
+        out = result.fetchone()
+        conn.close()
+        return out
 
-    def get_by_value(self,schema: str, value: str, semestre:str, uuid_parcours:UUID) -> Optional[MatierUE]:
+
+    def get_by_value(self,schema: str, value: str, semestre:str, uuid_parcours:str) -> Optional[MatierUE]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("unite_enseing", metadata,autoload=True)
         conn = engine.connect()
@@ -54,7 +68,7 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
         return out
 
 
-    def get_by_uuid(self,schema: str, uuid:UUID) -> Optional[MatierUE]:
+    def get_by_uuid(self,schema: str, uuid:str) -> Optional[MatierUE]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("unite_enseing", metadata,autoload=True)
         conn = engine.connect()
@@ -102,6 +116,4 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
         out = result.fetchall()
         return out
         
-
-
 matier_ue = CRUDMatierUE(MatierUE)

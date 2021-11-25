@@ -31,7 +31,7 @@ def read_by_value_ue(
     *,
     db: Session = Depends(deps.get_db),
     schema: str,
-    value:str,
+    value_ue:str,
     semestre:str,
     uuid_parcours:str,
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -40,7 +40,7 @@ def read_by_value_ue(
     Retrieve élément constitutif by value_ue.
     """
     matier_ec = crud.matier_ec.get_by_value_ue(schema=schema, 
-        value=value, semestre=semestre, uuid_parcours=uuid_parcours)
+        value_ue=value_ue, semestre=semestre, uuid_parcours=uuid_parcours)
     return matier_ec
 
 @router.get("/by_value", response_model=schemas.MatierEC)
