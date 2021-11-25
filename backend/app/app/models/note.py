@@ -10,6 +10,7 @@ from sqlalchemy.engine.reflection import Inspector
 
 
 def create_table_note(schemas, parcours, semestre, matiers) -> bool:
+   
     try:
         base =  MetaData()
         # table notes
@@ -26,12 +27,16 @@ def create_table_note(schemas, parcours, semestre, matiers) -> bool:
         return False
             
 
-def drop_table_note(schemas, parcours, semestre):
-        base =  MetaData(schema=schemas)
+def drop_table_note(schemas, parcours, semestre) -> bool:
+    try:
+        base =  MetaData(schema=schemas, bind=engine)
         # table notes
-        note = Table(f"note_{semestre}_{parcours}",base,autoload=True
-        )
+        note = Table(f"note_{semestre.lower()}_{parcours.lower()}",base,autoload=True )
         note.drop(engine)
+        return True
+    except Exception as e:
+        print("error:",e)
+        return False
 
         
 def add_column(schemas, table_name, column):

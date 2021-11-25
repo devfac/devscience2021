@@ -1,3 +1,4 @@
+from os import lchown
 from typing import Any, List, Optional
 
 from sqlalchemy import text
@@ -14,13 +15,22 @@ from app.db.session import engine
 class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
 
     def check_table_exist(self,schemas:str, semestre:str, parcours:str) -> bool:
-        metadata = MetaData(bind=engine, schema=schemas)
-        for table in metadata.sorted_tables:
-            print(table.name)
-            if table.name == f"note_{semestre.lower()}_{parcours.lower()}":
+        metadata = MetaData(schema = schemas)
+        metadata.reflect(bind=engine)
+        for table in metadata.tables:
+            table_name = table.replace(f'{schemas}.', '')
+            if table_name == f"note_{semestre.lower()}_{parcours.lower()}":
                 return True
         return False
 
+    def check_columns_exist(self,schemas:str, semestre:str, parcours:str) -> Optional[List[str]]:
+        metadata = MetaData(schema=schemas, bind=engine)
+        columns = []
+        table_ = Table(f"note_{semestre.lower()}_{parcours.lower()}", metadata,autoload=True)
+        for index, table in enumerate(table_.columns):
+            columns.append(str(table).partition(".")[2])
+        return columns
+       
 
     def insert_note(self,schema: str,semestre:str,parcours:str, num_carte:str) -> Optional[MatierEC]:
         metadata = MetaData(schema=schema, bind=engine)

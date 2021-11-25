@@ -13,3 +13,4 @@ from .etudiant import EtudiantAncien, EtudiantAncienCreate,EtudiantAncienUpdate,
 from .etudiant import EtudiantNouveau, EtudiantNouveauCreate, EtudiantNouveauUpdate, EtudiantNouveauInDB
 from .matier import MatierEC, MatierECCreate, MatierECInDB, MatierECUpdate
 from .matier import MatierUE, MatierUECreate, MatierUEInDB, MatierUEUpdate
+from .matier import MatierUni
