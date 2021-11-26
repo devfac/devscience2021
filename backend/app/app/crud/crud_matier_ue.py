@@ -39,13 +39,13 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
         conn.close()
         return out
 
-    def get_by_schema(self,schema: str,obj_in: MatierUECreate)-> Optional[List[MatierUE]]:
+    def get_by_schema(self,schema: str,obj_in: MatierUECreate,value:str)-> Optional[List[MatierUE]]:
         obj_in_data = jsonable_encoder(obj_in)
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("unite_enseing", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(table.c.value == obj_in_data['value'])
+        sel = sel.where(table.c.value == value)
         sel = sel.where(table.c.semestre == obj_in_data['semestre'])
         sel = sel.where(table.c.uuid_parcours == obj_in_data['uuid_parcours'])
         result = conn.execute(sel)
@@ -80,12 +80,12 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
         return out
 
 
-    def create_ue(self,schema: str, obj_in: MatierUECreate) -> Optional[MatierUE]:
+    def create_ue(self,schema: str, obj_in: MatierUECreate,value:str) -> Optional[MatierUE]:
         obj_in_data = jsonable_encoder(obj_in)
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table(f"unite_enseing", metadata,autoload=True)
-        ins = table.insert().values(obj_in_data)
+        ins = table.insert().values(**obj_in_data,value=value)
         conn.execute(ins)
         sel = table.select()
         result = conn.execute(sel)

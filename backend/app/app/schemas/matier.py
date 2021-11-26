@@ -7,7 +7,6 @@ from pydantic import BaseModel
 class MatiertBase(BaseModel):
     uuid: Optional[UUID]
     title: Optional[str] = None
-    value: Optional[str] = None
     semestre: Optional[str] = None
     uuid_parcours: Optional[UUID] = None
     uuid_mention: Optional[UUID] = None
@@ -15,7 +14,6 @@ class MatiertBase(BaseModel):
 # Properties to receive via API on creation
 class MatierUECreate(MatiertBase):
     title: str
-    value: str
     credit: int
     semestre: str
     uuid_parcours: UUID
@@ -46,12 +44,14 @@ class MatierECUpdate(BaseModel):
 
 class MatierUEInDBBase(MatiertBase):
     credit: Optional[int]
+    value: Optional[str]
 
     class Config:
         orm_mode = True
 
 class MatierECInDBBase(MatiertBase):
     poids: Optional[float]
+    value: Optional[str]
     value_ue: Optional[str]
     utilisateur: Optional[str]
 

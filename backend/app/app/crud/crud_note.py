@@ -30,7 +30,6 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         for index, table in enumerate(table_.columns):
             columns.append(str(table).partition(".")[2])
         return columns
-       
 
     def insert_note(self,schema: str,semestre:str,parcours:str, num_carte:str) :
         obj_in_data = jsonable_encoder({num_carte})
@@ -89,6 +88,5 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         out = result.fetchone()
         conn.close()
         return out
-        
 
 note = CRUDNote(MatierEC)

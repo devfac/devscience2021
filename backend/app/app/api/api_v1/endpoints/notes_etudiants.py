@@ -5,12 +5,14 @@ import sqlalchemy
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from fastapi.encoders import jsonable_encoder
 from app import crud, models, schemas
 from app.api import deps
 from app.db.session import engine
 from sqlalchemy.sql.ddl import CreateSchema
 from app.utils import create_anne
 from app.core.config import settings
+import json
 
 router = APIRouter()
 
@@ -19,7 +21,7 @@ def inserts_etudiant(
     *,
     db: Session = Depends(deps.get_db),
     schemas: str,
-    semstre:str,
+    semestre:str,
     parcours:str,
     uuid_parcours:str,
     uuid_mention:str,
@@ -32,7 +34,7 @@ def inserts_etudiant(
     list = crud.ancien_etudiant.get_by_class(schemas,uuid_parcours,uuid_mention,semstre)
     if list is not None:
         for etudiant in list:
-            et_un = crud.note.read_by_num_carte(schemas, semstre, parcours,etudiant.num_carte)
+            et_un = crud.note.read_by_num_carte(schemas, semestre, parcours,etudiant.num_carte)
             if not et_un:
                 crud.note.insert_note(schemas,semstre,parcours,etudiant.num_carte)
     etudiants = crud.note.read_all_note(schemas, semstre, parcours)
@@ -46,13 +48,18 @@ def inserts_note(
     schemas: str,
     semestre: str,
     parcours:str,
-    uuid_parcours:str,
-    note:schemas.MatierUni,
+    #uuid_parcours:str,
+    notes:List[schemas.Note],
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create table note.
     """ 
+    for note in notes:
+        print(note.num_carte)
+        et_un = crud.note.read_by_num_carte(schemas, semestre, parcours,note.num_carte)
+        if et_un:
+           crud.note.update_note(schemas,semestre,parcours,note.num_carte,note.note)
 
 
 @router.delete("/", response_model=schemas.Msg)
