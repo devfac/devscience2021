@@ -83,6 +83,7 @@ def update_etudiant(
 @router.get("/by_num/", response_model=schemas.EtudiantAncien)
 def read_etudiant_by_num_carte(
     *,
+    db: Session = Depends(deps.get_db),
     schema: str,
     num_carte: str,
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -93,7 +94,10 @@ def read_etudiant_by_num_carte(
     etudiant = crud.ancien_etudiant.get_by_num_carte(schema=schema, num_carte=num_carte)
     if not etudiant:
         raise HTTPException(status_code=404, detail="Etudiant not found")
-    return etudiant
+   
+    et = json.loads(json.dumps(dict(etudiant),cls=UUIDEncoder))
+    et["parcours"]=crud.parcours.get_by_uuid(db=db,uuid=etudiant.uuid_parcours).title
+    return et
 
 @router.get("/by_mention/", response_model=List[schemas.EtudiantAncien])
 def read_etudiant_by_mention(
