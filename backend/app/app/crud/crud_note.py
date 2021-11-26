@@ -52,8 +52,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.close()
         return out
 
-    def update_note(self,schema: str, semestre:str, parcours:str, num_carte:str, ec_in:Any, ue:str, note_ue:float):
-        ue_in = {f'{ue}':note_ue}
+    def update_note(self,schema: str, semestre:str, parcours:str, num_carte:str, ec_in:Any, ue_in:Any):
         obj_in_data = jsonable_encoder(ec_in)
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()

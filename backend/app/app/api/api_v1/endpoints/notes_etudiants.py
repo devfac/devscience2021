@@ -56,17 +56,17 @@ def inserts_note(
     Create table note.
     """ 
     for note in notes:
-        value_ec = json.loads(json.dumps(note.ec))
-        ue = crud.matier_ue.get_by_value(schemas,note.name,semestre,uuid_parcours)
+        ue_in = {}
         ecs = crud.matier_ec.get_by_value_ue(schemas,note.name,semestre,uuid_parcours)
         note_ue = 0
         for i,ec in enumerate(ecs):
             poids_ec = crud.matier_ec.get_by_value(schemas,ecs[i][2],semestre,uuid_parcours)
             note_ue += float(json.loads(json.dumps(note.ec))[f"ec_{ecs[i][2]}"])*float(poids_ec.poids)
-            
+        
+        ue_in[f'ue_{note.name}'] = note_ue
         et_un = crud.note.read_by_num_carte(schemas, semestre, parcours,note.num_carte)
         if et_un:
-           crud.note.update_note(schemas,semestre,parcours,note.num_carte,note.ec,f"ue_{note.name}",note_ue)
+           crud.note.update_note(schemas,semestre,parcours,note.num_carte,note.ec,ue_in)
     all_note = crud.note.read_all_note(schemas, semestre, parcours)
     return all_note
 
