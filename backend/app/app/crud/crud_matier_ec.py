@@ -93,12 +93,12 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         return out
 
 
-    def create_ec(self,schema: str, obj_in: MatierECCreate) -> Optional[List[MatierEC]]:
+    def create_ec(self,schema: str, obj_in: MatierECCreate,value:str) -> Optional[List[MatierEC]]:
         obj_in_data = jsonable_encoder(obj_in)
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table("element_const", metadata,autoload=True)
-        ins = table.insert().values(obj_in_data)
+        ins = table.insert().values(**obj_in_data,value=value)
         conn.execute(ins)
         sel = table.select()
         result = conn.execute(sel)

@@ -88,11 +88,11 @@ def create_ec(
     Create élément constitutif.
     """
     ec_in.uuid = uuid.uuid4()
-    ec_in.value = decode_text(ec_in.title)
+    value = decode_text(ec_in.title)
     matier_ec = crud.matier_ec.get_by_schema(schema=schema, obj_in=ec_in)
     if matier_ec:
         raise HTTPException(status_code=404, detail="E.C already exists")
-    ec = crud.matier_ec.create_ec(schema=schema, obj_in=ec_in)
+    ec = crud.matier_ec.create_ec(schema=schema, obj_in=ec_in,value=value)
     return ec
 
 @router.put("/update_ec/", response_model=List[schemas.MatierEC])

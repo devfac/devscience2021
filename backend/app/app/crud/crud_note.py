@@ -1,3 +1,4 @@
+import json
 from os import lchown
 from typing import Any, List, Optional
 
@@ -51,21 +52,21 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.close()
         return out
 
-    def update_note(self,schema: str, semestre:str, parcours:str, num_carte:str, obj_in:str) -> Optional[MatierEC]:
-        obj_in_data = jsonable_encoder(obj_in)
+    def update_note(self,schema: str, semestre:str, parcours:str, num_carte:str, ec_in:Any, ue:str, note_ue:float):
+        ue_in = {f'{ue}':note_ue}
+        obj_in_data = jsonable_encoder(ec_in)
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table(f"note_{semestre.lower()}_{parcours.lower()}", metadata,autoload=True)
         conn = engine.connect()
         up = update(table=table)
-        up = up.values(obj_in_data)
+        up = up.values(**obj_in_data)
         up = up.where(table.c.num_carte == num_carte)
         conn.execute(up)
-        sel = table.select()
-        result = conn.execute(sel)
-        out = result.fetchall()
-        conn.close()
-        return out
+        up = update(table=table)
+        up = up.values(ue_in)
+        up = up.where(table.c.num_carte == num_carte)
+        conn.execute(up)
 
     def read_by_num_carte(self,schema: str, semestre:str, parcours:str, num_carte:str) -> Any:
         metadata = MetaData(schema=schema, bind=engine)

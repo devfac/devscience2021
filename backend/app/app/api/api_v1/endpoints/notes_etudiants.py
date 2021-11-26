@@ -31,13 +31,13 @@ def inserts_etudiant(
     Create table note.
     """ 
     etudiants = []
-    list = crud.ancien_etudiant.get_by_class(schemas,uuid_parcours,uuid_mention,semstre)
+    list = crud.ancien_etudiant.get_by_class(schemas,uuid_parcours,uuid_mention,semestre)
     if list is not None:
         for etudiant in list:
             et_un = crud.note.read_by_num_carte(schemas, semestre, parcours,etudiant.num_carte)
             if not et_un:
-                crud.note.insert_note(schemas,semstre,parcours,etudiant.num_carte)
-    etudiants = crud.note.read_all_note(schemas, semstre, parcours)
+                crud.note.insert_note(schemas,semestre,parcours,etudiant.num_carte)
+    etudiants = crud.note.read_all_note(schemas, semestre, parcours)
     return etudiants
 
 
@@ -48,7 +48,7 @@ def inserts_note(
     schemas: str,
     semestre: str,
     parcours:str,
-    #uuid_parcours:str,
+    uuid_parcours:str,
     notes:List[schemas.Note],
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -56,10 +56,19 @@ def inserts_note(
     Create table note.
     """ 
     for note in notes:
-        print(note.num_carte)
+        value_ec = json.loads(json.dumps(note.ec))
+        ue = crud.matier_ue.get_by_value(schemas,note.name,semestre,uuid_parcours)
+        ecs = crud.matier_ec.get_by_value_ue(schemas,note.name,semestre,uuid_parcours)
+        note_ue = 0
+        for i,ec in enumerate(ecs):
+            poids_ec = crud.matier_ec.get_by_value(schemas,ecs[i][2],semestre,uuid_parcours)
+            note_ue += float(json.loads(json.dumps(note.ec))[f"ec_{ecs[i][2]}"])*float(poids_ec.poids)
+            
         et_un = crud.note.read_by_num_carte(schemas, semestre, parcours,note.num_carte)
         if et_un:
-           crud.note.update_note(schemas,semestre,parcours,note.num_carte,note.note)
+           crud.note.update_note(schemas,semestre,parcours,note.num_carte,note.ec,f"ue_{note.name}",note_ue)
+    all_note = crud.note.read_all_note(schemas, semestre, parcours)
+    return all_note
 
 
 @router.delete("/", response_model=schemas.Msg)
