@@ -7,5 +7,5 @@ class NoteEC(BaseModel):
 class Note(BaseModel):
     num_carte: str
     name:str
-    ec:Any
+    ec:List[NoteEC]
 

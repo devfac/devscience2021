@@ -52,16 +52,11 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.close()
         return out
 
-    def update_note(self,schema: str, semestre:str, parcours:str, num_carte:str, ec_in:Any, ue_in:Any):
-        obj_in_data = jsonable_encoder(ec_in)
+    def update_note(self,schema: str, semestre:str, parcours:str, num_carte:str, ue_in:Any):
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table(f"note_{semestre.lower()}_{parcours.lower()}", metadata,autoload=True)
         conn = engine.connect()
-        up = update(table=table)
-        up = up.values(**obj_in_data)
-        up = up.where(table.c.num_carte == num_carte)
-        conn.execute(up)
         up = update(table=table)
         up = up.values(ue_in)
         up = up.where(table.c.num_carte == num_carte)
