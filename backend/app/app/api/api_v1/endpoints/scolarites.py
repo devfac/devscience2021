@@ -50,6 +50,6 @@ def relever(
     current_user: models.User = Depends(deps.get_current_active_user),
     ) -> Any:
     note = {}
-    et_un_final = crud.note.read_by_num_carte(schemas, semestre, parcours,"final",note.num_carte)
+    et_un_final = crud.note.read_by_num_carte(schemas, semestre, parcours,"final",num_carte)
     print(et_un_final)
 
