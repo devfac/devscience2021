@@ -128,7 +128,7 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         conn = engine.connect()
         table = Table("ancien_etudiant", metadata,autoload=True)
         sel = table.select()
-        sel = sel.order_by(table.columns.nom_et.asc())
+        sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
