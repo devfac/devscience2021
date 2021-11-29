@@ -12,7 +12,7 @@ from app.utils_sco.scolarite import create_certificat_scolarite
 
 router = APIRouter()
 
-@router.delete("/certificat")
+@router.get("/certificat")
 def certificat(
     *,
     db: Session = Depends(deps.get_db),
@@ -36,3 +36,20 @@ def certificat(
     anne = decode_schemas(schema)
     file = create_certificat_scolarite(num_carte,date_.year, anne, data)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
+
+
+@router.get("/relever")
+def relever(
+    *,
+    db: Session = Depends(deps.get_db),
+    num_carte: str,
+    schemas: str,
+    semestre: str,
+    parcours:str,
+    uuid_parcours:str,
+    current_user: models.User = Depends(deps.get_current_active_user),
+    ) -> Any:
+    note = {}
+    et_un_final = crud.note.read_by_num_carte(schemas, semestre, parcours,"final",note.num_carte)
+    print(et_un_final)
+
