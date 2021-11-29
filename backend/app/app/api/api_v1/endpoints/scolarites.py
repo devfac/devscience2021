@@ -51,5 +51,6 @@ def relever(
     ) -> Any:
     note = {}
     et_un_final = crud.note.read_by_num_carte(schemas, semestre, parcours,"final",num_carte)
-    print(et_un_final)
+    note_ue = crud.matier_ue.get_by_class(schemas,uuid_parcours,semestre)
+    print(note_ue)
 
