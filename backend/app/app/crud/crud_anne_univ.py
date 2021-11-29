@@ -9,7 +9,7 @@ from app.schemas.anne_univ import AnneUnivCreate, AnneUnivUpdate
 from app.utils import create_secret
 
 
-class CRUDSemestre(CRUDBase[AnneUniv, AnneUnivCreate, AnneUnivUpdate]):
+class CRUDAnne(CRUDBase[AnneUniv, AnneUnivCreate, AnneUnivUpdate]):
 
     def get_by_uuid(self, db: Session, *, uuid: str) -> Optional[AnneUniv]:
         return db.query(AnneUniv).filter(AnneUniv.uuid == uuid).first()
@@ -40,4 +40,4 @@ class CRUDSemestre(CRUDBase[AnneUniv, AnneUnivCreate, AnneUnivUpdate]):
         )
 
 
-anne_univ = CRUDSemestre(AnneUniv)
+anne_univ = CRUDAnne(AnneUniv)

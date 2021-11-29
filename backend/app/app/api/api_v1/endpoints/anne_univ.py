@@ -25,7 +25,7 @@ def read_annee_universitaire(
     """
     Retrieve anne universitaire.
     """
-    anne_univ = crud.anne_univ.get_multi(db, skip=skip, limit=limit)
+    anne_univ = crud.anne_univ.get_multi(db)
     return anne_univ
     
 
