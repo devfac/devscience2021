@@ -3,7 +3,6 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-
 # Shared properties
 class ParcoursBase(BaseModel):
     title: Optional[str] = None
