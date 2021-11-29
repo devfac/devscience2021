@@ -3,7 +3,7 @@ from typing import Any
 from fpdf import FPDF
 import unidecode
 
-def create_certificat_scolarite(num_carte:str, num: int, date: str, anne_univ:str, data:Any) -> str:
+def create_certificat_scolarite(num_carte:str, date: str, anne_univ:str, data:Any) -> str:
     pdf = FPDF("P","mm","a4")
     pdf.add_page()
     pdf.l_margin = 20
@@ -14,7 +14,7 @@ def create_certificat_scolarite(num_carte:str, num: int, date: str, anne_univ:st
 
     titre4 = "UNIVERSITE DE FIANARANTSOA"
     titre5 = "FACULTE DES SCIENCES"
-    titre6 = f"N° {num}/{date}/UF/FAC.S/S.SCO"
+    titre6 = f"N° ___/{date}/UF/FAC.S/S.SCO"
     nom_certificat = f"CERTIFICAT DE SCOLARITE"
 
     text_1 = "Le DOYEN de la FACULTE des SCIENCES de L'Université de Fianarantsoa"

@@ -119,10 +119,56 @@ def create_anne(anne:str):
     ann = "anne_"+anne[0:4]+"_"+anne[5:9]
     return ann
 
+def decode_schemas(schema:str):
+    ann = schema[5:9]+"-"+schema[10:15]
+    return ann
+
+def creaate_registre(schema:str):
+    reg = schema[12:15]
+    return reg
+
 def decode_text(text:str) -> str:
      strd = text.replace(" ","_")
      return unidecode(strd)
 
+def get_max(sems_a:str, sems_b:str)-> str:
+    value_1 = sems_a.upper().partition("S")[2]
+    value_2 = sems_b.upper().partition("S")[2]
+    if int(value_1) > int(value_2):
+        return sems_a
+    return sems_b
+
+def get_min(sems_a:str, sems_b:str)-> str:
+    value_1 = sems_a.upper().partition("S")[2]
+    value_2 = sems_b.upper().partition("S")[2]
+    if int(value_1) > int(value_2):
+        return sems_b
+    return sems_a
+
+def get_credit(value:float, credit:int) -> int:
+    if value >= 10:
+        return credit
+    return 0
+
+def max_value(value_1:float, value_2:float) -> float:
+    if value_1 >= value_2:
+        return value_1
+    return value_2
+
+
+def get_niveau(sems_a:str, sems_b:str)-> str:
+    value_1 = get_max(sems_a,sems_b).upper().partition("S")[2]
+
+    if int(value_1) <= 2 :
+        return "L1"
+    elif int(value_1) <= 4:
+        return "L2"
+    elif int(value_1) <= 6:
+        return "L3"
+    elif int(value_1) <= 8:
+        return "M1"
+    elif int(value_1) <= 10:
+        return "M2"
 
 def send_new_account(email_to: str, password: str) -> str:
     smtp_server = settings.SMTP_SERVER

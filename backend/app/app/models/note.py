@@ -1,37 +1,37 @@
-from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, Column, Integer, String, Float
-from sqlalchemy.dialects.postgresql.base import UUID
-import uuid
+from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy import MetaData, Table
 from sqlalchemy.sql.sqltypes import Float
 from app.db.session import engine
-from sqlalchemy.engine.reflection import Inspector
 
 
-def create_table_note(schemas, parcours, semestre, matiers) -> bool:
+def create_table_note(schemas, parcours, semestre,session ,matiers) -> bool:
    
     try:
         base =  MetaData()
         # table notes
-        note = Table(f"note_{semestre.lower()}_{parcours.lower()}",base,
+        note = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}",base,
             Column("num_carte",String, primary_key=True),
             schema=schemas
         )
         note.create(engine)
-        for indexn,value_ue in enumerate(matiers):
-            column_ue = Column(f"{value_ue}",Float,default=0.0)
-            add_column(schemas=schemas,table_name=f"note_{semestre.lower()}_{parcours.lower()}",column=column_ue)
+        for index, value_ue in enumerate(matiers):
+            column_matier = Column(f"{value_ue}",Float,default=0.0)
+            add_column(schemas=schemas,table_name=f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}",column=column_matier)
+        column_moyenne = Column("moyenne",Float,default=0.0)
+        add_column(schemas=schemas,table_name=f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}",column=column_moyenne)
+        column_credit = Column("credit",Integer,default=0)
+        add_column(schemas=schemas,table_name=f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}",column=column_credit)
         return True
     except:
         return False
             
 
-def drop_table_note(schemas, parcours, semestre) -> bool:
+def drop_table_note(schemas, parcours,session, semestre) -> bool:
     try:
         base =  MetaData(schema=schemas, bind=engine)
         # table notes
-        note = Table(f"note_{semestre.lower()}_{parcours.lower()}",base,autoload=True )
+        note = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}",base,autoload=True )
         note.drop(engine)
         return True
     except Exception as e:

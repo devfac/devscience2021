@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 class Parcours(Base):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String)
+    abreviation = Column(String)
     uuid_mention = Column(UUID(as_uuid=True), ForeignKey("mention.uuid"))
     mention = relationship("Mention", back_populates="parcours")
 

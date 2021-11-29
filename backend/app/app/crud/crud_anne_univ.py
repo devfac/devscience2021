@@ -33,9 +33,9 @@ class CRUDSemestre(CRUDBase[AnneUniv, AnneUnivCreate, AnneUnivUpdate]):
     ) -> List[AnneUniv]:
         return (
             db.query(self.model)
+            .order_by(AnneUniv.title.desc())
             .offset(skip)
             .limit(limit)
-            .order_by(AnneUniv.title.desc())
             .all()
         )
 

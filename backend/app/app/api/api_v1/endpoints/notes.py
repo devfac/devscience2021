@@ -1,6 +1,5 @@
 from typing import Any, List
 
-import sqlalchemy
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -21,6 +20,7 @@ def create_table_note(
     schemas: str,
     semestre: str,
     parcours:str,
+    session:str,
     uuid_parcours:str,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -29,8 +29,7 @@ def create_table_note(
     """
    
     if crud.user.is_superuser(current_user):
-        test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours)
-        print(test_note)
+        test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours,session=session)
         if not test_note:
             matiers = []
             ues = crud.matier_ue.get_by_class(schema=schemas, uuid_parcours=uuid_parcours, semestre=semestre)
@@ -39,14 +38,15 @@ def create_table_note(
                 ecs = crud.matier_ec.get_by_value_ue(schema=schemas, value_ue=ue[2],semestre=semestre,uuid_parcours=uuid_parcours)
                 for index,ec in enumerate(ecs):
                     matiers.append("ec_"+ec[2])
-            if models.note.create_table_note(schemas=schemas,parcours=parcours,semestre=semestre,matiers=matiers):
-                return {"msg":"Succces"}
+            if models.note.create_table_note(schemas=schemas,parcours=parcours,semestre=semestre,matiers=matiers, session=session):
+               models.note.create_table_note(schemas=schemas,parcours=parcours,semestre=semestre,matiers=matiers, session="final")
+               return {"msg":"Succces"}
             else:
                 return {"msg":"Error"}
         else:
             raise HTTPException(
             status_code=400,
-            detail=f"note_{semestre}_{parcours} already exists in the system.",
+            detail=f"note_{semestre}_{parcours}_{session} already exists in the system.",
         )
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
@@ -59,6 +59,7 @@ def delete_table_note(
     schemas: str,
     semestre: str,
     parcours:str,
+    session:str,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -68,7 +69,7 @@ def delete_table_note(
     if crud.user.is_superuser(current_user):
         test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours)
         if test_note:
-            if models.note.drop_table_note(schemas=schemas,parcours=parcours,semestre=semestre):
+            if models.note.drop_table_note(schemas=schemas,parcours=parcours,session=session,semestre=semestre):
                 return {"msg":"Succces"}
             else:
                 raise HTTPException(
@@ -77,7 +78,7 @@ def delete_table_note(
         else:
             raise HTTPException(
             status_code=400,
-            detail=f"note_{semestre}_{parcours} not found.",
+            detail=f"note_{semestre}_{parcours}_{session} not found.",
         )
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
@@ -90,14 +91,15 @@ def get_all_columns(
     schemas: str,
     semestre: str,
     parcours:str,
+    session:str,
     uuid_parcours:str,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
-    test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours)
+    test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours,session=session)
     if test_note:
-        return crud.note.check_columns_exist(schemas=schemas, semestre=semestre,parcours=parcours)
+        return crud.note.check_columns_exist(schemas=schemas, semestre=semestre,parcours=parcours,session=session)
     else:
         raise HTTPException(
             status_code=400,
-            detail=f"note_{semestre}_{parcours} not found.",
+            detail=f"note_{semestre}_{parcours}_{session} not found.",
         )

@@ -37,7 +37,7 @@ def create_ue(
     Create unité d'enseingement.
     """
     ue_in.uuid = uuid.uuid4()
-    value = decode_text(ue_in.title)
+    value = decode_text(ec_in.title).lower()
     matier_ue = crud.matier_ue.get_by_schema(schema=schema, obj_in=ue_in,value=value)
     if matier_ue:
         raise HTTPException(status_code=404, detail="U.E already exists")
@@ -50,15 +50,16 @@ def update_ue(
     db: Session = Depends(deps.get_db),
     schema: str,
     ue_in: schemas.MatierUEUpdate,
+    uuid:str,
     current_user: models.User = Depends(deps.get_current_active_user),
     ) -> Any:
     """
     Update unité d'enseingement.
     """
-    ue = crud.matier_ue.get_by_uuid(schema=schema, uuid=ue_in.uuid)
+    ue = crud.matier_ue.get_by_uuid(schema=schema, uuid=uuid)
     if not ue:
         raise HTTPException(status_code=404, detail="U.E not found")
-    ue = crud.matier_ue.update_ue(schema=schema, obj_in=ue_in)
+    ue = crud.matier_ue.update_ue(schema=schema, obj_in=ue_in,uuid=uuid)
     return ue
 
 @router.delete("/delete_ue/", response_model=List[schemas.MatierUE])

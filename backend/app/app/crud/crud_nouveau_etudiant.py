@@ -14,16 +14,21 @@ class CRUDEtudiantNouveau(CRUDBase[EtudiantNouveau, EtudiantNouveauCreate, Etudi
 
     def update_etudiant(self,schema: str, num_insc: str, obj_in: EtudiantNouveauUpdate) -> Optional[EtudiantNouveau]:
         obj_in_data = jsonable_encoder(obj_in)
+        update_data  = {}
+        for field in obj_in_data:
+            if obj_in_data[field]:
+                update_data[field]= obj_in_data[field]
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table("nouveau_etudiant", metadata,autoload=True)
         conn = engine.connect()
         up = table.update()
-        up = up.values(obj_in_data)
+        up = up.values(update_data)
         up = up.where(table.c.num_insc == num_insc)
-        result= conn.execute(up)
+        conn.execute(up)
+        sel = table.select()
+        result = conn.execute(sel)
         out = result.fetchall()
-        conn.close()
         return out
     
 

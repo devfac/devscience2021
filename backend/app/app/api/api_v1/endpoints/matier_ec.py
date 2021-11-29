@@ -88,8 +88,8 @@ def create_ec(
     Create élément constitutif.
     """
     ec_in.uuid = uuid.uuid4()
-    value = decode_text(ec_in.title)
-    matier_ec = crud.matier_ec.get_by_schema(schema=schema, obj_in=ec_in)
+    value = decode_text(ec_in.title).lower()
+    matier_ec = crud.matier_ec.get_by_schema(schema=schema, obj_in=ec_in, value=value)
     if matier_ec:
         raise HTTPException(status_code=404, detail="E.C already exists")
     ec = crud.matier_ec.create_ec(schema=schema, obj_in=ec_in,value=value)
@@ -101,15 +101,16 @@ def update_ec(
     db: Session = Depends(deps.get_db),
     schema: str,
     ec_in: schemas.MatierECUpdate,
+    uuid:str,
     current_user: models.User = Depends(deps.get_current_active_user),
     ) -> Any:
     """
     Update élément constitutif.
     """
-    ec = crud.matier_ec.get_by_uuid(schema=schema, uuid=ec_in.uuid)
+    ec = crud.matier_ec.get_by_uuid(schema=schema, uuid=uuid)
     if not ec:
         raise HTTPException(status_code=404, detail="E.C not found")
-    ec = crud.matier_ec.update_ec(schema=schema, obj_in=ec_in)
+    ec = crud.matier_ec.update_ec(schema=schema, obj_in=ec_in,uuid=uuid)
     return ec
 
 @router.delete("/delete_ec/", response_model=List[schemas.MatierEC])

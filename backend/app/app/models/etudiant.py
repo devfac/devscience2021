@@ -56,6 +56,7 @@ def create(schemas):
             Column("date_cin",String),
             Column("lieu_cin",String),
             Column("montant",String),
+            Column("etat",String),
             Column("num_quitance",String,unique=True),
             Column("date_quitance",String),
             Column("photo",String,unique=True),

@@ -14,13 +14,14 @@ from app.db.session import engine
 
 class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
 
-    def update_ec(self,schema: str, obj_in: MatierECUpdate) -> Optional[MatierEC]:
+    def update_ec(self,schema: str, obj_in: MatierECUpdate, uuid:str) -> Optional[MatierEC]:
         obj_in_data = jsonable_encoder(obj_in)
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table("element_const", metadata,autoload=True)
-        ins = table.insert().values(obj_in_data)
-        conn.execute(ins)
+        up = table.update().values(obj_in_data)
+        up = up.where(table.columns.uuid == uuid)
+        conn.execute(up)
         sel = table.select()
         result = conn.execute(sel)
         out = result.fetchall()
@@ -78,13 +79,13 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.close()
         return out
 
-    def get_by_schema(self,schema: str,obj_in: MatierECCreate)-> Optional[List[MatierEC]]:
+    def get_by_schema(self,schema: str,obj_in: MatierECCreate, value:str)-> Optional[List[MatierEC]]:
         obj_in_data = jsonable_encoder(obj_in)
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("element_const", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(table.c.value == obj_in_data['value'])
+        sel = sel.where(table.c.value == value)
         sel = sel.where(table.c.semestre == obj_in_data['semestre'])
         sel = sel.where(table.c.uuid_parcours == obj_in_data['uuid_parcours'])
         result = conn.execute(sel)

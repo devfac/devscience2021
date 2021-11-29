@@ -207,7 +207,6 @@ def read_etudiant_by_class(
     *,
     db: Session = Depends(deps.get_db),
     schema: str,
-    uuid_mention: str,
     uuid_parcours: float,
     semestre:str,
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -215,7 +214,7 @@ def read_etudiant_by_class(
     """
     Get etudiant by class.
     """
-    etudiant = crud.ancien_etudiant.get_by_class(schema, uuid_parcours, uuid_mention,semestre)
+    etudiant = crud.ancien_etudiant.get_by_class(schema, uuid_parcours,semestre)
     list_et = []
     if etudiant:
         for un_etudiant in etudiant:

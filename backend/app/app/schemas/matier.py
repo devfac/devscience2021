@@ -21,7 +21,6 @@ class MatierUECreate(MatiertBase):
 
 class MatierECCreate(MatiertBase):
     title: str
-    value: str
     semestre: str
     value_ue: str
     poids: float
@@ -31,12 +30,10 @@ class MatierECCreate(MatiertBase):
 
 
 class MatierUEUpdate(BaseModel):
-    uuid: Optional[UUID]
     credit: Optional[int]
 
 
 class MatierECUpdate(BaseModel):
-    uuid: Optional[UUID]
     poids: Optional[float]
     value_ue: Optional[str]
     utilisateur: Optional[str]

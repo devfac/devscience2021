@@ -25,11 +25,9 @@ def read_annee_universitaire(
     """
     Retrieve anne universitaire.
     """
-    if crud.user.is_superuser(current_user):
-        anne_univ = crud.anne_univ.get_multi(db, skip=skip, limit=limit)
-    else:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+    anne_univ = crud.anne_univ.get_multi(db, skip=skip, limit=limit)
     return anne_univ
+    
 
 
 @router.post("/", response_model=schemas.AnneUniv)
@@ -84,7 +82,7 @@ def update_annee_universitaire(
     return anne_univ
 
 
-@router.get("/", response_model=schemas.AnneUniv)
+@router.get("/by_uuid", response_model=schemas.AnneUniv)
 def read_annee_universitaire(
     *,
     db: Session = Depends(deps.get_db),
