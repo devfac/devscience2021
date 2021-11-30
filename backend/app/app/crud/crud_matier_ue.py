@@ -35,6 +35,7 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
         sel = table.select()
         sel = sel.where(table.c.semestre == semestre)
         sel = sel.where(table.c.uuid_parcours == uuid_parcours)
+        sel = sel.order_by(table.columns.title.asc())
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()

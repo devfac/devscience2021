@@ -37,7 +37,7 @@ def create_ue(
     Create unité d'enseingement.
     """
     ue_in.uuid = uuid.uuid4()
-    value = decode_text(ec_in.title).lower()
+    value = decode_text(ue_in.title).lower()
     matier_ue = crud.matier_ue.get_by_schema(schema=schema, obj_in=ue_in,value=value)
     if matier_ue:
         raise HTTPException(status_code=404, detail="U.E already exists")

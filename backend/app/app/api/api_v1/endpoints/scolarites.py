@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse
 from datetime import date
 import locale, time
 from app.utils_sco.scolarite import create_certificat_scolarite
+from app.utils_sco.relever import PDF
 
 router = APIRouter()
 
@@ -50,7 +51,47 @@ def relever(
     current_user: models.User = Depends(deps.get_current_active_user),
     ) -> Any:
     note = {}
+    ue = {}
+    ues = []
     et_un_final = crud.note.read_by_num_carte(schemas, semestre, parcours,"final",num_carte)
-    note_ue = crud.matier_ue.get_by_class(schemas,uuid_parcours,semestre)
-    print(note_ue)
+    matier_ues = crud.matier_ue.get_by_class(schemas,uuid_parcours,semestre)
+    note['num_carte']=num_carte
+    note['moyenne']=et_un_final['moyenne']
+    note['credit']=et_un_final['credit']
+    for  matier_ue in matier_ues:
+        ue['name']= matier_ue['title']
+        ue['note']= et_un_final[f"ue_{matier_ue['value']}"]
+        ue['credit']= matier_ue['credit']
+        matier_ecs = crud.matier_ec.get_by_value_ue(schemas,matier_ue['value'],semestre,uuid_parcours)
+
+        print(matier_ue['title'])
+        ecs = []
+        for matier_ec in matier_ecs:
+            ec = {}
+            ec['name']= matier_ec['title']
+            ec['note']= et_un_final[f"ec_{matier_ec['value']}"]
+            ec['poids']= matier_ec['poids']
+            ecs.append(ec.copy())
+        print(ecs)
+        ue['ec']=ecs
+        ues.append(ue.copy())
+    note['ue']=ues
+    print(note)
+
+    etudiant = crud.ancien_etudiant.get_by_num_carte(schemas,num_carte)
+    parcours = crud.parcours.get_by_uuid(db=db,uuid=etudiant.uuid_parcours)
+    mention = crud.mention.get_by_uuid(db=db,uuid=etudiant.uuid_mention)
+    data = {}
+    data['nom']=etudiant.nom
+    data['prenom']=etudiant.prenom
+    data['date_naiss']=etudiant.date_naiss
+    data['lieu_naiss']=etudiant.lieu_naiss
+    data['semestre']=semestre
+    data['mention']=mention.title
+    data['parcours']=parcours.title
+    data['session']="Normal"
+    date_ = date.today()
+    anne = decode_schemas(schemas)
+    file = PDF.relever_note(num_carte,date_.year, anne, data,note)
+    return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
