@@ -41,6 +41,7 @@ def inserts_etudiant(
             et_un = crud.note.read_by_num_carte(schemas, semestre, parcours,session,etudiant.num_carte)
             if not et_un:
                 crud.note.insert_note(schemas,semestre,parcours,session,etudiant.num_carte)
+                crud.note.update_auto(schemas,semestre,parcours,session,etudiant.num_carte)
     else:
         all_note = []
         list = crud.ancien_etudiant.get_by_class(schemas,uuid_parcours,semestre)

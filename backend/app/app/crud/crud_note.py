@@ -62,6 +62,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         up = up.where(table.c.num_carte == num_carte)
         conn.execute(up)
 
+
     def read_by_num_carte(self,schema: str, semestre:str, parcours:str,session:str, num_carte:str) -> Any:
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
@@ -72,6 +73,23 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         out = result.fetchone()
         conn.close()
         return out
+
+
+    def update_auto(self,schema: str, semestre:str, parcours:str,session:str ,num_carte:str):
+        metadata = MetaData(schema=schema, bind=engine)
+        conn = engine.connect()
+        table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
+        table_norm = Table(f"note_{semestre.lower()}_{parcours.lower()}_normal", metadata,autoload=True)
+        sel = table_norm.select()
+        sel = sel.where(table_norm.c.num_carte == num_carte)
+        conn = engine.connect()
+        up = update(table=table)
+        result = conn.execute(sel)
+        out = result.fetchone()
+        up = up.values(out)
+        up = up.where(table.c.num_carte == num_carte)
+        conn.execute(up)
+        conn.close()
         
 
     def read_by_credit(self,schema: str, semestre:str, parcours:str,session:str, credit:int) -> Any:
