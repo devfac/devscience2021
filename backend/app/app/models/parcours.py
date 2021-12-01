@@ -5,6 +5,8 @@ from sqlalchemy.dialects.postgresql.base import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
 import uuid
+
+from sqlalchemy.sql.sqltypes import ARRAY
 from app.db.base_class import Base
 
 if TYPE_CHECKING:
@@ -16,5 +18,6 @@ class Parcours(Base):
     title = Column(String)
     abreviation = Column(String)
     uuid_mention = Column(UUID(as_uuid=True), ForeignKey("mention.uuid"))
+    semestre = Column(ARRAY(String))
     mention = relationship("Mention", back_populates="parcours")
 

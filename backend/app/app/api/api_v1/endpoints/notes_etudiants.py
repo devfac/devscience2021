@@ -27,10 +27,12 @@ def inserts_etudiant(
     all_note = []
     test_note = crud.note.check_table_exist(schemas, semestre,parcours,session)
     if not test_note:
-        raise HTTPException( status_code=400, detail=f"note_{semestre}_{parcours}_{session} not found.",
+        raise HTTPException( 
+            status_code=400, 
+            detail=f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()} not found.",
         )
 
-    if session == "Rattrapage":
+    if session.lower() == "rattrapage":
         test_note = crud.note.check_table_exist(schemas, semestre,parcours,"normal")
         if not test_note:
             raise HTTPException( status_code=400, 
