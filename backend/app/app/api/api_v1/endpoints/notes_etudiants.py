@@ -24,23 +24,36 @@ def inserts_etudiant(
     """
     Create table note.
     """ 
-    test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours,session=session)
+    test_note = crud.note.check_table_exist(schemas, semestre,parcours,session)
     if not test_note:
         raise HTTPException( status_code=400, detail=f"note_{semestre}_{parcours}_{session} not found.",
         )
 
-    all_note = []
-    list = crud.ancien_etudiant.get_by_class(schemas,uuid_parcours,semestre)
-    if list is not None:
-        for etudiant in list:
+    if session == "Rattrapage":
+        test_note = crud.note.check_table_exist(schemas, semestre,parcours,"normal")
+        if not test_note:
+            raise HTTPException( status_code=400, 
+            detail=f"note_{semestre.lower()}_{parcours.lower()}_normal not found.",
+            )
+        credit = 30;
+        all_etudiant = crud.note.read_by_credit(schemas, semestre, parcours,"normal",credit)
+        for etudiant in all_etudiant:
             et_un = crud.note.read_by_num_carte(schemas, semestre, parcours,session,etudiant.num_carte)
             if not et_un:
                 crud.note.insert_note(schemas,semestre,parcours,session,etudiant.num_carte)
-                crud.note.insert_note(schemas,semestre,parcours,"final",etudiant.num_carte)
-    all_note = crud.note.read_all_note(schemas, semestre, parcours,session)
-    for note in all_note:
-        print(note["ue_analyse"])
-    return all_note
+    else:
+        all_note = []
+        list = crud.ancien_etudiant.get_by_class(schemas,uuid_parcours,semestre)
+        if list is not None:
+            for etudiant in list:
+                et_un = crud.note.read_by_num_carte(schemas, semestre, parcours,session,etudiant.num_carte)
+                if not et_un:
+                    crud.note.insert_note(schemas,semestre,parcours,session,etudiant.num_carte)
+                    crud.note.insert_note(schemas,semestre,parcours,"final",etudiant.num_carte)
+        all_note = crud.note.read_all_note(schemas, semestre, parcours,session)
+        for note in all_note:
+            print(note["ue_analyse"])
+        return all_note
 
 
 @router.post("/insert_note", response_model=List[Any])

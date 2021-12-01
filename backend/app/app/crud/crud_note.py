@@ -72,6 +72,18 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         out = result.fetchone()
         conn.close()
         return out
+        
+
+    def read_by_credit(self,schema: str, semestre:str, parcours:str,session:str, credit:int) -> Any:
+        metadata = MetaData(schema=schema, bind=engine)
+        conn = engine.connect()
+        table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
+        sel = table.select()
+        sel = sel.where(table.c.credit < credit)
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
 
     def delete_by_num_carte(self,schema: str, semestre:str, parcours:str, session:str,num_carte:str):
         metadata = MetaData(schema=schema, bind=engine)
