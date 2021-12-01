@@ -24,6 +24,7 @@ def inserts_etudiant(
     """
     Create table note.
     """ 
+    all_note = []
     test_note = crud.note.check_table_exist(schemas, semestre,parcours,session)
     if not test_note:
         raise HTTPException( status_code=400, detail=f"note_{semestre}_{parcours}_{session} not found.",
@@ -42,8 +43,10 @@ def inserts_etudiant(
             if not et_un:
                 crud.note.insert_note(schemas,semestre,parcours,session,etudiant.num_carte)
                 crud.note.update_auto(schemas,semestre,parcours,session,etudiant.num_carte)
+        all_note = crud.note.read_all_note(schemas, semestre, parcours,session)
+        return all_note
+    
     else:
-        all_note = []
         list = crud.ancien_etudiant.get_by_class(schemas,uuid_parcours,semestre)
         if list is not None:
             for etudiant in list:
