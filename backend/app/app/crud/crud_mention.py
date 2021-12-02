@@ -24,12 +24,10 @@ class CRUDMention(CRUDBase[Mention, MentionCreate, MentionUpdate]):
         return db_obj
 
     def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100
+        self, db: Session
     ) -> List[Mention]:
         return (
             db.query(self.model)
-            .offset(skip)
-            .limit(limit)
             .all()
         )
 

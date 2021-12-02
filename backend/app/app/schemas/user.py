@@ -15,7 +15,7 @@ class UserBase(BaseModel):
     first_name: str
     last_name:Optional[str]
     uuid_mention: Optional[List[str]]
-    uuid_role: Optional[str]
+    uuid_role: Optional[UUID]
 
 
 # Properties to receive via API on creation

@@ -13,15 +13,13 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.Mention])
 def read_mentions(
     db: Session = Depends(deps.get_db),
-    skip: int = 0,
-    limit: int = 100,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve mentions.
     """
     if crud.user.is_superuser(current_user):
-        mentions = crud.mention.get_multi(db, skip=skip, limit=limit)
+        mentions = crud.mention.get_multi(db=db)
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return mentions
@@ -68,8 +66,8 @@ def update_mention(
     return mention
 
 
-@router.get("/", response_model=schemas.Mention)
-def read_item(
+@router.get("/by_uuid", response_model=schemas.Mention)
+def read_mention(
     *,
     db: Session = Depends(deps.get_db),
     uuid: str,
