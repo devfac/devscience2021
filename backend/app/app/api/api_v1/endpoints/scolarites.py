@@ -56,7 +56,16 @@ def relever(
     note = {}
     ue = {}
     ues = []
+    session = "Normal"
+    anne = decode_schemas(schemas)
+    test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours,session="rattrapage")
+    if test_note:
+        et_un_rattrapage = crud.note.read_by_num_carte(schemas, semestre, parcours,"rattrapage",num_carte)
+        if et_un_rattrapage:
+            session = "Rattrapage"
+
     et_un_final = crud.note.read_by_num_carte(schemas, semestre, parcours,"final",num_carte)
+    
     etudiant = crud.ancien_etudiant.get_by_num_carte(schemas,num_carte)
     if et_un_final and etudiant:
         validation = crud.semetre_valide.get_by_num_carte(db=db, num_carte=num_carte)
@@ -82,7 +91,7 @@ def relever(
             ues.append(ue.copy())
         note['ue']=ues
         if validation:
-            test_validation = validation_semestre(validation.semestre, semestre,et_un_final['credit'],30 )
+            test_validation = validation_semestre(validation, semestre,et_un_final['credit'],30,anne)
         else:
             test_validation = f"étudiant(e) redoublé(e)."
         parcours = crud.parcours.get_by_uuid(db=db,uuid=etudiant.uuid_parcours)
@@ -95,13 +104,12 @@ def relever(
         data['semestre']=semestre
         data['mention']=mention.title
         data['parcours']=parcours.title
-        data['session']="Normal"
+        data['session']=session
         data['validation']=test_validation['status']
         data['code']=test_validation['code']
-
+        data['anne']=test_validation['anne']
         date_ = date.today()
-        anne = decode_schemas(schemas)
-        file = PDF.relever_note(num_carte,date_.year, anne, data,note)
+        file = PDF.relever_note(num_carte,date_.year,data,note)
         return FileResponse(path=file, media_type='application/octet-stream', filename=file)
     else:
         raise HTTPException(status_code=404, detail="Etudiant not found")

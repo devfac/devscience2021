@@ -21,7 +21,7 @@ class PDF(FPDF):
         self.cell(1,6,"à l'intéressé sous peine d'annulation.",0,0)
 
     
-    def relever_note(num_carte:str,date: str, anne_univ:str, data:Any, note:Any) -> str:
+    def relever_note(num_carte:str,date: str, data:Any, note:Any) -> str:
            
         pdf = PDF('P','mm','A4')
         pdf.add_page()
@@ -38,7 +38,7 @@ class PDF(FPDF):
         titre3 = "Ministère de l'Enseignement Supérieur"
         titre3_1 = "Service scolarité"
         titre4 = "et de la recherche scientifique"
-        titre4_1 = f"Année universitaire {anne_univ}"
+        titre4_1 = f"Année universitaire {data['anne']}"
         titre5 = "releve de notes"
         titre6 = f"N° ___/{date}/UF/FAC.S/S.SCO"
 
