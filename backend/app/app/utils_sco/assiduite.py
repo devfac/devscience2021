@@ -1,9 +1,8 @@
 import random
 from typing import Any
 from fpdf import FPDF
-import unidecode
 
-def create_certificat_assidute( num_carte:str, num: int, date: str, rentre_univ:str, data:Any):
+def create_certificat_assidute( num_carte:str, date: str, rentre_univ:str, data:Any):
     pdf = FPDF("P","mm","a4")
     pdf.add_page()
     pdf.l_margin = 20
@@ -14,7 +13,7 @@ def create_certificat_assidute( num_carte:str, num: int, date: str, rentre_univ:
 
     titre4 = "UNIVERSITE DE FIANARANTSOA"
     titre5 = "FACULTE DES SCIENCES"
-    titre6 = f"N° {num}/{date}/UF/FAC.S/S.SCO"
+    titre6 = f"N° ___/{date}/UF/FAC.S/S.SCO"
     nom_certificat = f"CERTIFICAT D'ASSIDUITE"
 
     text_1 = "Le DOYEN de la FACULTE des SCIENCES de L'Université de Fianarantsoa"
@@ -41,6 +40,8 @@ def create_certificat_assidute( num_carte:str, num: int, date: str, rentre_univ:
 
     text_5 = "Fianarantsoa, le "
 
+    pdf.add_font("alger","","Algerian.ttf",uni=True)
+    pdf.add_font("aparaj","","aparaji.ttf",uni=True)
 
     pdf.set_font("arial","B",14)
     pdf.cell(0,15,"",0,1,"C")
@@ -48,7 +49,7 @@ def create_certificat_assidute( num_carte:str, num: int, date: str, rentre_univ:
     pdf.set_font("arial","B",14)
     pdf.cell(0,2,titre1,0,1,"C")
 
-    pdf.set_font("arial","B",8)
+    pdf.set_font("aparaj","",11)
     pdf.cell(0,10,titre2,0,1,"C")
 
     pdf.set_font("arial","BI",12)
@@ -68,7 +69,7 @@ def create_certificat_assidute( num_carte:str, num: int, date: str, rentre_univ:
 
 
     pdf.cell(0,6,"",0,2,"C")
-    pdf.set_font("Times","BI",18)
+    pdf.set_font("alger","",18)
     pdf.cell(90,20,nom_certificat,1,1,"C", center=True)
 
     pdf.cell(0,5,"",0,2,"C")
@@ -133,16 +134,5 @@ def create_certificat_assidute( num_carte:str, num: int, date: str, rentre_univ:
     pdf.cell(0,40,"",0,5)
 
 
-    pdf.output(f"{num_carte}_assiduite_.pdf","F")
-
-if __name__=="__main__":
-    # string = "éôfèçdn&n sdgfgz"
-    # strd = string.replace(" ","_")
-    # print(unidecode.unidecode(strd))
-    data = {"nom":"RALAITSIMANOLAKAVANA","prenom":"Henri Franck",
-            "date_naiss":"07 octobre 1995 ", "lieu_naiss":" Fianarantsoa",
-            "niveau":"M2", "mention":"Mathématiques et Applications",
-            "parcours":"Mathématiques et Informatiques pous la Sciences Social",
-            "registre":"20"}
-
-    create_certificat_assidute( "4465", 50,"2020", "3 Mars 2021", data)
+    pdf.output(f"files/{num_carte}_assiduite.pdf","F")
+    return f"files/{num_carte}_assiduite.pdf"

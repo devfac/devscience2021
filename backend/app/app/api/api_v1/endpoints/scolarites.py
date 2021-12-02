@@ -1,3 +1,4 @@
+from re import I
 from sqlalchemy import util
 from app import crud
 from app.utils import get_niveau, decode_schemas, creaate_registre, validation_semestre
@@ -11,6 +12,9 @@ from datetime import date
 import locale, time
 from app.utils_sco.scolarite import create_certificat_scolarite
 from app.utils_sco.relever import PDF
+from app.utils_sco.inscription import attestation_inscription
+from app.utils_sco.credit import attestation_validation_credit
+from app.utils_sco.assiduite import create_certificat_assidute
 
 router = APIRouter()
 
@@ -38,6 +42,90 @@ def certificat(
         date_ = date.today()
         anne = decode_schemas(schema)
         file = create_certificat_scolarite(num_carte,date_.year, anne, data)
+        return FileResponse(path=file, media_type='application/octet-stream', filename=file)
+    else:
+        raise HTTPException(status_code=404, detail="Etudiant not found")
+
+@router.get("/attestation_inscription")
+def attestation(
+    *,
+    db: Session = Depends(deps.get_db),
+    num_carte: str,
+    schema: str,
+    current_user: models.User = Depends(deps.get_current_active_user),
+    ) -> Any:
+    etudiant = crud.ancien_etudiant.get_by_num_carte(schema,num_carte)
+    if etudiant:
+        parcours = crud.parcours.get_by_uuid(db=db,uuid=etudiant.uuid_parcours)
+        mention = crud.mention.get_by_uuid(db=db,uuid=etudiant.uuid_mention)
+        data = {}
+        data['nom']=etudiant.nom
+        data['prenom']=etudiant.prenom
+        data['date_naiss']=etudiant.date_naiss
+        data['lieu_naiss']=etudiant.lieu_naiss
+        data['niveau']=get_niveau(etudiant.semestre_petit,etudiant.semestre_grand)
+        data['mention']=mention.title
+        data['parcours']=parcours.title
+        data['registre']=creaate_registre(schema)
+        date_ = date.today()
+        anne = decode_schemas(schema)
+        file = attestation_inscription(num_carte,date_.year, anne, data)
+        return FileResponse(path=file, media_type='application/octet-stream', filename=file)
+    else:
+        raise HTTPException(status_code=404, detail="Etudiant not found")
+
+@router.get("/validation_credit")
+def attestation_validation(
+    *,
+    db: Session = Depends(deps.get_db),
+    num_carte: str,
+    schema: str,
+    current_user: models.User = Depends(deps.get_current_active_user),
+    ) -> Any:
+    etudiant = crud.ancien_etudiant.get_by_num_carte(schema,num_carte)
+    if etudiant:
+        parcours = crud.parcours.get_by_uuid(db=db,uuid=etudiant.uuid_parcours)
+        mention = crud.mention.get_by_uuid(db=db,uuid=etudiant.uuid_mention)
+        data = {}
+        data['nom']=etudiant.nom
+        data['prenom']=etudiant.prenom
+        data['date_naiss']=etudiant.date_naiss
+        data['lieu_naiss']=etudiant.lieu_naiss
+        data['niveau']=get_niveau(etudiant.semestre_petit,etudiant.semestre_grand)
+        data['mention']=mention.title
+        data['parcours']=parcours.title
+        data['registre']=creaate_registre(schema)
+        date_ = date.today()
+        anne = decode_schemas(schema)
+        file = attestation_validation_credit(num_carte,date_.year, anne, data)
+        return FileResponse(path=file, media_type='application/octet-stream', filename=file)
+    else:
+        raise HTTPException(status_code=404, detail="Etudiant not found")
+
+@router.get("/assiduite")
+def certificat_assiduite(
+    *,
+    db: Session = Depends(deps.get_db),
+    num_carte: str,
+    schema: str,
+    rentrer:str,
+    current_user: models.User = Depends(deps.get_current_active_user),
+    ) -> Any:
+    etudiant = crud.ancien_etudiant.get_by_num_carte(schema,num_carte)
+    if etudiant:
+        parcours = crud.parcours.get_by_uuid(db=db,uuid=etudiant.uuid_parcours)
+        mention = crud.mention.get_by_uuid(db=db,uuid=etudiant.uuid_mention)
+        data = {}
+        data['nom']=etudiant.nom
+        data['prenom']=etudiant.prenom
+        data['date_naiss']=etudiant.date_naiss
+        data['lieu_naiss']=etudiant.lieu_naiss
+        data['niveau']=get_niveau(etudiant.semestre_petit,etudiant.semestre_grand)
+        data['mention']=mention.title
+        data['parcours']=parcours.title
+        data['registre']=creaate_registre(schema)
+        date_ = date.today()
+        file = create_certificat_assidute(num_carte,date_.year, rentrer, data,)
         return FileResponse(path=file, media_type='application/octet-stream', filename=file)
     else:
         raise HTTPException(status_code=404, detail="Etudiant not found")
