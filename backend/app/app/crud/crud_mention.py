@@ -14,10 +14,10 @@ class CRUDMention(CRUDBase[Mention, MentionCreate, MentionUpdate]):
         return db.query(Mention).filter(Mention.uuid == uuid).first()
         
     def create(
-        self, db: Session, *, obj_in: MentionCreate
+        self, db: Session, *, obj_in: MentionCreate, value:str
     ) -> Mention:
         obj_in_data = jsonable_encoder(obj_in)
-        db_obj = self.model(**obj_in_data)
+        db_obj = self.model(**obj_in_data, value=value)
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)

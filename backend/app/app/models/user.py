@@ -5,6 +5,8 @@ from sqlalchemy.dialects.postgresql.base import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
 import uuid
+
+from sqlalchemy.sql.sqltypes import ARRAY
 from app.db.base_class import Base
 
 if TYPE_CHECKING:
@@ -22,7 +24,6 @@ class User(Base):
     is_superuser = Column(Boolean(), default=False)
     is_admin = Column(Boolean(), default=False)
     uuid_role = Column(UUID(as_uuid=True), ForeignKey("role.uuid"))
-    uuid_mention = Column(UUID(as_uuid=True), ForeignKey("mention.uuid"))
+    uuid_mention = Column(ARRAY(String))
     role = relationship("Role", back_populates="user")
-    mention = relationship("Mention", back_populates="user")
 

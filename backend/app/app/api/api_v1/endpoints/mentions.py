@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+from app.utils import decode_text
 
 router = APIRouter()
 
@@ -30,14 +31,15 @@ def read_mentions(
 def create_mention(
     *,
     db: Session = Depends(deps.get_db),
-    item_in: schemas.MentionCreate,
+    mention_in: schemas.MentionCreate,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create new mention.
     """
+    value = decode_text(mention_in.title).lower()
     if crud.user.is_superuser(current_user):
-        mention = crud.mention.create(db=db, obj_in=item_in)
+        mention = crud.mention.create(db=db, obj_in=mention_in, value=value)
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return mention
@@ -54,12 +56,15 @@ def update_mention(
     """
     Update an mention.
     """
+    mention_oj = {}
+    mention_oj['title']=mention_in.title
+    mention_oj['value']=decode_text(mention_in.title).lower()
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid)
     if not mention:
         raise HTTPException(status_code=404, detail="Mention not found")
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    mention = crud.mention.update(db=db, db_obj=mention, obj_in=mention_in)
+    mention = crud.mention.update(db=db, db_obj=mention, obj_in=mention_oj)
     return mention
 
 

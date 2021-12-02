@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import List, Optional, Any
 from uuid import UUID, uuid4
 
 from sqlalchemy.sql.sqltypes import String
@@ -14,7 +14,7 @@ class UserBase(BaseModel):
     is_superuser: bool = False
     first_name: str
     last_name:Optional[str]
-    uuid_mention: Optional[str]
+    uuid_mention: Optional[List[str]]
     uuid_role: Optional[str]
 
 

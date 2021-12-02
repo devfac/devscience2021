@@ -8,12 +8,11 @@ from app.db.base_class import Base
 
 if TYPE_CHECKING:
     from .user import User  # noqa: F401
-    from .parcours import Parcours  # noqa: F401
 
 
 class Mention(Base):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String, unique=True)
-    user = relationship("User", back_populates="mention")
+    value= Column(String, unique=True)
     parcours = relationship("Parcours", back_populates="mention")
 
