@@ -28,8 +28,6 @@ class CRUDSemestre(CRUDBase[Semestre, SemestreCreate, SemestreUpdate]):
     ) -> List[Semestre]:
         return (
             db.query(self.model)
-            .offset(skip)
-            .limit(limit)
             .all()
         )
 

@@ -1,5 +1,6 @@
+from sqlalchemy import util
 from app import crud
-from app.utils import get_niveau, decode_schemas, creaate_registre
+from app.utils import get_niveau, decode_schemas, creaate_registre, validation_semestre
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import models
@@ -58,6 +59,8 @@ def relever(
     et_un_final = crud.note.read_by_num_carte(schemas, semestre, parcours,"final",num_carte)
     etudiant = crud.ancien_etudiant.get_by_num_carte(schemas,num_carte)
     if et_un_final and etudiant:
+        validation = crud.semetre_valide.get_by_num_carte(db=db, num_carte=num_carte)
+        
         matier_ues = crud.matier_ue.get_by_class(schemas,uuid_parcours,semestre)
         note['num_carte']=num_carte
         note['moyenne']=et_un_final['moyenne']
@@ -78,7 +81,10 @@ def relever(
             ue['ec']=ecs
             ues.append(ue.copy())
         note['ue']=ues
-
+        if validation:
+            test_validation = validation_semestre(validation.semestre, semestre,et_un_final['credit'],30 )
+        else:
+            test_validation = f"étudiant(e) redoublé(e)."
         parcours = crud.parcours.get_by_uuid(db=db,uuid=etudiant.uuid_parcours)
         mention = crud.mention.get_by_uuid(db=db,uuid=etudiant.uuid_mention)
         data = {}
@@ -90,6 +96,9 @@ def relever(
         data['mention']=mention.title
         data['parcours']=parcours.title
         data['session']="Normal"
+        data['validation']=test_validation['status']
+        data['code']=test_validation['code']
+
         date_ = date.today()
         anne = decode_schemas(schemas)
         file = PDF.relever_note(num_carte,date_.year, anne, data,note)

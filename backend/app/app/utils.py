@@ -1,7 +1,9 @@
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
+
+from sqlalchemy.sql.expression import true
 
 import emails
 from emails.template import JinjaTemplate
@@ -170,6 +172,22 @@ def get_niveau(sems_a:str, sems_b:str)-> str:
     elif int(value_1) <= 10:
         return "M2"
 
+def validation_semestre(semestr:List, sems:str, credit:int, total_cred:int):
+    response = {}
+    for sems_i in semestr:
+        if sems == sems_i:
+            if credit == total_cred:
+                response["status"]=f"Étudiant(e) ayant validé(e) la {total_cred} crédit définitive."
+                response["code"]=True
+            else:
+                response["status"]= f"Étudiant(e) ayant validé(e) la {total_cred} crédit par compensation."
+                response["code"]=True
+        else:
+                response["status"]="Étudiant(e) redoublé(e)"
+                response["code"]=False
+    return response
+
+    
 def send_new_account(email_to: str, password: str) -> str:
     smtp_server = settings.SMTP_SERVER
     smtp_port = settings.SMTP_PORT

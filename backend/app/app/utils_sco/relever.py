@@ -3,9 +3,12 @@ from typing import Any
 from fpdf import FPDF
 import unidecode
 
-def validation(ue:float)-> str:
+def validation(ue:float, code:bool)-> str:
         if float(ue) < 10:
-            return "Compensé"
+            if code :
+                return "Compensé"
+            else:
+                return "À refaire"
         else:
             return "Validé"
 
@@ -55,6 +58,7 @@ class PDF(FPDF):
         parcours_etudiant = f"{data['parcours']}"
         session = f"Session:"
         session_etudiant = f"{data['session']}"
+        validation_et = f"{data['validation']}"
 
 
         titre_1 = "Les unité d'enseignements"
@@ -222,14 +226,14 @@ class PDF(FPDF):
             pdf.cell(80,5,f"NOTE SOUS TOTAL U.E-{index_ue+1}",1,0,"C")
             pdf.set_font("arial","I",11)
             pdf.cell(1,1,"",0,0)
-            pdf.cell(19,5,str(value_ue['note']),1,0,"C")
+            pdf.cell(19,5,str(format(value_ue['note'], '.3f')),1,0,"C")
             pdf.cell(1,1,"",0,0)
             pdf.cell(24,5,"",1,0,"C")
             pdf.cell(1,1,"",0,0)
             pdf.cell(14,5,str(value_ue['credit']),1,0,"C")
             pdf.cell(1,1,"",0,0)
             pdf.set_font("alger","",12)
-            pdf.cell(29,5,validation(value_ue['note']),1,1,"C")
+            pdf.cell(29,5,validation(value_ue['note'], data["code"]),1,1,"C")
 
         pdf.set_top_margin(20)
         pdf.cell(30,1,"",0,1)
@@ -248,7 +252,9 @@ class PDF(FPDF):
         
         pdf.set_font("Times","Bui",12)
         pdf.cell(40,10,"",0,0)
-        pdf.cell(0,10,text_6,0,1)
+        pdf.cell(34,10,text_6,0,0)
+        pdf.set_font("Times","i",12)
+        pdf.cell(0,10,validation_et,0,1)
         pdf.set_font("arial","I",10)
         pdf.cell(120,1,"",0,1)
         pdf.cell(120,10,"",0,0)

@@ -102,27 +102,10 @@ def create(schemas):
             schema=schemas
         )
 
-        # table notes des elements costitutif
-        note_element_const = Table("note_element_const",base,
-            Column("uuid",UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
-            Column("num_carte",String),
-            schema=schemas
-        )
-
-        # table notes des unité d'enseignements
-        note_unite_enseing = Table("note_unite_enseing",base,
-            Column("uuid",UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
-            Column("num_carte",String),
-            schema=schemas
-        )
-
         unite_enseing.create(engine)
         element_const.create(engine)
         ancien_etudiant.create(engine)
         nouveau_etudiant.create(engine)
-        note_element_const.create(engine)
-        note_unite_enseing.create(engine)
-
         
 def add_column(schemas, table_name, column):
     column_name = column.compile(dialect=engine.dialect)
