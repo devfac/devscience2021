@@ -1,8 +1,27 @@
-import random
+
 from typing import Any
 from fpdf import FPDF
 
-def attestation_validation_credit(num_carte:str, date: str, anne_univ:str, data:Any) -> str:
+def get_niveau_credit(niveau:str):
+    niveau_ = {}
+    if niveau == "L1" :
+        niveau_["niveau"]="PREMIERE ANNÉE DU LICENCE"
+        niveau_["credit"]="60"
+    elif niveau == "L2" :
+        niveau_["niveau"]= "DEUXIEME ANNÉE DU LICENCE"
+        niveau_["credit"]="120"
+    elif niveau == "L3" :
+        niveau_["niveau"]= "TROISIÈME ANNÉE DU LICENCE"
+        niveau_["credit"]="180"
+    elif niveau == "M1" :
+        niveau_["niveau"]= "PREMIERE ANNÉE DU MASTER"
+        niveau_["credit"]="60"
+    else:
+        niveau_["niveau"]= "DEUXIEME ANNÉE DU MASTER"
+        niveau_["credit"]="120"
+    return niveau_
+
+def attestation_validation_credit(num_carte:str, date: str, niveau:str, data:Any) -> str:
     pdf = FPDF("P","mm","a4")
     pdf.add_page()
     pdf.l_margin = 20
@@ -33,7 +52,7 @@ def attestation_validation_credit(num_carte:str, date: str, anne_univ:str, data:
     registre_etudiant = f"{num_carte} RI-{data['registre']}"
 
 
-    text_3 = f"A validé les 60 crédits de la {data['niveau']}"
+    text_3 = f"A validé les {get_niveau_credit(niveau.upper())['credit']} crédits de la {get_niveau_credit(niveau.upper())['niveau']}"
     text_3_1 = f"en {data['parcours']}"
     text_4 = "En foi de quoi, la présence d'attestation lui est delivré pour servir et valoir ce que le droit"
 

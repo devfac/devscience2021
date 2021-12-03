@@ -173,19 +173,6 @@ def get_niveau(sems_a:str, sems_b:str)-> str:
         return "M2"
 
 
-def get_niveau_credit(niveau:str)-> str:
-
-    if niveau == "L1" :
-        return "PREMIER ANNÉE DU LICENCE"
-    if niveau == "L2" :
-        return "DEUXIEME ANNÉE DU LICENCE"
-    if niveau == "L3" :
-        return "TROISIEME ANNÉE DU LICENCE"
-    if niveau == "M1" :
-        return "PREMIER ANNÉE DU MASTER"
-    if niveau == "M2" :
-        return "DEUXIEME ANNÉE DU MASTER"
-
 def validation_semestre(etudiant:Any, sems:str, credit:int, total_cred:int,anne:str):
     response = {}
     response["anne"]=anne
