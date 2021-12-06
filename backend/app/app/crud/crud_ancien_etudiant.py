@@ -76,8 +76,23 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(table.columns.uuid_parcours == uuid_parcours
-                        and table.columns.semestre == semestre  )
+                        and (table.columns.semestre_petit == semestre or table.columns.semestre_grand == semestre  ))
         sel = sel.order_by(table.columns.nom.asc())
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
+
+    def get_by_class_limit(self, schema: str, uuid_parcours: UUID,  semestre: str,skip:int, limit:int) -> Optional[EtudiantAncien]:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table("ancien_etudiant", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(table.columns.uuid_parcours == uuid_parcours
+                        and (table.columns.semestre_petit == semestre or table.columns.semestre_grand == semestre  ))
+        sel = sel.order_by(table.columns.nom.asc())
+        sel = sel.offset(skip)
+        sel = sel.limit(limit)
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()

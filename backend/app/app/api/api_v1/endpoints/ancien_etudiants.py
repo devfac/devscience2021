@@ -207,7 +207,7 @@ def read_etudiant_by_class(
     *,
     db: Session = Depends(deps.get_db),
     schema: str,
-    uuid_parcours: float,
+    uuid_parcours: str,
     semestre:str,
     current_user: models.User = Depends(deps.get_current_active_user),
     ) -> Any:

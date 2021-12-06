@@ -1,7 +1,5 @@
-import random
 from typing import Any
 from fpdf import FPDF
-import unidecode
 
 def create_certificat_scolarite(num_carte:str, date: str, anne_univ:str, data:Any) -> str:
     pdf = FPDF("P","mm","a4")
