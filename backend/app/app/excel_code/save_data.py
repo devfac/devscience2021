@@ -27,7 +27,7 @@ def insert_data_xlsx(name:str,sheet_name:str, all_data:Any, columns:list, type:s
     row =2
     for index_, data in enumerate(all_data):
         for index,col in enumerate(data):
-            sheet.cell(row=row,column=index+1).value = data[index]
+            sheet.cell(row=row,column=index+1).value = str(data[index])
             print(f"{sheet_name}",data[index])
         row += 1
     

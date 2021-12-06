@@ -28,9 +28,7 @@ def get_models(
         for table in all_table:
             colums = check_columns_exist(create_anne(anne.title),table)
             save_data.write_data_title(anne.title, table,colums,"models")
-            all_data = crud.save.read_all_data(create_anne(anne.title),table)
-            if all_data:
-                save_data.insert_data_xlsx(anne.title,table,all_data,colums,"data")
+
     all_table = check_table_info("public")
     save_data.create_workbook("public",all_table,"models")
     for table in all_table:
@@ -53,11 +51,17 @@ def save_data_to_excel(
         for table in all_table:
             colums = check_columns_exist(create_anne(anne.title),table)
             save_data.write_data_title(anne.title, table,colums,"data" )
-            schemas = create_anne(anne.title)
+            all_data = crud.save.read_all_data(create_anne(anne.title),table)
+            if all_data:
+                save_data.insert_data_xlsx(anne.title,table,all_data,colums,"data")
 
     all_table = check_table_info("public")
     save_data.create_workbook("public",all_table,"data")
     for table in all_table:
             colums = check_columns_exist("public",table)
             save_data.write_data_title("public", table,colums,"data" )
+            all_data = crud.save.read_all_data("public",table)
+            if all_data:
+                save_data.insert_data_xlsx("public",table,all_data,colums,"data")
+                print()
     return {"msg": "Word received"}
