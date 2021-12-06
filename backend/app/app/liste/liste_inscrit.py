@@ -22,7 +22,7 @@ class PDF(FPDF):
         parcours = "PARCOURS:"
         parcours_etudiant = f"{data['parcours']}"
         semestre = "SEMESTRE:"
-        semestre_etudiant = f"{sems}"
+        semestre_etudiant = f"{sems.upper()}"
         anne = "ANNÉE UNIVERSITAIRE:"
         anne_univ = f"{data['anne']}"
 

@@ -33,7 +33,7 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
         table = Table("unite_enseing", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(table.c.semestre == semestre)
+        sel = sel.where(table.c.semestre == semestre.upper())
         sel = sel.where(table.c.uuid_parcours == uuid_parcours)
         sel = sel.order_by(table.columns.title.asc())
         result = conn.execute(sel)

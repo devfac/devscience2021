@@ -23,6 +23,9 @@ def certificat(
     schema: str,
     current_user: models.User = Depends(deps.get_current_active_user),
     ) -> Any:
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schema))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",)
     etudiant = crud.ancien_etudiant.get_by_num_carte(schema,num_carte)
     if etudiant:
         parcours = crud.parcours.get_by_uuid(db=db,uuid=etudiant.uuid_parcours)
@@ -51,6 +54,9 @@ def attestation(
     schema: str,
     current_user: models.User = Depends(deps.get_current_active_user),
     ) -> Any:
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schema))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",)
     etudiant = crud.ancien_etudiant.get_by_num_carte(schema,num_carte)
     if etudiant:
         parcours = crud.parcours.get_by_uuid(db=db,uuid=etudiant.uuid_parcours)
@@ -80,6 +86,9 @@ def attestation_validation(
     niveau:str,
     current_user: models.User = Depends(deps.get_current_active_user),
     ) -> Any:
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schema))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",)
     etudiant = crud.ancien_etudiant.get_by_num_carte(schema,num_carte)
     if etudiant:
         parcours = crud.parcours.get_by_uuid(db=db,uuid=etudiant.uuid_parcours)
@@ -108,6 +117,9 @@ def certificat_assiduite(
     rentrer:str,
     current_user: models.User = Depends(deps.get_current_active_user),
     ) -> Any:
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schema))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",)
     etudiant = crud.ancien_etudiant.get_by_num_carte(schema,num_carte)
     if etudiant:
         parcours = crud.parcours.get_by_uuid(db=db,uuid=etudiant.uuid_parcours)
@@ -137,6 +149,9 @@ def relever(
     parcours:str,
     current_user: models.User = Depends(deps.get_current_active_user),
     ) -> Any:
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
     note = {}
     ue = {}
     ues = []

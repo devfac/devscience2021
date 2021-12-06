@@ -63,7 +63,7 @@ class PDF(FPDF):
         parcours = "PARCOURS:"
         parcours_etudiant = f"{data['parcours']}"
         semestre = "SEMESTRE:"
-        semestre_etudiant = f"{sems}"
+        semestre_etudiant = f"{sems.upper()}"
         anne = "ANNÉE UNIVERSITAIRE:"
         anne_univ = f"{data['anne']}"
         session = "SESSION:"
@@ -110,10 +110,10 @@ class PDF(FPDF):
         pdf.cell(23,8,session,0,0,"L")
 
         pdf.set_font("arial","I",12)
-        pdf.cell(0,8,session_class,0,1)
+        pdf.cell(0,8,session_class.upper(),0,1)
 
         pdf.set_font("arial","BI",13)
-        pdf.cell(17,8,salle,0,0,"L")
+        pdf.cell(17,8,salle.upper(),0,0,"L")
 
         pdf.set_font("arial","I",12)
         pdf.cell(11,8,salle_et,0,0) 
@@ -185,7 +185,6 @@ class PDF(FPDF):
                     pdf.cell(24,5,"",1,0)
                     pdf.cell(1,5,"",0,0)
                     pdf.cell(24,5,"",1,0)
-        
         pdf.add_page()
         pdf.set_margin(10)  
         titre = "LISTE DES ETUDIANTS INSCRITS AUX EXAMENS"
@@ -200,18 +199,17 @@ class PDF(FPDF):
         pdf.cell(160,5,nom_et_prenom,1,0,"C")
         num_ = int(data['skip'])
         for i,etudiant in enumerate(etudiants):
-            print(etudiant)
-            #num_carte_ = etudiant["num_carte"]
-            #name = f"{etudiant['nom']} {etudiant['prenom']}"
+            num_carte_ = etudiant["num_carte"]
+            name = f"{etudiant['nom']} {etudiant['prenom']}"
             pdf.cell(1,7,"",0,1)
             pdf.set_font("arial","I",10)
             pdf.cell(1,5,"",0,0)
             pdf.cell(12,5,str(num_),1,0)
             pdf.cell(1,5,"",0,0)
-            pdf.cell(18,5,"num_carte_",1,0)
+            pdf.cell(18,5,num_carte_,1,0)
             pdf.cell(1,5,"",0,0)
             pdf.set_font("arial","I",10)
-            pdf.cell(160,5,"name",1,0,"L")
+            pdf.cell(160,5,name,1,0,"L")
             num_ +=1
 
 

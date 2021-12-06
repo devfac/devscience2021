@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 router = APIRouter()
 
 
-@router.post("/list_exam/")
+@router.get("/list_exam/")
 def list_examen(
     schemas:str,
     semestre:str,
@@ -26,8 +26,8 @@ def list_examen(
     uuid_mention:str,
     session:str,
     salle:str,
-    skip=1,
-    limit=21,
+    skip:int =1,
+    limit:int =100,
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
@@ -37,6 +37,11 @@ def list_examen(
     data = {}
     matiers = {} 
     ues = crud.matier_ue.get_by_class(schemas,uuid_parcours,semestre)
+    if len(ues)==0:
+        raise HTTPException(
+            status_code=400,
+            detail="Matiers not fount.",
+        )
     all_ue = []
     for ue in ues:
         ues_={}
@@ -64,7 +69,6 @@ def list_examen(
             detail="Etudiants not fount.",
         )
     for etudiant in etudiants_: 
-        print(etudiant['num_carte'])
         etudiants = {}
         etudiants["nom"]=etudiant["nom"]
         etudiants["prenom"]=etudiant["prenom"]
@@ -78,10 +82,10 @@ def list_examen(
     data['salle']=salle
     data['skip']=skip
     data['limit']=limit
-    file = liste_exams.PDF.create_list_examen(semestre,parcours,data,matiers,etudiant)
+    file = liste_exams.PDF.create_list_examen(semestre,parcours,data,matiers,all_etudiant)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
-@router.post("/list_inscrit/")
+@router.get("/list_inscrit/")
 def list_inscrit(
     schemas:str,
     semestre:str,

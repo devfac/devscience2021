@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.api import deps
-from app.utils import decode_text
+from app.utils import decode_schemas, decode_text
 
 router = APIRouter()
 
@@ -22,6 +22,9 @@ def read_ec(
     """
     Retrieve élément constitutif.
     """
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
     matier_ec = crud.matier_ec.get_all(schema=schema)
     return matier_ec
 
@@ -39,6 +42,9 @@ def read_by_value_ue(
     """
     Retrieve élément constitutif by value_ue.
     """
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
     matier_ec = crud.matier_ec.get_by_value_ue(schema=schema, 
         value_ue=value_ue, semestre=semestre, uuid_parcours=uuid_parcours)
     return matier_ec
@@ -56,6 +62,9 @@ def read_by_value(
     """
     Retrieve élément constitutif by value_ue.
     """
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
     matier_ec = crud.matier_ec.get_by_value_ue(schema=schema, 
         value=value, semestre=semestre, uuid_parcours=uuid_parcours)
     return matier_ec
@@ -71,6 +80,9 @@ def read_by_uuid(
     """
     Retrieve élément constitutif by uuid.
     """
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
     matier_ec = crud.matier_ec.get_by_uuid(schema=schema, uuid=uuid)
     if not matier_ec:
         raise HTTPException(status_code=404, detail="E.C not found")
@@ -87,6 +99,9 @@ def create_ec(
     """
     Create élément constitutif.
     """
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
     ec_in.uuid = uuid.uuid4()
     value = decode_text(ec_in.title).lower()
     matier_ec = crud.matier_ec.get_by_schema(schema=schema, obj_in=ec_in, value=value)
@@ -107,6 +122,9 @@ def update_ec(
     """
     Update élément constitutif.
     """
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
     ec = crud.matier_ec.get_by_uuid(schema=schema, uuid=uuid)
     if not ec:
         raise HTTPException(status_code=404, detail="E.C not found")
@@ -124,6 +142,9 @@ def delete_ec(
     """
     Delete élément constitutifs.
     """
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
     ec = crud.matier_ec.get_by_uuid(schema=schema, uuid=uuid)
     if not ec:
         raise HTTPException(status_code=404, detail="E.C not found")

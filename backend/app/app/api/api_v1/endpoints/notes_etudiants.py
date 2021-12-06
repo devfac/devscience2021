@@ -3,7 +3,7 @@ from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.utils import get_credit, max_value
+from app.utils import decode_schemas, get_credit, max_value
 from app import crud, models, schemas
 from app.api import deps
 import json
@@ -24,6 +24,10 @@ def inserts_etudiant(
     """
     Create table note.
     """ 
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
+        )
     all_note = []
     test_note = crud.note.check_table_exist(schemas, semestre,parcours,session)
     if not test_note:
@@ -77,6 +81,10 @@ def updates_note(
     """
     Create table note.
     """ 
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
+        )
     test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours,session=session)
     if not test_note:
         raise HTTPException( status_code=400, detail=f"note_{semestre}_{parcours}_{session} not found.",
@@ -161,7 +169,11 @@ def delete_note(
 ) -> Any:
     """
     Create table note.
-    """
+    """ 
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
+        )
     test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours,session=session)
     if not test_note:
         raise HTTPException( status_code=400, detail=f"note_{semestre}_{parcours}_{session} not found.",
