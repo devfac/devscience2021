@@ -53,6 +53,7 @@ def save_data_to_excel(
         for table in all_table:
             colums = check_columns_exist(create_anne(anne.title),table)
             save_data.write_data_title(anne.title, table,colums,"data" )
+            schemas = create_anne(anne.title)
 
     all_table = check_table_info("public")
     save_data.create_workbook("public",all_table,"data")

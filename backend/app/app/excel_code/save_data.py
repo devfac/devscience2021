@@ -26,9 +26,9 @@ def insert_data_xlsx(name:str,sheet_name:str, all_data:Any, columns:list, type:s
     sheet = wb.get_sheet_by_name(sheet_name)
     row =2
     for index_, data in enumerate(all_data):
-        print(data)
-        print("\n")
-        #for index,col in enumerate(data[index_]):
-            #sheet.cell(row=row,column=index_+1).value = data[index_]
-            #print(data[index_])
+        for index,col in enumerate(data):
+            sheet.cell(row=row,column=index+1).value = data[index]
+            print(f"{sheet_name}",data[index])
         row += 1
+    
+    wb.save(filename = f'files/excel/{type}/{name}.xlsx')
