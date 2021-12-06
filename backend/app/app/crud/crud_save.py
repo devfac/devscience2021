@@ -15,17 +15,16 @@ from app.db.session import engine
 
 class CRUDSave():
 
-    def insert_data(self,schema: str,semestre:str,parcours:str,session:str ,num_carte:str) :
-        obj_in_data = jsonable_encoder({num_carte})
+    def insert_data(self,schema: str,table_name:str,obj_in:Any) :
         metadata = MetaData(schema=schema, bind=engine)
-        table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
+        table = Table(table_name, metadata,autoload=True)
         conn = engine.connect()
         ins = insert(table=table)
-        ins = ins.values(obj_in_data)
+        ins = ins.values(obj_in)
         conn.execute(ins)
         conn.close()
-        
 
+    
     def read_all_data(self,schema: str,table_name:str) -> List[Any] :
         metadata = MetaData(schema=schema, bind=engine)
         table = Table(table_name, metadata,autoload=True)
