@@ -12,7 +12,7 @@ def create_workbook(name:str, sheet_name:list, type:str):
     wb.save(filename = f'files/excel/{type}/{name}.xlsx')
 
 
-def write_data_title(name:str, sheet_name:str,columns:list, type:str):
+def gwrite_data_title(name:str, sheet_name:str,columns:list, type:str):
     wb = load_workbook(f'files/excel/{type}/{name}.xlsx')
     sheet = wb.get_sheet_by_name(sheet_name)
     for index, columns in enumerate(columns):
@@ -32,7 +32,6 @@ def insert_data_xlsx(name:str,sheet_name:str, all_data:Any, columns:list, type:s
         row += 1
     
     wb.save(filename = f'files/excel/{type}/{name}.xlsx')
-
 
 def insert_from_xlsx(name:str,sheet_name:str, all_data:Any, columns:list, type:str):
     wb = load_workbook(f'files/excel/{type}/{name}.xlsx')
