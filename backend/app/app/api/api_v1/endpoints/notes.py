@@ -46,7 +46,7 @@ def create_table_note(
         else:
             raise HTTPException(
             status_code=400,
-            detail=f"note_{semestre}_{parcours}_{session} already exists in the system.",
+            detail=f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()} already exists in the system.",
         )
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
@@ -78,7 +78,7 @@ def delete_table_note(
         else:
             raise HTTPException(
             status_code=400,
-            detail=f"note_{semestre}_{parcours}_{session} not found.",
+            detail=f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()} not found.",
         )
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
@@ -101,5 +101,5 @@ def get_all_columns(
     else:
         raise HTTPException(
             status_code=400,
-            detail=f"note_{semestre}_{parcours}_{session} not found.",
+            detail=f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()} not found.",
         )

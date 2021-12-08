@@ -33,14 +33,14 @@ def inserts_etudiant(
     if not test_note:
         raise HTTPException( 
             status_code=400, 
-            detail=f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()} not found.",
+            detail=f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()} not found.",
         )
 
     if session.lower() == "rattrapage":
         test_note = crud.note.check_table_exist(schemas, semestre,parcours,"normal")
         if not test_note:
             raise HTTPException( status_code=400, 
-            detail=f"note_{semestre.lower()}_{parcours.lower()}_normal not found.",
+            detail=f"note_{parcours.lower()}_{semestre.lower()}_normal not found.",
             )
         credit = 30;
         all_etudiant = crud.note.read_by_credit(schemas, semestre, parcours,"normal",credit)
@@ -87,7 +87,7 @@ def updates_note(
         )
     test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours,session=session)
     if not test_note:
-        raise HTTPException( status_code=400, detail=f"note_{semestre}_{parcours}_{session} not found.",
+        raise HTTPException( status_code=400, detail=f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()} not found.",
         )
     moy_cred_in = {}
     moy_cred_in_fin = {}
@@ -176,7 +176,7 @@ def delete_note(
         )
     test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours,session=session)
     if not test_note:
-        raise HTTPException( status_code=400, detail=f"note_{semestre}_{parcours}_{session} not found.",
+        raise HTTPException( status_code=400, detail=f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()} not found.",
         )
     et_un = crud.note.read_by_num_carte(schemas, semestre, parcours,session,num_carte)
     if et_un:

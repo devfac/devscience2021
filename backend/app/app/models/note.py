@@ -17,11 +17,11 @@ def create_table_note(schemas, parcours, semestre,session ,matiers) -> bool:
         note.create(engine)
         for index, value_ue in enumerate(matiers):
             column_matier = Column(f"{value_ue}",Float,default=0.0)
-            add_column(schemas=schemas,table_name=f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}",column=column_matier)
+            add_column(schemas=schemas,table_name=f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}",column=column_matier)
         column_moyenne = Column("moyenne",Float,default=0.0)
-        add_column(schemas=schemas,table_name=f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}",column=column_moyenne)
+        add_column(schemas=schemas,table_name=f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}",column=column_moyenne)
         column_credit = Column("credit",Integer,default=0)
-        add_column(schemas=schemas,table_name=f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}",column=column_credit)
+        add_column(schemas=schemas,table_name=f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}",column=column_credit)
         return True
     except:
         return False
@@ -31,7 +31,7 @@ def drop_table_note(schemas, parcours,session, semestre) -> bool:
     try:
         base =  MetaData(schema=schemas, bind=engine)
         # table notes
-        note = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}",base,autoload=True )
+        note = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}",base,autoload=True )
         note.drop(engine)
         return True
     except Exception as e:
