@@ -1,12 +1,13 @@
-from typing import Any
+from typing import Any, List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, File, UploadFile
 from pydantic.networks import EmailStr
+from sqlalchemy.sql.expression import any_
 
 from app import models, schemas
 from app.api import deps
 from app.core.celery_app import celery_app
-from app.utils import check_table_info, create_anne,check_columns_exist
+from app.utils import check_table_info, create_anne,check_columns_exist, decode_schemas
 from app.excel_code import save_data
 from app import crud
 from sqlalchemy.orm import Session
@@ -37,6 +38,22 @@ def get_models(
     return {"msg": "Word received"}
 
 
+@router.get("/insert_data/", response_model=List[Any])
+def insert_from_xlsx(*,
+    db: Session = Depends(deps.get_db),
+    schema:str,
+    current_user: models.User = Depends(deps.get_current_active_superuser),
+) -> Any:
+    """
+    """
+    name = decode_schemas(schema)
+    all_data = save_data.get_data_xlsx(name,"ancien_etudiant","data")
+    return all_data
+
+@router.post("/uploadfile/")
+async def create_upload_file(file: UploadFile = File(...)):
+    return {"filename": len(file)}
+
 @router.get("/save_data/")
 def save_data_to_excel(
     db: Session = Depends(deps.get_db),
@@ -63,5 +80,4 @@ def save_data_to_excel(
             all_data = crud.save.read_all_data("public",table)
             if all_data:
                 save_data.insert_data_xlsx("public",table,all_data,colums,"data")
-                print()
     return {"msg": "Word received"}
