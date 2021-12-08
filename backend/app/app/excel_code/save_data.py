@@ -32,3 +32,15 @@ def insert_data_xlsx(name:str,sheet_name:str, all_data:Any, columns:list, type:s
         row += 1
     
     wb.save(filename = f'files/excel/{type}/{name}.xlsx')
+
+def get_data_xlsx(name:str,sheet_name:str, type:str)-> Any:
+    wb = load_workbook(f'files/excel/{type}/{name}.xlsx')
+    sheet = wb.get_sheet_by_name(sheet_name)
+    all_data = []
+    for row in range(sheet.max_row):
+        data = {}
+        if row != 0 :
+            for col in range(sheet.max_column):
+                data[str(sheet.cell(row=1,column=col+1).value)]= str(sheet.cell(row=row+1,column=col+1).value)
+            all_data.append(data) 
+    return all_data
