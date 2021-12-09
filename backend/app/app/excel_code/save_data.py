@@ -1,6 +1,8 @@
 from typing import Any
 from openpyxl.workbook import Workbook
 from openpyxl import load_workbook
+
+from app.utils import check_columns_exist
  
 def create_workbook(name:str, sheet_name:list, type:str):
     wb = Workbook()
@@ -33,8 +35,23 @@ def insert_data_xlsx(name:str,sheet_name:str, all_data:Any, columns:list, type:s
     
     wb.save(filename = f'files/excel/{type}/{name}.xlsx')
 
-def get_data_xlsx(name:str,sheet_name:str, type:str)-> Any:
-    wb = load_workbook(f'files/excel/{type}/{name}.xlsx')
+
+def get_all_sheet(workbook:str):
+    wb = load_workbook(workbook)
+    return wb.sheetnames
+
+def validation_file(name:str,sheet_name:str, schemas:str)-> str:
+    wb = load_workbook(name)
+    sheet = wb.get_sheet_by_name(sheet_name)
+    columns = check_columns_exist(schemas,sheet_name)
+    for col in range(sheet.max_column):
+        if str(sheet.cell(row=1,column=col+1).value) != columns[col]:
+            return f"invalid columns {sheet.cell(row=1,column=col+1)}"
+    return "valid"
+
+
+def get_data_xlsx(name:str,sheet_name:str)-> Any:
+    wb = load_workbook(name)
     sheet = wb.get_sheet_by_name(sheet_name)
     all_data = []
     for row in range(sheet.max_row):
