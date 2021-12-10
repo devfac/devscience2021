@@ -3,9 +3,12 @@ from typing import Any
 from fpdf import FPDF
 import unidecode
 
-def validation(ue:float)-> str:
+def validation(ue:float, code:bool)-> str:
         if float(ue) < 10:
-            return "Compensé"
+            if code :
+                return "Compensé"
+            else:
+                return "À refaire"
         else:
             return "Validé"
 
@@ -18,9 +21,9 @@ class PDF(FPDF):
         self.cell(1,6,"à l'intéressé sous peine d'annulation.",0,0)
 
     
-    def attestation_inscription(num_carte:str,date: str, anne_univ:str, data:Any, note:Any) -> str:
+    def relever_note(num_carte:str,date: str, data:Any, note:Any) -> str:
            
-        pdf = PDF()
+        pdf = PDF('P','mm','A4')
         pdf.add_page()
         pdf.l_margin = 0
         pdf.rect(5,5,200,287)
@@ -35,7 +38,7 @@ class PDF(FPDF):
         titre3 = "Ministère de l'Enseignement Supérieur"
         titre3_1 = "Service scolarité"
         titre4 = "et de la recherche scientifique"
-        titre4_1 = f"Année universitaire {anne_univ}"
+        titre4_1 = f"Année universitaire {data['anne']}"
         titre5 = "releve de notes"
         titre6 = f"N° ___/{date}/UF/FAC.S/S.SCO"
 
@@ -55,6 +58,7 @@ class PDF(FPDF):
         parcours_etudiant = f"{data['parcours']}"
         session = f"Session:"
         session_etudiant = f"{data['session']}"
+        validation_et = f"{data['validation']}"
 
 
         titre_1 = "Les unité d'enseignements"
@@ -64,7 +68,12 @@ class PDF(FPDF):
         titre_5 = "Status de l'UE"
         text_6 = "Décision du jury:"
         text_7 = "Fianarantsoa, le "
-        moyenne = "moyenne général"
+        moyenne = "moyenne générale"
+
+
+
+        pdf.add_font("alger","","Algerian.ttf",uni=True)
+        pdf.add_font("aparaj","","aparaji.ttf",uni=True)
 
 
         pdf.set_font("arial","B",12)
@@ -111,56 +120,56 @@ class PDF(FPDF):
         pdf.cell(18,6,"",0,0,"L")
         pdf.cell(12,6,nom,0,0,"L")
 
-        pdf.set_font("arial","I",12)
+        pdf.set_font("aparaj","",14)
         pdf.cell(0,6,nom_etudiant,0,1)
 
         pdf.set_font("arial","BI",12)
         pdf.cell(18,6,"",0,0,"L")
         pdf.cell(18,6,prenom,0,0,"L")
 
-        pdf.set_font("arial","I",12)
+        pdf.set_font("aparaj","",14)
         pdf.cell(0,6,prenom_etudiant,0,1)
 
         pdf.set_font("arial","BI",12)
         pdf.cell(18,6,"",0,0,"L")
         pdf.cell(18,6,naiss,0,0,"L")
 
-        pdf.set_font("arial","I",12)
+        pdf.set_font("aparaj","",14)
         pdf.cell(0,6,naiss_etudiant,0,1)
 
         pdf.set_font("arial","BI",12)
         pdf.cell(18,6,"",0,0,"L")
         pdf.cell(18,6,numero,0,0,"L")
-
-        pdf.set_font("arial","I",12)
+        pdf.set_font("aparaj","",14)
         pdf.cell(0,6,num_carte,0,1)
 
         pdf.set_font("arial","BI",12)
         pdf.cell(18,6,"",0,0,"L")
         pdf.cell(19,6,mention,0,0,"L")
 
-        pdf.set_font("arial","I",12)
+        pdf.set_font("aparaj","",14)
         pdf.cell(0,6,mention_etudiant,0,1)
 
         pdf.set_font("arial","BI",12)
         pdf.cell(18,6,"",0,0,"L")
         pdf.cell(21,6,parcours,0,0,"L")
 
-        pdf.set_font("arial","I",12)
+        pdf.set_font("aparaj","",14)
         pdf.cell(0,6,parcours_etudiant,0,1)
 
         pdf.set_font("arial","BI",12)
         pdf.cell(18,6,"",0,0,"L")
         pdf.cell(21,6,semestre,0,0,"L")
 
-        pdf.set_font("arial","I",12)
+
+        pdf.set_font("aparaj","",14)
         pdf.cell(0,6,semestre_etudiant,0,1)
 
         pdf.set_font("arial","BI",12)
         pdf.cell(18,6,"",0,0,"L")
         pdf.cell(19,6,session,0,0,"L")
 
-        pdf.set_font("arial","I",12)
+        pdf.set_font("aparaj","",14)
         pdf.cell(0,6,session_etudiant,0,1)
 
 
@@ -217,13 +226,14 @@ class PDF(FPDF):
             pdf.cell(80,5,f"NOTE SOUS TOTAL U.E-{index_ue+1}",1,0,"C")
             pdf.set_font("arial","I",11)
             pdf.cell(1,1,"",0,0)
-            pdf.cell(19,5,str(value_ue['note']),1,0,"C")
+            pdf.cell(19,5,str(format(value_ue['note'], '.3f')),1,0,"C")
             pdf.cell(1,1,"",0,0)
             pdf.cell(24,5,"",1,0,"C")
             pdf.cell(1,1,"",0,0)
             pdf.cell(14,5,str(value_ue['credit']),1,0,"C")
             pdf.cell(1,1,"",0,0)
-            pdf.cell(29,5,validation(value_ue['note']),1,1,"C")
+            pdf.set_font("alger","",12)
+            pdf.cell(29,5,validation(value_ue['note'], data["code"]),1,1,"C")
 
         pdf.set_top_margin(20)
         pdf.cell(30,1,"",0,1)
@@ -232,7 +242,7 @@ class PDF(FPDF):
         pdf.cell(80,6,moyenne.upper(),1,0,"C")
         pdf.set_font("arial","I",11)
         pdf.cell(1,1,"",0,0)
-        pdf.cell(19,6,str(note['moyenne']),1,0,"C")
+        pdf.cell(19,6,str(format(note['moyenne'], '.3f')),1,0,"C")
         pdf.cell(1,1,"",0,0)
         pdf.cell(24,5,"",0,0,"C")
         pdf.cell(1,1,"",0,0)
@@ -242,7 +252,9 @@ class PDF(FPDF):
         
         pdf.set_font("Times","Bui",12)
         pdf.cell(40,10,"",0,0)
-        pdf.cell(0,10,text_6,0,1)
+        pdf.cell(34,10,text_6,0,0)
+        pdf.set_font("Times","i",12)
+        pdf.cell(0,10,validation_et,0,1)
         pdf.set_font("arial","I",10)
         pdf.cell(120,1,"",0,1)
         pdf.cell(120,10,"",0,0)
@@ -250,107 +262,4 @@ class PDF(FPDF):
 
         pdf.output(f"files/{num_carte}_relever.pdf","F")
 
-   # return (f"files/{num_carte}_inscription.pdf"
-
-if __name__=="__main__":
-    # string = "éôfèçdn&n sdgfgz"
-    # strd = string.replace(" ","_")
-    # print(unidecode.unidecode(strd))
-    data = {"nom":"RALAITSIMANOLAKAVANA","prenom":"Henri Franck",
-            "date_naiss":"07 octobre 1995 ", "lieu_naiss":" Fianarantsoa",
-            "semestre":"S9", "mention":"Mathématiques et Applications",
-            "parcours":"Mathématiques et Informatiques pour la Sciences Social",
-            "session":"Normal"}
-
-    note ={
-        "num_carte":'4465',
-        "moyenne":12,
-        "ue":[{
-            "name":"Analyse",
-            "note": "12",
-            "credit":3,
-            "ec":[
-                {
-                "name":"Analyse",
-                "note":12,
-                "poids":1
-                }
-                ]
-            },
-            {
-            "name":"Algèbre",
-            "note": "10",
-            "credit":3,
-            "ec":[
-                {
-                "name":"Algèbre linéaire",
-                "note":8,
-                "poids":0.5
-                },
-                {
-                "name":"Algèbre générale",
-                "note":12,
-                "poids":0.5
-                },
-                ]
-            },
-            {
-            "name":"Informatique",
-            "note": 8,
-            "credit":18,
-            "ec":[
-                {
-                "name":"Algorithme et programation",
-                "note":8,
-                "poids":0.2
-                },
-                {
-                "name":"Logiciel R",
-                "note":8,
-                "poids":0.2
-                }, 
-                {
-                "name":"Statistique appliquée",
-                "note":8,
-                "poids":0.6
-                },
-                ]
-            }, 
-            {
-            "name":"Langue et culture",
-            "note": 13,
-            "credit":3,
-            "ec":[
-                {
-                "name":"Français",
-                "note":15,
-                "poids":0.5
-                },
-                {
-                "name":"Anglais",
-                "note":12,
-                "poids":0.5
-                }, 
-                ]
-            },
-            {
-            "name":"Economie",
-            "note": 10,
-            "credit":3,
-            "ec":[
-                {
-                "name":"Econometrie",
-                "note":12,
-                "poids":0.6
-                },
-                {
-                "name":"Probabilité",
-                "note":7,
-                "poids":0.4
-                },
-                ]
-            },
-            ]
-        }
-
-    PDF.attestation_inscription("4465","2020", "2020-2021", data, note)
+        return (f"files/{num_carte}_relever.pdf")

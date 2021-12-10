@@ -1,3 +1,4 @@
+from operator import and_, or_
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy import text
@@ -6,7 +7,7 @@ from sqlalchemy.inspection import inspect
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
-from sqlalchemy import MetaData, Table
+from sqlalchemy import MetaData, Table, or_, and_
 from app.crud.base import CRUDBase
 from app.schemas.etudiant import EtudiantAncienCreate, EtudiantAncienUpdate,EtudiantAncien
 from app.db.session import engine
@@ -75,9 +76,24 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         table = Table("ancien_etudiant", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(table.columns.uuid_parcours == uuid_parcours
-                        and table.columns.semestre == semestre  )
+        sel = sel.where(and_(table.columns.uuid_parcours == uuid_parcours,
+                        or_(table.columns.semestre_petit == semestre.upper(),table.columns.semestre_grand == semestre.upper())))
         sel = sel.order_by(table.columns.nom.asc())
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
+
+    def get_by_class_limit(self, schema: str, uuid_parcours: UUID,  semestre: str,skip:int, limit:int) -> Optional[EtudiantAncien]:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table("ancien_etudiant", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(and_(table.columns.uuid_parcours == uuid_parcours,
+                        or_(table.columns.semestre_petit == semestre.upper(),table.columns.semestre_grand == semestre.upper())))
+        sel = sel.order_by(table.columns.nom.asc())
+        sel = sel.offset(skip-1)
+        sel = sel.limit(limit)
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()

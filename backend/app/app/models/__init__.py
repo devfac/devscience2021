@@ -1,5 +1,4 @@
 from sqlalchemy.sql.operators import is_natural_self_precedent
-from .item import Item
 from .user import User
 from .mention import Mention
 from .role import Role

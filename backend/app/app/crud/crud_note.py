@@ -59,26 +59,56 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn = engine.connect()
         up = update(table=table)
         up = up.values(ue_in)
-        up = up.where(table.c.num_carte == num_carte)
+        up = up.where(table.columns.num_carte == num_carte)
         conn.execute(up)
+
 
     def read_by_num_carte(self,schema: str, semestre:str, parcours:str,session:str, num_carte:str) -> Any:
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
         sel = table.select()
-        sel = sel.where(table.c.num_carte == num_carte)
+        sel = sel.where(table.columns.num_carte == num_carte)
         result = conn.execute(sel)
         out = result.fetchone()
         conn.close()
         return out
+
+
+    def update_auto(self,schema: str, semestre:str, parcours:str,session:str ,num_carte:str):
+        metadata = MetaData(schema=schema, bind=engine)
+        conn = engine.connect()
+        table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
+        table_norm = Table(f"note_{semestre.lower()}_{parcours.lower()}_normal", metadata,autoload=True)
+        sel = table_norm.select()
+        sel = sel.where(table_norm.columns.num_carte == num_carte)
+        result = conn.execute(sel)
+        out = result.fetchone()
+        up = table.update()
+        up = up.values(out)
+        up = up.where(table.columns.num_carte == num_carte)
+        conn.execute(up)
+        conn.close()
+
+
+    def read_by_credit(self,schema: str, semestre:str, parcours:str,session:str, credit:int) -> Any:
+        metadata = MetaData(schema=schema, bind=engine)
+        conn = engine.connect()
+        table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
+        sel = table.select()
+        sel = sel.where(table.columns.credit < credit)
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
+        
 
     def delete_by_num_carte(self,schema: str, semestre:str, parcours:str, session:str,num_carte:str):
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
         dele = table.delete()
-        dele = dele.where(table.c.num_carte == {num_carte})
+        dele = dele.where(table.columns.num_carte == {num_carte})
         conn.execute(dele)
         conn.close
 
@@ -87,7 +117,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn = engine.connect()
         table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
         sel = table.select()
-        sel = sel.where(f"table.c.{num_carte} == {num_carte}")
+        sel = sel.where(f"table.columns.{num_carte} == {num_carte}")
         result = conn.execute(sel)
         out = result.fetchone()
         conn.close()

@@ -3,7 +3,7 @@ from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.utils import get_credit, max_value
+from app.utils import decode_schemas, get_credit, max_value
 from app import crud, models, schemas
 from app.api import deps
 import json
@@ -24,23 +24,46 @@ def inserts_etudiant(
     """
     Create table note.
     """ 
-    test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours,session=session)
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
+        )
+    all_note = []
+    test_note = crud.note.check_table_exist(schemas, semestre,parcours,session)
     if not test_note:
-        raise HTTPException( status_code=400, detail=f"note_{semestre}_{parcours}_{session} not found.",
+        raise HTTPException( 
+            status_code=400, 
+            detail=f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()} not found.",
         )
 
-    all_note = []
-    list = crud.ancien_etudiant.get_by_class(schemas,uuid_parcours,semestre)
-    if list is not None:
-        for etudiant in list:
+    if session.lower() == "rattrapage":
+        test_note = crud.note.check_table_exist(schemas, semestre,parcours,"normal")
+        if not test_note:
+            raise HTTPException( status_code=400, 
+            detail=f"note_{semestre.lower()}_{parcours.lower()}_normal not found.",
+            )
+        credit = 30;
+        all_etudiant = crud.note.read_by_credit(schemas, semestre, parcours,"normal",credit)
+        for etudiant in all_etudiant:
             et_un = crud.note.read_by_num_carte(schemas, semestre, parcours,session,etudiant.num_carte)
             if not et_un:
                 crud.note.insert_note(schemas,semestre,parcours,session,etudiant.num_carte)
-                crud.note.insert_note(schemas,semestre,parcours,"final",etudiant.num_carte)
-    all_note = crud.note.read_all_note(schemas, semestre, parcours,session)
-    for note in all_note:
-        print(note["ue_analyse"])
-    return all_note
+                crud.note.update_auto(schemas,semestre,parcours,session,etudiant.num_carte)
+        all_note = crud.note.read_all_note(schemas, semestre, parcours,session)
+        return all_note
+    
+    else:
+        list = crud.ancien_etudiant.get_by_class(schemas,uuid_parcours,semestre)
+        if list is not None:
+            for etudiant in list:
+                et_un = crud.note.read_by_num_carte(schemas, semestre, parcours,session,etudiant.num_carte)
+                if not et_un:
+                    crud.note.insert_note(schemas,semestre,parcours,session,etudiant.num_carte)
+                    crud.note.insert_note(schemas,semestre,parcours,"final",etudiant.num_carte)
+        all_note = crud.note.read_all_note(schemas, semestre, parcours,session)
+        for note in all_note:
+            print(note["ue_analyse"])
+        return all_note
 
 
 @router.post("/insert_note", response_model=List[Any])
@@ -58,6 +81,10 @@ def updates_note(
     """
     Create table note.
     """ 
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
+        )
     test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours,session=session)
     if not test_note:
         raise HTTPException( status_code=400, detail=f"note_{semestre}_{parcours}_{session} not found.",
@@ -142,7 +169,11 @@ def delete_note(
 ) -> Any:
     """
     Create table note.
-    """
+    """ 
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
+        )
     test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours,session=session)
     if not test_note:
         raise HTTPException( status_code=400, detail=f"note_{semestre}_{parcours}_{session} not found.",

@@ -20,7 +20,7 @@ def read_semestres(
     Retrieve semetres.
     """
     if crud.user.is_superuser(current_user):
-        semetre = crud.semetre.get_multi(db, skip=skip, limit=limit)
+        semetre = crud.semetre.get_multi(db=db)
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return semetre

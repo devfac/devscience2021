@@ -29,15 +29,11 @@ class CRUDAnne(CRUDBase[AnneUniv, AnneUnivCreate, AnneUnivUpdate]):
         return db_obj
 
     def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100
+        self, db: Session,
     ) -> List[AnneUniv]:
         return (
             db.query(self.model)
             .order_by(AnneUniv.title.desc())
-            .offset(skip)
-            .limit(limit)
             .all()
         )
-
-
 anne_univ = CRUDAnne(AnneUniv)

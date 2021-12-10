@@ -1,7 +1,10 @@
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
+
+from sqlalchemy.sql.expression import true
+from sqlalchemy import MetaData, Table
 
 import emails
 from emails.template import JinjaTemplate
@@ -14,6 +17,7 @@ import json
 from uuid import UUID
 from app.core.config import settings
 from unidecode import unidecode
+from app.db.session import engine
 
 
 def send_email(
@@ -169,6 +173,44 @@ def get_niveau(sems_a:str, sems_b:str)-> str:
         return "M1"
     elif int(value_1) <= 10:
         return "M2"
+
+
+def validation_semestre(etudiant:Any, sems:str, credit:int, total_cred:int,anne:str):
+    response = {}
+    response["anne"]=anne
+    for index,sems_i in enumerate(etudiant.semestre):
+        if sems == sems_i:
+            if credit == total_cred:
+                response["status"]=f"Étudiant(e) ayant validé(e) la {total_cred} crédit définitive."
+                response["code"]=True
+            else:
+                response["status"]= f"Étudiant(e) ayant validé(e) la {total_cred} crédit par compensation."
+                response["code"]=True
+            response["anne"]=etudiant.anne[index]
+        else:
+                response["status"]="Étudiant(e) redoublé(e)"
+                response["code"]=False
+    return response
+
+
+def check_table_info(schemas:str) -> list:
+        all_table = []
+        metadata = MetaData(schema = schemas)
+        metadata.reflect(bind=engine)
+        for table in metadata.tables:
+            table_name = table.replace(f'{schemas}.', '')
+            if table_name[0:4]!="note":
+                all_table.append(table_name)
+        return all_table
+
+def check_columns_exist(schemas:str, table_name:str) -> Optional[List[str]]:
+        metadata = MetaData(schema=schemas, bind=engine)
+        columns = []
+        table_ = Table(table_name, metadata,autoload=True)
+        for index, table in enumerate(table_.columns):
+            columns.append(str(table).partition(".")[2])
+        return columns
+
 
 def send_new_account(email_to: str, password: str) -> str:
     smtp_server = settings.SMTP_SERVER

@@ -12,15 +12,13 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.Role])
 def read_roles(
     db: Session = Depends(deps.get_db),
-    skip: int = 0,
-    limit: int = 100,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve roles.
     """
     if crud.user.is_superuser(current_user):
-        role = crud.role.get_multi(db, skip=skip, limit=limit)
+        role = crud.role.get_multi(db=db)
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return role
@@ -63,7 +61,7 @@ def update_role(
     return role
 
 
-@router.get("/", response_model=schemas.Role)
+@router.get("/by_uuid", response_model=schemas.Role)
 def read_role(
     *,
     db: Session = Depends(deps.get_db),

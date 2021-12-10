@@ -24,12 +24,10 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         return db_obj
 
     def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100
+        self, db: Session
     ) -> List[Role]:
         return (
             db.query(self.model)
-            .offset(skip)
-            .limit(limit)
             .all()
         )
 

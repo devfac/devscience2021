@@ -28,7 +28,7 @@ class MentionInDBBase(MentionBase):
 
 # Additional properties to return via API
 class Mention(MentionInDBBase):
-    pass
+    value:str
 
 
 # Additional properties stored in DB

@@ -5,7 +5,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.utils import UUIDEncoder, decode_text
+from app.utils import UUIDEncoder, decode_schemas, decode_text
 from app import crud, models, schemas
 from app.api import deps
 
@@ -22,6 +22,9 @@ def read_ue(
     """
     Retrieve unité d'enseingement.
     """
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
     matier_ue = crud.matier_ue.get_all(schema=schema)
     return matier_ue
 
@@ -36,8 +39,11 @@ def create_ue(
     """
     Create unité d'enseingement.
     """
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
     ue_in.uuid = uuid.uuid4()
-    value = decode_text(ec_in.title).lower()
+    value = decode_text(ue_in.title).lower()
     matier_ue = crud.matier_ue.get_by_schema(schema=schema, obj_in=ue_in,value=value)
     if matier_ue:
         raise HTTPException(status_code=404, detail="U.E already exists")
@@ -56,6 +62,9 @@ def update_ue(
     """
     Update unité d'enseingement.
     """
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
     ue = crud.matier_ue.get_by_uuid(schema=schema, uuid=uuid)
     if not ue:
         raise HTTPException(status_code=404, detail="U.E not found")
@@ -73,6 +82,9 @@ def delete_ue(
     """
     Delete unité d'enseingements.
     """
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
     ue = crud.matier_ue.get_by_uuid(schema=schema, uuid=uuid)
     if not ue:
         raise HTTPException(status_code=404, detail="U.E not found")
