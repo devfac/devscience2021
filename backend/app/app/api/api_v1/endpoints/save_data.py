@@ -79,20 +79,24 @@ async def create_upload_file(*,
         if table == "unite_enseing":
             cle = "num_carte"
         elif table == "element_const":
-            cle = "num_carte"
+            cle = "title"
         elif table == "ancien_etudiant":
-            cle = "num_carte"
+            cle = "title"
         elif table == "nouveau_etudiant":
             cle = "num_carte"
         valid = save_data.validation_file(file_location,table,schema)
         if valid != "valid":
             raise HTTPException(
             status_code=400,
-            detail=f"invalide file ",
+            detail=valid
         )
-
         all_data = save_data.get_data_xlsx(file_location,table)
+        for data in all_data:
+            exist_data = crud.save.exist_data(schema,table,cle,data['cle'])
+            if not exist_data:
+                one_data = crud.save.insert_data(schema,table,data)
         all_data_[table]=all_data
+
     os.remove(file_location)
     return all_data_
 

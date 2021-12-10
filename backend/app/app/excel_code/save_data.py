@@ -40,13 +40,14 @@ def get_all_sheet(workbook:str):
     wb = load_workbook(workbook)
     return wb.sheetnames
 
+
 def validation_file(name:str,sheet_name:str, schemas:str)-> str:
     wb = load_workbook(name)
     sheet = wb.get_sheet_by_name(sheet_name)
     columns = check_columns_exist(schemas,sheet_name)
     for col in range(sheet.max_column):
         if str(sheet.cell(row=1,column=col+1).value) != columns[col]:
-            return f"invalid columns {sheet.cell(row=1,column=col+1)}"
+            return f"invalid columns {columns[col]} and {sheet.cell(row=1,column=col+1).value} is differents"
     return "valid"
 
 
