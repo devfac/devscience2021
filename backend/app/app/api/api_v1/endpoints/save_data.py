@@ -1,8 +1,10 @@
+import os
 from typing import Any, List
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, UploadFile,HTTPException
 from pydantic.networks import EmailStr
 from sqlalchemy.sql.expression import any_
+import aiofiles
 
 from app import models, schemas
 from app.api import deps
@@ -38,21 +40,66 @@ def get_models(
     return {"msg": "Word received"}
 
 
-@router.get("/insert_data/", response_model=List[Any])
+@router.post("/insert_data/", response_model=List[Any])
 def insert_from_xlsx(*,
     db: Session = Depends(deps.get_db),
+    file: UploadFile = File(...),
     schema:str,
     current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
     """
     """
     name = decode_schemas(schema)
-    all_data = save_data.get_data_xlsx(name,"ancien_etudiant","data")
+    all_data = save_data.get_data_xlsx(file.filename,"ancien_etudiant")
     return all_data
 
+
 @router.post("/uploadfile/")
-async def create_upload_file(file: UploadFile = File(...)):
-    return {"filename": len(file)}
+async def create_upload_file(*,
+    uploaded_file: UploadFile = File(...),
+    schema:str,
+    current_user: models.User = Depends(deps.get_current_active_superuser)
+    ):
+    file_location = f"files/excel/uploaded/{uploaded_file.filename}"
+    with open(file_location, "wb+") as file_object:
+        file_object.write(uploaded_file.file.read())
+    
+    all_data_ = {}
+    cle = ""
+    all_table = check_table_info(schema)
+    all_sheet = save_data.get_all_sheet(file_location)
+    for i in range(len(all_table)):
+        if str(all_table[i]) != str(all_sheet[i]):
+            raise HTTPException(
+            status_code=400,
+            detail=f"invalide file {all_sheet[i]} not found",
+        )
+
+    for table in all_table:
+        if table == "unite_enseing":
+            cle = "num_carte"
+        elif table == "element_const":
+            cle = "title"
+        elif table == "ancien_etudiant":
+            cle = "title"
+        elif table == "nouveau_etudiant":
+            cle = "num_carte"
+        valid = save_data.validation_file(file_location,table,schema)
+        if valid != "valid":
+            raise HTTPException(
+            status_code=400,
+            detail=valid
+        )
+        all_data = save_data.get_data_xlsx(file_location,table)
+        for data in all_data:
+            exist_data = crud.save.exist_data(schema,table,cle,data['cle'])
+            if not exist_data:
+                one_data = crud.save.insert_data(schema,table,data)
+        all_data_[table]=all_data
+
+    os.remove(file_location)
+    return all_data_
+
 
 @router.get("/save_data/")
 def save_data_to_excel(
@@ -75,9 +122,9 @@ def save_data_to_excel(
     all_table = check_table_info("public")
     save_data.create_workbook("public",all_table,"data")
     for table in all_table:
-            colums = check_columns_exist("public",table)
-            save_data.write_data_title("public", table,colums,"data" )
-            all_data = crud.save.read_all_data("public",table)
-            if all_data:
-                save_data.insert_data_xlsx("public",table,all_data,colums,"data")
+        colums = check_columns_exist("public",table)
+        save_data.write_data_title("public", table,colums,"data" )
+        all_data = crud.save.read_all_data("public",table)
+        if all_data:
+            save_data.insert_data_xlsx("public",table,all_data,colums,"data")
     return {"msg": "Word received"}
