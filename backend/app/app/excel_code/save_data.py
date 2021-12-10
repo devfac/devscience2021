@@ -35,10 +35,10 @@ def insert_data_xlsx(name:str,sheet_name:str, all_data:Any, columns:list, type:s
     
     wb.save(filename = f'files/excel/{type}/{name}.xlsx')
 
-<<<<<<< HEAD
+
 def insert_from_xlsx(name:str,sheet_name:str, all_data:Any, columns:list, type:str):
     wb = load_workbook(f'files/excel/{type}/{name}.xlsx')
-=======
+
 
 def get_all_sheet(workbook:str):
     wb = load_workbook(workbook)
@@ -57,7 +57,6 @@ def validation_file(name:str,sheet_name:str, schemas:str)-> str:
 
 def get_data_xlsx(name:str,sheet_name:str)-> Any:
     wb = load_workbook(name)
->>>>>>> ae9290bfbf57b4f1c855ca4ecf6d7cee87f2ac51
     sheet = wb.get_sheet_by_name(sheet_name)
     row =2
     for index_, data in enumerate(all_data):
