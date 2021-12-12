@@ -23,12 +23,13 @@ class CRUDSave():
         ins = ins.values(obj_in)
         conn.execute(ins)
         conn.close()
+        
 
     def exist_data(self,schema: str,table_name:str,key:str,value:str) :
         metadata = MetaData(schema=schema, bind=engine)
         table = Table(table_name, metadata,autoload=True)
         conn = engine.connect()
-        result = conn.execute(f"SELECT * FROM {table} WHERE {key}=='{value}'")
+        result = conn.execute(f"SELECT * FROM {table} WHERE {key}='{value}'")
         out = result.fetchone()
         conn.close()
         return out
