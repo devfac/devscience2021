@@ -207,6 +207,18 @@ def get_niveau_(sems_a:str, sems_b:str)-> str:
         return "QUATRIÈME ANNÉE"
     elif int(value_1) <= 10:
         return "CINQUIÈME ANNÉE"
+
+def get_niveau_long(niv:str)-> str:
+    if niv == 'l1' :
+        return "PREMIÈRE ANNÉE"
+    if niv == 'l2' :
+        return "DEUXIÈME ANNÉE"
+    if niv == 'l3' :
+        return "TROISIÈME ANNÉE"
+    if niv == 'm1' :
+        return "QUATRIÈME ANNÉE"
+    if niv == 'm2' :
+        return "CINQUIÈME ANNÉE"
     
 
 def validation_semestre(etudiant:Any, sems:str, credit:int, total_cred:int,anne:str):
