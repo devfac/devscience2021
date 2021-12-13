@@ -67,16 +67,6 @@ def validation_file_note(name:str,sheet_name:str, table_name:str,schemas:str)-> 
 def get_data_xlsx(name:str,sheet_name:str)-> Any:
     wb = load_workbook(name)
     sheet = wb.get_sheet_by_name(sheet_name)
-<<<<<<< HEAD
-    row =2
-    for index_, data in enumerate(all_data):
-        for index,col in enumerate(data):
-            sheet.cell(row=row,column=index+1).value = str(data[index])
-            print(f"{sheet_name}",data[index])
-        row += 1
-    
-    wb.save(filename = f'files/excel/{type}/{name}.xlsx')
-=======
     all_data = []
     for row in range(sheet.max_row):
         data = {}
@@ -99,4 +89,3 @@ def get_data_xlsx_note(name:str,sheet_name:str)-> Any:
                 data[str(sheet.cell(row=1,column=col+1).value)]= str(sheet.cell(row=row+1,column=col+1).value)
             all_data.append(data) 
     return all_data
->>>>>>> excel

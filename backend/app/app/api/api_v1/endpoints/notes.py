@@ -44,19 +44,12 @@ def create_table_note(
             else:
                 return {"msg":"Error"}
         else:
-<<<<<<< HEAD
-            raise HTTPException(
-            status_code=400,
-            detail=f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()} already exists in the system.",
-        )
-=======
             all_columns = crud.note.check_columns_exist(schemas=schemas, semestre=semestre,parcours=parcours,session=session)
             matiers = compare_list(matiers,all_columns)
             if len(matiers) != 0:
                 models.note.update_table_note(schemas=schemas,parcours=parcours,semestre=semestre,matiers=matiers, session=session)
                 models.note.update_table_note(schemas=schemas,parcours=parcours,semestre=semestre,matiers=matiers, session="final")
 
->>>>>>> excel
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
 
