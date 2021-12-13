@@ -18,10 +18,7 @@ def read_mentions(
     """
     Retrieve mentions.
     """
-    if crud.user.is_superuser(current_user):
-        mentions = crud.mention.get_multi(db=db)
-    else:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+    mentions = crud.mention.get_multi(db=db)
     return mentions
 
 
@@ -79,8 +76,6 @@ def read_mention(
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid)
     if not mention:
         raise HTTPException(status_code=404, detail="Mention not found")
-    if not crud.user.is_superuser(current_user):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
     return mention
 
 

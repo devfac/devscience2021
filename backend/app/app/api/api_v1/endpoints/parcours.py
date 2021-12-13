@@ -18,10 +18,7 @@ def read_parcours(
     """
     Retrieve paarcours.
     """
-    if crud.user.is_superuser(current_user):
-        parcours = crud.parcours.get_multi(db=db)
-    else:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+    parcours = crud.parcours.get_multi(db=db)
     return parcours
 
 
@@ -75,8 +72,6 @@ def read_parcours_by_uuid(
     parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid)
     if not parcours:
         raise HTTPException(status_code=404, detail="Parcours not found")
-    if not crud.user.is_superuser(current_user):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
     return parcours
 
 
@@ -93,8 +88,6 @@ def read_parcours_by_mention(
     parcours = crud.parcours.get_by_mention(db=db, uuid_mention=uuid_mention)
     if not parcours:
         raise HTTPException(status_code=404, detail="Parcours not found")
-    if not crud.user.is_superuser(current_user):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
     return parcours
 
 

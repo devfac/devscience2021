@@ -10,6 +10,8 @@ import json
 
 router = APIRouter()
 
+
+
 @router.post("/insert_etudiants", response_model=List[Any])
 def inserts_etudiant(
     *,
@@ -61,8 +63,6 @@ def inserts_etudiant(
                     crud.note.insert_note(schemas,semestre,parcours,session,etudiant.num_carte)
                     crud.note.insert_note(schemas,semestre,parcours,"final",etudiant.num_carte)
         all_note = crud.note.read_all_note(schemas, semestre, parcours,session)
-        for note in all_note:
-            print(note["ue_analyse"])
         return all_note
 
 
