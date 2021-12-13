@@ -15,7 +15,7 @@ class CRUDAnne(CRUDBase[AnneUniv, AnneUnivCreate, AnneUnivUpdate]):
         return db.query(AnneUniv).filter(AnneUniv.uuid == uuid).first()
 
     
-    def get_by_title(self, db: Session, *, title: str) -> Optional[AnneUniv]:
+    def get_by_title(self, db: Session, title: str) -> Optional[AnneUniv]:
         return db.query(AnneUniv).filter(AnneUniv.title == title).first()
         
     def create(
@@ -35,5 +35,14 @@ class CRUDAnne(CRUDBase[AnneUniv, AnneUnivCreate, AnneUnivUpdate]):
             db.query(self.model)
             .order_by(AnneUniv.title.desc())
             .all()
+        )
+
+    def get_actual_value(
+        self, db: Session,
+    ) -> List[AnneUniv]:
+        return (
+            db.query(self.model)
+            .order_by(AnneUniv.title.desc())
+            .one()
         )
 anne_univ = CRUDAnne(AnneUniv)

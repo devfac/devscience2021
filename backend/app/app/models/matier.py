@@ -16,6 +16,7 @@ def create(schemas):
             Column("value",String),
             Column("credit",Integer),
             Column("semestre",String),
+            Column("key_unique",String),
             Column("uuid_parcours",UUID(as_uuid=True)),
             Column("uuid_mention",UUID(as_uuid=True)),
             schema=schemas
@@ -28,6 +29,7 @@ def create(schemas):
             Column("value_ue",String),
             Column("utilisateur",String),
             Column("semestre",String),
+            Column("key_unique",String),
             Column("uuid_parcours",UUID(as_uuid=True)),
             Column("uuid_mention",UUID(as_uuid=True)),
             schema=schemas

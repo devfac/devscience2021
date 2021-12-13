@@ -8,7 +8,7 @@ from app import crud, models, schemas
 from app.api import deps
 from app.db.session import engine
 from sqlalchemy.sql.ddl import CreateSchema
-from app.utils import create_anne
+from app.utils import create_anne, compare_list
 from app.core.config import settings
 
 router = APIRouter()
@@ -29,25 +29,34 @@ def create_table_note(
     """
    
     if crud.user.is_superuser(current_user):
+        matiers = []
+        ues = crud.matier_ue.get_by_class(schema=schemas, uuid_parcours=uuid_parcours, semestre=semestre)
+        for index ,ue in enumerate(ues):
+            matiers.append("ue_"+ue[2])
+            ecs = crud.matier_ec.get_by_value_ue(schema=schemas, value_ue=ue[2],semestre=semestre,uuid_parcours=uuid_parcours)
+            for index,ec in enumerate(ecs):
+                matiers.append("ec_"+ec[2])
         test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours,session=session)
         if not test_note:
-            matiers = []
-            ues = crud.matier_ue.get_by_class(schema=schemas, uuid_parcours=uuid_parcours, semestre=semestre)
-            for index ,ue in enumerate(ues):
-                matiers.append("ue_"+ue[2])
-                ecs = crud.matier_ec.get_by_value_ue(schema=schemas, value_ue=ue[2],semestre=semestre,uuid_parcours=uuid_parcours)
-                for index,ec in enumerate(ecs):
-                    matiers.append("ec_"+ec[2])
             if models.note.create_table_note(schemas=schemas,parcours=parcours,semestre=semestre,matiers=matiers, session=session):
                models.note.create_table_note(schemas=schemas,parcours=parcours,semestre=semestre,matiers=matiers, session="final")
                return {"msg":"Succces"}
             else:
                 return {"msg":"Error"}
         else:
+<<<<<<< HEAD
             raise HTTPException(
             status_code=400,
             detail=f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()} already exists in the system.",
         )
+=======
+            all_columns = crud.note.check_columns_exist(schemas=schemas, semestre=semestre,parcours=parcours,session=session)
+            matiers = compare_list(matiers,all_columns)
+            if len(matiers) != 0:
+                models.note.update_table_note(schemas=schemas,parcours=parcours,semestre=semestre,matiers=matiers, session=session)
+                models.note.update_table_note(schemas=schemas,parcours=parcours,semestre=semestre,matiers=matiers, session="final")
+
+>>>>>>> excel
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
 

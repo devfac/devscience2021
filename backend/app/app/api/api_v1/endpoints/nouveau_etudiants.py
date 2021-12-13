@@ -24,9 +24,9 @@ def read_etudiant_nouveau(
     """
     Retrieve etudiant nouveau.
     """
-    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schema))
     if not anne_univ:
-        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",
         )
     etudiant = crud.nouveau_etudiant.get_all(schema=schema)
    
@@ -44,9 +44,9 @@ def create_etudiant_nouveau(
     """
     Create new etudiant.
     """
-    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schema))
     if not anne_univ:
-        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",)
         
     etudiant_in.uuid = uuid.uuid4()
     etudiant = crud.nouveau_etudiant.create_etudiant(schema=schema, obj_in=etudiant_in)
@@ -65,9 +65,9 @@ def update_etudiant(
     """
     Update an etudiant.
     """
-    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schema))
     if not anne_univ:
-        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",)
         
     etudiant = crud.nouveau_etudiant.get_by_num_insc(schema=schema, num_insc=num_insc)
     if not etudiant:
@@ -87,9 +87,9 @@ def read_etudiant_by_num_carte(
     """
     Get etudiant by num insription.
     """
-    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schema))
     if not anne_univ:
-        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",)
     etudiant = crud.nouveau_etudiant.get_by_num_insc(schema=schema, num_insc=num_insc)
     if not etudiant:
         raise HTTPException(status_code=404, detail="Etudiant not found")
@@ -106,9 +106,9 @@ def read_etudiant_by_mention(
     """
     Get etudiant by mention.
     """
-    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schema))
     if not anne_univ:
-        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",)
     etudiant = crud.nouveau_etudiant.get_by_mention(schema=schema, uuid_mention=uuid_mention)
     
     return etudiant
@@ -124,9 +124,9 @@ def read_etudiant_by_mention(
     """
     Get etudiant by parcours.
     """
-    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schema))
     if not anne_univ:
-        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",)
     etudiant = crud.nouveau_etudiant.get_by_parcours(schema=schema, uuid_parcours=uuid_parcours)
     return etudiant
 
@@ -142,9 +142,9 @@ def delete_etudiant_nouveau(
     """
     Delete an etudiant.
     """
-    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schema))
     if not anne_univ:
-        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",)
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",)
     etudiant = crud.nouveau_etudiant.get_by_num_insc(schema=schema, num_insc=num_insc)
     if not etudiant:
         raise HTTPException(status_code=404, detail="Etudiant not found")

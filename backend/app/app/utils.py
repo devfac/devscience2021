@@ -124,7 +124,7 @@ def create_anne(anne:str):
     return ann
 
 def decode_schemas(schema:str):
-    ann = schema[5:9]+"-"+schema[10:15]
+    ann = f"{schema[5:9]}-{schema[10:15]}"
     return ann
 
 def creaate_registre(schema:str):
@@ -136,15 +136,30 @@ def decode_text(text:str) -> str:
      return unidecode(strd)
 
 def get_max(sems_a:str, sems_b:str)-> str:
-    value_1 = sems_a.upper().partition("S")[2]
-    value_2 = sems_b.upper().partition("S")[2]
+    if len(sems_a) == 0:
+        value_1=0
+    else:
+        value_1 = sems_a.upper().partition("S")[2]
+
+    if len(sems_b) == 0:
+        value_2 = 0
+    else:
+        value_2 = sems_b.upper().partition("S")[2]    
+
     if int(value_1) > int(value_2):
         return sems_a
     return sems_b
 
 def get_min(sems_a:str, sems_b:str)-> str:
-    value_1 = sems_a.upper().partition("S")[2]
-    value_2 = sems_b.upper().partition("S")[2]
+    if len(sems_a) == 0:
+        value_1=0
+    else:
+        value_1 = sems_a.upper().partition("S")[2]
+
+    if len(sems_b) == 0:
+        value_2 = 0
+    else:
+        value_2 = sems_b.upper().partition("S")[2]   
     if int(value_1) > int(value_2):
         return sems_b
     return sems_a
@@ -161,8 +176,10 @@ def max_value(value_1:float, value_2:float) -> float:
 
 
 def get_niveau(sems_a:str, sems_b:str)-> str:
-    value_1 = get_max(sems_a,sems_b).upper().partition("S")[2]
-
+    if len(get_max(sems_a,sems_b)) == 0:
+        return "Invalid semestre"
+    else:
+        value_1 = get_max(sems_a,sems_b).upper().partition("S")[2]
     if int(value_1) <= 2 :
         return "L1"
     elif int(value_1) <= 4:
@@ -174,6 +191,23 @@ def get_niveau(sems_a:str, sems_b:str)-> str:
     elif int(value_1) <= 10:
         return "M2"
 
+
+def get_niveau_(sems_a:str, sems_b:str)-> str:
+    if len(get_max(sems_a,sems_b)) == 0:
+        return "Invalid semestre"
+    else:
+        value_1 = get_max(sems_a,sems_b).upper().partition("S")[2]
+    if int(value_1) <= 2 :
+        return "PREMIERE ANNÉE"
+    elif int(value_1) <= 4:
+        return "DEUXIEME ANNÉE"
+    elif int(value_1) <= 6:
+        return "TROISIÈME ANNÉE"
+    elif int(value_1) <= 8:
+        return "QUATRIÈME ANNÉE"
+    elif int(value_1) <= 10:
+        return "CINQUIÈME ANNÉE"
+    
 
 def validation_semestre(etudiant:Any, sems:str, credit:int, total_cred:int,anne:str):
     response = {}
@@ -203,6 +237,16 @@ def check_table_info(schemas:str) -> list:
                 all_table.append(table_name)
         return all_table
 
+def check_table_note(schemas:str) -> list:
+        all_table = []
+        metadata = MetaData(schema = schemas)
+        metadata.reflect(bind=engine)
+        for table in metadata.tables:
+            table_name = table.replace(f'{schemas}.', '')
+            if table_name[0:4]=="note":
+                all_table.append(table_name)
+        return all_table
+
 def check_columns_exist(schemas:str, table_name:str) -> Optional[List[str]]:
         metadata = MetaData(schema=schemas, bind=engine)
         columns = []
@@ -210,6 +254,13 @@ def check_columns_exist(schemas:str, table_name:str) -> Optional[List[str]]:
         for index, table in enumerate(table_.columns):
             columns.append(str(table).partition(".")[2])
         return columns
+
+
+def compare_list(list_2:list, list_1:list):
+    for key_1 in list_1:
+            if key_1 in list_2:
+                list_2.remove(key_1)
+    return list_2
 
 
 def send_new_account(email_to: str, password: str) -> str:

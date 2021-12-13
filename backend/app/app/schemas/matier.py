@@ -42,6 +42,7 @@ class MatierECUpdate(BaseModel):
 class MatierUEInDBBase(MatiertBase):
     credit: Optional[int]
     value: Optional[str]
+    key_unique: Optional[str]
 
     class Config:
         orm_mode = True
@@ -50,6 +51,7 @@ class MatierECInDBBase(MatiertBase):
     poids: Optional[float]
     value: Optional[str]
     value_ue: Optional[str]
+    key_unique: Optional[str]
     utilisateur: Optional[str]
 
     class Config:

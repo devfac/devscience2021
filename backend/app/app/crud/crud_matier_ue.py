@@ -82,12 +82,12 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
         return out
 
 
-    def create_ue(self,schema: str, obj_in: MatierUECreate,value:str) -> Optional[MatierUE]:
+    def create_ue(self,schema: str, obj_in: MatierUECreate,value:str,key_unique) -> Optional[MatierUE]:
         obj_in_data = jsonable_encoder(obj_in)
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table(f"unite_enseing", metadata,autoload=True)
-        ins = table.insert().values(**obj_in_data,value=value)
+        ins = table.insert().values(**obj_in_data,value=value,key_unique=key_unique)
         conn.execute(ins)
         sel = table.select()
         result = conn.execute(sel)

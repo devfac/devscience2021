@@ -20,14 +20,14 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         metadata.reflect(bind=engine)
         for table in metadata.tables:
             table_name = table.replace(f'{schemas}.', '')
-            if table_name == f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}":
+            if table_name == f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}":
                 return True
         return False
 
     def check_columns_exist(self,schemas:str, semestre:str, parcours:str, session:str) -> Optional[List[str]]:
         metadata = MetaData(schema=schemas, bind=engine)
         columns = []
-        table_ = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
+        table_ = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
         for index, table in enumerate(table_.columns):
             columns.append(str(table).partition(".")[2])
         return columns
@@ -35,7 +35,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
     def insert_note(self,schema: str,semestre:str,parcours:str,session:str ,num_carte:str) :
         obj_in_data = jsonable_encoder({num_carte})
         metadata = MetaData(schema=schema, bind=engine)
-        table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
         conn = engine.connect()
         ins = insert(table=table)
         ins = ins.values(obj_in_data)
@@ -44,7 +44,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
 
     def read_all_note(self,schema: str,semestre:str,parcours:str, session:str) :
         metadata = MetaData(schema=schema, bind=engine)
-        table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
         result = conn.execute(sel)
@@ -55,7 +55,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
     def update_note(self,schema: str, semestre:str, parcours:str,session:str ,num_carte:str, ue_in:Any):
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
-        table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
         conn = engine.connect()
         up = update(table=table)
         up = up.values(ue_in)
@@ -66,7 +66,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
     def read_by_num_carte(self,schema: str, semestre:str, parcours:str,session:str, num_carte:str) -> Any:
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
-        table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
         sel = table.select()
         sel = sel.where(table.columns.num_carte == num_carte)
         result = conn.execute(sel)
@@ -78,7 +78,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
     def update_auto(self,schema: str, semestre:str, parcours:str,session:str ,num_carte:str):
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
-        table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
         table_norm = Table(f"note_{semestre.lower()}_{parcours.lower()}_normal", metadata,autoload=True)
         sel = table_norm.select()
         sel = sel.where(table_norm.columns.num_carte == num_carte)
@@ -94,7 +94,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
     def read_by_credit(self,schema: str, semestre:str, parcours:str,session:str, credit:int) -> Any:
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
-        table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
         sel = table.select()
         sel = sel.where(table.columns.credit < credit)
         result = conn.execute(sel)
@@ -106,7 +106,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
     def delete_by_num_carte(self,schema: str, semestre:str, parcours:str, session:str,num_carte:str):
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
-        table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
         dele = table.delete()
         dele = dele.where(table.columns.num_carte == {num_carte})
         conn.execute(dele)
@@ -115,7 +115,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
     def read_ue_moyenne(self,schema: str, semestre:str, parcours:str, session:str,num_carte:str, obj_in:str) -> Any:
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
-        table = Table(f"note_{semestre.lower()}_{parcours.lower()}_{session.lower()}", metadata,autoload=True)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
         sel = table.select()
         sel = sel.where(f"table.columns.{num_carte} == {num_carte}")
         result = conn.execute(sel)

@@ -79,6 +79,18 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.close()
         return out
 
+
+    def key_unique(self,schema: str, key_unique:str) -> Optional[MatierEC]:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table("element_const", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(table.columns.key_unique == key_unique)
+        result = conn.execute(sel)
+        out = result.fetchone()
+        conn.close()
+        return out
+
     def get_by_schema(self,schema: str,obj_in: MatierECCreate, value:str)-> Optional[List[MatierEC]]:
         obj_in_data = jsonable_encoder(obj_in)
         metadata = MetaData(schema=schema, bind=engine)
@@ -94,12 +106,12 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         return out
 
 
-    def create_ec(self,schema: str, obj_in: MatierECCreate,value:str) -> Optional[List[MatierEC]]:
+    def create_ec(self,schema: str, obj_in: MatierECCreate,value:str,key_unique) -> Optional[List[MatierEC]]:
         obj_in_data = jsonable_encoder(obj_in)
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table("element_const", metadata,autoload=True)
-        ins = table.insert().values(**obj_in_data,value=value)
+        ins = table.insert().values(**obj_in_data,value=value,key_unique=key_unique)
         conn.execute(ins)
         sel = table.select()
         result = conn.execute(sel)

@@ -4,7 +4,6 @@ from uuid import UUID
 from pydantic import BaseModel
 from sqlalchemy.sql.sqltypes import ARRAY
 
-
 # Shared properties
 class ParcoursBase(BaseModel):
     title: Optional[str] = None
