@@ -136,15 +136,30 @@ def decode_text(text:str) -> str:
      return unidecode(strd)
 
 def get_max(sems_a:str, sems_b:str)-> str:
-    value_1 = sems_a.upper().partition("S")[2]
-    value_2 = sems_b.upper().partition("S")[2]
+    if len(sems_a) == 0:
+        value_1=0
+    else:
+        value_1 = sems_a.upper().partition("S")[2]
+
+    if len(sems_b) == 0:
+        value_2 = 0
+    else:
+        value_2 = sems_b.upper().partition("S")[2]    
+
     if int(value_1) > int(value_2):
         return sems_a
     return sems_b
 
 def get_min(sems_a:str, sems_b:str)-> str:
-    value_1 = sems_a.upper().partition("S")[2]
-    value_2 = sems_b.upper().partition("S")[2]
+    if len(sems_a) == 0:
+        value_1=0
+    else:
+        value_1 = sems_a.upper().partition("S")[2]
+
+    if len(sems_b) == 0:
+        value_2 = 0
+    else:
+        value_2 = sems_b.upper().partition("S")[2]   
     if int(value_1) > int(value_2):
         return sems_b
     return sems_a
@@ -161,8 +176,10 @@ def max_value(value_1:float, value_2:float) -> float:
 
 
 def get_niveau(sems_a:str, sems_b:str)-> str:
-    value_1 = get_max(sems_a,sems_b).upper().partition("S")[2]
-
+    if len(get_max(sems_a,sems_b)) == 0:
+        return "Invalid semestre"
+    else:
+        value_1 = get_max(sems_a,sems_b).upper().partition("S")[2]
     if int(value_1) <= 2 :
         return "L1"
     elif int(value_1) <= 4:
@@ -174,6 +191,23 @@ def get_niveau(sems_a:str, sems_b:str)-> str:
     elif int(value_1) <= 10:
         return "M2"
 
+
+def get_niveau_(sems_a:str, sems_b:str)-> str:
+    if len(get_max(sems_a,sems_b)) == 0:
+        return "Invalid semestre"
+    else:
+        value_1 = get_max(sems_a,sems_b).upper().partition("S")[2]
+    if int(value_1) <= 2 :
+        return "PREMIERE ANNÉE"
+    elif int(value_1) <= 4:
+        return "DEUXIEME ANNÉE"
+    elif int(value_1) <= 6:
+        return "TROISIÈME ANNÉE"
+    elif int(value_1) <= 8:
+        return "QUATRIÈME ANNÉE"
+    elif int(value_1) <= 10:
+        return "CINQUIÈME ANNÉE"
+    
 
 def validation_semestre(etudiant:Any, sems:str, credit:int, total_cred:int,anne:str):
     response = {}

@@ -59,12 +59,24 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         conn.close()
         return out
 
-    def get_by_parcours(self, schema: str, uuid_parcours: UUID) -> Optional[EtudiantAncien]:
+    def get_by_parcours(self, schema: str, uuid_parcours: str) -> Optional[EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(table.columns.uuid_parcours == uuid_parcours)
+        sel = sel.order_by(table.columns.nom.asc())
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
+
+    def get_by_parcours_and_etat(self, schema: str, uuid_parcours: str, etat:str) -> Optional[EtudiantAncien]:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table("ancien_etudiant", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(and_(table.columns.uuid_parcours == uuid_parcours,table.columns.etat == etat))
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()
@@ -104,7 +116,7 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         table = Table("ancien_etudiant", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(table.columns.uuid_mention == uuid_mention and table.columns.semestre_grand == semestre_grand )
+        sel = sel.where(and_(table.columns.uuid_mention == uuid_mention ,table.columns.semestre_grand == semestre_grand ))
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()
@@ -123,12 +135,12 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         conn.close()
         return out
 
-    def get_by_etat_and_moyenne(self, schema: str,etat: str, moyenne: float) -> Optional[EtudiantAncien]:
+    def get_by_parcour_and_etat_and_moyenne(self, schema: str,uuid_parcours :str, etat: str, moyenne: float) -> Optional[EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(table.columns.moyenne == moyenne and table.columns.etat == etat)
+        sel = sel.where(and_(table.columns.moyenne >= moyenne, table.columns.etat == etat, table.columns.uuid_parcours == uuid_parcours))
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()
