@@ -274,6 +274,24 @@ def compare_list(list_2:list, list_1:list):
                 list_2.remove(key_1)
     return list_2
 
+def get_credit(note_ue:float, credit:int) -> int:
+    if note_ue is None:
+        return 0
+    elif note_ue < 10 :
+        return 0 
+    else:
+        return credit
+
+def get_status(note_ue:float) -> str:
+    if note_ue is None:
+        return "Non validé"
+    elif note_ue < 10 :
+        return "Non validé"
+    else:
+        return "Validé"
+
+
+
 
 def send_new_account(email_to: str, password: str) -> str:
     smtp_server = settings.SMTP_SERVER

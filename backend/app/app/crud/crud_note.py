@@ -52,6 +52,80 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.close()
         return out
 
+    def read_note_succes(self,schema: str,semestre:str,parcours:str, session:str, value_matier:str) :
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
+        conn = engine.connect()
+        result = conn.execute(f"SELECT num_carte, {value_matier} FROM {table} WHERE {value_matier} >= 10 ")
+        out = result.fetchall()
+        conn.close()
+        return out
+
+    def read_note_by_ue(self,schema: str,semestre:str,parcours:str, session:str, list_ue:list) :
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
+        conn = engine.connect()
+        result = conn.execute(f"SELECT num_carte, {list_ue} FROM {table} ")
+        out = result.fetchall()
+        conn.close()
+        return out
+
+
+    def read_note_failed(self,schema: str,semestre:str,parcours:str, session:str, value_matier:str) :
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
+        conn = engine.connect()
+        result = conn.execute(f"SELECT num_carte, {value_matier} FROM {table} WHERE {value_matier} < 10  OR {value_matier} IS NULL ")
+        out = result.fetchall()
+        conn.close()
+        return out
+
+    def read_note_by_moyenne_and_credit_equals(self,schema: str,semestre:str,parcours:str, session:str, moyenne:float, credit:int) :
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
+        conn = engine.connect()
+        result = conn.execute(f"SELECT num_carte,moyenne,credit FROM {table} WHERE moyenne >= {moyenne} and credit = {credit}")
+        out = result.fetchall()
+        conn.close()
+        return out
+
+    def read_note_by_moyenne_and_credit_sup(self,schema: str,semestre:str,parcours:str, session:str, moyenne:float, credit:int) :
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
+        conn = engine.connect()
+        result = conn.execute(f"SELECT num_carte,moyenne,credit FROM {table} WHERE moyenne >= {moyenne} and credit >= {credit}")
+        out = result.fetchall()
+        conn.close()
+        return out
+
+    def read_note_by_moyenne_and_credit_inf(self,schema: str,semestre:str,parcours:str, session:str, moyenne:float, credit:int) :
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
+        conn = engine.connect()
+        result = conn.execute(f"SELECT num_carte,moyenne,credit FROM {table} WHERE moyenne >= {moyenne} and credit <= {credit}")
+        out = result.fetchall()
+        conn.close()
+        return out
+
+    def read_note_by_credit(self,schema: str,semestre:str,parcours:str, session:str, credit:int) :
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
+        conn = engine.connect()
+        result = conn.execute(f"SELECT num_carte,credit FROM {table} WHERE credit = {credit}")
+        out = result.fetchall()
+        conn.close()
+        return out
+
+    def read_note_by_moyenne(self,schema: str,semestre:str,parcours:str, session:str, moyenne:float) :
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
+        conn = engine.connect()
+        result = conn.execute(f"SELECT num_carte,moyenne FROM {table} WHERE moyenne >= {moyenne}")
+        out = result.fetchall()
+        conn.close()
+        return out
+
+
     def update_note(self,schema: str, semestre:str, parcours:str,session:str ,num_carte:str, ue_in:Any):
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()

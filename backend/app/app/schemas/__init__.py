@@ -14,3 +14,4 @@ from .matier import MatierEC, MatierECCreate, MatierECInDB, MatierECUpdate
 from .matier import MatierUE, MatierUECreate, MatierUEInDB, MatierUEUpdate
 from .matier import MatierUni
 from .note import Note
+from .resultat import Resultat
