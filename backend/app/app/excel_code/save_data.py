@@ -85,3 +85,4 @@ def get_data_xlsx_note(name:str,sheet_name:str)-> Any:
                 data[str(sheet.cell(row=1,column=col+1).value)]= str(sheet.cell(row=row+1,column=col+1).value)
             all_data.append(data) 
     return all_data
+    
