@@ -43,6 +43,20 @@ def get_current_user(
     return user
 
 
+def get_token_info(token: str = Depends(reusable_oauth2)) -> Any:
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+        )
+        token_data = schemas.TokenPayload(**payload)
+    except (jwt.JWTError, ValidationError):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Could not validate credentials",
+        )
+    return token_data
+
+
 def get_current_active_user(
     current_user: models.User = Depends(get_current_user),
 ) -> models.User:

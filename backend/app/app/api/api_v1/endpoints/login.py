@@ -34,30 +34,24 @@ def login_access_token(
     elif not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    token =  security.create_access_token(
-            user.uuid, expires_delta=access_token_expires
-        )
     if user.uuid_mention:    
-        mention_title = []
+        mentions = []
         for uuid_mention in user.uuid_mention:
             mention = crud.mention.get_by_uuid(db, uuid=uuid_mention)
-            mention_title.append(mention.title)
+            mentions.append(mention)
     role = crud.role.get_by_uuid(db, uuid=user.uuid_role)
-    if crud.user.is_superuser(user):
-        return {
+    token =  security.create_access_token(
+            data={
+                "uuid":str(user.uuid),
+                "mention":mentions,
+                "role":role
+            }, expires_delta=access_token_expires
+        )
+    
+    return {
             "access_token":token,
-            "mention":[],
-            "role":"supperuser",
             "token_type": "bearer",
         }
-    else:
-        return {
-            "access_token":token,
-            "mention":mention_title,
-            "role":role.title,
-            "token_type": "bearer",
-        }
-
 
 
 @router.post("/login/test-token", response_model=schemas.User)
@@ -66,6 +60,13 @@ def test_token(current_user: models.User = Depends(deps.get_current_user)) -> An
     Test access token
     """
     return current_user
+
+@router.post("/decode_token", response_model=schemas.TokenPayload)
+def decode_token( info_token = Depends(deps.get_token_info)) -> Any:
+    """
+    Test access token
+    """
+    return info_token
 
 
 @router.post("/password-recovery/", response_model=schemas.Msg)
