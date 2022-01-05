@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class NoteEC(BaseModel):
     name:str
-    note:float
+    note:str
 class Note(BaseModel):
     num_carte: str
     name:str

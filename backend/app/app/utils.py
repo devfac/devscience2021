@@ -169,8 +169,13 @@ def get_credit(value:float, credit:int) -> int:
         return credit
     return 0
 
-def max_value(value_1:float, value_2:float) -> float:
-    if value_1 >= value_2:
+def max_value(value_1:str, value_2:str) -> float:
+    if value_1 == "":
+        value_1 =0
+    if value_2 == "":
+        value_2 = 0
+
+    if float(value_1) >= float(value_2):
         return value_1
     return value_2
 

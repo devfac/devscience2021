@@ -108,13 +108,22 @@ def updates_note(
             note_ue = 0
             note_ue_final = 0
             credit = crud.matier_ue.get_by_value(schemas,note.name,semestre,uuid_parcours).credit
+            if len(note.ec) != len(ecs):
+                raise HTTPException( status_code=400, detail="ivalide EC for UE",
+        )
             for i,ec in enumerate(ecs):
+                ec_note = note.ec[i].note
+                if ec_note == "":
+                   value_ec_note = 0
+                else:
+                   value_ec_note = float(note.ec[i].note)
+
                 value_sess = et_un_final[f'ec_{note.ec[i].name}']
                 if value_sess == None:
                     value_sess =0
                 poids_ec = crud.matier_ec.get_by_value(schemas,ecs[i][2],semestre,uuid_parcours)
-                note_ue += float(note.ec[i].note)*float(poids_ec.poids)
-                note_ue_final += max_value(float(note.ec[i].note),value_sess)*float(poids_ec.poids)
+                note_ue += value_ec_note*float(poids_ec.poids)
+                note_ue_final += max_value(value_ec_note,value_sess)*float(poids_ec.poids)
             ue_in[f'ue_{note.name}'] = note_ue
             ue_in_final[f'ue_{note.name}'] = note_ue_final
             for note_ec in note.ec:

@@ -16,7 +16,7 @@ def create_table_note(schemas, parcours, semestre,session ,matiers) -> bool:
         )
         note.create(engine)
         for index, value_ue in enumerate(matiers):
-            column_matier = Column(f"{value_ue}",Float)
+            column_matier = Column(f"{value_ue}",String)
             add_column(schemas=schemas,table_name=f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}",column=column_matier)
         column_moyenne = Column("moyenne",Float,default=0.0)
         add_column(schemas=schemas,table_name=f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}",column=column_moyenne)
@@ -30,7 +30,7 @@ def update_table_note(schemas, parcours, semestre,session ,matiers) -> bool:
    
     try:
         for index, value_ue in enumerate(matiers):
-            column_matier = Column(f"{value_ue}",Float)
+            column_matier = Column(f"{value_ue}",String)
             add_column(schemas=schemas,table_name=f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}",column=column_matier)
         return True
     except:
