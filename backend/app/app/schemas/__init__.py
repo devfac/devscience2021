@@ -9,7 +9,7 @@ from .semestre import Semestre, SemestreCreate, SemestreInDB, SemestreUpdate
 from .anne_univ import AnneUnivCreate, AnneUniv, AnneUnivUpdate, AnneUnivInDB
 from .semestre_valide import SemestreValide, SemestreValideInDB, SemestreValideCreate, SemestreValideUpdate
 from .etudiant import EtudiantAncien, EtudiantAncienCreate,EtudiantAncienUpdate,EtudiantAncienInDB
-from .etudiant import EtudiantNouveau, EtudiantNouveauCreate, EtudiantNouveauUpdate, EtudiantNouveauInDB
+from .etudiant import EtudiantNouveau, EtudiantNouveauCreate, EtudiantNouveauUpdate, EtudiantNouveauInDB, SelectEtudiantBase
 from .matier import MatierEC, MatierECCreate, MatierECInDB, MatierECUpdate
 from .matier import MatierUE, MatierUECreate, MatierUEInDB, MatierUEUpdate
 from .matier import MatierUni

@@ -33,11 +33,11 @@ def read_etudiant_nouveau(
     return etudiant
 
 
-@router.post("/", response_model=List[Any])
-def create_etudiant_nouveau(
+@router.post("/", response_model=List[schemas.SelectEtudiantBase])
+def create_select_etudiant_nouveau(
     *,
     db: Session = Depends(deps.get_db),
-    etudiant_in: schemas.EtudiantNouveauCreate,
+    etudiant_in: schemas.SelectEtudiantBase,
     schema: str,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -74,6 +74,30 @@ def update_etudiant(
         raise HTTPException(status_code=404, detail="Etudiant not found")
     etudiant = crud.nouveau_etudiant.update_etudiant(schema=schema,num_insc=num_insc, obj_in=etudiant_in)
     return etudiant
+
+
+@router.put("/update_etudiant_by_num_select/", response_model=List[Any])
+def update_etudiant(
+    *,
+    db: Session = Depends(deps.get_db),
+    num_select: str,
+    schema: str,
+    etudiant_in: schemas.EtudiantNouveauUpdate,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Update an etudiant.
+    """
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schema))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",)
+        
+    etudiant = crud.nouveau_etudiant.get_by_num_select(schema=schema, num_select=num_select)
+    if not etudiant:
+        raise HTTPException(status_code=404, detail="Etudiant not found")
+    etudiant = crud.nouveau_etudiant.update_etudiant_select(schema=schema,num_select=num_select, obj_in=etudiant_in)
+    return etudiant
+
 
 
 @router.get("/by_num_insc/", response_model=Any)

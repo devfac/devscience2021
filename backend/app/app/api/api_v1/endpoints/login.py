@@ -37,11 +37,6 @@ def login_access_token(
     token =  security.create_access_token(
             user.uuid, expires_delta=access_token_expires
         )
-    if user.uuid_mention:    
-        mention_title = []
-        for uuid_mention in user.uuid_mention:
-            mention = crud.mention.get_by_uuid(db, uuid=uuid_mention)
-            mention_title.append(mention.title)
     role = crud.role.get_by_uuid(db, uuid=user.uuid_role)
     if crud.user.is_superuser(user):
         return {
@@ -53,7 +48,7 @@ def login_access_token(
     else:
         return {
             "access_token":token,
-            "mention":mention_title,
+            "mention":user.uuid_mention,
             "role":role.title,
             "token_type": "bearer",
         }

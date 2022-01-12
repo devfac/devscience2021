@@ -25,6 +25,19 @@ class EtudiantBase(BaseModel):
     date_quitance: Optional[str] = None
 
 
+class SelectEtudiantBase(BaseModel):
+    uuid: Optional[UUID]
+    nom: Optional[str] = None
+    prenom: Optional[str] = None
+    date_naiss: Optional[str] = None
+    lieu_naiss: Optional[str] = None
+    adresse: Optional[str] = None
+    num_cin: Optional[str] = None
+    date_cin: Optional[str] = None
+    lieu_cin: Optional[str] = None
+    uuid_mention: Optional[UUID]
+    uuid_parcours: Optional[UUID]
+    select: Optional[bool] = False
 # Properties to receive via API on creation
 class EtudiantAncienCreate(EtudiantBase):
     num_carte: str
@@ -35,9 +48,9 @@ class EtudiantAncienCreate(EtudiantBase):
     adresse: str
     sexe: str
     nation: str
-    num_cin: str
-    date_cin: str
-    lieu_cin: str
+    num_cin: Optional[str]
+    date_cin: Optional[str]
+    lieu_cin: Optional[str]
     montant: str
     moyenne: float
     bacc: str
@@ -62,9 +75,9 @@ class EtudiantNouveauCreate(EtudiantBase):
     situation: str
     telephone: str
     nation: str
-    num_cin: str
-    date_cin: str
-    lieu_cin: str
+    num_cin: Optional[str]
+    date_cin: Optional[str]
+    lieu_cin: Optional[str]
     montant: str
     num_quitance: str
     date_quitance: str
@@ -74,11 +87,11 @@ class EtudiantNouveauCreate(EtudiantBase):
     bacc_anne: str
     bacc_serie: str
     proffession: str
-    nom_pere: str
-    proffession_pere: str
-    nom_mere: str
-    proffession_mere: str
-    adresse_parent: str
+    nom_pere: Optional[str]
+    proffession_pere: Optional[str]
+    nom_mere: Optional[str]
+    proffession_mere: Optional[str]
+    adresse_parent: Optional[str]
     niveau: str
     uuid_mention: UUID
     uuid_parcours: UUID
@@ -109,6 +122,7 @@ class EtudiantNouveauUpdate(EtudiantBase):
     niveau: Optional[str]
     uuid_mention: Optional[UUID]
     uuid_parcours: Optional[UUID]
+    select:Optional[bool] = True
 
 
 class EtudiantAncienInDBBase(EtudiantBase):
