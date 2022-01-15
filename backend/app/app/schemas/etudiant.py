@@ -27,6 +27,7 @@ class EtudiantBase(BaseModel):
 
 class SelectEtudiantBase(BaseModel):
     uuid: Optional[UUID]
+    num_select: Optional[str]
     nom: Optional[str] = None
     prenom: Optional[str] = None
     date_naiss: Optional[str] = None
@@ -35,8 +36,7 @@ class SelectEtudiantBase(BaseModel):
     num_cin: Optional[str] = None
     date_cin: Optional[str] = None
     lieu_cin: Optional[str] = None
-    uuid_mention: Optional[UUID]
-    uuid_parcours: Optional[UUID]
+    uuid_mention: Optional[str]
     select: Optional[bool] = False
 # Properties to receive via API on creation
 class EtudiantAncienCreate(EtudiantBase):

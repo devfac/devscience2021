@@ -7,16 +7,19 @@ from pydantic import BaseModel
 # Shared properties
 class MentionBase(BaseModel):
     title: Optional[str] = None
+    abreviation: Optional[str] = None
 
 
 # Properties to receive via API on creation
 class MentionCreate(MentionBase):
     title: str
+    abreviation: str
 
 
 # Properties to receive via API on update
 class MentionUpdate(MentionBase):
     title: Optional[str] = None
+    abreviation: Optional[str] = None
 
 
 class MentionInDBBase(MentionBase):

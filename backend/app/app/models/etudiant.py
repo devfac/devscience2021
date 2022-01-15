@@ -43,7 +43,7 @@ def create(schemas):
         nouveau_etudiant = Table("nouveau_etudiant",base,
             Column("uuid",UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
             Column("num_insc",String, unique=True),
-            Column("num_select",Integer, autoincrement=True, unique=True, primary_key=True),
+            Column("num_select",String, nullable=False, primary_key=True),
             Column("nom",String),
             Column("prenom",String),
             Column("date_naiss",String),

@@ -49,6 +49,11 @@ def create_select_etudiant_nouveau(
         raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",)
         
     etudiant_in.uuid = uuid.uuid4()
+    mention = crud.mention.get_by_uuid(db = db, uuid=etudiant_in.uuid_mention)
+    if not mention:
+        raise HTTPException( status_code=400, detail=f" Mention not found.",)
+    all_etutiant = crud.nouveau_etudiant.get_by_mention(schema,etudiant_in.uuid_mention)
+    etudiant_in.num_select = f"{mention.abreviation.upper()}{len(all_etutiant)+1}"
     etudiant = crud.nouveau_etudiant.create_etudiant(schema=schema, obj_in=etudiant_in)
     return etudiant
 
@@ -115,6 +120,25 @@ def read_etudiant_by_num_carte(
     if not anne_univ:
         raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",)
     etudiant = crud.nouveau_etudiant.get_by_num_insc(schema=schema, num_insc=num_insc)
+    if not etudiant:
+        raise HTTPException(status_code=404, detail="Etudiant not found")
+    return etudiant
+
+@router.get("/by_num_select/", response_model=Any)
+def read_etudiant_by_num_select(
+    *,
+    db: Session = Depends(deps.get_db),
+    schema: str,
+    num_select: str,
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Get etudiant by num insription.
+    """
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schema))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",)
+    etudiant = crud.nouveau_etudiant.get_by_num_select(schema=schema, num_select=num_select)
     if not etudiant:
         raise HTTPException(status_code=404, detail="Etudiant not found")
     return etudiant

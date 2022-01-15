@@ -14,5 +14,6 @@ class Mention(Base):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String, unique=True)
     value= Column(String, unique=True)
+    abreviation= Column(String, unique=True)
     parcours = relationship("Parcours", back_populates="mention")
 
