@@ -8,18 +8,24 @@ from pydantic import BaseModel
 class MentionBase(BaseModel):
     title: Optional[str] = None
     abreviation: Optional[str] = None
+    branche: Optional[str] = None
+    last_num_carte: Optional[int]
 
 
 # Properties to receive via API on creation
 class MentionCreate(MentionBase):
     title: str
     abreviation: str
+    branche: str
+    last_num_carte: int
 
 
 # Properties to receive via API on update
 class MentionUpdate(MentionBase):
     title: Optional[str] = None
     abreviation: Optional[str] = None
+    branche: Optional[str] = None
+    last_num_carte: Optional[int]
 
 
 class MentionInDBBase(MentionBase):

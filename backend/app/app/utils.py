@@ -123,6 +123,13 @@ def create_anne(anne:str):
     ann = "anne_"+anne[0:4]+"_"+anne[5:9]
     return ann
 
+def create_num_carte(branche:str, num:str):
+    key:str = branche[0:1]
+    nbr_zero:int = 6-len(num)
+    response:str =  "".join("0" for x in range(nbr_zero))
+    return f'{key.upper()}{response}{num}'
+
+
 def decode_schemas(schema:str):
     ann = f"{schema[5:9]}-{schema[10:15]}"
     return ann
@@ -163,6 +170,22 @@ def get_min(sems_a:str, sems_b:str)-> str:
     if int(value_1) > int(value_2):
         return sems_b
     return sems_a
+
+def get_sems_min(niveau:str) -> str:
+    if niveau.upper() == "L1" :
+        return "S1"
+    elif niveau.upper() == "M1" :
+        return "S7"
+    elif niveau.upper() == "M2" :
+        return "S9"
+
+def get_sems_max(niveau:str) -> str:
+    if niveau.upper() == "L1" :
+        return "S2"
+    elif niveau.upper() == "M1" :
+        return "S8"
+    elif niveau.upper() == "M2" :
+        return "S10"
 
 def get_credit(value:float, credit:int) -> int:
     if value >= 10:

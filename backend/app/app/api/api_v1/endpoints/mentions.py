@@ -52,8 +52,13 @@ def update_mention(
     Update an mention.
     """
     mention_oj = {}
-    mention_oj['title']=mention_in.title
-    mention_oj['value']=decode_text(mention_in.title).lower()
+    if mention_in.title:
+        mention_oj['title']=mention_in.title
+        mention_oj['value']=decode_text(mention_in.title).lower()
+    if mention_in.last_num_carte:
+        mention_oj['last_num_carte']=mention_in.last_num_carte
+    if mention_in.branche:
+        mention_oj['branche']=decode_text(mention_in.branche)
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid)
     if not mention:
         raise HTTPException(status_code=404, detail="Mention not found")

@@ -15,5 +15,7 @@ class Mention(Base):
     title = Column(String, unique=True)
     value= Column(String, unique=True)
     abreviation= Column(String, unique=True)
+    branche= Column(String)
+    last_num_carte= Column(Integer)
     parcours = relationship("Parcours", back_populates="mention")
 

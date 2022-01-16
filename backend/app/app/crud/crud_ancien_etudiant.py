@@ -33,6 +33,7 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()
+        conn.close()
         return out
 
     def get_by_num_carte(self, schema: str, num_carte: str) -> Optional[EtudiantAncien]:
@@ -94,6 +95,7 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         out = result.fetchall()
         conn.close()
         return out
+
     def get_by_mention_and_etat(self, schema: str, uuid_mention: str, etat:str) -> Optional[EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata,autoload=True)
@@ -196,6 +198,7 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()
+        conn.close()
         return out
 
     def get_all(self,schema: str) -> Optional[EtudiantAncien]:
@@ -220,6 +223,7 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()
+        conn.close()
         return out
         
 

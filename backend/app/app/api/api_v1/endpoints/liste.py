@@ -10,7 +10,7 @@ from app.api import deps
 from app.core.celery_app import celery_app
 from app.utils import send_test_email
 from fastapi.responses import FileResponse
-from app.liste import liste_exams, liste_inscrit, liste_bourse
+from app.liste import liste_exams, liste_inscrit, liste_bourse, liste_select
 from app import crud
 from app.utils import decode_schemas, get_niveau
 from sqlalchemy.orm import Session
@@ -106,8 +106,14 @@ def list_inscrit(
         raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
         )
     etudiants_ = crud.ancien_etudiant.get_by_class(schemas,uuid_parcours,semestre)
-    parcours = crud.parcours.get_by_uuid(db=db,uuid=uuid_parcours)
+    
     mention = crud.mention.get_by_uuid(db=db,uuid=uuid_mention)
+    if not mention:
+        raise HTTPException( status_code=400, detail=f" Mention not found.",)
+
+    parcours = crud.parcours.get_by_uuid(db=db,uuid=uuid_parcours)
+    if not parcours:
+        raise HTTPException( status_code=400, detail=f" Parcours not found.",)
     all_etudiant = []
     if etudiants_:
         for etudiant in etudiants_:
@@ -122,6 +128,44 @@ def list_inscrit(
     data['parcours']=parcours.title
     data['anne']=decode_schemas(schemas)
     file = liste_inscrit.PDF.create_list_inscrit(semestre,parcours.abreviation,data,all_etudiant)
+    return FileResponse(path=file, media_type='application/octet-stream', filename=file)
+
+@router.get("/list_selection/")
+def list_selection(
+    schemas:str,
+    uuid_mention:str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_superuser),
+) -> Any:
+    """
+    create liste au examen
+    """
+    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
+        )
+    etudiants_ = crud.nouveau_etudiant.get_by_select_and_mention(schemas, uuid_mention)
+    mention = crud.mention.get_by_uuid(db=db,uuid=uuid_mention)
+    niveau = ["L1", "M1", "M2"]
+    all_etudiant = {}
+    if etudiants_:
+        for niv in niveau:
+            etudiant_niveau = []
+            for etudiant in etudiants_:
+                etudiants = {}
+                etudiants["nom"]=etudiant["nom"]
+                etudiants["prenom"]=etudiant["prenom"]
+                etudiants["num_select"]=etudiant["num_select"]
+                if etudiant['niveau'] == niv:
+                    etudiant_niveau.append(etudiants)
+        
+            all_etudiant[niv] = etudiant_niveau
+
+    data = {}
+    data['mention']=mention.title
+    data['anne']=decode_schemas(schemas)
+    print(all_etudiant)
+    file = liste_select.PDF.create_list_select(mention.title,data,all_etudiant)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
 @router.get("/list_bourse_passant/")

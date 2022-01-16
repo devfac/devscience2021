@@ -5,6 +5,28 @@ from sqlalchemy.sql.sqltypes import String
 from pydantic import BaseModel, EmailStr
 
 
+keys = [
+    "num_carte",
+    "nom",
+    "prenom",
+    "date_naiss",
+    "lieu_naiss",
+    "adresse",
+    "sexe",
+    "nation",
+    "num_cin",
+    "date_cin",
+    "lieu_cin",
+    "montant",
+    "bacc_anne",
+    "etat",
+    "photo",
+    "num_quitance",
+    "date_quitance",
+    "uuid_mention",
+    "uuid_parcours"
+    ]
+
 # Shared properties
 class EtudiantBase(BaseModel):
     uuid: Optional[UUID]
@@ -37,7 +59,10 @@ class SelectEtudiantBase(BaseModel):
     date_cin: Optional[str] = None
     lieu_cin: Optional[str] = None
     uuid_mention: Optional[str]
+    niveau:  Optional[str] = None
+    branche:  Optional[str] = None
     select: Optional[bool] = False
+
 # Properties to receive via API on creation
 class EtudiantAncienCreate(EtudiantBase):
     num_carte: str
@@ -53,7 +78,7 @@ class EtudiantAncienCreate(EtudiantBase):
     lieu_cin: Optional[str]
     montant: str
     moyenne: float
-    bacc: str
+    bacc_anne: str
     etat: str
     photo: str
     num_quitance: str
@@ -65,7 +90,7 @@ class EtudiantAncienCreate(EtudiantBase):
 
 
 class EtudiantNouveauCreate(EtudiantBase):
-    num_insc: str
+    num_carte: str
     nom: str
     prenom: str
     date_naiss: str
@@ -93,20 +118,21 @@ class EtudiantNouveauCreate(EtudiantBase):
     proffession_mere: Optional[str]
     adresse_parent: Optional[str]
     niveau: str
+    branche: str
     uuid_mention: UUID
     uuid_parcours: UUID
 # Properties to receive via API on update
 class EtudiantAncienUpdate(EtudiantBase):
     moyenne: Optional[float] = None
     num_carte: Optional[str]
-    bacc:Optional[str]
+    bacc_anne:Optional[str]
     uuid_mention: Optional[UUID]
     uuid_parcours: Optional[UUID]
     semestre_petit: Optional[str]
     semestre_grand: Optional[str]
 
 class EtudiantNouveauUpdate(EtudiantBase):
-    num_insc: Optional[str]
+    num_carte: Optional[str]
     situation: Optional[str]
     telephone: Optional[str]
     bacc_num: Optional[str]
@@ -119,7 +145,7 @@ class EtudiantNouveauUpdate(EtudiantBase):
     nom_mere: Optional[str]
     proffession_mere: Optional[str]
     adresse_parent: Optional[str]
-    niveau: Optional[str]
+    branche: Optional[str]
     uuid_mention: Optional[UUID]
     uuid_parcours: Optional[UUID]
     select:Optional[bool] = True
@@ -149,6 +175,7 @@ class EtudiantNouveauInDBBase(EtudiantBase):
     proffession_mere: Optional[str]
     adresse_parent: Optional[str]
     niveau: Optional[str]
+    branche: Optional[str]
 
     class Config:
         orm_mode = True
