@@ -146,7 +146,6 @@ def relever(
     num_carte: str,
     schemas: str,
     semestre: str,
-    parcours:str,
     current_user: models.User = Depends(deps.get_current_active_user),
     ) -> Any:
     anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
@@ -157,6 +156,12 @@ def relever(
     ues = []
     session = "Normal"
     anne = decode_schemas(schemas)
+
+    etudiant = crud.ancien_etudiant.get_by_num_carte(schemas,num_carte)
+    if etudiant:
+        parcours = crud.parcours.get_by_uuid(db=db,uuid=etudiant.uuid_parcours).abreviation
+    else:
+        raise HTTPException(status_code=404, detail="Etudiant not found")
     test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours,session="rattrapage")
     test_note_final = crud.note.check_table_exist(schemas=schemas, semestre=semestre,parcours=parcours,session="final")
     if test_note:
@@ -169,9 +174,8 @@ def relever(
         )
     et_un_final = crud.note.read_by_num_carte(schemas, semestre, parcours,"final",num_carte)
     
-    etudiant = crud.ancien_etudiant.get_by_num_carte(schemas,num_carte)
     if et_un_final and etudiant:
-        validation = crud.semetre_valide.get_by_num_carte(db=db, num_carte=num_carte)
+        validation = crud.semetre_valide.get_by_num_carte(schema=schemas, num_carte=num_carte)
         
         matier_ues = crud.matier_ue.get_by_class(schemas,etudiant.uuid_parcours,semestre)
         note['num_carte']=num_carte

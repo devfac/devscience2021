@@ -64,20 +64,27 @@ def list_examen(
     matiers['ue']=all_ue
 
     etudiants_ = crud.ancien_etudiant.get_by_class_limit(schemas,uuid_parcours,semestre,skip,limit)
-    parcours = crud.parcours.get_by_uuid(db=db,uuid=uuid_parcours)
-    mention = crud.mention.get_by_uuid(db=db,uuid=uuid_mention)
+    mention = crud.mention.get_by_uuid(db = db, uuid=uuid_mention)
+    if not mention:
+        raise HTTPException( status_code=400, detail=f" Mention not found.",)
+
+    parcours = crud.parcours.get_by_uuid(db = db, uuid=uuid_parcours)
+    if not parcours:
+        raise HTTPException( status_code=400, detail=f" Parcours not found.",)
     all_etudiant = []
     if len(etudiants_)==0:
         raise HTTPException(
             status_code=400,
             detail="Etudiants not fount.",
         )
-    for etudiant in etudiants_: 
-        etudiants = {}
-        etudiants["nom"]=etudiant["nom"]
-        etudiants["prenom"]=etudiant["prenom"]
-        etudiants["num_carte"]=etudiant['num_carte']
-        all_etudiant.append(etudiants)
+    for etudiant in etudiants_:
+        un_et = crud.note.read_by_num_carte(schemas,semestre,parcours.abreviation,session, etudiant.num_carte)
+        if un_et:
+            etudiants = {}
+            etudiants["nom"]=etudiant["nom"]
+            etudiants["prenom"]=etudiant["prenom"]
+            etudiants["num_carte"]=etudiant['num_carte']
+            all_etudiant.append(etudiants)
 
     data['mention']=mention.title
     data['parcours']=parcours.title

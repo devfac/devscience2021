@@ -99,8 +99,16 @@ async def create_upload_file(*,
     cle = ""
     all_table = check_table_info(schema)
     all_sheet = save_data.get_all_sheet(file_location)
-    for i in range(len(all_table)):
-        if str(all_table[i]) != str(all_sheet[i]):
+    print(all_sheet)
+    print(all_table)
+    if len(all_table) != len(all_sheet):
+        raise HTTPException(
+            status_code=400,
+            detail=f"invalide file",
+        )
+    test = False
+    for i in all_table :
+        if i not in all_sheet:
             raise HTTPException(
             status_code=400,
             detail=f"invalide file {all_sheet[i]} not found",
@@ -114,7 +122,7 @@ async def create_upload_file(*,
         elif table == "ancien_etudiant":
             cle = "num_carte"
         elif table == "nouveau_etudiant":
-            cle = "num_insc"
+            cle = "num_carte"
         valid = save_data.validation_file(file_location,table,schema)
         if valid != "valid":
             raise HTTPException(
@@ -123,8 +131,13 @@ async def create_upload_file(*,
         )
         all_data = save_data.get_data_xlsx(file_location,table)
         for data in all_data:
+            if table == "nouveau_etudiant":
+                data["select"] = bool(data["select"])
+            elif table == "ancien_etudiant":
+                if data["moyenne"] == "None":
+                    data["moyenne"] = 0.0
             exist_data = crud.save.exist_data(schema,table,cle,data[cle])
-            if not exist_data:
+            if not exist_data and data[cle] != "None":
                 one_data = crud.save.insert_data(schema,table,data)
         all_data_[table]=all_data
 

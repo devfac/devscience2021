@@ -54,7 +54,7 @@ def inserts_etudiant(
             if not et_un:
                 crud.note.insert_note(schemas,semestre,parcours.abreviation,session,etudiant.num_carte)
                 crud.note.update_auto(schemas,semestre,parcours.abreviation,session,etudiant.num_carte)
-        all_note = crud.note.read_all_note(schemas, semestre, parcours.aabreviation,session)
+        all_note = crud.note.read_all_note(schemas, semestre, parcours.abreviation,session)
         return all_note
     
     else:
@@ -155,7 +155,7 @@ def updates_note(
                 credit += get_credit(float(value_sess),ue.credit)
 
                 moy_fin += float(value_fin)*ue.credit
-                credit_fin += get_credit(value_fin,ue.credit)
+                credit_fin += get_credit(float(value_fin),ue.credit)
 
                 moy_cred_in["moyenne"]=moy/somme
                 moy_cred_in["credit"]=credit

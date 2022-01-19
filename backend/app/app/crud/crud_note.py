@@ -116,6 +116,15 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.close()
         return out
 
+    def read_note_by_credit_inf(self,schema: str,semestre:str,parcours:str, session:str, credit:int) :
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
+        conn = engine.connect()
+        result = conn.execute(f"SELECT num_carte,credit FROM {table} WHERE credit < {credit}")
+        out = result.fetchall()
+        conn.close()
+        return out
+
     def read_note_by_moyenne(self,schema: str,semestre:str,parcours:str, session:str, moyenne:float) :
         metadata = MetaData(schema=schema, bind=engine)
         table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
@@ -153,7 +162,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table(f"note_{parcours.lower()}_{semestre.lower()}_{session.lower()}", metadata,autoload=True)
-        table_norm = Table(f"note_{semestre.lower()}_{parcours.lower()}_normal", metadata,autoload=True)
+        table_norm = Table(f"note_{parcours.lower()}_{semestre.lower()}_normal", metadata,autoload=True)
         sel = table_norm.select()
         sel = sel.where(table_norm.columns.num_carte == num_carte)
         result = conn.execute(sel)

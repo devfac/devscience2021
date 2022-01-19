@@ -162,6 +162,43 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         conn.close()
         return out
 
+    def get_for_stat(self, schema: str,uuid_parcours:str, semestre_grand: str, sexe:str, etat:str) -> Optional[EtudiantAncien]:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table("ancien_etudiant", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(and_(table.columns.uuid_parcours == uuid_parcours ,table.columns.semestre_grand == semestre_grand ,
+                    table.columns.sexe == sexe, table.columns.etat == etat))
+        sel = sel.order_by(table.columns.nom.asc())
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
+
+    def get_by_sexe_for_stat(self, schema: str,uuid_parcours:str, semestre_grand: str, sexe:str) -> Optional[EtudiantAncien]:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table("ancien_etudiant", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(and_(table.columns.uuid_parcours == uuid_parcours ,table.columns.semestre_grand == semestre_grand ,
+                    table.columns.sexe == sexe))
+        sel = sel.order_by(table.columns.nom.asc())
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
+
+    def get_by_parcours_for_stat(self, schema: str,uuid_parcours:str, semestre_grand: str) -> Optional[EtudiantAncien]:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table("ancien_etudiant", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(and_(table.columns.uuid_parcours == uuid_parcours ,table.columns.semestre_grand == semestre_grand))
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
+
     def get_by_etat(self, schema: str,etat: str) -> Optional[EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata,autoload=True)

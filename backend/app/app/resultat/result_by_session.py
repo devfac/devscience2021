@@ -52,8 +52,21 @@ def get_dime(nbr:int) -> int:
     else:
         return 400
 
+def get_title_session(session:str) -> str:
+    if session.lower() == "rattrapage":
+        return "session de rattrapage"
+    return f"session {session}"
+
+def get_type_response(session:str, type:str)-> str:
+    if type != "compense":
+        if session.lower() == "rattrapage":
+            return "en session de rattrapage"
+        return f"en session {session}"
+    return "par compensation"
+
+
 class PDF(FPDF):
-    def add_title(pdf:FPDF, data:Any,sems:str,title:str, nbr:int):
+    def add_title(pdf:FPDF, data:Any,sems:str,title:str):
 
         pdf.add_font("alger","","Algerian.ttf",uni=True)
 
@@ -64,10 +77,7 @@ class PDF(FPDF):
         pdf.add_font("alger","","Algerian.ttf",uni=True)
 
         pdf.image(image_univ,x=30,y=6,w=30, h=30)
-        if nbr >= 8:
-            pdf.image(image_fac,x=240,y=6,w=30, h=30)
-        else:
-            pdf.image(image_fac,x=155,y=6,w=30, h=30)
+        pdf.image(image_fac,x=155,y=6,w=30, h=30)
 
         titre4 = "UNIVERSITE DE FIANARANTSOA"
         titre5 = "FACULTE DES SCIENCES"
@@ -122,12 +132,15 @@ class PDF(FPDF):
 
         pdf.set_font("arial","I",12)
         pdf.cell(0,8,session_class.upper(),0,1)
-        
-    def add_corp(pdf:FPDF, data:Any,sems:str,matiers:List[str], admis:Any, type:str):
+
+
+    def create_result_by_session(sems:str, parcour:str, data:Any, admis:Any,type:str):
+        pdf = PDF("P","mm","a4")
         pdf.add_page()
-        pdf.set_margin(10)  
-        titre = f"RESULTAT DE L'UNITÉ D'ESEIGNEMENTS {matiers[1].upper()}"
-        PDF.add_title(pdf=pdf,data=data,sems=sems,title=titre,nbr=2)
+        session = str(data["session"])
+        titre = f"RÉSULTAT {get_title_session(session).upper()}"
+        PDF.add_title(pdf=pdf,data=data,sems=sems,title=titre)
+        pdf.set_margin(10) 
         pdf.cell(1,7,"",0,1)
         pdf.set_font("arial","BI",10)
         pdf.cell(1,5,"",0,0)
@@ -147,11 +160,8 @@ class PDF(FPDF):
             pdf.set_font("arial","I",10)
             pdf.cell(160,5,name,1,0,"L")
 
-        text_1 = f"ARRÉTÉE LA PRÉSENTE LISTE AU NOMBRE DE {nbr} ÉTUDIANT(S) AYANT VALIDÉ(S) L'UNITE D'ENSEIGNEMENT "
-        if type =="compense":
-            text_2 = f"{matiers[1].upper()} PAR COMPENSATION"
-        else:
-            text_2 = f"{matiers[1].upper()} "
+        text_1 = f"ARRÉTÉE LA PRÉSENTE LISTE AU NOMBRE DE {nbr} ÉTUDIANT(S) AYANT VALIDÉS "
+        text_2 = f"LES TRENTE CREDITS (30 Crédits) {get_type_response(session, type).upper()}"
 
         text_3 = "Le PRÉSIDENT DU JURY"
         text_4 = "Fianarantsoa, le"
@@ -168,62 +178,6 @@ class PDF(FPDF):
         pdf.cell(100,5,"",0,0,"L")
         pdf.cell(0,5,text_4,0,1,"L")
 
-
-
-    def create_result_by_ue(sems:str, parcour:str, data:Any,matiers:List[str],etudiants:Any, admis:Any, admis_comp:Any):
-        pdf = PDF(set_orientation(len(matiers)),"mm","a4")
-        pdf.add_page()
-        
-        titre = f"RÉSULTAT PROVISOIR DE L'UNITÉ D'ENSEIGNEMENT {matiers[1].upper()}"
-        PDF.add_title(pdf=pdf,data=data,sems=sems,title=titre,nbr=len(matiers))
-
-        pdf.set_font("arial","B",10)
-        pdf.cell(0,5,"",0,1,"C")
-
-        for i, ue in enumerate(matiers):
-            dim = set_dimention(len(ue))
-            pdf.set_left_margin(1)
-            taille = set_police(ue, len(matiers))
-            pdf.cell(1,8,"",0,0)
-            pdf.set_font("arial","I",10)
-            titre = f"{ue}"
-            dim = get_dime(len(matiers))/len(matiers)-3
-            if titre == "Status":
-                dim = 20
-            elif titre ==  "Crédit" or titre == "N° Carte":
-                dim = 15
-            pdf.set_font("arial","",taille)
-            pdf.cell(dim,5,titre,1,0,"C")
-    
-        for i,etudiant in enumerate(etudiants):
-
-            pdf.cell(1,5,"",0,1)
-            pdf.cell(1,1,"",0,1)
-            for i, ue in enumerate(matiers):
-                titre = f"{ue}"
-                dim = get_dime(len(matiers))/len(matiers)-3
-                if titre == "Status":
-                    dim = 20
-                    value = str(etudiant[ue])
-                elif titre ==  "Crédit" or titre == "N° Carte":
-                    dim = 15
-                    value = str(etudiant[ue])
-                else:
-                    if str(etudiant[ue]) == "None":
-                        value = "Absent"
-                    value = str(format(float(etudiant[ue]),'.3f') )
-                pdf.set_font("arial","I",10)
-                pdf.cell(1,5,"",0,0)
-                if value == "None":
-                    value = "Absent"
-                pdf.cell(dim,5,value,1,0,'C')
-        PDF.add_corp(pdf=pdf,data=data,sems=sems,matiers=matiers,admis=admis,type="definitive")
-        if len(admis_comp) != 0:
-            PDF.add_corp(pdf=pdf,data=data,sems=sems,matiers=matiers,admis=admis_comp,type="compense")
-
-
-
-
-        pdf.output(f"files/resultat_{sems}_{parcour.abreviation}_{matiers[1]}.pdf","F")
-        return f"files/resultat_{sems}_{parcour.abreviation}_{matiers[1]}.pdf"
+        pdf.output(f"files/resultat_{sems}_{parcour.abreviation}_{session}.pdf","F")
+        return f"files/resultat_{sems}_{parcour.abreviation}_{session}.pdf"
 

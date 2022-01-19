@@ -7,20 +7,18 @@ from pydantic import BaseModel
 # Shared properties
 class SemestreValideBase(BaseModel):
     semestre: Optional[List[str]] = None
-    anne: Optional[List[str]] = None
 
 
 # Properties to receive via API on creation
 class SemestreValideCreate(SemestreValideBase):
+    uuid:Optional[UUID]
     num_carte: str
     semestre: List[str]
-    anne: List[str]
 
 
 # Properties to receive via API on update
 class SemestreValideUpdate(SemestreValideBase):
     semestre: List[str]
-    anne: List[str]
 
 
 class SemestreValideInDBBase(SemestreValideBase):

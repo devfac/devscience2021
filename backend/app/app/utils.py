@@ -260,7 +260,6 @@ def validation_semestre(etudiant:Any, sems:str, credit:int, total_cred:int,anne:
             else:
                 response["status"]= f"Étudiant(e) ayant validé(e) la {total_cred} crédit par compensation."
                 response["code"]=True
-            response["anne"]=etudiant.anne[index]
         else:
                 response["status"]="Étudiant(e) redoublé(e)"
                 response["code"]=False
@@ -318,7 +317,11 @@ def get_status(note_ue:float) -> str:
     else:
         return "Validé"
 
-
+def test_semestre(semestre: list, sems_act) -> bool:
+    for sems in semestre:
+        if sems == sems_act:
+            return True
+    return False
 
 
 def send_new_account(email_to: str, password: str) -> str:

@@ -2,10 +2,11 @@ from fastapi import APIRouter
 
 from app.api.api_v1.endpoints import login, users, utils, mentions, roles, parcours, \
 semestres, anne_univ, semestre_valide,ancien_etudiants, nouveau_etudiants, matier_ue, matier_ec, \
-scolarites, notes, notes_etudiants,liste,save_data, resultat
+scolarites, notes, notes_etudiants,liste,save_data, resultat, statistic
 
 api_router = APIRouter()
 api_router.include_router(liste.router, prefix="/liste", tags=["liste"])
+api_router.include_router(statistic.router, prefix="/statistic", tags=["statistic"])
 api_router.include_router(save_data.router, prefix="/save_data", tags=["save_data"])
 api_router.include_router(utils.router, prefix="/utils", tags=["utils"])
 api_router.include_router(login.router, tags=["login"])

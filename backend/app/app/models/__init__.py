@@ -5,7 +5,6 @@ from .role import Role
 from .parcours import Parcours
 from .semestre import Semestre
 from .anne_univ import AnneUniv
-from .semestre_valide import SemestreValide
 from .etudiant import create
 from .matier import create
 from .note import create_table_note

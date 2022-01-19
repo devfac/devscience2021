@@ -8,6 +8,7 @@ from sqlalchemy.sql.schema import ForeignKey, MetaData, Table
 from sqlalchemy.sql.sqltypes import Float
 from app.db.session import engine
 from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy.sql.sqltypes import ARRAY
 
 
 def create(schemas):
@@ -107,8 +108,18 @@ def create(schemas):
             schema=schemas
         )
 
+        #semestre valide
+
+        semestre_valide = Table("semestre_valide",base,
+            Column("uuid",UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+            Column("num_carte",String),
+            Column("semestre",ARRAY(String)),
+            schema=schemas
+        )
+
         unite_enseing.create(engine)
         element_const.create(engine)
+        semestre_valide.create(engine)
         ancien_etudiant.create(engine)
         nouveau_etudiant.create(engine)
         
