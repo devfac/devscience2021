@@ -117,9 +117,19 @@ def create(schemas):
             schema=schemas
         )
 
+        diplome = Table("diplome",base,
+            Column("uuid",UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
+            Column("num_carte",String),
+            Column("diplome",ARRAY(String)),
+            Column("uuid_parcours",UUID(as_uuid=True)),
+            Column("uuid_mention",UUID(as_uuid=True)),
+            schema=schemas
+        )
+
         unite_enseing.create(engine)
         element_const.create(engine)
         semestre_valide.create(engine)
+        diplome.create(engine)
         ancien_etudiant.create(engine)
         nouveau_etudiant.create(engine)
         

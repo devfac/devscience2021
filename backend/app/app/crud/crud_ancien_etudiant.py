@@ -108,6 +108,18 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         conn.close()
         return out
 
+    def get_by_mention_and_niveau(self, schema: str, uuid_mention: str, semestre_grand:str) -> Optional[EtudiantAncien]:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table("ancien_etudiant", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(and_(table.columns.uuid_mention == uuid_mention,table.columns.semestre_grand == semestre_grand))
+        sel = sel.order_by(table.columns.nom.asc())
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
+
 
     def get_by_parcours_and_etat_and_niveau(self, schema: str, uuid_parcours: str, etat:str, sems_petit:str, sems_grand:str) -> Optional[EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)

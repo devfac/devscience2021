@@ -15,3 +15,5 @@ from .matier import MatierUE, MatierUECreate, MatierUEInDB, MatierUEUpdate
 from .matier import MatierUni
 from .note import Note
 from .resultat import Resultat
+from .diplome import Diplome, DiplomeCreate, DiplomeUpdate, DiplomeInDB
+from .droit import Droit, DroitUpdate, DroitCreate, DroitInDB

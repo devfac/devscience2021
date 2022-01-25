@@ -12,6 +12,8 @@ from .crud_matier_ue import matier_ue
 from .crud_matier_ec import matier_ec
 from .crud_note import note
 from .crud_save import save
+from .crud_diplome import diplome
+from .crud_droit import droit
 # For a new basic set of CRUD operations you could just do
 
 # from .base import CRUDBase

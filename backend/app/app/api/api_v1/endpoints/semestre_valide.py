@@ -87,3 +87,4 @@ def delete_semestre_valide(
     
     semetre_valide = crud.semetre_valide.delete_sems(schema=schema, num_carte=num_carte)
     return semetre_valide
+

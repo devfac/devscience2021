@@ -16,10 +16,14 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
 
     def update_ec(self,schema: str, obj_in: MatierECUpdate, uuid:str) -> Optional[MatierEC]:
         obj_in_data = jsonable_encoder(obj_in)
+        update_data  = {}
+        for field in obj_in_data:
+            if obj_in_data[field]:
+                update_data[field]= obj_in_data[field]
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table("element_const", metadata,autoload=True)
-        up = table.update().values(obj_in_data)
+        up = table.update().values(update_data)
         up = up.where(table.columns.uuid == uuid)
         conn.execute(up)
         sel = table.select()

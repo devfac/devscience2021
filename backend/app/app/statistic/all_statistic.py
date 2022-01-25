@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Any, List
 from fpdf import FPDF
 from app import crud
@@ -22,7 +23,6 @@ def get_nbr_etudiant(schemas:str,niveau:str, etat:str,sexe:str,uuid_parcours:str
         niveau = "S10"
 
     all_etudiant = []
-    print(etat)
     if etat != "M" and etat != "F" and etat != "Total":
         all_etudiant = crud.ancien_etudiant.get_for_stat(schemas,uuid_parcours,niveau,sexe,etat)
     elif etat == "M":
@@ -33,13 +33,80 @@ def get_nbr_etudiant(schemas:str,niveau:str, etat:str,sexe:str,uuid_parcours:str
 
     elif etat == "Total":
         all_etudiant = crud.ancien_etudiant.get_by_parcours_for_stat(schemas,uuid_parcours,niveau)
-        print(len(all_etudiant))
 
     return len(all_etudiant)
+    
 
 
+def get_by_params(all_niveau:Any, sexe:str, etat:str, age_:int )-> int:
+    if etat == "R":
+        etat = "Redoublant"
+    elif etat =="T+":
+        etat = "Triplant ou plus"
+    elif etat == "N":
+        etat = "Passant"
+    now = date.today().year
+    all_etudiant = []
+    for etudiant in all_niveau:
+        date_ = etudiant.date_naiss
+        naiss = date_[len(date_)-4:len(date_)]
+        age :int = int(now) - int(naiss)
+        if sexe == "ENSEMBLE":
+            if etat == "Total":
+                if age_ == 15:
+                    if  age <= age_:
+                        all_etudiant.append(etudiant)
+                elif age_ == 29:
+                    if  age >= age_:
+                        all_etudiant.append(etudiant)
+                elif age_ == 30:
+                        all_etudiant.append(etudiant)
+                else:
+                    if age == age_:
+                        all_etudiant.append(etudiant)
+            else:
+                if age_ == 15:
+                    if etudiant.etat == etat and age <= age_:
+                        all_etudiant.append(etudiant)
+                elif age_ == 29:
+                    if etudiant.etat == etat and age >= age_:
+                        all_etudiant.append(etudiant)
+                elif age_ == 30:
+                    if etudiant.etat == etat :
+                        all_etudiant.append(etudiant)
+                else:
+                    if etudiant.etat == etat and age == age_:
+                        all_etudiant.append(etudiant)
+        else:
+            if etat == "S/Tot":
+                if age_ == 15:
+                    if etudiant.sexe == sexe  and age <= age_:
+                        all_etudiant.append(etudiant)
+                elif age_ == 29:
+                    if etudiant.sexe == sexe and age >= age_:
+                        all_etudiant.append(etudiant)
+                elif age_ == 30:
+                    if etudiant.sexe == sexe :
+                        all_etudiant.append(etudiant)
+                else:
+                    if etudiant.sexe == sexe  and age == age_:
+                        all_etudiant.append(etudiant)
+            else:
+                if age_ == 15:
+                    if etudiant.sexe == sexe and etudiant.etat == etat and age <= age_:
+                        all_etudiant.append(etudiant)
+                elif age_ == 29:
+                    if etudiant.sexe == sexe and etudiant.etat == etat and age >= age_:
+                        all_etudiant.append(etudiant)
+                elif age_ == 30:
+                    if etudiant.sexe == sexe and etudiant.etat == etat :
+                        all_etudiant.append(etudiant)
+                else:
+                    if etudiant.sexe == sexe and etudiant.etat == etat and age == age_:
+                        all_etudiant.append(etudiant)
+    return len(all_etudiant)
 class PDF(FPDF):
-    def add_title(pdf:FPDF, data:Any):
+    def add_title(pdf:FPDF, data:Any, type:str = "total"):
 
         pdf.add_font("alger","","Algerian.ttf",uni=True)
 
@@ -62,6 +129,20 @@ class PDF(FPDF):
         titre_1 = "Etudiants inscritent par filiere et option au titre de l'année"
         anne_univ = f"{data['anne']}"
 
+        tabulation: int  = 35
+        ln:int = 1
+        if type != "total":
+            pdf.rect(195,47.5,5,3)
+            pdf.rect(195,53.5,5,3)
+            type_formation = "Type de Formation*:"
+            cocher = "(Veuillez cochez)"
+            type_1 = "Formation initial"
+            type_2 = "Formation continue"
+            anne_ = "Année d'etude :"
+            anne_etude = f'{data["niveau"]} {data["parcours"]}'
+            ln = 0
+            tabulation = 10
+
         pdf.set_font("arial","B",12)
         pdf.cell(0,6,titre4,0,1,"C")
 
@@ -70,23 +151,35 @@ class PDF(FPDF):
 
         pdf.cell(0,18,"",0,1,"C")
 
-        pdf.set_font("arial","BI",12)
-        pdf.cell(35,6,"",0,0,"L")
-        pdf.cell(24,6,mention,0,0,"L")
-
-        pdf.set_font("arial","I",12)
-        pdf.cell(0,6,mention_etudiant,0,1)
-
-        pdf.cell(35,6,"",0,0,"L")
+        pdf.cell(tabulation,6,"",0,0,"L")
         pdf.set_font("arial","BI",12)
         pdf.cell(34,6,localisation,0,0,"L")
-
         pdf.set_font("arial","I",12)
         pdf.cell(0,6,localisation_,0,1)
 
-        pdf.cell(20,6,"",0,0,"L")
-        pdf.cell(107,6,titre_1,0,0,"L")
-        pdf.cell(0,6,anne_univ,0,1)
+        pdf.set_font("arial","BI",12)
+        pdf.cell(tabulation,6,"",0,0,"L")
+        pdf.cell(24,6,mention,0,0,"L")
+
+        pdf.set_font("arial","I",12)
+        pdf.cell(70,6,mention_etudiant,0,ln)
+
+        if type !="total":
+            pdf.cell(40,6,type_formation,0,ln)
+            pdf.cell(0,6,type_1,0,1)
+
+
+        if type !="total":
+            pdf.cell(tabulation,6,"",0,0,"L")
+            pdf.cell(30,6,anne_,0,ln)
+            pdf.cell(65,6,anne_etude,0,ln)
+            pdf.cell(38,6,cocher,0,ln)
+            pdf.cell(0,6,type_2,0,1)
+
+        else:
+            pdf.cell(20,6,"",0,0,"L")
+            pdf.cell(107,6,titre_1,0,0,"L")
+            pdf.cell(0,6,anne_univ,0,ln)
 
         pdf.cell(15,10,"",0,1,"L")
 
@@ -101,7 +194,7 @@ class PDF(FPDF):
 
         pdf = PDF("P","mm","a4")
         pdf.add_page()
-        PDF.add_title(pdf=pdf,data=data)
+        PDF.add_title(pdf=pdf,data=data,type="total")
         pdf.set_margin(20) 
         for titre in titre_stat:
             if titre["name"] != '':
@@ -162,10 +255,79 @@ class PDF(FPDF):
         pdf.cell(0,5,bas_1,0,1,"L")                    
         pdf.cell(0,5,bas_2,0,1,"L")        
 
-
-        
-
-
         pdf.output(f"files/statistic_total.pdf","F")
         return f"files/statistic_total.pdf"
+
+    def create_statistic_by_years(data:Any, all_niveau:Any, schemas:str):
+        titre_stat = [{"name":'',"value":["Age"]},{"name":"masculin","value":["N","R","T+","S/Tot"]},{"name":"feminin","value":["N","R","T+","S/Tot"]},
+                      {"name":"ensemble","value":["N","R","T+","Total"]}]
+        
+        width:int = 48
+        height:int = 7
+
+        pdf = PDF("P","mm","a4")
+
+        niveau_ = ["L1","L2","L3","M1","M2","H"]
+        for index, niveau in enumerate(all_niveau):
+            data["niveau"] = niveau_[index]
+            for index_3, parc in enumerate(niveau[niveau_[index]]):
+                if len(parc["etudiants"]) != 0:
+                    data["parcours"] = f'{parc["name"]}'
+                    pdf.add_page()
+                    PDF.add_title(pdf=pdf,data=data,type="age")
+                    pdf.set_margin(9) 
+                    for titre in titre_stat:
+                        if titre["name"] != '':
+                            pdf.set_font("arial","BI",10)
+                            pdf.cell(width,height,titre["name"].upper(),1,0,"C")
+                        else:
+                            pdf.cell(width,height,"",0,0,"C")
+                    pdf.cell(0,height,"",0,1,"L")
+
+                    for titre in titre_stat:
+                        for value in titre["value"]:
+                            pdf.set_font("arial","BI",10)
+                            pdf.cell(width/(len(titre["value"])),height,value,1,0,"C")
+                    pdf.cell(0,height,"",0,1,"L")      
+
+                    for index in range(16):
+                        for index_1, titre in enumerate(titre_stat):
+                            for value in titre["value"]:
+                                pdf.set_font("arial","BI",10)
+                                response = get_by_params(parc["etudiants"],titre["name"].upper(),value,index+15)
+                                if index == 0:
+                                    if index_1 == 0:
+                                        pdf.cell(width/(len(titre["value"])),height,"Moins de 16 ans",1,0,"C")
+                                    else:
+                                        pdf.cell(width/(len(titre["value"])),height,str(response),1,0,"C")
+                                elif index == 14:
+                                    if index_1 == 0:
+                                        pdf.cell(width/(len(titre["value"])),height,"29+",1,0,"C")
+                                    else:
+                                        pdf.cell(width/(len(titre["value"])),height,str(response),1,0,"C")
+                                elif index == 15:
+                                    if index_1 == 0:
+                                        pdf.cell(width/(len(titre["value"])),height,"Total",1,0,"C")
+                                    else:
+                                        pdf.cell(width/(len(titre["value"])),height,str(response),1,0,"C")
+                                else:
+                                    if index_1 == 0:
+                                        pdf.cell(width/(len(titre["value"])),height,str(index+15),1,0,"C")
+                                    else:
+                                        pdf.cell(width/(len(titre["value"])),height,str(response),1,0,"C")
+
+                        pdf.cell(0,height,"",0,1,"L")  
+
+
+                    bas_1 = "*la plupart des filières sont des types de formation; initiale pour les étudiants à plein temps"
+                    bas_2 = "On attend par formation continue celle qui est donnée aux travailleurs à temps partiels"
+                    bas_3 = "N.B: Veuillez remplir séparement le canevas par filière, type de formation et année d' études"
+
+                    pdf.cell(0,height,"",0,1,"L")  
+                    pdf.cell(0,5,bas_1,0,1,"L")                    
+                    pdf.cell(0,5,bas_2,0,1,"L")                      
+                    pdf.cell(0,5,bas_3,0,1,"L")        
+
+        pdf.output(f"files/statistic_by_years.pdf","F")
+        return f"files/statistic_by_years.pdf"
 

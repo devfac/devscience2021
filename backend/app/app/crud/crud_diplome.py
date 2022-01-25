@@ -5,19 +5,19 @@ from sqlalchemy.orm import Session
 
 from sqlalchemy import MetaData, Table, or_, and_
 from app.crud.base import CRUDBase
-from app.schemas.semestre_valide import SemestreValideCreate, SemestreValideUpdate, SemestreValide
+from app.schemas.diplome import DiplomeCreate, DiplomeUpdate, Diplome
 from app.db.session import engine
 
 
-class CRUDSemestreValide(CRUDBase[SemestreValide, SemestreValideCreate, SemestreValideUpdate]):
+class CRUDDiplome(CRUDBase[Diplome, DiplomeCreate, DiplomeUpdate]):
 
-    def get_by_uuid(self, db: Session, *, uuid: str) -> Optional[SemestreValide]:
-        return db.query(SemestreValide).filter(SemestreValide.uuid == uuid).first()
+    def get_by_uuid(self, db: Session, *, uuid: str) -> Optional[Diplome]:
+        return db.query(Diplome).filter(Diplome.uuid == uuid).first()
 
     
-    def get_by_num_carte(self, schema:str, num_carte: str) -> Optional[SemestreValide]:
+    def get_by_num_carte(self, schema:str, num_carte: str) -> Optional[Diplome]:
         metadata = MetaData(schema=schema, bind=engine)
-        table = Table("semestre_valide", metadata,autoload=True)
+        table = Table("diplome", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(table.columns.num_carte == num_carte)
@@ -26,15 +26,26 @@ class CRUDSemestreValide(CRUDBase[SemestreValide, SemestreValideCreate, Semestre
         conn.close()
         return out
 
-    def update_sems(self, schema:str, obj_in: SemestreValideUpdate, num_carte:str) -> Optional[List[SemestreValide]]:
-        obj_in_data = jsonable_encoder(obj_in)
+    def get_by_mention(self, schema:str, uuid_mention: str) -> Optional[Diplome]:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table("diplome", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(table.columns.uuid_mention == uuid_mention)
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
+
+    def update_diplome(self, schema:str, obj_in: DiplomeUpdate, num_carte:str) -> Optional[List[Diplome]]:
+        obj_in_data = jsonable_encoder(obj_in) 
         update_data  = {}
         for field in obj_in_data:
             if obj_in_data[field]:
                 update_data[field]= obj_in_data[field]
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
-        table = Table("semestre_valide", metadata,autoload=True)
+        table = Table("diplome", metadata,autoload=True)
         up = table.update().values(update_data)
         up = up.where(table.columns.num_carte == num_carte)
         conn.execute(up)
@@ -43,13 +54,13 @@ class CRUDSemestreValide(CRUDBase[SemestreValide, SemestreValideCreate, Semestre
         out = result.fetchall()
         return out
         
-    def create_sems(
-        self, schema:str, obj_in: SemestreValideCreate
-    ) -> Optional[List[SemestreValide]]:
+    def create_diplome(
+        self, schema:str, obj_in: DiplomeCreate
+    ) -> Optional[List[Diplome]]:
         obj_in_data = jsonable_encoder(obj_in)
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
-        table = Table("semestre_valide", metadata,autoload=True)
+        table = Table("diplome", metadata,autoload=True)
         ins = table.insert().values(obj_in_data)
         conn.execute(ins)
         sel = table.select()
@@ -59,20 +70,20 @@ class CRUDSemestreValide(CRUDBase[SemestreValide, SemestreValideCreate, Semestre
 
     def get_all(
         self, schema:str
-    ) -> Optional[List[SemestreValide]]:
+    ) -> Optional[List[Diplome]]:
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
-        table = Table("semestre_valide", metadata,autoload=True)
+        table = Table("diplome", metadata,autoload=True)
         sel = table.select()
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
         return out
 
-    def delete_sems(self,schema: str, num_carte: str) -> Optional[List[SemestreValide]]:
+    def delete_diplome(self,schema: str, num_carte: str) -> Optional[List[Diplome]]:
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
-        table = Table("semestre_valide", metadata,autoload=True)
+        table = Table("diplome", metadata,autoload=True)
         dele = table.delete()
         dele = dele.where(table.columns.num_carte == num_carte)
         conn.execute(dele)
@@ -83,4 +94,4 @@ class CRUDSemestreValide(CRUDBase[SemestreValide, SemestreValideCreate, Semestre
         return out
 
 
-semetre_valide = CRUDSemestreValide(SemestreValide)
+diplome = CRUDDiplome(Diplome)

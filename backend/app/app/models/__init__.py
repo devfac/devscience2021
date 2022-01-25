@@ -8,3 +8,4 @@ from .anne_univ import AnneUniv
 from .etudiant import create
 from .matier import create
 from .note import create_table_note
+from .droit import Droit
