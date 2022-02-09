@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from app.api.api_v1.endpoints import login, users, utils, mentions, roles, parcours, \
 semestres, anne_univ, semestre_valide,ancien_etudiants, nouveau_etudiants, matier_ue, matier_ec, \
-scolarites, notes, notes_etudiants,liste,save_data, resultat, statistic, diplome, droit
+scolarites, notes, notes_etudiants,liste,save_data, resultat, statistic, diplome, droit, carte
 
 api_router = APIRouter()
 api_router.include_router(liste.router, prefix="/liste", tags=["liste"])
@@ -27,3 +27,4 @@ api_router.include_router(semestre_valide.router, prefix="/semestre_valide", tag
 api_router.include_router(scolarites.router, prefix="/scolarites", tags=["scolarites"])
 api_router.include_router(diplome.router, prefix="/diplome", tags=["diplome"])
 api_router.include_router(droit.router, prefix="/droit", tags=["droits"])
+api_router.include_router(carte.router, prefix="/carte", tags=["cartes"])

@@ -9,7 +9,7 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from sqlalchemy import MetaData, Table, or_, and_
 from app.crud.base import CRUDBase
-from app.schemas.etudiant import EtudiantAncienCreate, EtudiantAncienUpdate,EtudiantAncien
+from app.schemas.etudiant import EtudiantAncienCreate, EtudiantAncienUpdate,EtudiantAncien, EtudiantCarte
 from app.db.session import engine
 
 
@@ -49,6 +49,18 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         return out
 
     def get_by_mention(self, schema: str, uuid_mention: UUID) -> Optional[EtudiantAncien]:
+        metadata = MetaData(schema=schema, bind=engine)
+        table = Table("ancien_etudiant", metadata,autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(table.columns.uuid_mention == uuid_mention)
+        sel = sel.order_by(table.columns.nom.asc())
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
+
+    def get_by_carte(self, schema: str, uuid_mention: UUID) -> Optional[EtudiantCarte]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata,autoload=True)
         conn = engine.connect()

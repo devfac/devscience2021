@@ -15,6 +15,10 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def get_by_name(self, db: Session, *, name: str) -> Optional[User]:
         return db.query(User).filter(User.name == name).first()
 
+    
+    def get_chefsco(self, db: Session, *, uuid_role: str) -> Optional[User]:
+        return db.query(User).filter(User.uuid_role == uuid_role).first()
+
     def create(self, db: Session, *, obj_in: UserCreate) -> User:
         db_obj = User(
             email=obj_in.email,

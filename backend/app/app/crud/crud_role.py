@@ -12,6 +12,10 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
 
     def get_by_uuid(self, db: Session, *, uuid: str) -> Optional[Role]:
         return db.query(Role).filter(Role.uuid == uuid).first()
+
+    
+    def get_title(self, db: Session, *, title: str) -> Optional[Role]:
+        return db.query(Role).filter(Role.title == title).first()
         
     def create(
         self, db: Session, *, obj_in: RoleCreate

@@ -196,3 +196,16 @@ class EtudiantNouveau(EtudiantNouveauInDBBase):
 # Additional properties stored in DB
 class EtudiantNouveauInDB(EtudiantNouveauInDBBase):
     pass
+
+
+class EtudiantCarte(BaseModel):
+    num_carte: str
+    nom: str
+    prenom: str
+    date_naiss: str
+    lieu_naiss: str
+    num_cin: Optional[str]
+    date_cin: Optional[str]
+    lieu_cin: Optional[str]
+    parcours: str
+    
