@@ -1,9 +1,7 @@
-from typing import Optional, Any
-from uuid import uuid4, UUID
-from sqlalchemy.sql.sqltypes import String
+from typing import Optional
+from uuid import UUID
 
-from pydantic import BaseModel, EmailStr
-
+from pydantic import BaseModel
 
 keys = [
     "num_carte",
@@ -25,7 +23,8 @@ keys = [
     "date_quitance",
     "uuid_mention",
     "uuid_parcours"
-    ]
+]
+
 
 # Shared properties
 class EtudiantBase(BaseModel):
@@ -59,9 +58,10 @@ class SelectEtudiantBase(BaseModel):
     date_cin: Optional[str] = None
     lieu_cin: Optional[str] = None
     uuid_mention: Optional[str]
-    niveau:  Optional[str] = None
-    branche:  Optional[str] = None
+    niveau: Optional[str] = None
+    branche: Optional[str] = None
     select: Optional[bool] = False
+
 
 # Properties to receive via API on creation
 class EtudiantAncienCreate(EtudiantBase):
@@ -121,15 +121,18 @@ class EtudiantNouveauCreate(EtudiantBase):
     branche: str
     uuid_mention: UUID
     uuid_parcours: UUID
+
+
 # Properties to receive via API on update
 class EtudiantAncienUpdate(EtudiantBase):
     moyenne: Optional[float] = None
     num_carte: Optional[str]
-    bacc_anne:Optional[str]
+    bacc_anne: Optional[str]
     uuid_mention: Optional[UUID]
     uuid_parcours: Optional[UUID]
     semestre_petit: Optional[str]
     semestre_grand: Optional[str]
+
 
 class EtudiantNouveauUpdate(EtudiantBase):
     num_carte: Optional[str]
@@ -148,7 +151,7 @@ class EtudiantNouveauUpdate(EtudiantBase):
     branche: Optional[str]
     uuid_mention: Optional[UUID]
     uuid_parcours: Optional[UUID]
-    select:Optional[bool] = True
+    select: Optional[bool] = True
 
 
 class EtudiantAncienInDBBase(EtudiantBase):
@@ -160,6 +163,7 @@ class EtudiantAncienInDBBase(EtudiantBase):
 
     class Config:
         orm_mode = True
+
 
 class EtudiantNouveauInDBBase(EtudiantBase):
     uuid: Optional[UUID]
@@ -183,15 +187,17 @@ class EtudiantNouveauInDBBase(EtudiantBase):
 
 # Additional properties to return via API
 class EtudiantAncien(EtudiantAncienInDBBase):
-    parcours:Optional[str]
+    parcours: Optional[str]
 
 
 # Additional properties stored in DB
 class EtudiantAncienInDB(EtudiantAncienInDBBase):
     pass
 
+
 class EtudiantNouveau(EtudiantNouveauInDBBase):
     pass
+
 
 # Additional properties stored in DB
 class EtudiantNouveauInDB(EtudiantNouveauInDBBase):
@@ -208,4 +214,3 @@ class EtudiantCarte(BaseModel):
     date_cin: Optional[str]
     lieu_cin: Optional[str]
     parcours: str
-    

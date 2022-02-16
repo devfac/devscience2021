@@ -1,7 +1,6 @@
 from ast import Pass
-from typing import List, Optional, Any
+from typing import Optional
 from uuid import UUID
-
 from pydantic import BaseModel
 
 
