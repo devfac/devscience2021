@@ -209,12 +209,13 @@ class PDF(FPDF):
                     dim = 15
                     value = str(etudiant[ue])
                 else:
-                    if str(etudiant[ue]) == "None":
+                    if str(etudiant[ue]) == "None" or str(etudiant[ue]) == "":
                         value = "Absent"
-                    value = str(format(float(etudiant[ue]),'.3f') )
+                    else:
+                        value = str(format(float(etudiant[ue]),'.3f') )
                 pdf.set_font("arial","I",10)
                 pdf.cell(1,5,"",0,0)
-                if value == "None":
+                if value == "None" or value == "":
                     value = "Absent"
                 pdf.cell(dim,5,value,1,0,'C')
         PDF.add_corp(pdf=pdf,data=data,sems=sems,matiers=matiers,admis=admis,type="definitive")

@@ -49,7 +49,7 @@ def get_by_params(all_niveau:Any, sexe:str, etat:str, age_:int )-> int:
     all_etudiant = []
     for etudiant in all_niveau:
         date_ = etudiant.date_naiss
-        naiss = date_[len(date_)-4:len(date_)]
+        naiss = date_[0:4]
         age :int = int(now) - int(naiss)
         if sexe == "ENSEMBLE":
             if etat == "Total":
