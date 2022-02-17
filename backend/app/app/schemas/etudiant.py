@@ -157,6 +157,7 @@ class EtudiantNouveauUpdate(EtudiantBase):
 class EtudiantAncienInDBBase(EtudiantBase):
     uuid: Optional[UUID]
     num_carte: Optional[str]
+    bacc_anne: Optional[str]
     moyenne: Optional[float] = None
     semestre_petit: Optional[str]
     semestre_grand: Optional[str]

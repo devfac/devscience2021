@@ -1,5 +1,6 @@
 import json
 import uuid
+from os import getcwd
 from typing import Any, List
 from uuid import UUID
 
@@ -7,6 +8,7 @@ from app import crud, models, schemas
 from app.api import deps
 from app.utils import UUIDEncoder
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 router = APIRouter()
@@ -255,3 +257,8 @@ def delete_etudiant(
             et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
             list_et.append(et)
     return list_et
+
+
+@router.get("/photo")
+def get_file(name_file: str):
+    return FileResponse(path=getcwd() + "/photos/" + name_file)
