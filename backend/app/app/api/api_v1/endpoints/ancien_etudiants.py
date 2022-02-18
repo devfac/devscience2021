@@ -7,7 +7,7 @@ from uuid import UUID
 from app import crud, models, schemas
 from app.api import deps
 from app.utils import UUIDEncoder
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
@@ -29,7 +29,10 @@ def read_etudiant_ancienne(
     if etudiant:
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
-            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
+            parcours = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours)
+            print(un_etudiant.uuid_parcours)
+            if parcours:
+                et["parcours"] = parcours.abreviation
             list_et.append(et)
     return list_et
 
@@ -262,3 +265,20 @@ def delete_etudiant(
 @router.get("/photo")
 def get_file(name_file: str):
     return FileResponse(path=getcwd() + "/photos/" + name_file)
+
+
+@router.post("/upload_photo/")
+async def create_upload_file(*,
+                             uploaded_file: UploadFile = File(...),
+                             num_carte: str,
+                             current_user: models.User = Depends(deps.get_current_active_superuser)
+                             ):
+    allowed_files = {"image/jpg", "image/jpeg"}
+    extension = str(uploaded_file.content_type).partition("/")[2]
+    uploaded_file.filename = f"{num_carte}.{extension}"
+    if uploaded_file.content_type not in allowed_files:
+        raise HTTPException(status_code=402, detail="invalid image")
+    file_location = f"photos/{uploaded_file.filename}"
+    with open(file_location, "wb+") as file_object:
+        file_object.write(uploaded_file.file.read())
+    return {"filename": f"{num_carte}.{extension}"}
