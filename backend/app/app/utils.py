@@ -204,9 +204,9 @@ def get_credit(value: float, credit: int) -> int:
 
 
 def max_value(value_1: str, value_2: str) -> float:
-    if value_1 == "":
+    if value_1 == "" or value_1 is None:
         value_1 = 0
-    if value_2 == "":
+    if value_2 == "" or value_2 is None:
         value_2 = 0
 
     if float(value_1) >= float(value_2):
