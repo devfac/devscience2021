@@ -1,4 +1,5 @@
 import json
+import os
 import uuid
 from os import getcwd
 from typing import Any, List
@@ -271,14 +272,14 @@ def get_file(name_file: str):
 async def create_upload_file(*,
                              uploaded_file: UploadFile = File(...),
                              num_carte: str,
-                             current_user: models.User = Depends(deps.get_current_active_superuser)
+                             current_user: models.User = Depends(deps.get_current_active_user)
                              ):
-    allowed_files = {"image/jpg", "image/jpeg"}
-    extension = str(uploaded_file.content_type).partition("/")[2]
-    uploaded_file.filename = f"{num_carte}.{extension}"
-    if uploaded_file.content_type not in allowed_files:
+    name = list(os.path.splitext(uploaded_file.filename))[1]
+    allowed_files = {".jpg", ".jpeg", ".png"}
+
+    if name.lower() not in allowed_files:
         raise HTTPException(status_code=402, detail="invalid image")
-    file_location = f"photos/{uploaded_file.filename}"
+    file_location = f"photos/{num_carte}{name}"
     with open(file_location, "wb+") as file_object:
         file_object.write(uploaded_file.file.read())
-    return {"filename": f"{num_carte}.{extension}"}
+    return {"filename": f'{num_carte}{name}'}

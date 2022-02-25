@@ -7,7 +7,7 @@ from sqlalchemy.sql.expression import false
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import MetaData, Table, and_
 from app.crud.base import CRUDBase
-from app.schemas.etudiant import EtudiantNouveauCreate, EtudiantNouveauUpdate, EtudiantNouveau
+from app.schemas.etudiant import EtudiantNouveauCreate, EtudiantNouveauUpdate, EtudiantNouveau, SelectEtudiantBase
 from app.db.session import engine
 
 
@@ -34,13 +34,15 @@ class CRUDEtudiantNouveau(CRUDBase[EtudiantNouveau, EtudiantNouveauCreate, Etudi
         conn.close()
         return out
 
-    def update_etudiant_select(self, schema: str, num_select: str, obj_in: EtudiantNouveauUpdate) -> Optional[
+    def update_etudiant_select(self, schema: str, num_select: str, obj_in: SelectEtudiantBase) -> Optional[
         EtudiantNouveau]:
         obj_in_data = jsonable_encoder(obj_in)
         update_data = {}
         for field in obj_in_data:
-            if obj_in_data[field]:
+            if obj_in_data[field] != "" and obj_in_data[field] is not None:
                 update_data[field] = obj_in_data[field]
+        print(obj_in_data)
+        print(update_data)
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table("nouveau_etudiant", metadata, autoload=True)

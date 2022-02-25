@@ -20,91 +20,91 @@ from app.utils import UUIDEncoder
 router = APIRouter()
 
 
-
 @router.get("/carte_etudiant/")
 def create_carte(
-    schemas:str,
-    uuid_mention:str,
-    db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(deps.get_current_active_superuser),
+        schema: str,
+        uuid_mention: str,
+        db: Session = Depends(deps.get_db),
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     create liste au examen
     """
-    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
     if not anne_univ:
-        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
-        )
-    etudiants_=crud.ancien_etudiant.get_by_mention(schemas, uuid_mention)
-    
-    mention = crud.mention.get_by_uuid(db=db,uuid=uuid_mention)
+        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",
+                            )
+    etudiants_ = crud.ancien_etudiant.get_by_mention(schema, uuid_mention)
+
+    mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
     if not mention:
-        raise HTTPException( status_code=400, detail=f" Mention not found.",)
+        raise HTTPException(status_code=400, detail=f" Mention not found.", )
 
     all_etudiant = []
     if etudiants_:
         for un_etudiant in etudiants_:
-            et = json.loads(json.dumps(dict(un_etudiant),cls=UUIDEncoder))
-            et['niveau'] = get_niveau(un_etudiant.semestre_petit,un_etudiant.semestre_grand)
-            et["parcours"]=crud.parcours.get_by_uuid(db=db,uuid=un_etudiant.uuid_parcours).abreviation
+            et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
+            et['niveau'] = get_niveau(un_etudiant.semestre_petit, un_etudiant.semestre_grand)
+            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
             all_etudiant.append(et)
 
-    role = crud.role.get_title(db=db,title="chefsco")
+    role = crud.role.get_title(db=db, title="chefsco")
     data = {}
-    data['supperadmin']=""
+    data['supperadmin'] = ""
 
-    chefsco:schema.User = Any
+    chefsco: schemas.User = Any
     if role:
-        chefsco=crud.user.get_chefsco(db=db, uuid_role = role.uuid)
-        data['supperadmin']=f"{chefsco.first_name} {chefsco.last_name}"
+        chefsco = crud.user.get_chefsco(db=db, uuid_role=role.uuid)
+        data['supperadmin'] = f"{chefsco.first_name} {chefsco.last_name}"
 
-    data['mention']=mention.title
-    data['key']=anne_univ.code
-    data['img_carte']=(mention.branche.lower())[0:1]
+    data['mention'] = mention.title
+    data['key'] = anne_univ.code
+    data['img_carte'] = (mention.branche.lower())[0:1]
 
-    file = carte_avant.PDF.parcourir_et(all_etudiant,data)
+    file = carte_avant.PDF.parcourir_et(all_etudiant, data)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
+
 
 @router.get("/carte_etudiant_ariere/")
 def create_ariere_carte(
-    schemas:str,
-    uuid_mention:str,
-    db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(deps.get_current_active_superuser),
+        schema: str,
+        uuid_mention: str,
+        db: Session = Depends(deps.get_db),
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     create liste au examen
     """
-    anne_univ = crud.anne_univ.get_by_title(db,decode_schemas(schema=schemas))
+    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
     if not anne_univ:
-        raise HTTPException( status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
-        )
-    etudiants_=crud.ancien_etudiant.get_by_mention(schemas, uuid_mention)
-    
-    mention = crud.mention.get_by_uuid(db=db,uuid=uuid_mention)
+        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",
+                            )
+    etudiants_ = crud.ancien_etudiant.get_by_mention(schema, uuid_mention)
+
+    mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
     if not mention:
-        raise HTTPException( status_code=400, detail=f" Mention not found.",)
+        raise HTTPException(status_code=400, detail=f" Mention not found.", )
 
     all_etudiant = []
     if etudiants_:
         for un_etudiant in etudiants_:
-            et = json.loads(json.dumps(dict(un_etudiant),cls=UUIDEncoder))
-            et['niveau'] = get_niveau(un_etudiant.semestre_petit,un_etudiant.semestre_grand)
-            et["parcours"]=crud.parcours.get_by_uuid(db=db,uuid=un_etudiant.uuid_parcours).abreviation
+            et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
+            et['niveau'] = get_niveau(un_etudiant.semestre_petit, un_etudiant.semestre_grand)
+            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
             all_etudiant.append(et)
 
-    role = crud.role.get_title(db=db,title="chefsco")
+    role = crud.role.get_title(db=db, title="chefsco")
     data = {}
-    data['supperadmin']=""
+    data['supperadmin'] = ""
 
-    chefsco:schema.User = Any
+    chefsco: schema.User = Any
     if role:
-        chefsco=crud.user.get_chefsco(db=db, uuid_role = role.uuid)
-        data['supperadmin']=f"{chefsco.first_name} {chefsco.last_name}"
+        chefsco = crud.user.get_chefsco(db=db, uuid_role=role.uuid)
+        data['supperadmin'] = f"{chefsco.first_name} {chefsco.last_name}"
 
-    data['mention']=mention.title
-    data['key']=anne_univ.code
-    data['img_carte']=(mention.branche.lower())[0:1]
+    data['mention'] = mention.title
+    data['key'] = anne_univ.code
+    data['img_carte'] = (mention.branche.lower())[0:1]
 
-    file = arrire_carte.PDF.parcourir_et(all_etudiant,data)
+    file = arrire_carte.PDF.parcourir_et(all_etudiant, data)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)

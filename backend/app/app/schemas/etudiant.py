@@ -59,6 +59,8 @@ class SelectEtudiantBase(BaseModel):
     lieu_cin: Optional[str] = None
     uuid_mention: Optional[str]
     niveau: Optional[str] = None
+    sexe: Optional[str] = None
+    nation: Optional[str] = None
     branche: Optional[str] = None
     select: Optional[bool] = False
 
@@ -149,6 +151,7 @@ class EtudiantNouveauUpdate(EtudiantBase):
     proffession_mere: Optional[str]
     adresse_parent: Optional[str]
     branche: Optional[str]
+    niveau: Optional[str]
     uuid_mention: Optional[UUID]
     uuid_parcours: Optional[UUID]
     select: Optional[bool] = True

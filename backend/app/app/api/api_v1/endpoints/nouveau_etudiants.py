@@ -54,7 +54,7 @@ def create_select_etudiant_nouveau(
     if not mention:
         raise HTTPException(status_code=400, detail=f" Mention not found.", )
     all_etutiant = crud.nouveau_etudiant.get_by_mention(schema, etudiant_in.uuid_mention)
-    etudiant_in.num_select = f"S{mention.abreviation.upper()}{len(all_etutiant) + 1}"
+    etudiant_in.num_select = f"S{mention.abreviation.upper()}{etudiant_in.num_select}"
     etudiant = crud.nouveau_etudiant.create_etudiant(schema=schema, obj_in=etudiant_in)
     return etudiant
 
@@ -138,8 +138,7 @@ def update_etudiant(
     num = int(mention.last_num_carte) + len(all_etudiant) + 1
     if not etudiant.num_carte:
         etudiant_in.num_carte = create_num_carte(etudiant.branche, str(num))
-    else:
-        etudiant_in.num_carte = ""
+
     etudiant_in.uuid_mention = mention.uuid
     etudiant_in.branche = mention.branche
 
@@ -253,9 +252,9 @@ def delete_etudiant_nouveau(
     anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
     if not anne_univ:
         raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schema)} not found.", )
-    etudiant = crud.nouveau_etudiant.get_by_num_select(schema=schema, num_carte=num_select)
+    etudiant = crud.nouveau_etudiant.get_by_num_select(schema=schema, num_select=num_select)
     if not etudiant:
         raise HTTPException(status_code=404, detail="Etudiant not found")
 
-    etudiant = crud.nouveau_etudiant.delete_etudiant(schema=schema, num_carte=num_select)
+    etudiant = crud.nouveau_etudiant.delete_etudiant(schema=schema, num_select=num_select)
     return etudiant

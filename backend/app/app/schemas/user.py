@@ -13,7 +13,7 @@ class UserBase(BaseModel):
     is_admin: Optional[bool]
     is_superuser: bool = False
     first_name: str
-    last_name:Optional[str]
+    last_name: Optional[str]
     uuid_mention: Optional[List[str]]
     uuid_role: Optional[UUID]
 
@@ -23,7 +23,7 @@ class UserCreate(UserBase):
     email: EmailStr
     password: str
     first_name: str
-    last_name:Optional[str]
+    last_name: Optional[str]
 
 
 # Properties to receive via API on update
