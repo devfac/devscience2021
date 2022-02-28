@@ -1,3 +1,4 @@
+import json
 from typing import Any, List
 from uuid import UUID
 
@@ -6,6 +7,8 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+
+from app.utils import UUIDEncoder
 
 router = APIRouter()
 
@@ -22,7 +25,7 @@ def read_parcours(
     return parcours
 
 
-@router.post("/", response_model=schemas.Parcours)
+@router.post("/", response_model=List[schemas.Parcours])
 def create_parcours(
     *,
     db: Session = Depends(deps.get_db),
@@ -36,7 +39,7 @@ def create_parcours(
         parcours = crud.parcours.create(db=db, obj_in=paarcours_in)
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    return parcours
+    return crud.parcours.get_multi(db=db)
 
 
 @router.put("/", response_model=schemas.Parcours)

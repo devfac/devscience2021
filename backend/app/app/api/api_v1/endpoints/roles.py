@@ -24,7 +24,7 @@ def read_roles(
     return role
 
 
-@router.post("/", response_model=schemas.Role)
+@router.post("/", response_model=List[schemas.Role])
 def create_role(
     *,
     db: Session = Depends(deps.get_db),
@@ -38,7 +38,7 @@ def create_role(
         role = crud.role.create(db=db, obj_in=role_in)
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    return role
+    return crud.role.get_multi(db=db)
 
 
 @router.put("/", response_model=schemas.Role)

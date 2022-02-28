@@ -17,28 +17,27 @@ router = APIRouter()
 
 @router.get("/", response_model=List[schemas.AnneUniv])
 def read_annee_universitaire(
-    db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(deps.get_current_active_user),
+        db: Session = Depends(deps.get_db),
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve anne universitaire.
     """
     anne_univ = crud.anne_univ.get_multi(db)
     return anne_univ
-    
 
 
-@router.post("/", response_model=schemas.AnneUniv)
+@router.post("/", response_model=List[schemas.AnneUniv])
 def create_annee_universitaire(
-    *,
-    db: Session = Depends(deps.get_db),
-    anne_univ_in: schemas.AnneUnivCreate,
-    current_user: models.User = Depends(deps.get_current_active_user),
+        *,
+        db: Session = Depends(deps.get_db),
+        anne_univ_in: schemas.AnneUnivCreate,
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create new anne universitaire.
     """
-   
+
     if crud.user.is_superuser(current_user):
         anne_univ = crud.anne_univ.get_by_title(db, title=anne_univ_in.title)
         if not anne_univ:
@@ -52,21 +51,21 @@ def create_annee_universitaire(
                 reponse = "Erreur"
         else:
             raise HTTPException(
-            status_code=400,
-            detail=f"{anne_univ.title} already exists in the system.",
-        )
+                status_code=400,
+                detail=f"{anne_univ.title} already exists in the system.",
+            )
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    return anne_univ
+    return crud.anne_univ.get_multi(db=db)
 
 
 @router.put("/", response_model=schemas.AnneUniv)
 def update_annee_universitaire(
-    *,
-    db: Session = Depends(deps.get_db),
-    uuid: str,
-    anne_univ_in: schemas.AnneUnivUpdate,
-    current_user: models.User = Depends(deps.get_current_active_user),
+        *,
+        db: Session = Depends(deps.get_db),
+        uuid: str,
+        anne_univ_in: schemas.AnneUnivUpdate,
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update an anne universitaire.
@@ -82,10 +81,10 @@ def update_annee_universitaire(
 
 @router.get("/by_uuid", response_model=schemas.AnneUniv)
 def read_annee_universitaire(
-    *,
-    db: Session = Depends(deps.get_db),
-    uuid: str,
-    current_user: models.User = Depends(deps.get_current_active_user),
+        *,
+        db: Session = Depends(deps.get_db),
+        uuid: str,
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get anne universitaire by ID.
@@ -100,10 +99,10 @@ def read_annee_universitaire(
 
 @router.delete("/", response_model=schemas.AnneUniv)
 def delete_annee_universitaire(
-    *,
-    db: Session = Depends(deps.get_db),
-    uuid: str,
-    current_user: models.User = Depends(deps.get_current_active_user),
+        *,
+        db: Session = Depends(deps.get_db),
+        uuid: str,
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Delete anne universitaire.

@@ -12,6 +12,9 @@ class CRUDMention(CRUDBase[Mention, MentionCreate, MentionUpdate]):
 
     def get_by_uuid(self, db: Session, *, uuid: str) -> Optional[Mention]:
         return db.query(Mention).filter(Mention.uuid == uuid).first()
+
+    def get_by_value(self, db: Session, *, value: str) -> Optional[Mention]:
+        return db.query(Mention).filter(Mention.value == value).first()
         
     def create(
         self, db: Session, *, obj_in: MentionCreate, value:str

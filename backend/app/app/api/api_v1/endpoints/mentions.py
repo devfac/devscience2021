@@ -22,7 +22,7 @@ def read_mentions(
     return mentions
 
 
-@router.post("/", response_model=schemas.Mention)
+@router.post("/", response_model=List[schemas.Mention])
 def create_mention(
     *,
     db: Session = Depends(deps.get_db),
@@ -33,11 +33,15 @@ def create_mention(
     Create new mention.
     """
     value = decode_text(mention_in.title).lower()
+    mention = crud.mention.get_by_value(db=db, value=value)
+    if mention:
+        raise HTTPException(status_code=400, detail="Mention already exist")
+
     if crud.user.is_superuser(current_user):
         mention = crud.mention.create(db=db, obj_in=mention_in, value=value)
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    return mention
+    return crud.mention.get_multi(db=db)
 
 
 @router.put("/", response_model=schemas.Mention)

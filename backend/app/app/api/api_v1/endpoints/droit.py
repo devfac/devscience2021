@@ -24,7 +24,7 @@ def read_droits(
     return droit
 
 
-@router.post("/", response_model=schemas.Droit)
+@router.post("/", response_model=List[schemas.Droit])
 def create_droit(
     *,
     db: Session = Depends(deps.get_db),
@@ -38,7 +38,7 @@ def create_droit(
         droit = crud.droit.create(db=db, obj_in=droit_in)
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    return droit
+    return crud.droit.get_multi(db=db)
 
 
 @router.put("/", response_model=schemas.Droit)
