@@ -13,12 +13,13 @@ from app.core.config import settings
 router = APIRouter()
 
 
-@router.post("/", response_model=schemas.Msg)
+@router.post("/", response_model=Any)
 def create_table_note(
         *,
         db: Session = Depends(deps.get_db),
         schemas: str,
         semestre: str,
+        session_: str,
         uuid_parcours: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -57,11 +58,14 @@ def create_table_note(
                     models.note.update_table_note(schemas=schemas, parcours=parcours.abreviation, semestre=semestre,
                                                   matiers=matiers, session=session)
                 else:
-                    raise HTTPException(
-                        status_code=400,
-                        detail=f"note_{parcours.abreviation.lower()}_{semestre.lower()}_{session.lower()} already exists"
-                    )
-        return {"msg": "Succces"}
+                    return crud.note.check_columns_exist(schemas=schemas, semestre=semestre,
+                                                         parcours=parcours.abreviation,
+                                                         session=session_.lower())
+        test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours.abreviation,
+                                                session=session_.lower())
+        if test_note:
+            return crud.note.check_columns_exist(schemas=schemas, semestre=semestre, parcours=parcours.abreviation,
+                                                 session=session_.lower())
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
 

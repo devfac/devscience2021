@@ -11,6 +11,7 @@ class MatiertBase(BaseModel):
     uuid_parcours: Optional[UUID] = None
     uuid_mention: Optional[UUID] = None
 
+
 # Properties to receive via API on creation
 class MatierUECreate(MatiertBase):
     title: str
@@ -18,6 +19,7 @@ class MatierUECreate(MatiertBase):
     semestre: str
     uuid_parcours: UUID
     uuid_mention: UUID
+
 
 class MatierECCreate(MatiertBase):
     title: str
@@ -47,6 +49,7 @@ class MatierUEInDBBase(MatiertBase):
     class Config:
         orm_mode = True
 
+
 class MatierECInDBBase(MatiertBase):
     poids: Optional[float]
     value: Optional[str]
@@ -67,8 +70,10 @@ class MatierUE(MatierUEInDBBase):
 class MatierUEInDB(MatierUEInDBBase):
     pass
 
+
 class MatierEC(MatierECInDBBase):
     pass
+
 
 # Additional properties stored in DB
 class MatierECInDB(MatierECInDBBase):
@@ -76,19 +81,19 @@ class MatierECInDB(MatierECInDBBase):
 
 
 class MatierUniEc(BaseModel):
-    name:Optional[str]
-    note:float
+    name: Optional[str]
+    note: float
     poids: float
 
+
 class MatierUniUe(BaseModel):
-    name:Optional[str]
-    note:Optional[float]
+    name: Optional[str]
+    note: Optional[float]
     credit: Optional[int]
-    ec:Optional[List[MatierUniEc]]
+    ec: Optional[List[MatierUniEc]]
+
 
 class MatierUni(BaseModel):
-    num_carte:Optional[str]
-    moyenne:Optional[float]
-    ue:Optional[List[MatierUniUe]]
-
-
+    num_carte: Optional[str]
+    moyenne: Optional[float]
+    ue: Optional[List[MatierUniUe]]

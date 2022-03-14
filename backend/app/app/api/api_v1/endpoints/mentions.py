@@ -44,7 +44,7 @@ def create_mention(
     return crud.mention.get_multi(db=db)
 
 
-@router.put("/", response_model=schemas.Mention)
+@router.put("/", response_model=List[schemas.Mention])
 def update_mention(
     *,
     db: Session = Depends(deps.get_db),
@@ -69,7 +69,7 @@ def update_mention(
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     mention = crud.mention.update(db=db, db_obj=mention, obj_in=mention_oj)
-    return mention
+    return crud.mention.get_multi(db=db)
 
 
 @router.get("/by_uuid", response_model=schemas.Mention)
@@ -88,7 +88,7 @@ def read_mention(
     return mention
 
 
-@router.delete("/", response_model=schemas.Mention)
+@router.delete("/", response_model=List[schemas.Mention])
 def delete_mention(
     *,
     db: Session = Depends(deps.get_db),
@@ -104,4 +104,4 @@ def delete_mention(
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     mention = crud.mention.remove_uuid(db=db, uuid=uuid)
-    return mention
+    return crud.mention.get_multi(db=db)

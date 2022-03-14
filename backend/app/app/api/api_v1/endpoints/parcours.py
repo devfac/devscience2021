@@ -42,7 +42,7 @@ def create_parcours(
     return crud.parcours.get_multi(db=db)
 
 
-@router.put("/", response_model=schemas.Parcours)
+@router.put("/", response_model=List[schemas.Parcours])
 def update_parcours(
     *,
     db: Session = Depends(deps.get_db),
@@ -59,7 +59,7 @@ def update_parcours(
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     parcours = crud.mention.update(db=db, db_obj=parcours, obj_in=parcours_in)
-    return parcours
+    return crud.parcours.get_multi(db=db)
 
 
 @router.get("/by_uuid/", response_model=schemas.Parcours)
@@ -94,7 +94,7 @@ def read_parcours_by_mention(
     return parcours
 
 
-@router.delete("/", response_model=schemas.Parcours)
+@router.delete("/", response_model=List[schemas.Parcours])
 def delete_parcours(
     *,
     db: Session = Depends(deps.get_db),
@@ -110,4 +110,4 @@ def delete_parcours(
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     parcours = crud.parcours.remove_uuid(db=db, uuid=uuid)
-    return parcours
+    return crud.parcours.get_multi(db=db)

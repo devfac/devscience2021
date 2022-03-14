@@ -17,10 +17,7 @@ def read_droits(
     """
     Retrieve droits.
     """
-    if crud.user.is_superuser(current_user):
-        droit = crud.droit.get_multi(db=db)
-    else:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+    droit = crud.droit.get_multi(db=db)
     return droit
 
 
@@ -41,7 +38,7 @@ def create_droit(
     return crud.droit.get_multi(db=db)
 
 
-@router.put("/", response_model=schemas.Droit)
+@router.put("/", response_model=List[schemas.Droit])
 def update_droit(
     *,
     db: Session = Depends(deps.get_db),
@@ -58,7 +55,7 @@ def update_droit(
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     droit = crud.droit.update(db=db, db_obj=droit, obj_in=droit_in)
-    return droit
+    return crud.droit.get_multi(db=db)
 
 
 @router.get("/by_niveau_and_annee", response_model=schemas.Droit)
@@ -81,7 +78,7 @@ def read_droit(
     return droit
 
 
-@router.delete("/", response_model=schemas.Droit)
+@router.delete("/", response_model=List[schemas.Droit])
 def delete_droit(
     *,
     db: Session = Depends(deps.get_db),
@@ -97,4 +94,4 @@ def delete_droit(
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     droit = crud.droit.remove_uuid(db=db, uuid=uuid)
-    return droit
+    return crud.droit.get_multi(db=db)

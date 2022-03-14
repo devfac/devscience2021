@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Union, List
 
 from sqlalchemy.orm import Session
 
@@ -15,7 +15,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def get_by_name(self, db: Session, *, name: str) -> Optional[User]:
         return db.query(User).filter(User.name == name).first()
 
-    
+    def get_by_uuid(self, db: Session, *, uuid: str) -> Optional[User]:
+        return db.query(User).filter(User.uuid == uuid).first()
+
     def get_chefsco(self, db: Session, *, uuid_role: str) -> Optional[User]:
         return db.query(User).filter(User.uuid_role == uuid_role).first()
 
@@ -34,6 +36,14 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db.commit()
         db.refresh(db_obj)
         return db_obj
+
+    def get_multi(
+        self, db: Session
+    ) -> List[User]:
+        return (
+            db.query(self.model)
+            .all()
+        )
 
     def update(
         self, db: Session, *, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]

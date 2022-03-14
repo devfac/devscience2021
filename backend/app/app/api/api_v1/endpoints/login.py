@@ -21,7 +21,7 @@ router = APIRouter()
 
 @router.post("/login/access-token", response_model=schemas.Token)
 def login_access_token(
-    db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
+        db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
     """
     OAuth2 compatible token login, get an access token for future requests
@@ -34,25 +34,24 @@ def login_access_token(
     elif not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    token =  security.create_access_token(
-            user.uuid, expires_delta=access_token_expires
-        )
+    token = security.create_access_token(
+        user.uuid, expires_delta=access_token_expires
+    )
     role = crud.role.get_by_uuid(db, uuid=user.uuid_role)
     if crud.user.is_superuser(user):
         return {
-            "access_token":token,
-            "mention":[],
-            "role":"supperuser",
+            "access_token": token,
+            "mention": [],
+            "role": "supperuser",
             "token_type": "bearer",
         }
     else:
         return {
-            "access_token":token,
-            "mention":user.uuid_mention,
-            "role":role.title,
+            "access_token": token,
+            "mention": user.uuid_mention,
+            "role": role.title,
             "token_type": "bearer",
         }
-
 
 
 @router.post("/login/test-token", response_model=schemas.User)
@@ -84,9 +83,9 @@ def recover_password(email: str, db: Session = Depends(deps.get_db)) -> Any:
 
 @router.post("/reset-password/", response_model=schemas.Msg)
 def reset_password(
-    token: str = Body(...),
-    new_password: str = Body(...),
-    db: Session = Depends(deps.get_db),
+        token: str = Body(...),
+        new_password: str = Body(...),
+        db: Session = Depends(deps.get_db),
 ) -> Any:
     """
     Reset password

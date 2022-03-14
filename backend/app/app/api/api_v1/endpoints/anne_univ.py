@@ -59,7 +59,7 @@ def create_annee_universitaire(
     return crud.anne_univ.get_multi(db=db)
 
 
-@router.put("/", response_model=schemas.AnneUniv)
+@router.put("/", response_model=List[schemas.AnneUniv])
 def update_annee_universitaire(
         *,
         db: Session = Depends(deps.get_db),
@@ -75,8 +75,8 @@ def update_annee_universitaire(
         raise HTTPException(status_code=404, detail="Anne Univ not found")
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    anne_univ = crud.semetre.update(db=db, db_obj=anne_univ, obj_in=anne_univ_in)
-    return anne_univ
+    anne_univ = crud.anne_univ.update(db=db, db_obj=anne_univ, obj_in=anne_univ_in)
+    return crud.anne_univ.get_multi(db=db)
 
 
 @router.get("/by_uuid", response_model=schemas.AnneUniv)
@@ -97,7 +97,7 @@ def read_annee_universitaire(
     return anne_univ
 
 
-@router.delete("/", response_model=schemas.AnneUniv)
+@router.delete("/", response_model=List[schemas.AnneUniv])
 def delete_annee_universitaire(
         *,
         db: Session = Depends(deps.get_db),
@@ -112,5 +112,5 @@ def delete_annee_universitaire(
         raise HTTPException(status_code=404, detail="Anne Univ not found")
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    anne_univ = crud.semetre.remove_uuid(db=db, uuid=uuid)
-    return anne_univ
+    anne_univ = crud.anne_univ.remove_uuid(db=db, uuid=uuid)
+    return crud.anne_univ.get_multi(db=db)

@@ -41,7 +41,7 @@ def create_role(
     return crud.role.get_multi(db=db)
 
 
-@router.put("/", response_model=schemas.Role)
+@router.put("/", response_model=List[schemas.Role])
 def update_role(
     *,
     db: Session = Depends(deps.get_db),
@@ -58,7 +58,7 @@ def update_role(
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     role = crud.role.update(db=db, db_obj=role, obj_in=role_in)
-    return role
+    return crud.role.get_multi(db=db)
 
 
 @router.get("/by_uuid", response_model=schemas.Role)
@@ -79,7 +79,7 @@ def read_role(
     return role
 
 
-@router.delete("/", response_model=schemas.Role)
+@router.delete("/", response_model=List[schemas.Role])
 def delete_role(
     *,
     db: Session = Depends(deps.get_db),
@@ -95,4 +95,4 @@ def delete_role(
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     role = crud.role.remove_uuid(db=db, uuid=uuid)
-    return role
+    return crud.role.get_multi(db=db)

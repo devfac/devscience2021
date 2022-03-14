@@ -10,7 +10,7 @@ import json
 router = APIRouter()
 
 
-@router.post("/insert_etudiants", response_model=List[Any])
+@router.post("/insert_etudiants/", response_model=List[Any])
 def inserts_etudiant(
         *,
         db: Session = Depends(deps.get_db),
@@ -66,6 +66,29 @@ def inserts_etudiant(
                     crud.note.insert_note(schemas, semestre, parcours.abreviation, "final", etudiant.num_carte)
         all_note = crud.note.read_all_note(schemas, semestre, parcours.abreviation, session)
         return all_note
+
+
+@router.get("/get_all_notes/", response_model=List[Any])
+def get_all_notes(
+        *,
+        db: Session = Depends(deps.get_db),
+        schemas: str,
+        semestre: str,
+        session: str,
+        uuid_parcours: str,
+        current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schemas))
+    if not anne_univ:
+        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
+                            )
+
+    parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
+    if not parcours:
+        raise HTTPException(status_code=400, detail="Parcours not found")
+
+    all_note = crud.note.read_all_note(schemas, semestre, parcours.abreviation, session)
+    return all_note
 
 
 @router.post("/insert_note", response_model=List[Any])
