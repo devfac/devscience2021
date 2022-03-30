@@ -55,7 +55,7 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(table.columns.uuid_mention == uuid_mention)
-        sel = sel.order_by(table.columns.nom.asc())
+        sel = sel.order_by(table.columns.uuid_parcours.asc())
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
@@ -98,7 +98,7 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         return out
 
     def get_by_parcours_and_etat_and_moyenne(self, schema: str, uuid_parcours: str, etat: str, moyenne: float) -> \
-    Optional[EtudiantAncien]:
+            Optional[EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata, autoload=True)
         conn = engine.connect()
@@ -260,7 +260,7 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         sel = table.select()
         sel = sel.where(and_(table.columns.uuid_parcours == uuid_parcours, table.columns.etat == etat,
                              table.columns.moyenne >= moyenne, or_(table.columns.semestre_grand == sems_petit.upper(),
-                             table.columns.semestre_grand == sems_grand.upper())))
+                                                                   table.columns.semestre_grand == sems_grand.upper())))
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()

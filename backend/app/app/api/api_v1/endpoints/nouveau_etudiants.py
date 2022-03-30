@@ -34,7 +34,7 @@ def read_etudiant_nouveau(
     return etudiant
 
 
-@router.post("/", response_model=List[schemas.SelectEtudiantBase])
+@router.post("/", response_model=List[Any])
 def create_select_etudiant_nouveau(
         *,
         db: Session = Depends(deps.get_db),

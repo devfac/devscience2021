@@ -371,6 +371,42 @@ def check_email_valide(email: EmailStr) -> str:
     return status
 
 
+def excel_to_model(list_note: list):
+    all_notes = []
+    for note in list_note:
+        list_ue = []
+        for index, items in enumerate(list(note)):
+            all_ue = {"num_carte": note["num_carte"]}
+            if items[0:3] == "ue_":
+                all_ue["name"] = items[3:len(items)]
+                data = list(note)[index + 1:len(note)]
+                all_ec = []
+                for ec in data:
+                    if ec[0:3] == "ec_":
+                        value = note[ec]
+                        if value is None:
+                            ec_ = {"name": ec[3:len(ec)], "note": ""}
+                        else:
+                            ec_ = {"name": ec[3:len(ec)], "note": value}
+                        all_ec.append(ec_)
+                    else:
+                        break
+                all_ue["ec"] = all_ec
+                list_ue.append(all_ue)
+        all_notes.append(list_ue)
+    return all_notes
+
+
+def transpose(data: list) -> list:
+    new_data = []
+    for i in range(len(data[0])):
+        new_row = []
+        for j in range(len(data)):
+            new_row.append(data[j][i])
+        new_data.append(new_row)
+    return new_data
+
+
 class UUIDEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, UUID):

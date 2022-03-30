@@ -3,11 +3,14 @@ from typing import Any, List
 
 from app import crud
 from app import models
+from app import schemas
 from app.api import deps
 from app.excel_code import save_data
-from app.utils import check_table_info, create_anne, check_columns_exist, decode_schemas, check_table_note
+from app.utils import check_table_info, create_anne, check_columns_exist, decode_schemas, check_table_note, \
+    get_credit, max_value, excel_to_model, transpose
 from fastapi import APIRouter, Depends, File, UploadFile, HTTPException
 from sqlalchemy.orm import Session
+from starlette.responses import FileResponse
 
 router = APIRouter()
 
@@ -15,7 +18,7 @@ router = APIRouter()
 @router.get("/get_models/")
 def get_models(
         db: Session = Depends(deps.get_db),
-        current_user: models.User = Depends(deps.get_current_active_superuser),
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     """
@@ -39,31 +42,34 @@ def get_models(
 
 @router.get("/get_models_notes/")
 def get_models_notes(
+        *,
         db: Session = Depends(deps.get_db),
-        current_user: models.User = Depends(deps.get_current_active_superuser),
+        uuid_parcours: str,
+        session: str,
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     """
     anne_univ = crud.anne_univ.get_actual_value(db=db)
     all_table_note = check_table_note(create_anne(anne_univ.title))
-    sessions = ['normal', 'rattrapage', "final"]
-    parcours = crud.parcours.get_multi(db=db)
-    for session in sessions:
-        for parcour in parcours:
-            save_data.create_workbook(f"note_{parcour.abreviation.lower()}_{session.lower()}", parcour.semestre,
-                                      "notes")
-            for sems in parcour.semestre:
-                for table in all_table_note:
-                    if f"note_{parcour.abreviation.lower()}_{sems.lower()}_{session.lower()}" == table:
-                        print("note", table)
-                        colums = check_columns_exist(create_anne(anne_univ.title), table)
-                        save_data.write_data_title(f"note_{parcour.abreviation.lower()}_{session.lower()}", sems,
-                                                   colums, "notes")
-                        all_data = crud.save.read_all_data(create_anne(anne_univ.title), table)
-                        if all_data:
-                            save_data.insert_data_xlsx(f"note_{parcour.abreviation.lower()}_{session.lower()}", sems,
-                                                       all_data, colums, "notes")
-    return {"msg": "succes"}
+    # sessions = ['normal', 'rattrapage', "final"]
+    parcour = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
+    if not parcour:
+        raise HTTPException(status_code=400, detail=f" Parcours not found.", )
+    file = None
+    save_data.create_workbook(f"note_{parcour.abreviation.lower()}_{session.lower()}", parcour.semestre,
+                              "notes")
+    for sems in parcour.semestre:
+        for table in all_table_note:
+            if f"note_{parcour.abreviation.lower()}_{sems.lower()}_{session.lower()}" == table:
+                colums = check_columns_exist(create_anne(anne_univ.title), table)
+                save_data.write_data_title(f"note_{parcour.abreviation.lower()}_{session.lower()}", sems,
+                                           colums, "notes")
+                all_data = crud.save.read_all_data(create_anne(anne_univ.title), table)
+                if all_data:
+                    file = save_data.insert_data_xlsx(f"note_{parcour.abreviation.lower()}_{session.lower()}",
+                                                      sems, all_data, colums, "notes")
+    return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
 
 @router.post("/insert_data/", response_model=List[Any])
@@ -71,7 +77,7 @@ def insert_from_xlsx(*,
                      db: Session = Depends(deps.get_db),
                      file: UploadFile = File(...),
                      schema: str,
-                     current_user: models.User = Depends(deps.get_current_active_superuser),
+                     current_user: models.User = Depends(deps.get_current_active_user),
                      ) -> Any:
     """
     """
@@ -84,7 +90,7 @@ def insert_from_xlsx(*,
 async def create_upload_file(*,
                              uploaded_file: UploadFile = File(...),
                              schema: str,
-                             current_user: models.User = Depends(deps.get_current_active_superuser)
+                             current_user: models.User = Depends(deps.get_current_active_user)
                              ):
     file_location = f"files/excel/uploaded/{uploaded_file.filename}"
     with open(file_location, "wb+") as file_object:
@@ -94,8 +100,6 @@ async def create_upload_file(*,
     cle = ""
     all_table = check_table_info(schema)
     all_sheet = save_data.get_all_sheet(file_location)
-    print(all_sheet)
-    print(all_table)
     if len(all_table) != len(all_sheet):
         raise HTTPException(
             status_code=400,
@@ -148,7 +152,8 @@ async def create_upload_note_file(
         schema: str,
         uuid_parcours: str,
         session: str,
-        current_user: models.User = Depends(deps.get_current_active_superuser)
+        sems: str,
+        current_user: models.User = Depends(deps.get_current_active_user)
 ):
     file_location = f"files/excel/uploaded/{uploaded_file.filename}"
     with open(file_location, "wb+") as file_object:
@@ -157,7 +162,6 @@ async def create_upload_note_file(
     all_data_ = {}
     cle = "num_carte"
     parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
-    all_table = check_table_note(schema)
     if not parcours:
         raise HTTPException(
             status_code=400,
@@ -165,39 +169,113 @@ async def create_upload_note_file(
         )
     all_semestre = parcours.semestre
     all_sheet = save_data.get_all_sheet(file_location)
+    all_data = []
     for i in range(len(all_semestre)):
         if str(all_semestre[i]) != str(all_sheet[i]):
             raise HTTPException(
                 status_code=400,
-                detail=f"invalide file {all_sheet[i]} not found",
+                detail=f"invalide file {all_sheet[i]}",
             )
+    test_note = crud.note.check_table_exist(schemas=schema, semestre=sems, parcours=parcours.abreviation,
+                                            session=session)
+    if test_note:
+        table = f"note_{parcours.abreviation.lower()}_{sems.lower()}_{session.lower()}"
+        valid = save_data.validation_file_note(file_location, sems, table, schema)
+        if valid != "valid":
+            raise HTTPException(
+                status_code=400,
+                detail=valid
+            )
+        all_data = save_data.get_data_xlsx_note(file_location, sems)
+        all_notes_ue = transpose(excel_to_model(all_data))
+        moy_cred_in = {}
+        moy_cred_in_fin = {}
+        for notes in all_notes_ue:
+            for note in notes:
+                note = schemas.Note(**note)
+                et_un = crud.note.read_by_num_carte(schema, sems, parcours.abreviation, session, note.num_carte)
+                et_un_final = crud.note.read_by_num_carte(schema, sems, parcours.abreviation, "final",
+                                                          note.num_carte)
+                if et_un:
+                    ue_in = {}
+                    ue_in_final = {}
+                    ecs = crud.matier_ec.get_by_value_ue(schema, note.name, sems, uuid_parcours)
+                    note_ue = 0
+                    note_ue_final = 0
+                    credit = crud.matier_ue.get_by_value(schema, note.name, sems, uuid_parcours).credit
+                    if len(note.ec) != len(ecs):
+                        raise HTTPException(status_code=400, detail="ivalide EC for UE",
+                                            )
+                    for i, ec in enumerate(ecs):
+                        ec_note = note.ec[i].note
+                        if ec_note == "":
+                            note.ec[i].note = None
+                            value_ec_note = 0
+                        else:
+                            value_ec_note = float(note.ec[i].note)
 
-    for sems in all_semestre:
-        for table in all_table:
-            if f"note_{(parcours.abreviation).lower()}_{sems.lower()}_{session.lower()}" == table:
-                print(f"note_{(parcours.abreviation).lower()}_{sems.lower()}_{session.lower()}")
-                valid = save_data.validation_file_note(file_location, sems, table, schema)
-                if valid != "valid":
-                    raise HTTPException(
-                        status_code=400,
-                        detail=valid
-                    )
-                all_data = save_data.get_data_xlsx_note(file_location, sems)
-                print(all_data)
-                for data in all_data:
-                    exist_data = crud.save.exist_data(schema, table, cle, data[cle])
-                    if not exist_data:
-                        one_data = crud.save.insert_data(schema, table, data)
-                all_data_[table] = all_data
+                        value_sess = et_un_final[f'ec_{note.ec[i].name}']
+                        if value_sess is None:
+                            value_sess = 0
+                        poids_ec = crud.matier_ec.get_by_value(schema, ecs[i][2], sems, uuid_parcours)
+                        note_ue += value_ec_note * float(poids_ec.poids)
+                        note_ue_final += max_value(value_ec_note, value_sess) * float(poids_ec.poids)
+                    ue_in[f'ue_{note.name}'] = note_ue
+                    ue_in_final[f'ue_{note.name}'] = note_ue_final
+                    for note_ec in note.ec:
+                        value_sess = et_un_final[f'ec_{note_ec.name}']
+                        if value_sess is None:
+                            value_sess = 0
+                        ue_in[f'ec_{note_ec.name}'] = note_ec.note
+                        ue_in_final[f'ec_{note_ec.name}'] = max_value(note_ec.note, value_sess)
+
+                    crud.note.update_note(schema, sems, parcours.abreviation, session, note.num_carte, ue_in)
+                    crud.note.update_note(schema, sems, parcours.abreviation, "final", note.num_carte, ue_in_final)
+                    et_un = crud.note.read_by_num_carte(schema, sems, parcours.abreviation, session,
+                                                        note.num_carte)
+                    et_un_final = crud.note.read_by_num_carte(schema, sems, parcours.abreviation, "final",
+                                                              note.num_carte)
+                    ues = crud.matier_ue.get_by_class(schema, uuid_parcours, sems)
+                    moy = 0
+                    credit = 0
+                    moy_fin = 0
+                    credit_fin = 0
+                    somme = 0
+                    for ue in ues:
+                        value_sess = et_un[f'ue_{ue.value}']
+                        if value_sess is None:
+                            value_sess = 0
+                        value_fin = et_un_final[f'ue_{ue.value}']
+                        if value_fin is None:
+                            value_fin = 0
+                        somme += ue.credit
+                        moy += float(value_sess) * ue.credit
+                        credit += get_credit(float(value_sess), ue.credit)
+
+                        moy_fin += float(value_fin) * ue.credit
+                        credit_fin += get_credit(float(value_fin), ue.credit)
+
+                        moy_cred_in["moyenne"] = moy / somme
+                        moy_cred_in["credit"] = credit
+
+                        moy_cred_in_fin["moyenne"] = moy_fin / somme
+                        moy_cred_in_fin["credit"] = credit_fin
+
+                        crud.note.update_note(schema, sems, parcours.abreviation, session, note.num_carte,
+                                              moy_cred_in)
+                        crud.note.update_note(schema, sems, parcours.abreviation, "final", note.num_carte,
+                                              moy_cred_in)
+
+        all_note = crud.note.read_all_note(schema, sems, parcours.abreviation, session)
 
     os.remove(file_location)
-    return all_data_
+    return all_note
 
 
 @router.get("/save_data/")
 def save_data_to_excel(
         db: Session = Depends(deps.get_db),
-        current_user: models.User = Depends(deps.get_current_active_superuser),
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     """
