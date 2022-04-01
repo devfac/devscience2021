@@ -17,17 +17,21 @@ router = APIRouter()
 
 @router.get("/get_models/")
 def get_models(
+        *,
         db: Session = Depends(deps.get_db),
+        schema: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     """
-    anne_univ = crud.anne_univ.get_actual_value(db=db)
-    all_table = check_table_info(create_anne(anne_univ.title))
-    save_data.create_workbook(anne_univ.title, all_table, "models")
+    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
+    if not anne_univ:
+        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schema)} not found.", )
+    all_table = check_table_info(schema)
+    save_data.create_workbook(decode_schemas(schema), all_table, "models")
     for table in all_table:
-        colums = check_columns_exist(create_anne(anne_univ.title), table)
-        save_data.write_data_title(anne_univ.title, table, colums, "models")
+        colums = check_columns_exist(schema, table)
+        save_data.write_data_title(decode_schemas(schema), table, colums, "models")
 
     all_table = check_table_info("public")
     save_data.create_workbook("public", all_table, "models")
@@ -35,7 +39,7 @@ def get_models(
         colums = check_columns_exist("public", table)
         save_data.write_data_title("public", table, colums, "models")
 
-    all_table_note = check_table_note(create_anne(anne_univ.title))
+    all_table_note = check_table_note(schema)
     print(all_table_note)
     return {"msg": "succes"}
 
@@ -44,15 +48,17 @@ def get_models(
 def get_models_notes(
         *,
         db: Session = Depends(deps.get_db),
+        schema: str,
         uuid_parcours: str,
         session: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     """
-    anne_univ = crud.anne_univ.get_actual_value(db=db)
-    all_table_note = check_table_note(create_anne(anne_univ.title))
-    # sessions = ['normal', 'rattrapage', "final"]
+    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
+    if not anne_univ:
+        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schema)} not found.", )
+    all_table_note = check_table_note(schema)
     parcour = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
     if not parcour:
         raise HTTPException(status_code=400, detail=f" Parcours not found.", )
@@ -62,10 +68,10 @@ def get_models_notes(
     for sems in parcour.semestre:
         for table in all_table_note:
             if f"note_{parcour.abreviation.lower()}_{sems.lower()}_{session.lower()}" == table:
-                colums = check_columns_exist(create_anne(anne_univ.title), table)
+                colums = check_columns_exist(schema, table)
                 save_data.write_data_title(f"note_{parcour.abreviation.lower()}_{session.lower()}", sems,
                                            colums, "notes")
-                all_data = crud.save.read_all_data(create_anne(anne_univ.title), table)
+                all_data = crud.save.read_all_data(schema, table)
                 if all_data:
                     file = save_data.insert_data_xlsx(f"note_{parcour.abreviation.lower()}_{session.lower()}",
                                                       sems, all_data, colums, "notes")
@@ -74,7 +80,6 @@ def get_models_notes(
 
 @router.post("/insert_data/", response_model=List[Any])
 def insert_from_xlsx(*,
-                     db: Session = Depends(deps.get_db),
                      file: UploadFile = File(...),
                      schema: str,
                      current_user: models.User = Depends(deps.get_current_active_user),
@@ -155,21 +160,23 @@ async def create_upload_note_file(
         sems: str,
         current_user: models.User = Depends(deps.get_current_active_user)
 ):
+    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
+    if not anne_univ:
+        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schema)} not found.", )
+
     file_location = f"files/excel/uploaded/{uploaded_file.filename}"
     with open(file_location, "wb+") as file_object:
         file_object.write(uploaded_file.file.read())
 
-    all_data_ = {}
-    cle = "num_carte"
     parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
     if not parcours:
         raise HTTPException(
             status_code=400,
             detail="parcours not found"
         )
+
     all_semestre = parcours.semestre
     all_sheet = save_data.get_all_sheet(file_location)
-    all_data = []
     for i in range(len(all_semestre)):
         if str(all_semestre[i]) != str(all_sheet[i]):
             raise HTTPException(
@@ -202,7 +209,6 @@ async def create_upload_note_file(
                     ecs = crud.matier_ec.get_by_value_ue(schema, note.name, sems, uuid_parcours)
                     note_ue = 0
                     note_ue_final = 0
-                    credit = crud.matier_ue.get_by_value(schema, note.name, sems, uuid_parcours).credit
                     if len(note.ec) != len(ecs):
                         raise HTTPException(status_code=400, detail="ivalide EC for UE",
                                             )
@@ -265,29 +271,31 @@ async def create_upload_note_file(
                                               moy_cred_in)
                         crud.note.update_note(schema, sems, parcours.abreviation, "final", note.num_carte,
                                               moy_cred_in)
-
         all_note = crud.note.read_all_note(schema, sems, parcours.abreviation, session)
-
     os.remove(file_location)
     return all_note
 
 
 @router.get("/save_data/")
 def save_data_to_excel(
+        *,
         db: Session = Depends(deps.get_db),
+        schema: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     """
-    anne_univ = crud.anne_univ.get_actual_value(db=db)
-    all_table = check_table_info(create_anne(anne_univ.title))
-    save_data.create_workbook(anne_univ.title, all_table, "data")
+    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
+    if not anne_univ:
+        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schema)} not found.", )
+    all_table = check_table_info(schema)
+    save_data.create_workbook(decode_schemas(schema=schema), all_table, "data")
     for table in all_table:
-        colums = check_columns_exist(create_anne(anne_univ.title), table)
-        save_data.write_data_title(anne_univ.title, table, colums, "data")
-        all_data = crud.save.read_all_data(create_anne(anne_univ.title), table)
+        colums = check_columns_exist(schema, table)
+        save_data.write_data_title(decode_schemas(schema=schema), table, colums, "data")
+        all_data = crud.save.read_all_data(schema, table)
         if all_data:
-            save_data.insert_data_xlsx(anne_univ.title, table, all_data, colums, "data")
+            save_data.insert_data_xlsx(decode_schemas(schema=schema), table, all_data, colums, "data")
 
     all_table = check_table_info("public")
     save_data.create_workbook("public", all_table, "data")
