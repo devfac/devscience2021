@@ -157,7 +157,7 @@ async def create_upload_note_file(
         schema: str,
         uuid_parcours: str,
         session: str,
-        sems: str,
+        semestre: str,
         current_user: models.User = Depends(deps.get_current_active_user)
 ):
     anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
@@ -183,30 +183,30 @@ async def create_upload_note_file(
                 status_code=400,
                 detail=f"invalide file {all_sheet[i]}",
             )
-    test_note = crud.note.check_table_exist(schemas=schema, semestre=sems, parcours=parcours.abreviation,
+    test_note = crud.note.check_table_exist(schemas=schema, semestre=semestre, parcours=parcours.abreviation,
                                             session=session)
     if test_note:
-        table = f"note_{parcours.abreviation.lower()}_{sems.lower()}_{session.lower()}"
-        valid = save_data.validation_file_note(file_location, sems, table, schema)
+        table = f"note_{parcours.abreviation.lower()}_{semestre.lower()}_{session.lower()}"
+        valid = save_data.validation_file_note(file_location, semestre, table, schema)
         if valid != "valid":
             raise HTTPException(
                 status_code=400,
                 detail=valid
             )
-        all_data = save_data.get_data_xlsx_note(file_location, sems)
+        all_data = save_data.get_data_xlsx_note(file_location, semestre)
         all_notes_ue = transpose(excel_to_model(all_data))
         moy_cred_in = {}
         moy_cred_in_fin = {}
         for notes in all_notes_ue:
             for note in notes:
                 note = schemas.Note(**note)
-                et_un = crud.note.read_by_num_carte(schema, sems, parcours.abreviation, session, note.num_carte)
-                et_un_final = crud.note.read_by_num_carte(schema, sems, parcours.abreviation, "final",
+                et_un = crud.note.read_by_num_carte(schema, semestre, parcours.abreviation, session, note.num_carte)
+                et_un_final = crud.note.read_by_num_carte(schema, semestre, parcours.abreviation, "final",
                                                           note.num_carte)
                 if et_un:
                     ue_in = {}
                     ue_in_final = {}
-                    ecs = crud.matier_ec.get_by_value_ue(schema, note.name, sems, uuid_parcours)
+                    ecs = crud.matier_ec.get_by_value_ue(schema, note.name, semestre, uuid_parcours)
                     note_ue = 0
                     note_ue_final = 0
                     if len(note.ec) != len(ecs):
@@ -223,7 +223,7 @@ async def create_upload_note_file(
                         value_sess = et_un_final[f'ec_{note.ec[i].name}']
                         if value_sess is None:
                             value_sess = 0
-                        poids_ec = crud.matier_ec.get_by_value(schema, ecs[i][2], sems, uuid_parcours)
+                        poids_ec = crud.matier_ec.get_by_value(schema, ecs[i][2], semestre, uuid_parcours)
                         note_ue += value_ec_note * float(poids_ec.poids)
                         note_ue_final += max_value(value_ec_note, value_sess) * float(poids_ec.poids)
                     ue_in[f'ue_{note.name}'] = note_ue
@@ -235,13 +235,13 @@ async def create_upload_note_file(
                         ue_in[f'ec_{note_ec.name}'] = note_ec.note
                         ue_in_final[f'ec_{note_ec.name}'] = max_value(note_ec.note, value_sess)
 
-                    crud.note.update_note(schema, sems, parcours.abreviation, session, note.num_carte, ue_in)
-                    crud.note.update_note(schema, sems, parcours.abreviation, "final", note.num_carte, ue_in_final)
-                    et_un = crud.note.read_by_num_carte(schema, sems, parcours.abreviation, session,
+                    crud.note.update_note(schema, semestre, parcours.abreviation, session, note.num_carte, ue_in)
+                    crud.note.update_note(schema, semestre, parcours.abreviation, "final", note.num_carte, ue_in_final)
+                    et_un = crud.note.read_by_num_carte(schema, semestre, parcours.abreviation, session,
                                                         note.num_carte)
-                    et_un_final = crud.note.read_by_num_carte(schema, sems, parcours.abreviation, "final",
+                    et_un_final = crud.note.read_by_num_carte(schema, semestre, parcours.abreviation, "final",
                                                               note.num_carte)
-                    ues = crud.matier_ue.get_by_class(schema, uuid_parcours, sems)
+                    ues = crud.matier_ue.get_by_class(schema, uuid_parcours, semestre)
                     moy = 0
                     credit = 0
                     moy_fin = 0
@@ -267,11 +267,11 @@ async def create_upload_note_file(
                         moy_cred_in_fin["moyenne"] = moy_fin / somme
                         moy_cred_in_fin["credit"] = credit_fin
 
-                        crud.note.update_note(schema, sems, parcours.abreviation, session, note.num_carte,
+                        crud.note.update_note(schema, semestre, parcours.abreviation, session, note.num_carte,
                                               moy_cred_in)
-                        crud.note.update_note(schema, sems, parcours.abreviation, "final", note.num_carte,
+                        crud.note.update_note(schema, semestre, parcours.abreviation, "final", note.num_carte,
                                               moy_cred_in)
-        all_note = crud.note.read_all_note(schema, sems, parcours.abreviation, session)
+        all_note = crud.note.read_all_note(schema, semestre, parcours.abreviation, session)
     os.remove(file_location)
     return all_note
 

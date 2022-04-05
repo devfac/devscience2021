@@ -11,14 +11,14 @@ class SemestreValideBase(BaseModel):
 
 # Properties to receive via API on creation
 class SemestreValideCreate(SemestreValideBase):
-    uuid:Optional[UUID]
+    uuid: Optional[UUID]
     num_carte: str
     semestre: List[str]
 
 
 # Properties to receive via API on update
 class SemestreValideUpdate(SemestreValideBase):
-    semestre: List[str]
+    semestre: Optional[List[str]]
 
 
 class SemestreValideInDBBase(SemestreValideBase):
