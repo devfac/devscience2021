@@ -1,3 +1,4 @@
+import datetime
 from typing import Any
 
 from sqlalchemy.sql.functions import percentile_cont
@@ -16,6 +17,8 @@ from app.utils import decode_schemas, get_niveau
 from sqlalchemy.orm import Session
 import json
 from app.utils import UUIDEncoder
+
+from app.script_logging import ScriptLogging
 
 router = APIRouter()
 
@@ -49,8 +52,7 @@ def create_carte(
             all_etudiant.append(et)
 
     role = crud.role.get_title(db=db, title="chefsco")
-    data = {}
-    data['supperadmin'] = ""
+    data = {'supperadmin': ""}
 
     chefsco: schemas.User = Any
     if role:
@@ -62,6 +64,7 @@ def create_carte(
     data['img_carte'] = (mention.branche.lower())[0:1]
 
     file = carte_avant.PDF.parcourir_et(all_etudiant, data)
+
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
 
@@ -94,8 +97,7 @@ def create_ariere_carte(
             all_etudiant.append(et)
 
     role = crud.role.get_title(db=db, title="chefsco")
-    data = {}
-    data['supperadmin'] = ""
+    data = {'supperadmin': ""}
 
     chefsco: schema.User = Any
     if role:
@@ -107,4 +109,5 @@ def create_ariere_carte(
     data['img_carte'] = (mention.branche.lower())[0:1]
 
     file = arrire_carte.PDF.parcourir_et(all_etudiant, data)
+
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)

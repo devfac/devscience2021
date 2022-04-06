@@ -1,7 +1,7 @@
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class Token(BaseModel):
@@ -13,3 +13,4 @@ class Token(BaseModel):
 
 class TokenPayload(BaseModel):
     uuid: Optional[UUID] = None
+    email: Optional[EmailStr]

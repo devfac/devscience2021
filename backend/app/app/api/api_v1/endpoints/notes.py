@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -9,6 +10,8 @@ from app.db.session import engine
 from sqlalchemy.sql.ddl import CreateSchema
 from app.utils import create_anne, compare_list
 from app.core.config import settings
+
+from app.script_logging import ScriptLogging
 
 router = APIRouter()
 
@@ -27,6 +30,7 @@ def create_table_note(
     Create table note.
     """
 
+    logging_ = ScriptLogging(current_user.email)
     if crud.user.is_superuser(current_user):
         matiers = []
         parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
@@ -66,7 +70,14 @@ def create_table_note(
         if test_note:
             return crud.note.check_columns_exist(schemas=schemas, semestre=semestre, parcours=parcours.abreviation,
                                                  session=session_.lower())
+
+        logging_.script_logging("info",
+                                f"CREATE:======={datetime.datetime.now()}=======TABLE NOTE ========"
+                                f"Success")
     else:
+        logging_.script_logging("info",
+                                f"DELETE:======={datetime.datetime.now()}=======TABLE NOTE ========"
+                                f"Success")
         raise HTTPException(status_code=400, detail="Not enough permissions")
 
 
@@ -83,7 +94,6 @@ def delete_table_note(
     """
     Create table note.
     """
-
     if crud.user.is_superuser(current_user):
 
         parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)

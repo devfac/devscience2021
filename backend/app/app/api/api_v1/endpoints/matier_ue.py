@@ -1,3 +1,4 @@
+import datetime
 from os import SEEK_HOLE
 from typing import Any, List
 import uuid, json
@@ -8,6 +9,8 @@ from sqlalchemy.orm import Session
 from app.utils import UUIDEncoder, decode_schemas, decode_text
 from app import crud, models, schemas
 from app.api import deps
+
+from app.script_logging import ScriptLogging
 
 router = APIRouter()
 
@@ -51,6 +54,7 @@ def create_ue(
     if matier_ue:
         raise HTTPException(status_code=404, detail="U.E already exists")
     matier_ue = crud.matier_ue.create_ue(schema=schema, obj_in=ue_in, value=value, key_unique=key_unique)
+
     return matier_ue
 
 

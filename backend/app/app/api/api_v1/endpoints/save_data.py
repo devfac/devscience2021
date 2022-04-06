@@ -1,3 +1,4 @@
+import datetime
 import os
 from typing import Any, List
 
@@ -11,6 +12,8 @@ from app.utils import check_table_info, create_anne, check_columns_exist, decode
 from fastapi import APIRouter, Depends, File, UploadFile, HTTPException
 from sqlalchemy.orm import Session
 from starlette.responses import FileResponse
+
+from app.script_logging import ScriptLogging
 
 router = APIRouter()
 
@@ -199,6 +202,7 @@ async def create_upload_note_file(
         moy_cred_in_fin = {}
         for notes in all_notes_ue:
             for note in notes:
+                print(note)
                 note = schemas.Note(**note)
                 et_un = crud.note.read_by_num_carte(schema, semestre, parcours.abreviation, session, note.num_carte)
                 et_un_final = crud.note.read_by_num_carte(schema, semestre, parcours.abreviation, "final",

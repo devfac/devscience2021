@@ -1,3 +1,4 @@
+import logging
 from datetime import timedelta
 from typing import Any
 
@@ -7,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+from app.script_logging import ScriptLogging
 from app.core import security
 from app.core.config import settings
 from app.core.security import get_password_hash
@@ -35,7 +37,7 @@ def login_access_token(
         raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     token = security.create_access_token(
-        user.uuid, expires_delta=access_token_expires
+        data={"uuid": str(user.uuid), "email": form_data.username}, expires_delta=access_token_expires
     )
     role = crud.role.get_by_uuid(db, uuid=user.uuid_role)
     if crud.user.is_superuser(user):
@@ -60,6 +62,14 @@ def test_token(current_user: models.User = Depends(deps.get_current_user)) -> An
     Test access token
     """
     return current_user
+
+
+@router.post("/decode_token", response_model=schemas.TokenPayload)
+def test_token(token_info=Depends(deps.get_token_info)) -> Any:
+    """
+    Test access token
+    """
+    return token_info
 
 
 @router.post("/password-recovery/", response_model=schemas.Msg)

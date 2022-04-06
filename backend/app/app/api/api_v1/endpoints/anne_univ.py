@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, List
 
 import sqlalchemy
@@ -7,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+from app.script_logging import ScriptLogging
 from app.db.session import engine
 from sqlalchemy.sql.ddl import CreateSchema
 from app.utils import create_anne
@@ -38,6 +40,7 @@ def create_annee_universitaire(
     Create new anne universitaire.
     """
 
+    logging_ = ScriptLogging(current_user.email)
     if crud.user.is_superuser(current_user):
         anne_univ = crud.anne_univ.get_by_title(db, title=anne_univ_in.title)
         if not anne_univ:
@@ -46,9 +49,8 @@ def create_annee_universitaire(
                 schem_et = create_anne(anne_univ.title)
                 engine.execute(CreateSchema(schem_et))
                 models.etudiant.create(schem_et)
-                reponse = "Success"
-            except sqlalchemy.exc.ProgrammingError:
-                reponse = "Erreur"
+            except sqlalchemy.exc.ProgrammingError as e:
+                print(e)
         else:
             raise HTTPException(
                 status_code=400,
@@ -89,6 +91,7 @@ def read_annee_universitaire(
     """
     Get anne universitaire by ID.
     """
+
     anne_univ = crud.anne_univ.get_by_uuid(db=db, uuid=uuid)
     if not anne_univ:
         raise HTTPException(status_code=404, detail="Anne Univ not found")

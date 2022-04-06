@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import uuid
@@ -12,6 +13,8 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
+from app.script_logging import ScriptLogging
+
 router = APIRouter()
 
 
@@ -25,6 +28,8 @@ def read_etudiant_ancienne(
     """
     Retrieve etudiant ancienne.
     """
+
+    logging_ = ScriptLogging(current_user.email)
     etudiant = crud.ancien_etudiant.get_all(schema=schema)
     list_et = []
     if etudiant:
@@ -35,6 +40,10 @@ def read_etudiant_ancienne(
             if parcours:
                 et["parcours"] = parcours.abreviation
             list_et.append(et)
+
+    logging_.script_logging("error",
+                            f"GET:======={datetime.datetime.now()}=======Ancien etudiant========"
+                            f"Anne Univ not found")
     return list_et
 
 
@@ -49,13 +58,21 @@ def create_etudiant_ancien(
     """
     Create new etudiant.
     """
+
+    logging_ = ScriptLogging(current_user.email)
     etudiant_in.uuid = uuid.uuid4()
     etudiant = crud.ancien_etudiant.get_by_num_carte(schema=schema, num_carte=etudiant_in.num_carte)
     if etudiant:
+        logging_.script_logging("error",
+                                f"POST:======={datetime.datetime.now()}======={dict(etudiant_in)}========"
+                                f"Etudiant already exists")
         raise HTTPException(status_code=404, detail="Etudiant already exists")
     etudiant = crud.ancien_etudiant.create_etudiant(schema=schema, obj_in=etudiant_in)
     list_et = []
     if etudiant:
+        logging_.script_logging("info",
+                                f"POST:======={datetime.datetime.now()}======={dict(etudiant_in)}========"
+                                f"Success")
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
             et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
@@ -75,12 +92,20 @@ def update_etudiant(
     """
     Update an etudiant.
     """
+
+    logging_ = ScriptLogging(current_user.email)
     etudiant = crud.ancien_etudiant.get_by_num_carte(schema=schema, num_carte=num_carte)
     if not etudiant:
+        logging_.script_logging("error",
+                                f"PUT:======={datetime.datetime.now()}======={dict(etudiant_in)}========"
+                                f"Etudiant not found")
         raise HTTPException(status_code=404, detail="Etudiant not found")
     etudiant = crud.ancien_etudiant.update_etudiant(schema=schema, num_carte=num_carte, obj_in=etudiant_in)
     list_et = []
     if etudiant:
+        logging_.script_logging("info",
+                                f"PUT:======={datetime.datetime.now()}======={dict(etudiant_in)}========"
+                                f"Success")
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
             et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
@@ -99,10 +124,17 @@ def read_etudiant_by_num_carte(
     """
     Get etudiant by num carte.
     """
+    logging_ = ScriptLogging(current_user.email)
     etudiant = crud.ancien_etudiant.get_by_num_carte(schema=schema, num_carte=num_carte)
     if not etudiant:
+        logging_.script_logging("error",
+                                f"GET:======={datetime.datetime.now()}=======Ancien etudiant========"
+                                f"Etudiant not found")
         raise HTTPException(status_code=404, detail="Etudiant not found")
 
+    logging_.script_logging("info",
+                            f"GET:======={datetime.datetime.now()}=======Ancien etudiant========"
+                            f"Success")
     et = json.loads(json.dumps(dict(etudiant), cls=UUIDEncoder))
     et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=etudiant.uuid_parcours).abreviation
     return et
@@ -119,9 +151,13 @@ def read_etudiant_by_mention(
     """
     Get etudiant by mention.
     """
+    logging_ = ScriptLogging(current_user.email)
     etudiant = crud.ancien_etudiant.get_by_mention(schema=schema, uuid_mention=uuid_mention)
     list_et = []
     if etudiant:
+        logging_.script_logging("info",
+                                f"GET:======={datetime.datetime.now()}=======Ancien etudiant========"
+                                f"Success")
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
             et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
@@ -140,9 +176,13 @@ def read_etudiant_by_parcours(
     """
     Get etudiant by parcours.
     """
+    logging_ = ScriptLogging(current_user.email)
     etudiant = crud.ancien_etudiant.get_by_parcours(schema=schema, uuid_parcours=uuid_parcours)
     list_et = []
     if etudiant:
+        logging_.script_logging("info",
+                                f"GET:======={datetime.datetime.now()}=======Ancien etudiant========"
+                                f"Success")
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
             et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours).abreviation
@@ -162,6 +202,7 @@ def read_etudiant_by_semstre_and_mention(
     """
     Get etudiant by semestre and mention.
     """
+    logging_ = ScriptLogging(current_user.email)
     etudiant = crud.ancien_etudiant.get_by_semetre_and_mention(
         schema=schema, uuid_mention=uuid_mention, semetre_grand=semetre_grand)
     list_et = []
@@ -184,9 +225,13 @@ def read_etudiant_by_etat(
     """
     Get etudiant by etat.
     """
+    logging_ = ScriptLogging(current_user.email)
     etudiant = crud.ancien_etudiant.get_by_etat(schema=schema, etat=etat)
     list_et = []
     if etudiant:
+        logging_.script_logging("info",
+                                f"GET:======={datetime.datetime.now()}=======Ancien etudiant========"
+                                f"Success")
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
             et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
@@ -206,9 +251,13 @@ def read_etudiant_by_etat_and_moyenne(
     """
     Get etudiant by etat and moyenne.
     """
+    logging_ = ScriptLogging(current_user.email)
     etudiant = crud.ancien_etudiant.get_by_etat_and_moyenne(schema=schema, etat=etat, moyenne=moyenne)
     list_et = []
     if etudiant:
+        logging_.script_logging("info",
+                                f"GET:======={datetime.datetime.now()}=======Ancien etudiant========"
+                                f"Success")
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
             et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
@@ -251,11 +300,17 @@ def delete_etudiant(
     """
     etudiant = crud.ancien_etudiant.get_by_num_carte(schema=schema, num_carte=num_carte)
     if not etudiant:
+        logging_.script_logging("error",
+                                f"DELETE:======={datetime.datetime.now()}=======Ancien etudiant========"
+                                f"Etudiant not found")
         raise HTTPException(status_code=404, detail="Etudiant not found")
 
     etudiant = crud.ancien_etudiant.delete_etudiant(schema=schema, num_carte=num_carte)
     list_et = []
     if etudiant:
+        logging_.script_logging("info",
+                                f"DELETE:======={datetime.datetime.now()}=======Ancien etudiant========"
+                                f"Success")
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
             et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
@@ -274,6 +329,7 @@ async def create_upload_file(*,
                              num_carte: str,
                              current_user: models.User = Depends(deps.get_current_active_user)
                              ):
+
     name = list(os.path.splitext(uploaded_file.filename))[1]
     allowed_files = {".jpg", ".jpeg", ".png"}
 

@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, List
 import uuid
 
@@ -6,6 +7,8 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+
+from app.script_logging import ScriptLogging
 
 router = APIRouter()
 
@@ -36,7 +39,6 @@ def create_diplome(
     """
     diplome_in.uuid = uuid.uuid4()
     diplome = crud.diplome.create_diplome(schema=schema, obj_in=diplome_in)
-    
     return diplome
 
 
@@ -85,7 +87,7 @@ def read_diplome(
 
     mention = crud.mention.get_by_uuid(db = db, uuid=uuid_mention)
     if not mention:
-        raise HTTPException( status_code=400, detail=f" Mention not found.",)
+        raise HTTPException(status_code=400, detail=f" Mention not found.",)
     diplome = crud.diplome.get_by_mention(schema=schema, uuid_mention=uuid_mention)
 
     if not diplome:

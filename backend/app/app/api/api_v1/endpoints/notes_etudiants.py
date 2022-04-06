@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -6,6 +7,8 @@ from app.utils import decode_schemas, get_credit, max_value
 from app import crud, models, schemas
 from app.api import deps
 import json
+
+from app.script_logging import ScriptLogging
 
 router = APIRouter()
 
@@ -45,7 +48,7 @@ def inserts_etudiant(
             raise HTTPException(status_code=400,
                                 detail=f"note_{parcours.abreviation.lower()}_{semestre.lower()}_normal not found.",
                                 )
-        credit = 30;
+        credit = 30
         all_etudiant = crud.note.read_by_credit(schemas, semestre, parcours.abreviation, "normal", credit)
         for etudiant in all_etudiant:
             et_un = crud.note.read_by_num_carte(schemas, semestre, parcours.abreviation, session, etudiant.num_carte)
