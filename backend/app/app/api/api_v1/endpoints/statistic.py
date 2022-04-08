@@ -23,7 +23,7 @@ def all_statistic_(
         schemas: str,
         uuid_mention: str,
         db: Session = Depends(deps.get_db),
-        current_user: models.User = Depends(deps.get_current_active_superuser),
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     all_statistic
@@ -51,7 +51,6 @@ def all_statistic_(
     all_niveau_stat.append(
         {"H": [{"name": "6 eme", "uuid": ""}, {"name": "7 eme", "uuid": ""}, {"name": "Doctorat", "uuid": ""}]})
     data = {"anne": decode_schemas(schemas), "mention": mention.title}
-    print(all_niveau_stat)
     file = all_statistic.PDF.create_all_statistic(data, all_niveau_stat, schemas)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
@@ -61,7 +60,7 @@ def statistic_by_years(
         schemas: str,
         uuid_mention: str,
         db: Session = Depends(deps.get_db),
-        current_user: models.User = Depends(deps.get_current_active_superuser),
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     statistic_by_years
@@ -99,7 +98,7 @@ def statistic_by_nation(
         schemas: str,
         uuid_mention: str,
         db: Session = Depends(deps.get_db),
-        current_user: models.User = Depends(deps.get_current_active_superuser),
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     statistic_by_years
@@ -129,7 +128,7 @@ def statistic_by_diplome(
         schemas: str,
         uuid_mention: str,
         db: Session = Depends(deps.get_db),
-        current_user: models.User = Depends(deps.get_current_active_superuser),
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     statistic_by_years
@@ -160,7 +159,7 @@ def renseignement(
         schemas: str,
         uuid_mention: str,
         db: Session = Depends(deps.get_db),
-        current_user: models.User = Depends(deps.get_current_active_superuser),
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     statistic_by_years
@@ -191,7 +190,7 @@ def bachelier_(
         schemas: str,
         uuid_mention: str,
         db: Session = Depends(deps.get_db),
-        current_user: models.User = Depends(deps.get_current_active_superuser),
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     statistic_by_years

@@ -1,3 +1,5 @@
+import time
+
 from app import crud
 from app.utils import get_niveau, decode_schemas, creaate_registre, validation_semestre
 from fastapi import APIRouter, Depends, HTTPException

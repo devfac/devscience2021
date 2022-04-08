@@ -2,8 +2,9 @@ import random
 from typing import Any
 from fpdf import FPDF
 
-def create_certificat_assidute( num_carte:str, date: str, rentre_univ:str, data:Any):
-    pdf = FPDF("P","mm","a4")
+
+def create_certificat_assidute(num_carte: str, date: str, rentre_univ: str, data: Any):
+    pdf = FPDF("P", "mm", "a4")
     pdf.add_page()
     pdf.l_margin = 20
 
@@ -34,105 +35,100 @@ def create_certificat_assidute( num_carte:str, date: str, rentre_univ:str, data:
     registre = f"N° sur le registre:"
     registre_etudiant = f"{num_carte} RI-{data['registre']}"
 
-
     text_3 = f"a été assidue dépuis le {rentre_univ}, date de la rentrée universitaire jusqu'à ce jour"
     text_4 = "En foi de quoi, ce certificat lui est delivré pour servir et valoir ce que le droit"
 
     text_5 = "Fianarantsoa, le "
 
-    pdf.add_font("alger","","Algerian.ttf",uni=True)
-    pdf.add_font("aparaj","","aparaji.ttf",uni=True)
+    pdf.add_font("alger", "", "Algerian.ttf", uni=True)
+    pdf.add_font("aparaj", "", "aparaji.ttf", uni=True)
 
-    pdf.set_font("arial","B",14)
-    pdf.cell(0,15,"",0,1,"C")
+    pdf.set_font("arial", "B", 14)
+    pdf.cell(0, 15, "", 0, 1, "C")
 
-    pdf.set_font("arial","B",14)
-    pdf.cell(0,2,titre1,0,1,"C")
+    pdf.set_font("arial", "B", 14)
+    pdf.cell(0, 2, titre1, 0, 1, "C")
 
-    pdf.set_font("aparaj","",11)
-    pdf.cell(0,10,titre2,0,1,"C")
+    pdf.set_font("aparaj", "", 11)
+    pdf.cell(0, 10, titre2, 0, 1, "C")
 
-    pdf.set_font("arial","BI",12)
-    pdf.cell(0,0,titre3,0,1,"C")
+    pdf.set_font("arial", "BI", 12)
+    pdf.cell(0, 0, titre3, 0, 1, "C")
 
-    pdf.set_font("arial","BI",12)
-    pdf.cell(0,10,"",0,1,"C")
+    pdf.set_font("arial", "BI", 12)
+    pdf.cell(0, 10, "", 0, 1, "C")
 
-    pdf.set_font("arial","B",14)
-    pdf.cell(0,6,titre4,0,1,"C")
+    pdf.set_font("arial", "B", 14)
+    pdf.cell(0, 6, titre4, 0, 1, "C")
 
-    pdf.set_font("arial","B",12)
-    pdf.cell(0,6,titre5,0,1,"C")
+    pdf.set_font("arial", "B", 12)
+    pdf.cell(0, 6, titre5, 0, 1, "C")
 
-    pdf.set_font("arial","BI",12)
-    pdf.cell(0,6,titre6,0,1,"C")
+    pdf.set_font("arial", "BI", 12)
+    pdf.cell(0, 6, titre6, 0, 1, "C")
 
+    pdf.cell(0, 6, "", 0, 2, "C")
+    pdf.set_font("alger", "", 18)
+    pdf.cell(90, 20, nom_certificat, 1, 1, "C", center=True)
 
-    pdf.cell(0,6,"",0,2,"C")
-    pdf.set_font("alger","",18)
-    pdf.cell(90,20,nom_certificat,1,1,"C", center=True)
+    pdf.cell(0, 5, "", 0, 2, "C")
+    pdf.set_font("arial", "", 12)
+    pdf.cell(0, 8, text_1, 0, 1, "L")
 
-    pdf.cell(0,5,"",0,2,"C")
-    pdf.set_font("arial","",12)
-    pdf.cell(0,8,text_1,0,1,"L")
+    pdf.set_font("arial", "", 12)
+    pdf.cell(0, 8, text_2, 0, 1, "L")
 
-    pdf.set_font("arial","",12)
-    pdf.cell(0,8,text_2,0,1,"L")
+    pdf.set_font("arial", "BUI", 12)
+    pdf.cell(12, 8, nom, 0, 0, "L")
 
-    pdf.set_font("arial","BUI",12)
-    pdf.cell(12,8,nom,0,0,"L")
+    pdf.set_font("arial", "I", 12)
+    pdf.cell(0, 8, nom_etudiant, 0, 1)
 
-    pdf.set_font("arial","I",12)
-    pdf.cell(0,8,nom_etudiant,0,1)
+    pdf.set_font("arial", "BUI", 12)
+    pdf.cell(18, 8, prenom, 0, 0, "L")
 
-    pdf.set_font("arial","BUI",12)
-    pdf.cell(18,8,prenom,0,0,"L")
+    pdf.set_font("arial", "I", 12)
+    pdf.cell(0, 8, prenom_etudiant, 0, 1)
 
-    pdf.set_font("arial","I",12)
-    pdf.cell(0,8,prenom_etudiant,0,1)
+    pdf.set_font("arial", "BUI", 12)
+    pdf.cell(18, 8, naiss, 0, 0, "L")
 
-    pdf.set_font("arial","BUI",12)
-    pdf.cell(18,8,naiss,0,0,"L")
+    pdf.set_font("arial", "I", 12)
+    pdf.cell(0, 8, naiss_etudiant, 0, 1)
 
-    pdf.set_font("arial","I",12)
-    pdf.cell(0,8,naiss_etudiant,0,1)
+    pdf.set_font("arial", "", 12)
+    pdf.cell(93, 8, niveau, 0, 0, "L")
 
-    pdf.set_font("arial","",12)
-    pdf.cell(93,8,niveau,0,0,"L")
+    pdf.set_font("arial", "BI", 12)
+    pdf.cell(0, 8, niveau_etudiant, 0, 1)
 
-    pdf.set_font("arial","BI",12)
-    pdf.cell(0,8,niveau_etudiant,0,1)
+    pdf.set_font("arial", "BUI", 12)
+    pdf.cell(22, 8, mention, 0, 0, "L")
 
-    pdf.set_font("arial","BUI",12)
-    pdf.cell(22,8,mention,0,0,"L")
+    pdf.set_font("arial", "I", 12)
+    pdf.cell(0, 8, mention_etudiant, 0, 1)
 
-    pdf.set_font("arial","I",12)
-    pdf.cell(0,8,mention_etudiant,0,1)
+    pdf.set_font("arial", "BUI", 12)
+    pdf.cell(27, 8, parcours, 0, 0, "L")
 
-    pdf.set_font("arial","BUI",12)
-    pdf.cell(27,8,parcours,0,0,"L")
+    pdf.set_font("arial", "I", 12)
+    pdf.cell(0, 8, parcours_etudiant, 0, 1)
 
-    pdf.set_font("arial","I",12)
-    pdf.cell(0,8,parcours_etudiant,0,1)
+    pdf.set_font("arial", "BUI", 12)
+    pdf.cell(37, 8, registre, 0, 0, "L")
 
-    pdf.set_font("arial","BUI",12)
-    pdf.cell(37,8,registre,0,0,"L")
+    pdf.set_font("arial", "I", 12)
+    pdf.cell(0, 8, registre_etudiant, 0, 1)
 
-    pdf.set_font("arial","I",12)
-    pdf.cell(0,8,registre_etudiant,0,1)
+    pdf.set_font("arial", "", 12)
+    pdf.cell(0, 8, text_3, 0, 1)
 
-    pdf.set_font("arial","",12)
-    pdf.cell(0,8,text_3,0,1)
+    pdf.cell(0, 8, "", 0, 1)
+    pdf.cell(0, 8, text_4, 0, 1)
+    pdf.cell(94, 12, "", 0, 0)
+    pdf.cell(0, 12, text_5, 0, 1)
 
+    pdf.cell(0, 40, "", 0, 5)
 
-    pdf.cell(0,8,"",0,3)
-    pdf.cell(0,8,text_4,0,1)
-    pdf.cell(94,12,"",0,0)
-    pdf.cell(0,12,text_5,0,1)
-
-
-    pdf.cell(0,40,"",0,5)
-
-
-    pdf.output(f"files/{num_carte}_assiduite.pdf","F")
+    pdf.output(f"files/{num_carte}_assiduite.pdf", "F")
     return f"files/{num_carte}_assiduite.pdf"

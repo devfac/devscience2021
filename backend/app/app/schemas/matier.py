@@ -27,12 +27,14 @@ class MatierECCreate(MatiertBase):
     value_ue: str
     poids: float
     utilisateur: str
+    is_optional: bool = False
     uuid_parcours: UUID
     uuid_mention: UUID
 
 
 class MatierUEUpdate(BaseModel):
     credit: Optional[int]
+    is_optional: Optional[bool]
 
 
 class MatierECUpdate(BaseModel):
@@ -54,6 +56,7 @@ class MatierECInDBBase(MatiertBase):
     poids: Optional[float]
     value: Optional[str]
     value_ue: Optional[str]
+    is_optional: Optional[bool]
     key_unique: Optional[str]
     utilisateur: Optional[str]
 
