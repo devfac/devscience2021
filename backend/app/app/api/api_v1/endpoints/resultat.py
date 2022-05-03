@@ -225,25 +225,27 @@ def get_by_matier_pdf(
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
 
-@router.get("/get_by_session_definive", response_model=List[Any])
+@router.get("/get_by_session")
 def get_by_session_definitive_pdf(
         schema: str,
         semestre: str,
-        uuid_mention: str,
         uuid_parcours: str,
         session: str,
+        type_result: str,
         db: Session = Depends(deps.get_db),
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
-    mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
-    if not mention:
-        raise HTTPException(status_code=400, detail=f" Mention not found.", )
-
     parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
     if not parcours:
         raise HTTPException(status_code=400, detail=f" Parcours not found.", )
+
+    mention = crud.mention.get_by_uuid(db=db, uuid=parcours.uuid_mention)
     credit = 30
-    all_note = crud.note.read_note_by_credit(schema, semestre, parcours.abreviation.lower(), session, credit)
+    if type_result == "definitive":
+        all_note = crud.note.read_note_by_credit(schema, semestre, parcours.abreviation.lower(), session, credit)
+    else:
+        all_note = crud.note.read_note_by_credit_inf(schema, semestre, parcours.abreviation.lower(), session, credit)
+    print(all_note)
     etudiant_admis = []
     for note in jsonable_encoder(all_note):
         validation = crud.semetre_valide.get_by_num_carte(schema=schema, num_carte=note["num_carte"])
@@ -255,39 +257,5 @@ def get_by_session_definitive_pdf(
                 info_etudiants['prenom'] = un_etudiant["prenom"]
                 etudiant_admis.append(info_etudiants)
     data = {'mention': mention.title, 'parcours': parcours.title, 'anne': decode_schemas(schema), 'session': session}
-    file = result_by_session.PDF.create_result_by_session(semestre, parcours, data, etudiant_admis, "definitive")
-    return FileResponse(path=file, media_type='application/octet-stream', filename=file)
-
-
-@router.get("/get_by_session_compense", response_model=List[Any])
-def get_by_session_compense_pdf(
-        schema: str,
-        semestre: str,
-        uuid_mention: str,
-        uuid_parcours: str,
-        session: str,
-        db: Session = Depends(deps.get_db),
-        current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
-    mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
-    if not mention:
-        raise HTTPException(status_code=400, detail=f" Mention not found.", )
-
-    parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
-    if not parcours:
-        raise HTTPException(status_code=400, detail=f" Parcours not found.", )
-    credit = 30
-    all_note = crud.note.read_note_by_credit_inf(schema, semestre, parcours.abreviation.lower(), session, credit)
-    etudiant_admis = []
-    for note in jsonable_encoder(all_note):
-        validation = crud.semetre_valide.get_by_num_carte(schema=schema, num_carte=note["num_carte"])
-        if validation:
-            if test_semestre(validation.semestre, semestre):
-                info_etudiants = {'N° Carte': note["num_carte"]}
-                un_etudiant = crud.ancien_etudiant.get_by_num_carte(schema=schema, num_carte=note['num_carte'])
-                info_etudiants['nom'] = un_etudiant["nom"]
-                info_etudiants['prenom'] = un_etudiant["prenom"]
-                etudiant_admis.append(info_etudiants)
-    data = {'mention': mention.title, 'parcours': parcours.title, 'anne': decode_schemas(schema), 'session': session}
-    file = result_by_session.PDF.create_result_by_session(semestre, parcours, data, etudiant_admis, "compense")
+    file = result_by_session.PDF.create_result_by_session(semestre, parcours, data, etudiant_admis, type_result)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)

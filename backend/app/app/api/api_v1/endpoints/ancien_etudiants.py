@@ -305,7 +305,7 @@ def delete_etudiant(
 
 @router.get("/photo")
 def get_file(name_file: str):
-    return FileResponse(path=getcwd() + "/photos/" + name_file)
+    return FileResponse(path=getcwd() + "/files/photos/" + name_file)
 
 
 @router.post("/upload_photo/")
@@ -320,7 +320,7 @@ async def create_upload_file(*,
 
     if name.lower() not in allowed_files:
         raise HTTPException(status_code=402, detail="invalid image")
-    file_location = f"photos/{num_carte}{name}"
+    file_location = f"files/photos/{num_carte}{name}"
     with open(file_location, "wb+") as file_object:
         file_object.write(uploaded_file.file.read())
     return {"filename": f'{num_carte}{name}'}

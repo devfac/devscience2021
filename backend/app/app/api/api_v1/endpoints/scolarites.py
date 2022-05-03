@@ -148,8 +148,7 @@ def relever(
     else:
         raise HTTPException(status_code=404, detail="Etudiant not found")
     test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours, session="rattrapage")
-    test_note_final = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours,
-                                                  session="final")
+    test_note_final = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours, session="final")
     if test_note:
         et_un_rattrapage = crud.note.read_by_num_carte(schemas, semestre, parcours, "rattrapage", num_carte)
         if et_un_rattrapage:

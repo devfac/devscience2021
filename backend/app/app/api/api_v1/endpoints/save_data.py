@@ -61,12 +61,13 @@ def get_models_notes(
     if not parcour:
         raise HTTPException(status_code=400, detail=f" Parcours not found.", )
     file = None
-    save_data.create_workbook(f"note_{parcour.abreviation.lower()}_{session.lower()}", parcour.semestre,"notes")
+    save_data.create_workbook(f"note_{parcour.abreviation.lower()}_{session.lower()}", parcour.semestre, "notes")
     for sems in parcour.semestre:
         for table in all_table_note:
             if f"note_{parcour.abreviation.lower()}_{sems.lower()}_{session.lower()}" == table:
                 colums = check_columns_exist(schema, table)
-                save_data.write_data_title(f"note_{parcour.abreviation.lower()}_{session.lower()}", sems, colums, "notes")
+                save_data.write_data_title(f"note_{parcour.abreviation.lower()}_{session.lower()}", sems, colums,
+                                           "notes")
                 all_data = crud.save.read_all_data(schema, table)
                 if all_data:
                     file = save_data.insert_data_xlsx(f"note_{parcour.abreviation.lower()}_{session.lower()}",
@@ -203,7 +204,7 @@ async def create_upload_note_file(
                     et_un = crud.note.read_by_num_carte(schema, semestre, parcours.abreviation, session, note.num_carte)
                     et_un_final = crud.note.read_by_num_carte(schema, semestre, parcours.abreviation, "final",
                                                               note.num_carte)
-                    print("eto",et_un)
+                    print("eto", et_un)
                     if et_un:
                         print("avy eo eto", et_un)
                         ue_in = {}
@@ -237,7 +238,8 @@ async def create_upload_note_file(
                             if value_sess is None:
                                 value_sess = 0
                             ue_in[f'ec_{note_ec.name}'] = format(float(note_ec.note), '.30f')
-                            ue_in_final[f'ec_{note_ec.name}'] = format(float(max_value(note_ec.note, value_sess)), '.30f')
+                            ue_in_final[f'ec_{note_ec.name}'] = format(float(max_value(note_ec.note, value_sess)),
+                                                                       '.30f')
                         crud.note.update_note(schema, semestre, parcours.abreviation, session, note.num_carte, ue_in)
                         crud.note.update_note(schema, semestre, parcours.abreviation, "final", note.num_carte,
                                               ue_in_final)
@@ -276,7 +278,7 @@ async def create_upload_note_file(
                             crud.note.update_note(schema, semestre, parcours.abreviation, "final", note.num_carte,
                                                   moy_cred_in)
                 except Exception as e:
-                    print("error",e)
+                    print("error", e)
                     continue
         all_note = crud.note.read_all_note(schema, semestre, parcours.abreviation, session)
     os.remove(file_location)

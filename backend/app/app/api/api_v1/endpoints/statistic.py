@@ -176,7 +176,7 @@ def renseignement(
                 all_etudiants.append(un_etudiant)
         info[niv] = all_etudiants
     data = {"annee": decode_schemas(schemas), "mention": mention.title}
-    file = stat_renseignement.PDF.create_stat_renseignement(data, info, schemas, db, uuid_mention)
+    file = stat_renseignement.create_stat_renseignement(data, info, db, uuid_mention)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
 

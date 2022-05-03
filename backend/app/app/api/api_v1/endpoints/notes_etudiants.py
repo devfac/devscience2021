@@ -157,6 +157,7 @@ def updates_note(
                         value_sess = 0
                     ue_in[f'ec_{note_ec.name}'] = note_ec.note
                     ue_in_final[f'ec_{note_ec.name}'] = max_value(note_ec.note, value_sess)
+                    print(max_value(note_ec.note, value_sess))
 
                 crud.note.update_note(schemas, semestre, parcours.abreviation, session, note.num_carte, ue_in)
                 crud.note.update_note(schemas, semestre, parcours.abreviation, "final", note.num_carte, ue_in_final)

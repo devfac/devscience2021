@@ -1,6 +1,8 @@
 from typing import Any
 from fpdf import FPDF
 
+from app.utils import convert_date
+
 
 def create_certificat_scolarite(num_carte: str, date: str, anne_univ: str, data: Any) -> str:
     pdf = FPDF("P", "mm", "a4")
@@ -24,7 +26,7 @@ def create_certificat_scolarite(num_carte: str, date: str, anne_univ: str, data:
     prenom = "Prénom:"
     prenom_etudiant = f"{data['prenom']}"
     naiss = "Né(e) le:"
-    naiss_etudiant = f"{data['date_naiss']} à {data['lieu_naiss']}"
+    naiss_etudiant = f"{convert_date(data['date_naiss'])} à {data['lieu_naiss']}"
     niveau = "est régulièrement inscrit(e) comme étudiant(e) en "
     niveau_etudiant = f"{data['niveau']}"
     mention = "MENTION:"

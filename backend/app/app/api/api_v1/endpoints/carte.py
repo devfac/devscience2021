@@ -51,6 +51,7 @@ def create_carte(
         chefsco = crud.user.get_chefsco(db=db, uuid_role=role.uuid)
         data['supperadmin'] = f"{chefsco.first_name} {chefsco.last_name}"
 
+    print("chef sco",data['supperadmin'])
     data['mention'] = mention.title
     data['key'] = anne_univ.code
     data['img_carte'] = (mention.branche.lower())[0:1]

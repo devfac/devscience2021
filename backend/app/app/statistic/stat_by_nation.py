@@ -47,30 +47,30 @@ class PDF(FPDF):
         ln: int = 1
 
         pdf.set_font("arial", "B", 12)
-        pdf.cell(0, 6, titre4, 0, 1, "C")
+        pdf.cell(0, 6, txt=titre4, ln=1, align="C")
 
         pdf.set_font("arial", "B", 10)
-        pdf.cell(0, 6, titre5, 0, 1, "C")
+        pdf.cell(0, 6, txt=titre5, ln=1, align="C")
 
-        pdf.cell(0, 18, "", 0, 1, "C")
+        pdf.cell(0, 18, txt="", ln=1, align="C")
 
-        pdf.cell(tabulation, 6, "", 0, 0, "L")
+        pdf.cell(tabulation, 6, txt="", ln=0, align="L")
         pdf.set_font("arial", "BI", 12)
-        pdf.cell(34, 6, localisation, 0, 0, "L")
+        pdf.cell(34, 6, txt=localisation, ln=0, align="L")
         pdf.set_font("arial", "I", 12)
-        pdf.cell(0, 6, localisation_, 0, 1)
+        pdf.cell(0, 6, txt=localisation_, ln=1)
 
         pdf.set_font("arial", "BI", 12)
-        pdf.cell(tabulation, 6, "", 0, 0, "L")
-        pdf.cell(24, 6, mention, 0, 0, "L")
+        pdf.cell(tabulation, 6, txt="", ln=0, align="L")
+        pdf.cell(24, 6, txt=mention, ln=0, align="L")
 
         pdf.set_font("arial", "I", 12)
-        pdf.cell(70, 6, mention_etudiant, 0, ln)
+        pdf.cell(70, 6, txt=mention_etudiant, ln=ln)
 
-        pdf.cell(20, 6, "", 0, 0, "L")
-        pdf.cell(107, 6, titre_1, 0, 0, "L")
+        pdf.cell(20, 6, txt="", ln=0, align="L")
+        pdf.cell(107, 6, txt=titre_1, ln=0, align="L")
 
-        pdf.cell(15, 10, "", 0, 1, "L")
+        pdf.cell(15, 10, txt="", ln=1, align="L")
 
     def create_statistic_by_nation(data: Any, all_etudiant, schemas: str):
         titre_stat = [{"name": '', "value": ["Niveau"]}, {"name": "Africaine", "value": ["M", "F"]},
@@ -90,21 +90,21 @@ class PDF(FPDF):
         for titre in titre_stat:
             pdf.set_font("arial", "BI", 10)
             if titre["name"] == '':
-                pdf.cell(width, height, titre["name"], 0, 0, "C")
+                pdf.cell(width, height, txt=titre["name"], border=0, ln=0, align="C")
             elif titre["name"] != 'Autre à préciser':
-                pdf.cell(width, height, titre["name"], 1, 0, "C")
+                pdf.cell(width, height, txt=titre["name"], border=1, ln=0, align="C")
             else:
-                pdf.cell(width + 10, height, titre["name"], 1, 0, "C")
-                pdf.cell(0, height, "", 0, 1, "L")
+                pdf.cell(width + 10, height, txt=titre["name"], border=1, ln=0, align="C")
+                pdf.cell(0, height, txt="", border=0, ln=1, align="L")
 
         for titre in titre_stat:
             for value in titre["value"]:
                 pdf.set_font("arial", "BI", 10)
                 if titre["name"] != 'Autre à préciser':
-                    pdf.cell(width / (len(titre["value"])), height, value, 1, 0, "C")
+                    pdf.cell(width / (len(titre["value"])), height, txt=value, border=1, ln=0, align="C")
                 else:
-                    pdf.cell((width + 10) / (len(titre["value"])), height, value, 1, 0, "C")
-        pdf.cell(0, height, "", 0, 1, "L")
+                    pdf.cell((width + 10) / (len(titre["value"])), height, txt=value, border=1, ln=0, align="C")
+        pdf.cell(0, height, txt="", border=0, ln=1, align="L")
 
         for niveau in niveau_:
             for index_1, titre in enumerate(titre_stat):
@@ -112,19 +112,19 @@ class PDF(FPDF):
                     pdf.set_font("arial", "BI", 10)
                     response = get_by_params(niveau, all_etudiant, value, titre["name"])
                     if index_1 == 0:
-                        pdf.cell(width / (len(titre["value"])), height, niveau, 1, 0, "C")
+                        pdf.cell(width / (len(titre["value"])), height, txt=niveau, border=1, ln=0, align="C")
                     else:
                         if titre["name"] != 'Autre à préciser':
-                            pdf.cell(width / (len(titre["value"])), height, str(response), 1, 0, "C")
+                            pdf.cell(width / (len(titre["value"])), height, txt=str(response), border=1, ln=0, align="C")
                         else:
-                            pdf.cell((width + 10) / (len(titre["value"])), height, str(0), 1, 0, "C")
+                            pdf.cell((width + 10) / (len(titre["value"])), height, txt=str(0), border=1, ln=0, align="C")
 
-            pdf.cell(0, height, "", 0, 1, "L")
+            pdf.cell(0, height, txt="", border=0, ln=1, align="L")
 
         bas_1 = " M: Masculin, F: Feminin"
 
-        pdf.cell(0, height, "", 0, 1, "L")
-        pdf.cell(0, 5, bas_1, 0, 1, "L")
+        pdf.cell(0, height, txt="", border=0, ln=1, align="L")
+        pdf.cell(0, 5, txt=bas_1, border=0, ln=1, align="L")
 
         pdf.output(f"files/statistic_by_nation.pdf", "F")
         return f"files/statistic_by_nation.pdf"

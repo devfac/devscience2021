@@ -1,6 +1,7 @@
 import random
 from typing import Any
 from fpdf import FPDF
+from app.utils import convert_date
 import unidecode
 
 
@@ -48,7 +49,7 @@ class PDF(FPDF):
         prenom = "Prénom:"
         prenom_etudiant = f"{data['prenom']}"
         naiss = "Né(e) le:"
-        naiss_etudiant = f"{data['date_naiss']} à {data['lieu_naiss']}"
+        naiss_etudiant = f"{convert_date(data['date_naiss'])} à {data['lieu_naiss']}"
         numero = "N° carte:"
         semestre = f"Semestre:"
         semestre_etudiant = f"{data['semestre']}"

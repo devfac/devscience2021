@@ -3,6 +3,8 @@ from typing import Any
 import qrcode
 import os
 
+from app.utils import convert_date
+
 
 class PDF(FPDF):
     def footer(self) -> None:
@@ -12,7 +14,7 @@ class PDF(FPDF):
         j: int = 0
 
         image_fac = f"images/{data['img_carte']}_avant.jpg"
-        logo_fac = "images/logo_science.jpg"
+        # logo_fac = "images/logo_science.jpg"
 
         titre_1 = "Université de Fanarantsoa \n"
         titre_1 += "Faculté des Sciences \n"
@@ -20,7 +22,7 @@ class PDF(FPDF):
         titre_2 = "Le Chef de service de scolarité:"
         titre_3 = f"{data['supperadmin']}"
 
-        titre_4 = "Faculté des Sciences"
+        # titre_4 = "Faculté des Sciences"
         i: int = 0
         pos_init_x: int = 0.2
         long_init_x: int = 3.9
@@ -33,29 +35,31 @@ class PDF(FPDF):
             niveau = f"Niveau: {deux_et[i]['niveau']}"
 
             image = f"files/photos/profil.png"
-            if os.path.exists(f"photos/{num_carte}.jpg"):
-                image = f"photos/{num_carte}.jpg"
-            info = f"{deux_et[i]['nom'].upper()}\n"
-            info += f"{deux_et[i]['prenom']}\n"
-
-            info_ = f" {data['mention']} \n "
-            info_ += f"Parcours: {deux_et[i]['parcours'].upper()} \n "
-            info_ += f"Né(e) le {deux_et[i]['date_naiss']} "
-            info_ += f"à {deux_et[i]['lieu_naiss']} \n "
+            if os.path.exists(f"files/photos/{deux_et[i]['photo']}"):
+                image = f"files/photos/{deux_et[i]['photo']}"
+            info = f"Nom: {deux_et[i]['nom'].upper()}\n"
+            info += f"Prénom: {deux_et[i]['prenom']}\n"
+            info += f"Né(e) le: {convert_date(deux_et[i]['date_naiss'])} à {deux_et[i]['lieu_naiss']}\n"
+            if {deux_et[i]['num_cin']}:
+                info += f"CIN: {deux_et[i]['num_cin']} \n"
+                info += f"du {convert_date(deux_et[i]['date_cin'])} à {deux_et[i]['lieu_cin']} \n "
+            info_ = f"CE: {num_carte}\n"
+            info_ += f"Parcours: {deux_et[i]['parcours'].upper()}\n"
+            info_ += f"Mention: {data['mention']}\n"
 
             data_et = [deux_et[i]['num_carte'], data['key']]
-
-            if {deux_et[i]['num_cin']}:
-                info_ += f"CIN {deux_et[i]['num_cin']} "
-                info_ += f"du {deux_et[i]['date_cin']} \n "
-                info_ += f"à {deux_et[i]['lieu_cin']} \n "
+            #
+            # if {deux_et[i]['num_cin']}:
+            #     info_ += f"CIN {deux_et[i]['num_cin']} "
+            #     info_ += f"du {deux_et[i]['date_cin']} \n "
+            #     info_ += f"à {deux_et[i]['lieu_cin']} \n "
 
             qr = qrcode.make(f"{data_et}")
 
             pdf.set_font('Times', '', 8.0)
             pdf.image(image_fac, x=pos_init_x, y=pos_init_y, w=long_init_x, h=long_init_y)
             pdf.rect(pos_init_x, pos_init_y, w=long_init_x, h=long_init_y)
-            pdf.image(image, x=pos_init_x, y=pos_init_y, w=1, h=1.18)
+            pdf.image(image, x=pos_init_x+0.05, y=pos_init_y+0.05, w=1, h=1.18)
             pdf.set_text_color(0, 0, 0)
 
             pdf.set_font('Times', 'B', 7.0)
@@ -64,63 +68,64 @@ class PDF(FPDF):
             else:
                 pdf.set_xy(absci + pos_init_x - 0.2, pos_init_y + ordon)
 
-            pdf.multi_cell(1.8, 0.15, info, 0, fill=0, align='L')
+            pdf.multi_cell(2.16, 0.15, info, 0, fill=0, align='L')
             pdf.ln(0.1)
 
             pdf.set_font('Times', '', 8.0)
             if i == 0:
-                pdf.set_xy(absci, pos_init_y + ordon + 0.4)
+                pdf.set_xy(absci, pos_init_y + ordon + 0.9)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2, pos_init_y + ordon + 0.4)
-            pdf.cell(1.5, 0.15, txt=titre_2, ln=1, align="L")
+                pdf.set_xy(absci + pos_init_x - 0.2, pos_init_y + ordon + 0.9)
+            pdf.cell(2.5, 0.15, txt=titre_2, ln=1, align="L")
 
             if i == 0:
-                pdf.set_xy(absci, pos_init_y + ordon + 0.63)
+                pdf.set_xy(absci + 0.1, pos_init_y + ordon + 1.1)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2, pos_init_y + ordon + 0.63)
-            pdf.cell(1.5, 0.15, txt=titre_3, ln=0, align="L")
+                pdf.set_xy(absci + pos_init_x - 0.2 + 0.1, pos_init_y + ordon + 1.1)
+            pdf.cell(2.5, 0.15, txt=titre_3, ln=0, align="L")
 
-            pdf.set_font('Times', 'B', 8.0)
+            pdf.set_font('Times', '', 10)
+            pdf.set_fill_color(255, 255, 255)
             if i == 0:
-                pdf.set_xy(absci + 2.18, pos_init_y + ordon + 0.65)
+                pdf.set_xy(absci + 1.9, pos_init_y + ordon + 1)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2 + 2.18, pos_init_y + ordon + 0.65)
-            pdf.image(logo_fac, w=0.4, h=0.4)
-
-            if i == 0:
-                pdf.set_xy(absci + 2.19, pos_init_y + ordon + 1.85)
-            else:
-                pdf.set_xy(absci + pos_init_x - 0.2 + 2.19, pos_init_y + ordon + 1.85)
-            pdf.image(qr.get_image(), w=0.5, h=0.5)
+                pdf.set_xy(absci + pos_init_x - 0.2 + 1.9, pos_init_y + ordon + 1)
+            pdf.cell(0.8, 0.4, txt="", border=1, fill=True, align="L")
 
             if i == 0:
-                pdf.set_xy(absci + 1.8, pos_init_y + ordon + 1.1)
+                pdf.set_xy(absci + 1.9, pos_init_y + ordon + 0.8)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2 + 1.8, pos_init_y + ordon + 1.1)
-            pdf.cell(0, 0.15, txt=titre_4, ln=0, align="L")
+                pdf.set_xy(absci + pos_init_x - 0.2 + 1.9, pos_init_y + ordon + 0.8)
+            pdf.cell(0.9, 0.15, txt="Signature", align="L")
+
+            # if i == 0:
+            #     pdf.set_xy(absci + 1.6, pos_init_y + ordon + 1.3)
+            # else:
+            #     pdf.set_xy(absci + pos_init_x - 0.2 + 1.6, pos_init_y + ordon + 1.3)
+            # pdf.cell(0, 0.15, txt=titre_4, ln=0, align="L")
 
             if i == 0:
-                pdf.set_xy(0.3, pos_init_y + ordon + 1.3)
+                pdf.set_xy(0.3, pos_init_y + ordon + 1.4)
             else:
-                pdf.set_xy(0.9 + pos_init_x - 0.2 - 0.6, pos_init_y + ordon + 1.3)
+                pdf.set_xy(0.9 + pos_init_x - 0.2 - 0.6, pos_init_y + ordon + 1.4)
 
             pdf.set_font('Times', '', 9.0)
-            pdf.set_text_color(255, 255, 255)
             pdf.multi_cell(2.2, 0.15, info_, 0, fill=0, align='J')
 
             pdf.set_font('Times', 'B', 14.0)
             if i == 0:
-                pdf.set_xy(absci + 1.9, pos_init_y + ordon + 0.06)
+                pdf.set_xy(absci + 2.23, pos_init_y + ordon + 0.03)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2 + 1.9, pos_init_y + ordon + 0.06)
-            pdf.cell(1, 0.15, txt=num_carte, ln=1, align="C")
+                pdf.set_xy(absci + pos_init_x - 0.2 + 2.23, pos_init_y + ordon + 0.03)
+            # pdf.cell(1, 0.15, txt=num_carte, ln=1, align="C")
+            pdf.image(qr.get_image(), w=0.6, h=0.6)
 
-            pdf.set_font('Times', 'BI', 10.0)
+            pdf.set_font('Times', 'BI', 9)
             if i == 0:
                 pdf.set_xy(absci + 1.9, pos_init_y + ordon + 0.36)
             else:
                 pdf.set_xy(absci + pos_init_x - 0.2 + 1.9, pos_init_y + ordon + 0.36)
-            pdf.cell(1, 0.15, txt=niveau, ln=1, align="C")
+            # pdf.cell(1, 0.15, txt=niveau, ln=1, align="C")
             pdf.ln(0.1)
 
             pos_init_x = long_init_x + 0.3

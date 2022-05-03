@@ -1,6 +1,8 @@
 from typing import Any
 from fpdf import FPDF
 
+from app.utils import convert_date
+
 
 def get_niveau_credit(niveau: str):
     niveau_ = {}
@@ -44,7 +46,7 @@ def attestation_validation_credit(num_carte: str, date: str, niveau: str, data: 
     prenom = "Prénom:"
     prenom_etudiant = f"{data['prenom']}"
     naiss = "Né(e) le:"
-    naiss_etudiant = f"{data['date_naiss']} à {data['lieu_naiss']}"
+    naiss_etudiant = f"{convert_date(data['date_naiss'])} à {data['lieu_naiss']}"
     mention = "MENTION:"
     mention_etudiant = f"{data['mention']}"
     parcours = "PARCOURS:"

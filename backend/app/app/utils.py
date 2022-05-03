@@ -407,6 +407,21 @@ def transpose(data: list) -> list:
     return new_data
 
 
+def convert_date(date: str) -> str:
+    print("eto zw", date)
+    mois = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet",
+            "Aout", "Séptembre", "Octobre", "Novembre","Décembre", ""]
+    # 1995-10-20
+    jours = date[8:10]
+    annee = date[0:4]
+    mois_ = int(date[5:7])
+    print("10", mois[10])
+    print("11", mois[11])
+    print(jours, mois_ - 1, annee)
+
+    return f"{jours} {mois[mois_ - 1]} {annee}"
+
+
 class UUIDEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, UUID):

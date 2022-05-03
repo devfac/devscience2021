@@ -10,18 +10,21 @@ class PDF(FPDF):
 
     def create_carte(pdf: FPDF, pos_init_y: int, long_init_y: int, deux_et: list, data: Any):
 
-        image_fac = f"images/{data['img_carte']}_arriere.jpeg"
+        image_fac = f"images/{data['img_carte']}_arriere.jpg"
         logo_univ = "images/logo_univ.jpg"
+        logo_fac = "images/logo_science.jpg"
 
         titre_1 = "Faculté des Sciences \n"
         titre_1 += "Visites médicale \n"
         titre_1 += "medecine préventive \n"
 
-        titre_2 = "Null ne se présenter à l'examen s'il n'a pas subi la visite médicale organisé par le Service de la medecine préventive,"
+        titre_2 = f"Null ne se présenter à l'examen s'il n'a pas subi la visite médicale organisé par le Service de " \
+                  f"la medecine préventive, "
 
         titre_3 = "Signature du Medecin"
 
-        titre_4 = "   NB:il n'est délivrer qu'une seule carte pendant l'année, l'interessé(e) doit faire une déclaration auprès de la police en cas de perte."
+        titre_4 = f"NB:il n'est délivrer qu'une seule carte pendant l'année, l'interessé(e) doit faire une " \
+                  f"déclaration auprès de la police en cas de perte. "
 
         titre_5 = "Université \n "
         titre_5 += "de \n"
@@ -40,11 +43,11 @@ class PDF(FPDF):
 
             pdf.set_font('Times', 'B', 10)
             if i == 0:
-                pdf.set_xy(absci - 1, pos_init_y + ordon)
+                pdf.set_xy(absci - 0.35, pos_init_y + ordon)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2 - 1, pos_init_y + ordon)
+                pdf.set_xy(absci + pos_init_x - 0.2 - 0.35, pos_init_y + ordon)
 
-            pdf.multi_cell(2.5, 0.15, titre_1.upper(), 0, fill=False, align='C')
+            pdf.multi_cell(2.5, 0.15, titre_1.upper(), border=0, ln=0, fill=False, align='C')
             pdf.ln(0.1)
 
             pdf.set_font('Times', 'I', 8.0)
@@ -52,34 +55,40 @@ class PDF(FPDF):
                 pdf.set_xy(absci - 1, pos_init_y + ordon + 0.6)
             else:
                 pdf.set_xy(absci + pos_init_x - 0.2 - 1, pos_init_y + ordon + 0.6)
-            pdf.multi_cell(2.8, 0.15, titre_2, 0, fill=0, align='C')
+            pdf.multi_cell(1.8, 0.15, titre_2, 0, fill=0, align='C')
 
             if i == 0:
-                pdf.set_xy(absci - 1, pos_init_y + ordon + 1.05)
+                pdf.set_xy(absci - 1, pos_init_y + ordon + 1.3)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2 - 1, pos_init_y + ordon + 1.05)
-            pdf.cell(2.8, 0.15, txt=titre_3, ln=0, align="C")
+                pdf.set_xy(absci + pos_init_x - 0.2 - 1, pos_init_y + ordon + 1.3)
+            pdf.cell(1.8, 0.15, txt=titre_3, border=0, ln=0, align="C")
 
             pdf.set_font('Times', 'B', 8.0)
             if i == 0:
-                pdf.set_xy(absci + 2.16, pos_init_y + ordon + 1.5)
+                pdf.set_xy(absci - 0.7, pos_init_y + ordon)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2 + 2.16, pos_init_y + ordon + 1.5)
+                pdf.set_xy(absci + pos_init_x - 0.2 - 0.7, pos_init_y + ordon)
             pdf.image(logo_univ, w=0.5, h=0.5)
+
+            if i == 0:
+                pdf.set_xy(absci + 2, pos_init_y + ordon)
+            else:
+                pdf.set_xy(absci + pos_init_x - 0.2 + 2, pos_init_y + ordon)
+            pdf.image(logo_fac, w=0.5, h=0.5)
 
             pdf.set_font('Times', 'B', 7.0)
             if i == 0:
-                pdf.set_xy(absci + 1.88, pos_init_y + ordon + 2.04)
+                pdf.set_xy(absci + 1.88, pos_init_y + ordon + 0.8)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2 + 1.88, pos_init_y + ordon + 2.04)
+                pdf.set_xy(absci + pos_init_x - 0.2 + 1.88, pos_init_y + ordon + 0.8)
             pdf.multi_cell(1, 0.13, titre_5.upper(), 0, fill=0, align='C')
 
             pdf.set_font('Times', 'I', 7.0)
 
             if i == 0:
-                pdf.set_xy(absci - 1.05, pos_init_y + ordon + 1.6)
+                pdf.set_xy(absci - 1.05, pos_init_y + ordon + 2.04)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2 - 1.05, pos_init_y + ordon + 1.6)
+                pdf.set_xy(absci + pos_init_x - 0.2 - 1.05, pos_init_y + ordon + 2.04)
             pdf.multi_cell(2.9, 0.15, titre_4, 0, fill=0, align='L')
 
             pos_init_x = long_init_x + 0.3
@@ -121,4 +130,4 @@ class PDF(FPDF):
             l += 8
         pdf.output(f"files/carte_{data['mention']}_arriere.pdf", "F")
 
-        return (f"files/carte_{data['mention']}_arriere.pdf")
+        return f"files/carte_{data['mention']}_arriere.pdf"
