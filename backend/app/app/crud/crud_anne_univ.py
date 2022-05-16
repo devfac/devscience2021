@@ -42,7 +42,7 @@ class CRUDAnne(CRUDBase[AnneUniv, AnneUnivCreate, AnneUnivUpdate]):
         return (
             db.query(self.model)
                 .order_by(AnneUniv.title.desc())
-                .one()
+                .all()
         )
 
 

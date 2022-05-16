@@ -14,12 +14,12 @@ def get_drive() -> GoogleDrive:
     global _drive
     if not _drive:
         g_auth = GoogleAuth()
-        g_auth.LoadCredentialsFile("/backend/files/my_credentials.txt")
+        g_auth.LoadCredentialsFile("/app/credentials/files/my_credentials.txt")
         _drive = GoogleDrive(g_auth)
 
         # Authenticate if they're not there
         g_auth.LocalWebserverAuth()
 
     _drive.GetAbout()
-    _drive.auth.SaveCredentialsFile("/backend/files/my_credentials.txt")
+    _drive.auth.SaveCredentialsFile("/app/credentials/files/my_credentials.txt")
     return _drive

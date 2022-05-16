@@ -11,6 +11,7 @@ from app.utils import create_anne, check_table_info, check_columns_exist
 def create_forlder_and_spreadsheet(db: Session) -> str:
     anne_univ = crud.anne_univ.get_actual_value(db)
     if anne_univ:
+        anne_univ = anne_univ[0]
         print(anne_univ)
         schema = create_anne(anne_univ.title)
         foolder_name = f"annee {anne_univ.title}"
