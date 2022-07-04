@@ -44,7 +44,7 @@ def create_ue(
     ue_in.uuid = uuid.uuid4()
     parcours = crud.parcours.get_by_uuid(db=db, uuid=ue_in.uuid_parcours)
     value = decode_text(ue_in.title).lower()
-    key_unique = decode_text(f"{value}_{ue_in.semestre}_{parcours.abreviation}").lower()
+    key_unique = decode_text(f"{value}_{ue_in.semestre}_{parcours.abbreviation}").lower()
     matier_ue = crud.matier_ue.get_by_schema(schema=schema, obj_in=ue_in, value=value)
     if matier_ue:
         raise HTTPException(status_code=404, detail="U.E already exists")

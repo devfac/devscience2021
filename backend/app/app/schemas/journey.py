@@ -6,30 +6,30 @@ from sqlalchemy.sql.sqltypes import ARRAY
 
 
 # Shared properties
-class ParcoursBase(BaseModel):
+class JourneyBase(BaseModel):
     title: Optional[str] = None
-    abreviation: Optional[str]
+    abbreviation: Optional[str]
     uuid_mention: Optional[UUID] = None
-    semestre: Optional[List[str]]
+    semester: Optional[List[str]]
 
 
 # Properties to receive via API on creation
-class ParcoursCreate(ParcoursBase):
+class JourneyCreate(JourneyBase):
     title: str
-    abreviation: str
+    abbreviation: str
     uuid_mention: UUID
-    semestre: List[str]
+    semester: List[str]
 
 
 # Properties to receive via API on update
-class ParcoursUpdate(ParcoursBase):
+class JourneyUpdate(JourneyBase):
     title: Optional[str] = None
-    abreviation: Optional[str]
+    abbreviation: Optional[str]
     uuid_mention: Optional[UUID]
-    semestre: Optional[List[str]]
+    semester: Optional[List[str]]
 
 
-class ParcoursInDBBase(ParcoursBase):
+class JourneyInDBBase(JourneyBase):
     uuid: Optional[UUID]
 
     class Config:
@@ -37,10 +37,10 @@ class ParcoursInDBBase(ParcoursBase):
 
 
 # Additional properties to return via API
-class Parcours(ParcoursInDBBase):
+class Journey(JourneyInDBBase):
     pass
 
 
 # Additional properties stored in DB
-class ParcoursInDB(ParcoursInDBBase):
+class JourneyInDB(JourneyInDBBase):
     pass

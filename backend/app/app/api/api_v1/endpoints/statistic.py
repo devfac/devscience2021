@@ -41,7 +41,7 @@ def all_statistic_(
     for index, niveau in enumerate(all_niveau):
         for parcours in all_parcours:
             if niveau[niveau_[index]][0] in parcours.semestre or niveau[niveau_[index]][1] in parcours.semestre:
-                info = {"name": parcours.abreviation.upper(), "uuid": parcours.uuid}
+                info = {"name": parcours.abbreviation.upper(), "uuid": parcours.uuid}
                 all_niveau_stat[index][niveau_[index]].append(info)
     all_niveau_stat.append(
         {"H": [{"name": "6 eme", "uuid": ""}, {"name": "7 eme", "uuid": ""}, {"name": "Doctorat", "uuid": ""}]})
@@ -78,7 +78,7 @@ def statistic_by_years(
     for index, niveau in enumerate(all_niveau):
         for parcours in all_parcours:
             if niveau[niveau_[index]][0] in parcours.semestre or niveau[niveau_[index]][1] in parcours.semestre:
-                info = {"name": parcours.abreviation.upper()}
+                info = {"name": parcours.abbreviation.upper()}
                 etudiants = crud.ancien_etudiant.get_by_parcours_for_stat(schemas, str(parcours.uuid),
                                                                           niveau[niveau_[index]][1])
                 info["etudiants"] = etudiants

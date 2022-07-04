@@ -11,13 +11,15 @@ from app.db.base_class import Base
 
 if TYPE_CHECKING:
     from .mention import Mention  # noqa: F401
+    from .student import Students  # noqa: F401
 
 
-class Parcours(Base):
+class Journey(Base):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String)
-    abreviation = Column(String)
+    abbreviation = Column(String)
     uuid_mention = Column(UUID(as_uuid=True), ForeignKey("mention.uuid"))
-    semestre = Column(ARRAY(String))
-    mention = relationship("Mention", back_populates="parcours")
+    semester = Column(ARRAY(String))
+    mention = relationship("Mention", back_populates="journey")
+    student = relationship("Students", back_populates="journey")
 

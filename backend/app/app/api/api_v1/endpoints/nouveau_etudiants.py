@@ -51,7 +51,7 @@ def create_select_etudiant_nouveau(
     if not mention:
         raise HTTPException(status_code=400, detail=f" Mention not found.", )
     all_etutiant = crud.nouveau_etudiant.get_by_mention(schema, etudiant_in.uuid_mention)
-    etudiant_in.num_select = f"S{mention.abreviation.upper()}{etudiant_in.num_select}"
+    etudiant_in.num_select = f"S{mention.abbreviation.upper()}{etudiant_in.num_select}"
     etudiant = crud.nouveau_etudiant.create_etudiant(schema=schema, obj_in=etudiant_in)
     return etudiant
 

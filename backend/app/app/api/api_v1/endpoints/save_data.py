@@ -61,16 +61,16 @@ def get_models_notes(
     if not parcour:
         raise HTTPException(status_code=400, detail=f" Parcours not found.", )
     file = None
-    save_data.create_workbook(f"note_{parcour.abreviation.lower()}_{session.lower()}", parcour.semestre, "notes")
+    save_data.create_workbook(f"note_{parcour.abbreviation.lower()}_{session.lower()}", parcour.semestre, "notes")
     for sems in parcour.semestre:
         for table in all_table_note:
-            if f"note_{parcour.abreviation.lower()}_{sems.lower()}_{session.lower()}" == table:
+            if f"note_{parcour.abbreviation.lower()}_{sems.lower()}_{session.lower()}" == table:
                 colums = check_columns_exist(schema, table)
-                save_data.write_data_title(f"note_{parcour.abreviation.lower()}_{session.lower()}", sems, colums,
+                save_data.write_data_title(f"note_{parcour.abbreviation.lower()}_{session.lower()}", sems, colums,
                                            "notes")
                 all_data = crud.save.read_all_data(schema, table)
                 if all_data:
-                    file = save_data.insert_data_xlsx(f"note_{parcour.abreviation.lower()}_{session.lower()}",
+                    file = save_data.insert_data_xlsx(f"note_{parcour.abbreviation.lower()}_{session.lower()}",
                                                       sems, all_data, colums, "notes")
                     print("file", file)
                     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
@@ -183,10 +183,10 @@ async def create_upload_note_file(
                 status_code=400,
                 detail=f"invalide file {all_sheet[i]}",
             )
-    test_note = crud.note.check_table_exist(schemas=schema, semestre=semestre, parcours=parcours.abreviation,
+    test_note = crud.note.check_table_exist(schemas=schema, semestre=semestre, parcours=parcours.abbreviation,
                                             session=session)
     if test_note:
-        table = f"note_{parcours.abreviation.lower()}_{semestre.lower()}_{session.lower()}"
+        table = f"note_{parcours.abbreviation.lower()}_{semestre.lower()}_{session.lower()}"
         valid = save_data.validation_file_note(file_location, semestre, table, schema)
         if valid != "valid":
             raise HTTPException(
@@ -201,8 +201,8 @@ async def create_upload_note_file(
             for note in notes:
                 try:
                     note = schemas.Note(**note)
-                    et_un = crud.note.read_by_num_carte(schema, semestre, parcours.abreviation, session, note.num_carte)
-                    et_un_final = crud.note.read_by_num_carte(schema, semestre, parcours.abreviation, "final",
+                    et_un = crud.note.read_by_num_carte(schema, semestre, parcours.abbreviation, session, note.num_carte)
+                    et_un_final = crud.note.read_by_num_carte(schema, semestre, parcours.abbreviation, "final",
                                                               note.num_carte)
                     print("eto", et_un)
                     if et_un:
@@ -240,12 +240,12 @@ async def create_upload_note_file(
                             ue_in[f'ec_{note_ec.name}'] = format(float(note_ec.note), '.30f')
                             ue_in_final[f'ec_{note_ec.name}'] = format(float(max_value(note_ec.note, value_sess)),
                                                                        '.30f')
-                        crud.note.update_note(schema, semestre, parcours.abreviation, session, note.num_carte, ue_in)
-                        crud.note.update_note(schema, semestre, parcours.abreviation, "final", note.num_carte,
+                        crud.note.update_note(schema, semestre, parcours.abbreviation, session, note.num_carte, ue_in)
+                        crud.note.update_note(schema, semestre, parcours.abbreviation, "final", note.num_carte,
                                               ue_in_final)
-                        et_un = crud.note.read_by_num_carte(schema, semestre, parcours.abreviation, session,
+                        et_un = crud.note.read_by_num_carte(schema, semestre, parcours.abbreviation, session,
                                                             note.num_carte)
-                        et_un_final = crud.note.read_by_num_carte(schema, semestre, parcours.abreviation, "final",
+                        et_un_final = crud.note.read_by_num_carte(schema, semestre, parcours.abbreviation, "final",
                                                                   note.num_carte)
                         ues = crud.matier_ue.get_by_class(schema, uuid_parcours, semestre)
                         moy = 0
@@ -273,14 +273,14 @@ async def create_upload_note_file(
                             moy_cred_in_fin["moyenne"] = format(moy_fin / somme, '.4f')
                             moy_cred_in_fin["credit"] = credit_fin
 
-                            crud.note.update_note(schema, semestre, parcours.abreviation, session, note.num_carte,
+                            crud.note.update_note(schema, semestre, parcours.abbreviation, session, note.num_carte,
                                                   moy_cred_in)
-                            crud.note.update_note(schema, semestre, parcours.abreviation, "final", note.num_carte,
+                            crud.note.update_note(schema, semestre, parcours.abbreviation, "final", note.num_carte,
                                                   moy_cred_in)
                 except Exception as e:
                     print("error", e)
                     continue
-        all_note = crud.note.read_all_note(schema, semestre, parcours.abreviation, session)
+        all_note = crud.note.read_all_note(schema, semestre, parcours.abbreviation, session)
     os.remove(file_location)
     return all_note
 

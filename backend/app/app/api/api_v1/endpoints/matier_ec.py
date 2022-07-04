@@ -106,7 +106,7 @@ def create_ec(
     ec_in.uuid = uuid.uuid4()
     parcours = crud.parcours.get_by_uuid(db=db, uuid=ec_in.uuid_parcours)
     value = decode_text(ec_in.title).lower()
-    key_unique = decode_text(f"{value}_{ec_in.semestre}_{parcours.abreviation}").lower()
+    key_unique = decode_text(f"{value}_{ec_in.semestre}_{parcours.abbreviation}").lower()
     matier_ec = crud.matier_ec.get_by_schema(schema=schema, obj_in=ec_in, value=value)
     if matier_ec:
         raise HTTPException(status_code=404, detail="E.C already exists")

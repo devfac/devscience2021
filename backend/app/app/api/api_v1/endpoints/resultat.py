@@ -24,7 +24,7 @@ def get_all_notes(
     parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
     if not parcours:
         raise HTTPException(status_code=400, detail="Parcours not found")
-    all_note = crud.note.read_all_note(schemas, semestre, parcours.abreviation, session)
+    all_note = crud.note.read_all_note(schemas, semestre, parcours.abbreviation, session)
     return all_note
 
 
@@ -41,7 +41,7 @@ def get_by_credit(
     parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
     if not parcours:
         raise HTTPException(status_code=400, detail="Parcours not found")
-    all_note = crud.note.read_note_by_credit(schemas, semestre, parcours.abreviation, session, credit)
+    all_note = crud.note.read_note_by_credit(schemas, semestre, parcours.abbreviation, session, credit)
     return all_note
 
 
@@ -58,7 +58,7 @@ def get_by_moyenne(
     parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
     if not parcours:
         raise HTTPException(status_code=400, detail="Parcours not found")
-    all_note = crud.note.read_note_by_moyenne(schemas, semestre, parcours.abreviation, session, moyenne)
+    all_note = crud.note.read_note_by_moyenne(schemas, semestre, parcours.abbreviation, session, moyenne)
     return all_note
 
 
@@ -76,7 +76,7 @@ def get_by_moyenne_and_credit_inf(
     parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
     if not parcours:
         raise HTTPException(status_code=400, detail="Parcours not found")
-    all_note = crud.note.read_note_by_moyenne_and_credit_inf(schemas, semestre, parcours.abreviation, session, moyenne,
+    all_note = crud.note.read_note_by_moyenne_and_credit_inf(schemas, semestre, parcours.abbreviation, session, moyenne,
                                                              credit)
     return all_note
 
@@ -95,7 +95,7 @@ def get_by_moyenne_and_credit_equals(
     parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
     if not parcours:
         raise HTTPException(status_code=400, detail="Parcours not found")
-    all_note = crud.note.read_note_by_moyenne_and_credit_equals(schemas, semestre, parcours.abreviation, session,
+    all_note = crud.note.read_note_by_moyenne_and_credit_equals(schemas, semestre, parcours.abbreviation, session,
                                                                 moyenne, credit)
     return all_note
 
@@ -115,7 +115,7 @@ def get_by_moyenne_and_credit_sup(
     if not parcours:
         raise HTTPException(status_code=400, detail="Parcours not found")
 
-    all_note = crud.note.read_note_by_moyenne_and_credit_sup(schemas, semestre, parcours.abreviation, session, moyenne,
+    all_note = crud.note.read_note_by_moyenne_and_credit_sup(schemas, semestre, parcours.abbreviation, session, moyenne,
                                                              credit)
     return all_note
 
@@ -134,7 +134,7 @@ def get_by_matier(
     if not parcours:
         raise HTTPException(status_code=400, detail="Parcours not found")
     validation = False
-    all_columns = crud.note.check_columns_exist(schemas=schemas, semestre=semestre, parcours=parcours.abreviation,
+    all_columns = crud.note.check_columns_exist(schemas=schemas, semestre=semestre, parcours=parcours.abbreviation,
                                                 session=session)
     for value in all_columns:
         if value == value_matier:
@@ -143,8 +143,8 @@ def get_by_matier(
     if not validation:
         raise HTTPException(status_code=400, detail="matier value not found")
     all_note = {}
-    non_valide = crud.note.read_note_failed(schemas, semestre, parcours.abreviation, session, value_matier)
-    valide = crud.note.read_note_succes(schemas, semestre, parcours.abreviation, session, value_matier)
+    non_valide = crud.note.read_note_failed(schemas, semestre, parcours.abbreviation, session, value_matier)
+    valide = crud.note.read_note_succes(schemas, semestre, parcours.abbreviation, session, value_matier)
     all_note['list_valide'] = valide
     all_note['list_non_valide'] = non_valide
     return all_note
@@ -187,7 +187,7 @@ def get_by_matier_pdf(
     matier = ','.join(tuple(value_matier))
     notes = []
     mention = crud.mention.get_by_uuid(db=db, uuid=parcours.uuid_mention)
-    all_note = crud.note.read_note_by_ue(schema, semestre, parcours.abreviation.lower(), session, matier)
+    all_note = crud.note.read_note_by_ue(schema, semestre, parcours.abbreviation.lower(), session, matier)
     etudiant_admis = []
     etudiant_admis_compense = []
     for note in jsonable_encoder(all_note):
@@ -242,9 +242,9 @@ def get_by_session_definitive_pdf(
     mention = crud.mention.get_by_uuid(db=db, uuid=parcours.uuid_mention)
     credit = 30
     if type_result == "definitive":
-        all_note = crud.note.read_note_by_credit(schema, semestre, parcours.abreviation.lower(), session, credit)
+        all_note = crud.note.read_note_by_credit(schema, semestre, parcours.abbreviation.lower(), session, credit)
     else:
-        all_note = crud.note.read_note_by_credit_inf(schema, semestre, parcours.abreviation.lower(), session, credit)
+        all_note = crud.note.read_note_by_credit_inf(schema, semestre, parcours.abbreviation.lower(), session, credit)
     print(all_note)
     etudiant_admis = []
     for note in jsonable_encoder(all_note):

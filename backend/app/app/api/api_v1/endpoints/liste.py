@@ -73,7 +73,7 @@ def list_examen(
             detail="Etudiants not fount.",
         )
     for etudiant in etudiants_:
-        un_et = crud.note.read_by_num_carte(schema, semestre, parcours.abreviation, session, etudiant.num_carte)
+        un_et = crud.note.read_by_num_carte(schema, semestre, parcours.abbreviation, session, etudiant.num_carte)
         if un_et:
             etudiants = {}
             etudiants["nom"] = etudiant["nom"]
@@ -130,7 +130,7 @@ def list_inscrit(
     data['mention'] = mention.title
     data['parcours'] = parcours.title
     data['anne'] = decode_schemas(schema)
-    file = liste_inscrit.PDF.create_list_inscrit(semestre, parcours.abreviation, data, all_etudiant)
+    file = liste_inscrit.PDF.create_list_inscrit(semestre, parcours.abbreviation, data, all_etudiant)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
 

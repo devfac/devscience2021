@@ -144,7 +144,7 @@ def relever(
 
     etudiant = crud.ancien_etudiant.get_by_num_carte(schemas, num_carte)
     if etudiant:
-        parcours = crud.parcours.get_by_uuid(db=db, uuid=etudiant.uuid_parcours).abreviation
+        parcours = crud.parcours.get_by_uuid(db=db, uuid=etudiant.uuid_parcours).abbreviation
     else:
         raise HTTPException(status_code=404, detail="Etudiant not found")
     test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours, session="rattrapage")

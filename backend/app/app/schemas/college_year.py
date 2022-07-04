@@ -5,23 +5,23 @@ from pydantic import BaseModel
 
 
 # Shared properties
-class AnneUnivBase(BaseModel):
+class CollegeYearBase(BaseModel):
     title: Optional[str] = None
-    moyenne: Optional[float]
+    mean: Optional[float]
 
 
 # Properties to receive via API on creation
-class AnneUnivCreate(AnneUnivBase):
+class CollegeYearCreate(CollegeYearBase):
     title: str
-    moyenne: float
+    mean: float
 
 
 # Properties to receive via API on update
-class AnneUnivUpdate(AnneUnivBase):
+class CollegeYearUpdate(CollegeYearBase):
     pass
 
 
-class AnneUnivInDBBase(AnneUnivBase):
+class CollegeYearInDBBase(CollegeYearBase):
     uuid: Optional[UUID]
 
     class Config:
@@ -29,10 +29,10 @@ class AnneUnivInDBBase(AnneUnivBase):
 
 
 # Additional properties to return via API
-class AnneUniv(AnneUnivInDBBase):
+class CollegeYear(CollegeYearInDBBase):
     code: Optional[str] = None
 
 
 # Additional properties stored in DB
-class AnneUnivInDB(AnneUnivInDBBase):
+class CollegeYearInDB(CollegeYearInDBBase):
     pass

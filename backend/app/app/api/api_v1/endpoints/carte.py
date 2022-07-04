@@ -40,7 +40,7 @@ def create_carte(
         for un_etudiant in etudiants_:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
             et['niveau'] = get_niveau(un_etudiant.semestre_petit, un_etudiant.semestre_grand)
-            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
+            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abbreviation
             all_etudiant.append(et)
 
     role = crud.role.get_title(db=db, title="chefsco")
@@ -86,7 +86,7 @@ def create_ariere_carte(
         for un_etudiant in etudiants_:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
             et['niveau'] = get_niveau(un_etudiant.semestre_petit, un_etudiant.semestre_grand)
-            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
+            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abbreviation
             all_etudiant.append(et)
 
     role = crud.role.get_title(db=db, title="chefsco")

@@ -13,8 +13,8 @@ from app.utils import create_anne
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.AnneUniv])
-def read_annee_universitaire(
+@router.get("/", response_model=List[schemas.CollegeYear])
+def read_college_year(
         db: Session = Depends(deps.get_db),
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -25,11 +25,11 @@ def read_annee_universitaire(
     return anne_univ
 
 
-@router.post("/", response_model=List[schemas.AnneUniv])
-def create_annee_universitaire(
+@router.post("/", response_model=List[schemas.CollegeYear])
+def create_college_year(
         *,
         db: Session = Depends(deps.get_db),
-        anne_univ_in: schemas.AnneUnivCreate,
+        anne_univ_in: schemas.CollegeYearCreate,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -56,12 +56,12 @@ def create_annee_universitaire(
     return crud.anne_univ.get_multi(db=db)
 
 
-@router.put("/", response_model=List[schemas.AnneUniv])
-def update_annee_universitaire(
+@router.put("/", response_model=List[schemas.CollegeYear])
+def update_college_year(
         *,
         db: Session = Depends(deps.get_db),
         uuid: str,
-        anne_univ_in: schemas.AnneUnivUpdate,
+        anne_univ_in: schemas.CollegeYearUpdate,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -76,8 +76,8 @@ def update_annee_universitaire(
     return crud.anne_univ.get_multi(db=db)
 
 
-@router.get("/by_uuid", response_model=schemas.AnneUniv)
-def read_annee_universitaire(
+@router.get("/by_uuid", response_model=schemas.CollegeYear)
+def read_college_year(
         *,
         db: Session = Depends(deps.get_db),
         uuid: str,
@@ -95,8 +95,8 @@ def read_annee_universitaire(
     return anne_univ
 
 
-@router.delete("/", response_model=List[schemas.AnneUniv])
-def delete_annee_universitaire(
+@router.delete("/", response_model=List[schemas.CollegeYear])
+def delete_college_year(
         *,
         db: Session = Depends(deps.get_db),
         uuid: str,

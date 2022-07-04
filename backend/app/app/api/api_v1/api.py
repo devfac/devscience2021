@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from app.api.api_v1.endpoints import login, users, utils, mentions, roles, parcours, \
-    semestres, anne_univ, semestre_valide, ancien_etudiants, nouveau_etudiants, matier_ue, matier_ec, \
+from app.api.api_v1.endpoints import login, users, utils, mentions, roles, journey, \
+    semestres, college_year, semestre_valide, ancien_etudiants, nouveau_etudiants, matier_ue, matier_ec, \
     scolarites, notes, notes_etudiants, liste, save_data, resultat, statistic, diplome, droit, carte, drive_action
 
 api_router = APIRouter()

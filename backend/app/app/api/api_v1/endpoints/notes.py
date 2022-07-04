@@ -46,26 +46,26 @@ def create_table_note(
                 matiers.append("ec_" + ec[2])
         sesions = ["normal", "rattrapage", "final"]
         for session in sesions:
-            test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours.abreviation,
+            test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours.abbreviation,
                                                     session=session)
             if not test_note:
-                models.note.create_table_note(schemas=schemas, parcours=parcours.abreviation, semestre=semestre,
+                models.note.create_table_note(schemas=schemas, parcours=parcours.abbreviation, semestre=semestre,
                                               matiers=matiers, session=session)
             else:
                 all_columns = crud.note.check_columns_exist(schemas=schemas, semestre=semestre,
-                                                            parcours=parcours.abreviation, session=session)
+                                                            parcours=parcours.abbreviation, session=session)
                 matier = compare_list(matiers, all_columns)
                 if len(matier) != 0:
-                    models.note.update_table_note(schemas=schemas, parcours=parcours.abreviation, semestre=semestre,
+                    models.note.update_table_note(schemas=schemas, parcours=parcours.abbreviation, semestre=semestre,
                                                   matiers=matiers, session=session)
                 else:
                     return crud.note.check_columns_exist(schemas=schemas, semestre=semestre,
-                                                         parcours=parcours.abreviation,
+                                                         parcours=parcours.abbreviation,
                                                          session=session_.lower())
-        test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours.abreviation,
+        test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours.abbreviation,
                                                 session=session_.lower())
         if test_note:
-            return crud.note.check_columns_exist(schemas=schemas, semestre=semestre, parcours=parcours.abreviation,
+            return crud.note.check_columns_exist(schemas=schemas, semestre=semestre, parcours=parcours.abbreviation,
                                                  session=session_.lower())
 
         logging_.script_logging("info",
@@ -96,10 +96,10 @@ def delete_table_note(
         parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
         if not parcours:
             raise HTTPException(status_code=400, detail="Parcours not found")
-        test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours.abreviation,
+        test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours.abbreviation,
                                                 session=session)
         if test_note:
-            if models.note.drop_table_note(schemas=schemas, parcours=parcours.abreviation, session=session,
+            if models.note.drop_table_note(schemas=schemas, parcours=parcours.abbreviation, session=session,
                                            semestre=semestre):
                 return {"msg": "Succces"}
             else:
@@ -109,7 +109,7 @@ def delete_table_note(
         else:
             raise HTTPException(
                 status_code=400,
-                detail=f"note_{parcours.abreviation.lower()}_{semestre.lower()}_{session.lower()} not found.",
+                detail=f"note_{parcours.abbreviation.lower()}_{semestre.lower()}_{session.lower()} not found.",
             )
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
@@ -128,13 +128,13 @@ def get_all_columns(
     parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
     if not parcours:
         raise HTTPException(status_code=400, detail="Parcours not found")
-    test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours.abreviation,
+    test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours.abbreviation,
                                             session=session)
     if test_note:
-        return crud.note.check_columns_exist(schemas=schemas, semestre=semestre, parcours=parcours.abreviation,
+        return crud.note.check_columns_exist(schemas=schemas, semestre=semestre, parcours=parcours.abbreviation,
                                              session=session)
     else:
         raise HTTPException(
             status_code=400,
-            detail=f"note_{parcours.abreviation.lower()}_{semestre.lower()}_{session.lower()} not found.",
+            detail=f"note_{parcours.abbreviation.lower()}_{semestre.lower()}_{session.lower()} not found.",
         )
