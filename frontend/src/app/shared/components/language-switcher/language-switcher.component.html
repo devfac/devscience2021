@@ -1,0 +1,11 @@
+<div class="language-switcher">
+  <button nz-button nzType="link" [class]="translation.translate.currentLang === 'en' ? 'active' : ''"
+    (click)="translation.setTranslationTo('en')">
+    {{ 'shared.language_switcher.en' | translate }}
+  </button>
+  <div class="divider"></div>
+  <button nz-button nzType="link" [class]="translation.translate.currentLang === 'fr' ? 'active' : ''"
+    (click)="translation.setTranslationTo('fr')">
+    {{'shared.language_switcher.fr' | translate }}
+  </button>
+</div>

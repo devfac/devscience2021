@@ -9,7 +9,6 @@ from app.db.base_class import Base
 if TYPE_CHECKING:
     from .user import User  # noqa: F401
     from .journey import Journey  # noqa: F401
-    from .student import Students  # noqa: F401
 
 
 class Mention(Base):
@@ -20,4 +19,3 @@ class Mention(Base):
     plugged = Column(String)
     last_num_carte = Column(Integer)
     journey = relationship("Journey", back_populates="mention")
-    student = relationship("Students", back_populates="mention")

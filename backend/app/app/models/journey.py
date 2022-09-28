@@ -11,7 +11,6 @@ from app.db.base_class import Base
 
 if TYPE_CHECKING:
     from .mention import Mention  # noqa: F401
-    from .student import Students  # noqa: F401
 
 
 class Journey(Base):
@@ -21,5 +20,3 @@ class Journey(Base):
     uuid_mention = Column(UUID(as_uuid=True), ForeignKey("mention.uuid"))
     semester = Column(ARRAY(String))
     mention = relationship("Mention", back_populates="journey")
-    student = relationship("Students", back_populates="journey")
-

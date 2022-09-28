@@ -1,0 +1,88 @@
+<form nz-form [formGroup]="form" class="form"  nzLayout="vertical">
+    <div class="header-title" nz-row>
+        <nz-form-item>
+            <nz-form-label>
+              {{ 'admin.home.college_year.title' | translate }}
+            </nz-form-label>
+            <nz-form-control >
+              <nz-input-group>
+                <nz-select
+                    [ngModel]="data"
+                    formControlName="collegeYear"
+                    [nzPlaceHolder]="'admin.home.college_year.title' | translate"
+                    (ngModelChange)="getAllStudents()"
+                    >
+                    <nz-option *ngFor="let item of all_years"
+                        [nzLabel]="item.title"
+                        [nzValue]="item.title"
+                    >
+                    </nz-option>
+                </nz-select>
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+            <nz-form-label style="margin-left: 30px;">
+              {{ 'admin.home.mention.title' | translate }}
+            </nz-form-label>
+            <nz-form-control >
+              <nz-input-group>
+                <nz-select style="margin-left: 30px;"
+                    [ngModel]="data"
+                    formControlName="mention"
+                    [nzPlaceHolder]="'admin.home.mention.title' | translate"
+                    (ngModelChange)="getAllStudents()"
+                    >
+                    <nz-option *ngFor="let item of all_mention"
+                        [nzLabel]="item.title"
+                        [nzValue]="item.uuid"
+                    >
+                    </nz-option>
+                </nz-select>
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+
+      </div>
+  </form>
+  <div class="header">
+    <div class="header-text">
+        <h3>
+            {{'admin.home.note.title' | translate }}</h3>
+    </div>
+    <div class="button-text">
+        <button nz-button nzType="primary" (click)="addStudent()">
+            <span nz-icon nzType="plus" nzTheme="outline"></span>
+            {{'admin.user.create' | translate | uppercase}}
+        </button>
+    </div>
+  </div>
+  <nz-table #studentList [nzData]="all_students" nzSize="small" [nzPageSize]="10" nzBordered 
+  [nzScroll]="{ x: 200 + 'px' }"> 
+      <thead>
+          <tr>
+            <th> Num Carte</th>
+              <th> Nom</th>
+              <th> Prénom</th>
+              <th> Semestre</th>
+              <th> Parcours</th>
+              <th> Action</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr *ngFor="let data of studentList.data">
+              <td> {{data.num_carte}}</td>
+              <td> {{data.last_name}}</td>
+              <td> {{data.first_name}}</td>
+              <td> {{data.inf_semester}}, {{data.sup_semester}}</td>
+              <td> {{data.journey.abbreviation}}</td>
+              <td>
+                  <a nz-icon nzType="edit" nzTheme="fill" style="font-size: 20px; color: green;"  (click)="showModalEdit(data.num_carte)"></a>
+                  <nz-divider nzType="vertical"></nz-divider>
+                  <a nz-icon nzType="delete" nzTheme="fill" style="font-size: 20px; color: red;" (click)="showConfirm(data.first_name, data.num_carte)"></a>
+              </td>
+              
+          </tr>
+      </tbody>
+  </nz-table>

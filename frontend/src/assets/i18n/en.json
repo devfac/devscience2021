@@ -1,0 +1,271 @@
+{
+  "server_error": "Errors occur on server",
+  "welcomeMessage": "Thanks for joining, {{ firstName }}!",
+  "welcomeContent": "It's great to have you!",
+  "home": "Home",
+  "about": "About",
+  "Dashboard": "Dashboard",
+  "profile": "My account",
+  "manage_profile": "Manage Profile",
+  "change_password": "Change Password",
+  "sign_out": "Sign Out",
+  "shared": {
+    "language_switcher": {
+      "en": "English",
+      "fr": "French"
+    }
+  },
+  "general_data":{
+    "title": "Title",
+    "first_name": "Firstname",
+    "last_name": "Lastname",
+    "save": "Save"
+  },
+  "components": {
+    "notification_dropdown": {
+      "sure": "Are you sûre to hide/archive it ?",
+      "ok": "Ok",
+      "cancel": "Cancel",
+      "all": "All",
+      "unread": "Unread",
+      "view_more": "View more",
+      "view_all": "View all notifications",
+      "details": "Details",
+      "notifications": "Notifications",
+      "unread_notifications": "Unread",
+      "all_notifications": "All",
+      "archived": "Archived"
+    }
+  },
+  "helpers": {
+    "server_error": "Errors occur on server"
+  },
+  "admin": {
+    "profile": {
+      "manage_profile": "Manage Profile",
+      "general": {
+        "title": "General",
+        "email": "E-mail address",
+        "firstname": "First name",
+        "lastname": "Last name",
+        "createAt": "Profile created",
+        "updateAt": "Profile updated",
+        "isadmin": "Admin",
+        "job": "Job",
+        "mention": "Mention",
+        "issuperuser": "Super Admin"
+      },
+      "edit_password": {
+        "title": "Change Password",
+        "old_password": "Old Password",
+        "old_password_error": "Please input the old password!",
+        "new_password": "New Password",
+        "new_password_error": "Password must contain at least 8 caracters with uppercase, lowercase and number",
+        "confirm_password": "Confirmation Password",
+        "confirm_password_error": "Please input the confirmation password!",
+        "confirm_password_mismatch": "Confirmation password mismatch!",
+        "edit_password": "Change Password",
+        "confirm_password_notification": "Password confirmation",
+        "confirm_password_notification_content": "Your password has been chanded, to confirm it click here :"
+      }
+    },
+    "home":{
+      "create":"Create",
+      "delete":"Delete",
+      "update":"Update",
+      "menu": "Menu",
+      "users":{
+        "add_users":"add or update users",
+        "title": "Users",
+        "email": "E-mail",
+        "password": "Password",
+        "confirm_passowrd": "Corfirmed Password",
+        "email_error":"Please input the email address",
+        "password_error": "Please input the password",
+        "confirm_password_error":"Please input the confirmed password"
+      },
+      "mention":{
+        "title": "Mention",
+        "abbreviation": "Abbreviation",
+        "plugged": "Plugged",
+        "last_num_carte": "Last CE",
+        "title_error": "Enter the mention",
+        "abbreviation_error": "Enter the abbreviation",
+        "plugged_error": "Enter the plugged",
+        "last_num_carte_error": "Enter the last CE",
+        "add_mention": "Add or update mention"
+      },
+      "journey":{
+        "title": "Journey",
+        "abbreviation": "Abbreviation",
+        "semester": "Semester",
+        "mention": "Mention",
+        "title_error": "Entrer the journey",
+        "semester_error": "Enter the semeter",
+        "abbreviation_error": "enter the abbreviation",
+        "mention_error": "Choise the mention",
+        "add_journey": "add or update journey"
+      },
+      "role":{
+        "title": "Role",
+        "role_error": "Entrer the role",
+        "add_role": "Add or update role"
+      },
+      "college_year":{
+        "title": "College year",
+        "mean_error": "Entet the mean",
+        "college_year_error": "Enter the college year",
+        "mean": "Mean"
+      },
+      "ue":{
+        "title": "Unité d'enseignement",
+        "title_error":"Enter the Ue",
+        "credit":"Credit",
+        "credit_error":"Enter the credit",
+        "semester":"Semester"
+      },
+      "ec":{
+        "title": "Elément constitutif",
+        "title_error":"Enter the ec",
+        "weight":"Weight",
+        "weight_error":"Enter the Weight",
+        "semester":"Semester",
+        "semester_error":"Choise the Semester",
+        "value_ue_error":"Choise the U.E",
+        "user":"Teacher",
+        "optional":"Optional"
+      },
+      "note":{
+        "title":"Notes"
+      }
+    },
+    "student":{
+      "title":"Add or Update student",
+      "first_name": "Firstname",
+      "last_name":"Lastname",
+      "date_birth":"Birth day",
+      "place_birth":"Birth place",
+      "num_cin": "CIN N°",
+      "date_cin":"Date CIN",
+      "place_cin":"Place CIN",
+      "phone":"Phone number",
+      "price_rigth": "Inscription price",
+      "address":"Address",
+      "sex": "Sexe",
+      "type":"Type",
+      "photo": "Photo",
+      "nation": "Nation",
+      "num_receipt":"Numéro quintance",
+      "date_receipt":"Date quintance",
+      "bacc_year":"Baccalaureat years",
+      "bacc_num":"Baccalaureat number",
+      "bacc_serie":"Baccalaureat Serie",
+      "work":"Job",
+      "father_name":"father name",
+      "father_work":"father job",
+      "mother_name":"mother name",
+      "mother_work":"mother job",
+      "parent_address":"Parent address",
+      "level":"Level",
+      "plugged":"Plugged",
+      "champ_error":"this champ is required",
+      "num_carte":"Carte number",
+      "num_select":"Selection number",
+      "num_insc":"Inscription number",
+      "mean":"Mean",
+      "receip":"Droit d'inscription",
+      "add_receipt":" add Droit d'inscription"
+    },
+    "user":{
+      "create":"Add",
+      "inscription":{
+        "title":"Inscription"
+      },
+      "reinscription":{
+        "title":"Re-inscription"
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "email": "E-mail address",
+      "email_placeholder": "Enter your e-mail address",
+      "email_error": "Please input your e-mail address!",
+      "password": "Password",
+      "password_placeholder": "Password",
+      "password_error": "Please input your password!",
+      "need_help": "Need help, ",
+      "forgot_password": "Forgot your password ?",
+      "login": "Login",
+      "signin": "Sign-In",
+      "new_to_wimse": "New to WIMSE STORE?",
+      "create_account": "Create your WIMSE STORE account"
+    },
+    "registration": {
+      "title": "Registration",
+      "register": "Register now",
+      "firstname": "Firstname",
+      "firstname_placeholder": "Enter your firstname",
+      "firstname_error": "Please input your firstname!",
+      "lastname": "Lastname",
+      "lastname_placeholder": "Enter your lastname",
+      "lastname_error": "Please input your lastname!",
+      "email": "E-mail address",
+      "email_placeholder": "Enter your e-mail address",
+      "email_error": "Please input your e-mail address!",
+      "password": "Password",
+      "password_placeholder": "Password",
+      "password_error": "Password must contain at least 8 caracters with uppercase, lowercase and number",
+      "confirm_password": "Confirmation Password",
+      "confirm_password_error": "Please input the confirmation password!",
+      "confirm_password_mismatch": "Confirmation password mismatch!",
+      "need_help": "Need help, ",
+      "already_account": "Already have an account?",
+      "success": {
+        "title": "E-mail validation sent",
+        "content": "An e-mail to validate your account has been sent successfully!"
+      },
+      "email_confirmation": {
+        "title": "E-mail confirmation",
+        "content": "You have create your account in WISME STORE, to validate your account, please click on this link : ",
+        "confirm": "confirm"
+      },
+      "validate_registration": {
+        "title": "Account activated",
+        "content": "Your e-mail address has been confirmed and your account is now active. You can now login to you new account!",
+        "login": "Login"
+      }
+    },
+    "password": {
+      "changed": {
+        "title": "Password Changed",
+        "content": "Your password has been changed successfully. All instances sessions has been removed. You can now login to you new password!",
+        "login": "Login"
+      },
+      "forgot_password": {
+        "title": "Forgot Password",
+        "email": "E-mail address",
+        "email_placeholder": "Enter your e-mail address",
+        "email_error": "Please input your e-mail address!",
+        "reset_button": "Reset Password",
+        "email_sent": {
+          "title": "E-mail sent",
+          "content": "Reset link password was sent to your e-mail successfully!"
+        },
+        "email_reset": {
+          "title": "Reset password link",
+          "content": "You have request to reset your password. Click on this link : ",
+          "reset": "reset"
+        }
+      },
+      "reset_password": {
+        "title": "Reset Password",
+        "new_password": "New Password",
+        "new_password_error": "Password must contain at least 8 caracters with uppercase, lowercase and number",
+        "confirm_password": "Confirmation Password",
+        "confirm_password_error": "Please input the confirmation password!",
+        "confirm_password_mismatch": "Confirmation password mismatch!"
+      }
+    }
+  }
+}

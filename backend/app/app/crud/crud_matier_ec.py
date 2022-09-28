@@ -1,15 +1,13 @@
+import uuid
 from typing import List, Optional
-
-from sqlalchemy import text
 from uuid import UUID
-from sqlalchemy.inspection import inspect
 
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session
-from sqlalchemy import MetaData,  Table, select, insert, update, delete
+from sqlalchemy import MetaData, Table
+
 from app.crud.base import CRUDBase
-from app.schemas.matier import MatierECUpdate, MatierECCreate,MatierEC
 from app.db.session import engine
+from app.schemas.matier import MatierECUpdate, MatierECCreate, MatierEC
 
 
 class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
@@ -31,48 +29,48 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         out = result.fetchall()
         return out
 
-    def get_by_class(self, schema: str, uuid_parcours: UUID, semestre: str) -> Optional[MatierEC]:
+    def get_by_class(self, schema: str, uuid_journey: UUID, semester: str) -> Optional[MatierEC]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("element_const", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(table.c.semestre == semestre)
-        sel = sel.where(table.c.uuid_parcours == uuid_parcours)
+        sel = sel.where(table.c.semester == semester)
+        sel = sel.where(table.c.uuid_journey == uuid_journey)
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
         return out
 
 
-    def get_by_value_ue(self,schema: str, value_ue: str, semestre:str, uuid_parcours:UUID) -> Optional[MatierEC]:
+    def get_by_value_ue(self,schema: str, value_ue: str, semester:str, uuid_journey:UUID) -> Optional[MatierEC]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("element_const", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(table.c.value_ue == value_ue)
-        sel = sel.where(table.c.semestre == semestre.upper())
-        sel = sel.where(table.c.uuid_parcours == uuid_parcours)
+        sel = sel.where(table.c.semester == semester.upper())
+        sel = sel.where(table.c.uuid_journey == uuid_journey)
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
         return out
 
 
-    def get_by_value(self,schema: str, value: str, semestre:str, uuid_parcours:UUID) -> Optional[MatierEC]:
+    def get_by_value(self,schema: str, value: str, semester:str, uuid_journey:UUID) -> Optional[MatierEC]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("element_const", metadata,autoload=True)
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(table.c.value == value)
-        sel = sel.where(table.c.semestre == semestre.upper())
-        sel = sel.where(table.c.uuid_parcours == uuid_parcours)
+        sel = sel.where(table.c.semester == semester.upper())
+        sel = sel.where(table.c.uuid_journey == uuid_journey)
         result = conn.execute(sel)
         out = result.fetchone()
         conn.close()
         return out
 
 
-    def get_by_uuid(self,schema: str, uuid:UUID) -> Optional[MatierEC]:
+    def get_by_uuid(self,schema: str, uuid:str) -> Optional[MatierEC]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("element_const", metadata,autoload=True)
         conn = engine.connect()
@@ -102,8 +100,8 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(table.c.value == value)
-        sel = sel.where(table.c.semestre == obj_in_data['semestre'])
-        sel = sel.where(table.c.uuid_parcours == obj_in_data['uuid_parcours'])
+        sel = sel.where(table.c.semester == obj_in_data['semester'])
+        sel = sel.where(table.c.uuid_journey == obj_in_data['uuid_journey'])
         result = conn.execute(sel)
         out = result.fetchone()
         conn.close()
@@ -112,6 +110,7 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
 
     def create_ec(self,schema: str, obj_in: MatierECCreate,value:str,key_unique) -> Optional[List[MatierEC]]:
         obj_in_data = jsonable_encoder(obj_in)
+        obj_in_data["uuid"] = str(uuid.uuid4())
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table("element_const", metadata,autoload=True)

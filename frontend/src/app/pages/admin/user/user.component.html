@@ -1,0 +1,24 @@
+<nz-layout class="inner-layout">
+    <nz-sider nzWidth="250px" nzTheme="light">
+      <nz-content class="inner-content">
+        <ul nz-menu nzMode="inline">
+          <li nz-menu-group [nzTitle]="'admin.home.menu' | translate ">
+            <ul>
+              <li nz-menu-item nzSelected routerLink="/user/inscription"
+                [nzSelected]="router.routerState.snapshot.url === '/user/inscription'">
+                <a routerLink="/user/inscription">{{'admin.user.inscription.title' | translate}}</a>
+              </li>
+              <li nz-menu-item nzSelected routerLink="/user/reinscription"
+                [nzSelected]="router.routerState.snapshot.url === '/user/reinscription'">
+                <a routerLink="/user/reinscription">{{'admin.user.reinscription.title' | translate}}</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nz-content>
+    </nz-sider>
+    <nz-content class="inner-content" style="width: 100%">
+      <router-outlet></router-outlet>
+    </nz-content>
+  </nz-layout>
+  

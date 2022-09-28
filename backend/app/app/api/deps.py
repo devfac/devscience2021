@@ -37,10 +37,27 @@ def get_current_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
+
     user = crud.user.get(db, uuid=token_data.uuid)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+
+def get_user(
+        token: str,
+) -> models.User:
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+        )
+        token_data = schemas.TokenPayload(**payload)
+    except (jwt.JWTError, ValidationError):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Could not validate credentials",
+        )
+    return token_data
 
 
 def get_token_info(token: str = Depends(reusable_oauth2)):

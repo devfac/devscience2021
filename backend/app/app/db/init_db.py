@@ -32,10 +32,10 @@ def init_db(db: Session) -> None:
             is_superuser=True,
         )
         user = crud.user.create(db, obj_in=user_in)  # noqa: F841
-    anne_univ_in = schemas.AnneUnivCreate(**{"title": "2020-2021", "moyenne": 9.5})
-    anne_univ = crud.anne_univ.get_by_title(db, title=anne_univ_in.title)
+    anne_univ_in = schemas.CollegeYearCreate(**{"title": "2020-2021", "mean": 9.5})
+    anne_univ = crud.college_year.get_by_title(db, title=anne_univ_in.title)
     if not anne_univ:
-        anne_univ = crud.anne_univ.create(db=db, obj_in=anne_univ_in)
+        anne_univ = crud.college_year.create(db=db, obj_in=anne_univ_in)
         try:
             schem_et = create_anne(anne_univ.title)
             engine.execute(CreateSchema(schem_et))

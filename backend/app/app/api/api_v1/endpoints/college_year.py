@@ -21,15 +21,15 @@ def read_college_year(
     """
     Retrieve anne universitaire.
     """
-    anne_univ = crud.anne_univ.get_multi(db)
-    return anne_univ
+    college_year = crud.college_year.get_multi(db)
+    return college_year
 
 
 @router.post("/", response_model=List[schemas.CollegeYear])
 def create_college_year(
         *,
         db: Session = Depends(deps.get_db),
-        anne_univ_in: schemas.CollegeYearCreate,
+        college_year_in: schemas.CollegeYearCreate,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -37,11 +37,11 @@ def create_college_year(
     """
 
     if crud.user.is_superuser(current_user):
-        anne_univ = crud.anne_univ.get_by_title(db, title=anne_univ_in.title)
-        if not anne_univ:
-            anne_univ = crud.anne_univ.create(db=db, obj_in=anne_univ_in)
+        college_year = crud.college_year.get_by_title(db, title=college_year_in.title)
+        if not college_year:
+            college_year = crud.college_year.create(db=db, obj_in=college_year_in)
             try:
-                schem_et = create_anne(anne_univ.title)
+                schem_et = create_anne(college_year.title)
                 engine.execute(CreateSchema(schem_et))
                 models.etudiant.create(schem_et)
             except sqlalchemy.exc.ProgrammingError as e:
@@ -49,11 +49,11 @@ def create_college_year(
         else:
             raise HTTPException(
                 status_code=400,
-                detail=f"{anne_univ.title} already exists in the system.",
+                detail=f"{college_year.title} already exists in the system.",
             )
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    return crud.anne_univ.get_multi(db=db)
+    return crud.college_year.get_multi(db=db)
 
 
 @router.put("/", response_model=List[schemas.CollegeYear])
@@ -61,22 +61,22 @@ def update_college_year(
         *,
         db: Session = Depends(deps.get_db),
         uuid: str,
-        anne_univ_in: schemas.CollegeYearUpdate,
+        college_year_in: schemas.CollegeYearUpdate,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update an anne universitaire.
     """
-    anne_univ = crud.anne_univ.get_by_uuid(db=db, uuid=uuid)
-    if not anne_univ:
+    college_year = crud.college_year.get_by_uuid(db=db, uuid=uuid)
+    if not college_year:
         raise HTTPException(status_code=404, detail="Anne Univ not found")
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    anne_univ = crud.anne_univ.update(db=db, db_obj=anne_univ, obj_in=anne_univ_in)
-    return crud.anne_univ.get_multi(db=db)
+    college_year = crud.college_year.update(db=db, db_obj=college_year, obj_in=college_year_in)
+    return crud.college_year.get_multi(db=db)
 
 
-@router.get("/by_uuid", response_model=schemas.CollegeYear)
+@router.get("/{uuid}", response_model=schemas.CollegeYear)
 def read_college_year(
         *,
         db: Session = Depends(deps.get_db),
@@ -87,12 +87,12 @@ def read_college_year(
     Get anne universitaire by ID.
     """
 
-    anne_univ = crud.anne_univ.get_by_uuid(db=db, uuid=uuid)
-    if not anne_univ:
+    college_year = crud.college_year.get_by_uuid(db=db, uuid=uuid)
+    if not college_year:
         raise HTTPException(status_code=404, detail="Anne Univ not found")
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    return anne_univ
+    return college_year
 
 
 @router.delete("/", response_model=List[schemas.CollegeYear])
@@ -105,10 +105,10 @@ def delete_college_year(
     """
     Delete anne universitaire.
     """
-    anne_univ = crud.anne_univ.get_by_uuid(db=db, uuid=uuid)
-    if not anne_univ:
+    college_year = crud.college_year.get_by_uuid(db=db, uuid=uuid)
+    if not college_year:
         raise HTTPException(status_code=404, detail="Anne Univ not found")
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    anne_univ = crud.anne_univ.remove_uuid(db=db, uuid=uuid)
-    return crud.anne_univ.get_multi(db=db)
+    college_year = crud.college_year.remove_uuid(db=db, uuid=uuid)
+    return crud.college_year.get_multi(db=db)

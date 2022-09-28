@@ -23,7 +23,7 @@ class PDF(FPDF):
         self.cell(12, 6, txt="", ln=0)
         self.cell(1, 6, txt="à l'intéressé sous peine d'annulation.", ln=0)
 
-    def relever_note(num_carte: str, date: str, data: Any, note: Any) -> str:
+    def relever_note(self, num_carte: str, date: str, data: Any, note: Any) -> str:
 
         pdf = PDF('P', 'mm', 'A4')
         pdf.add_page()
@@ -45,20 +45,20 @@ class PDF(FPDF):
         titre6 = f"N° ___/{date}/UF/FAC.S/S.SCO"
 
         nom = "Nom:"
-        nom_etudiant = f"{data['nom']}"
+        nom_etudiant = f"{data['last_name']}"
         prenom = "Prénom:"
-        prenom_etudiant = f"{data['prenom']}"
+        prenom_etudiant = f"{data['first_name']}"
         naiss = "Né(e) le:"
-        naiss_etudiant = f"{convert_date(data['date_naiss'])} à {data['lieu_naiss']}"
+        naiss_etudiant = f"{convert_date(data['date_birth'])} à {data['place_birth']}"
         numero = "N° carte:"
-        semestre = f"Semestre:"
-        semestre_etudiant = f"{data['semestre']}"
+        semester = f"semester:"
+        semester_etudiant = f"{data['semester']}"
         mention = "Mention:"
         mention_etudiant = f"{data['mention']}"
-        parcours = "Parcours:"
-        parcours_etudiant = f"{data['parcours']}"
+        journey = "journey:"
+        journey_etudiant = f"{data['journey']}"
         session = f"Session:"
-        session_etudiant = f"{data['session']}"
+        sessionetudiant = f"{data['session']}"
         validation_et = f"{data['validation']}"
 
         titre_1 = "Les unité d'enseignements"
@@ -144,24 +144,24 @@ class PDF(FPDF):
 
         pdf.set_font("arial", "BI", 12)
         pdf.cell(18, 6, txt="", ln=0, align="L")
-        pdf.cell(21, 6, txt=parcours, ln=0, align="L")
+        pdf.cell(21, 6, txt=journey, ln=0, align="L")
 
         pdf.set_font("aparaj", "", 14)
-        pdf.cell(0, 6, txt=parcours_etudiant, ln=1)
+        pdf.cell(0, 6, txt=journey_etudiant, ln=1)
 
         pdf.set_font("arial", "BI", 12)
         pdf.cell(18, 6, txt="", ln=0, align="L")
-        pdf.cell(21, 6, txt=semestre, ln=0, align="L")
+        pdf.cell(21, 6, txt=semester, ln=0, align="L")
 
         pdf.set_font("aparaj", "", 14)
-        pdf.cell(0, 6, txt=semestre_etudiant, ln=1)
+        pdf.cell(0, 6, txt=semester_etudiant, ln=1)
 
         pdf.set_font("arial", "BI", 12)
         pdf.cell(18, 6, txt="",  ln=0, align="L")
         pdf.cell(19, 6, txt=session, ln=0, align="L")
 
         pdf.set_font("aparaj", "", 14)
-        pdf.cell(0, 6, txt=session_etudiant, ln=1)
+        pdf.cell(0, 6, txt=sessionetudiant, ln=1)
 
         # debut de creation du tableau
         pdf.cell(30, 2, txt="", ln=1)

@@ -127,9 +127,9 @@ def update_etudiant(
     if not mention:
         raise HTTPException(status_code=400, detail=f" Mention not found.", )
 
-    parcours = crud.parcours.get_by_uuid(db=db, uuid=etudiant_in.uuid_parcours)
-    if not parcours:
-        raise HTTPException(status_code=400, detail=f" Parcours not found.", )
+    journey = crud.journey.get_by_uuid(db=db, uuid=etudiant_in.uuid_journey)
+    if not journey:
+        raise HTTPException(status_code=400, detail=f" journey not found.", )
 
     all_etudiant = crud.nouveau_etudiant.get_by_num_select_admis(schema=schema, branche=etudiant.branche)
     num = int(mention.last_num_carte) + len(all_etudiant) + 1
@@ -145,8 +145,8 @@ def update_etudiant(
     etudiant_create = {}
     for key in schemas.keys:
         etudiant_create[key] = jsonable_encoder(etudiant)[key]
-    etudiant_create["semestre_petit"] = get_sems_min(jsonable_encoder(etudiant)["niveau"])
-    etudiant_create["semestre_grand"] = get_sems_max(jsonable_encoder(etudiant)["niveau"])
+    etudiant_create["semester_petit"] = get_sems_min(jsonable_encoder(etudiant)["niveau"])
+    etudiant_create["semester_grand"] = get_sems_max(jsonable_encoder(etudiant)["niveau"])
     etudiant_ = crud.ancien_etudiant.get_by_num_carte(schema=schema, num_carte=etudiant_create["num_carte"])
     if etudiant_:
         etudiant = crud.ancien_etudiant.update_etudiant(schema=schema, num_carte=etudiant_create["num_carte"],
@@ -217,21 +217,21 @@ def read_etudiant_by_mention(
     return etudiant
 
 
-@router.get("/by_parcours/", response_model=List[Any])
+@router.get("/by_journey/", response_model=List[Any])
 def read_etudiant_by_mention(
         *,
         db: Session = Depends(deps.get_db),
         schema: str,
-        uuid_parcours: str,
+        uuid_journey: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Get etudiant by parcours.
+    Get etudiant by journey.
     """
     anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
     if not anne_univ:
         raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schema)} not found.", )
-    etudiant = crud.nouveau_etudiant.get_by_parcours(schema=schema, uuid_parcours=uuid_parcours)
+    etudiant = crud.nouveau_etudiant.get_by_journey(schema=schema, uuid_journey=uuid_journey)
     return etudiant
 
 

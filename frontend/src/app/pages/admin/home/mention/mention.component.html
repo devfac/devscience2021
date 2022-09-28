@@ -1,0 +1,100 @@
+<div class="container" ><div class="header">
+    <div class="header-text">
+        <h3>Mention list</h3>
+    </div>
+    <div class="button-text">
+        <button nz-button nzType="primary" (click)="showModal()">
+            <span nz-icon nzType="plus" nzTheme="outline"></span>
+            Ajouter
+        </button>
+    </div>
+        
+</div>
+    <nz-table #mentionList [nzData]="all_mention" nzSize="small" [nzPageSize]="10" nzBordered [nzScroll]="{ x: 200 + 'px' }"> 
+        <thead>
+            <tr>
+                <th> Title</th>
+                <th> Abreviation</th>
+                <th> Branche</th>
+                <th> Last CE</th>
+                <th> Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let data of mentionList.data">
+                <td> {{data.title}}</td>
+                <td> {{data.abbreviation}}</td>
+                <td> {{data.plugged}}</td>
+                <td> {{data.last_num_carte}}</td>
+                <td>
+                    <a nz-icon nzType="edit" nzTheme="fill" style="font-size: 20px; color: green;" (click)="showModalEdit(data.uuid)"></a>
+                    <nz-divider nzType="vertical"></nz-divider>
+                    <a nz-icon nzType="delete" nzTheme="fill" style="font-size: 20px; color: red;" (click)="showConfirm(data.title, data.uuid)"></a>
+                </td>
+            </tr>
+        </tbody>
+    </nz-table>
+    <nz-modal [(nzVisible)]="isvisible" 
+              nzTitle="{{'admin.home.mention.add_mention' | translate}}" 
+              (nzOnCancel)="handleCancel()" 
+              nzMask="true"
+              nzMaskClosable="false" >
+        <div *nzModalContent>
+            <form nz-form [formGroup]="form" class="form" (ngSubmit)="submitForm()" nzLayout="vertical">
+                <nz-form-item>
+                  <nz-form-label nzRequired>
+                    {{ 'admin.home.mention.title' | translate }}
+                  </nz-form-label>
+                  <nz-form-control [nzErrorTip]="'admin.home.mention.title_error' | translate">
+                    <nz-input-group>
+                      <input type="text" nz-input formControlName="title" appCustomAutoFocus
+                        [placeholder]="'general_data.title' | translate" />
+                    </nz-input-group>
+                  </nz-form-control>
+
+                </nz-form-item>
+                <nz-form-item>
+                    <nz-form-label nzRequired>
+                      {{ 'admin.home.mention.abbreviation' | translate }}
+                    </nz-form-label>
+                    <nz-form-control [nzErrorTip]="'admin.home.mention.abbreviation_error' | translate">
+                      <nz-input-group>
+                        <input type="text" nz-input formControlName="abbreviation" appCustomAutoFocus
+                          [placeholder]="'admin.home.mention.abbreviation' | translate" />
+                      </nz-input-group>
+                    </nz-form-control>
+                  </nz-form-item>
+                  <nz-form-item>
+                    <nz-form-label nzRequired>
+                      {{ 'admin.home.mention.plugged' | translate }}
+                    </nz-form-label>
+                    <nz-form-control [nzErrorTip]="'admin.home.mention.plugged_error' | translate">
+                      <nz-input-group>
+                        <input type="text" nz-input formControlName="plugged" appCustomAutoFocus
+                          [placeholder]="'admin.home.mention.plugged' | translate" />
+                      </nz-input-group>
+                    </nz-form-control>
+
+                  </nz-form-item>
+                  <nz-form-item>
+                    <nz-form-label nzRequired>
+                      {{ 'admin.home.mention.last_num_carte' | translate }}
+                    </nz-form-label>
+                    <nz-form-control [nzErrorTip]="'admin.home.mention.last_num_carte_error' | translate">
+                      <nz-input-group>
+                        <input type="number" nz-input formControlName="last_num_carte" appCustomAutoFocus
+                          [placeholder]="'admin.home.mention.last_num_carte' | translate" />
+                      </nz-input-group>
+                    </nz-form-control>
+                  </nz-form-item>
+                <nz-spin [nzSpinning]="isConfirmLoading">
+                    <button nz-button class="form-button form-margin" [nzType]="'primary'">
+                      {{'general_data.save' | translate | uppercase}}
+                    </button>
+                </nz-spin>
+            </form>
+        </div>
+        <div *nzModalFooter>
+            </div>
+    </nz-modal>
+</div>

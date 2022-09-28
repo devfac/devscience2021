@@ -1,11 +1,13 @@
-from typing import List, Optional, Any
+from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
-from sqlalchemy.sql.sqltypes import ARRAY
 
 
 # Shared properties
+from .mention import Mention
+
+
 class JourneyBase(BaseModel):
     title: Optional[str] = None
     abbreviation: Optional[str]
@@ -38,7 +40,7 @@ class JourneyInDBBase(JourneyBase):
 
 # Additional properties to return via API
 class Journey(JourneyInDBBase):
-    pass
+    mention: Optional[Mention]
 
 
 # Additional properties stored in DB

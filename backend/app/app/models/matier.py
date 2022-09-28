@@ -15,9 +15,9 @@ def create(schemas):
                           Column("title", String),
                           Column("value", String),
                           Column("credit", Integer),
-                          Column("semestre", String),
+                          Column("semester", String),
                           Column("key_unique", String),
-                          Column("uuid_parcours", UUID(as_uuid=True)),
+                          Column("uuid_journey", UUID(as_uuid=True)),
                           Column("uuid_mention", UUID(as_uuid=True)),
                           schema=schemas
                           )
@@ -25,13 +25,13 @@ def create(schemas):
                           Column("uuid", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
                           Column("title", String),
                           Column("value", String),
-                          Column("poids", Float),
+                          Column("weight", Float),
                           Column("value_ue", String),
-                          Column("utilisateur", String),
-                          Column("semestre", String),
+                          Column("users", String),
+                          Column("semester", String),
                           Column("is_optional", Boolean),
                           Column("key_unique", String),
-                          Column("uuid_parcours", UUID(as_uuid=True)),
+                          Column("uuid_journey", UUID(as_uuid=True)),
                           Column("uuid_mention", UUID(as_uuid=True)),
                           schema=schemas
                           )

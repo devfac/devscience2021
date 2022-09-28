@@ -22,7 +22,7 @@ keys = [
     "num_quitance",
     "date_quitance",
     "uuid_mention",
-    "uuid_parcours"
+    "uuid_journey"
 ]
 
 
@@ -86,9 +86,9 @@ class EtudiantAncienCreate(EtudiantBase):
     num_quitance: str
     date_quitance: str
     uuid_mention: UUID
-    uuid_parcours: UUID
-    semestre_petit: str
-    semestre_grand: str
+    uuid_journey: UUID
+    semester_petit: str
+    semester_grand: str
 
 
 class EtudiantNouveauCreate(EtudiantBase):
@@ -122,7 +122,7 @@ class EtudiantNouveauCreate(EtudiantBase):
     niveau: str
     branche: str
     uuid_mention: UUID
-    uuid_parcours: UUID
+    uuid_journey: UUID
 
 
 # Properties to receive via API on update
@@ -131,9 +131,9 @@ class EtudiantAncienUpdate(EtudiantBase):
     num_carte: Optional[str]
     bacc_anne: Optional[str]
     uuid_mention: Optional[UUID]
-    uuid_parcours: Optional[UUID]
-    semestre_petit: Optional[str]
-    semestre_grand: Optional[str]
+    uuid_journey: Optional[UUID]
+    semester_petit: Optional[str]
+    semester_grand: Optional[str]
 
 
 class EtudiantNouveauUpdate(EtudiantBase):
@@ -153,7 +153,7 @@ class EtudiantNouveauUpdate(EtudiantBase):
     branche: Optional[str]
     niveau: Optional[str]
     uuid_mention: Optional[UUID]
-    uuid_parcours: Optional[UUID]
+    uuid_journey: Optional[UUID]
     select: Optional[bool] = True
 
 
@@ -162,8 +162,8 @@ class EtudiantAncienInDBBase(EtudiantBase):
     num_carte: Optional[str]
     bacc_anne: Optional[str]
     moyenne: Optional[float] = None
-    semestre_petit: Optional[str]
-    semestre_grand: Optional[str]
+    semester_petit: Optional[str]
+    semester_grand: Optional[str]
 
     class Config:
         orm_mode = True
@@ -191,7 +191,7 @@ class EtudiantNouveauInDBBase(EtudiantBase):
 
 # Additional properties to return via API
 class EtudiantAncien(EtudiantAncienInDBBase):
-    parcours: Optional[str]
+    journey: Optional[str]
 
 
 # Additional properties stored in DB
@@ -217,4 +217,4 @@ class EtudiantCarte(BaseModel):
     num_cin: Optional[str]
     date_cin: Optional[str]
     lieu_cin: Optional[str]
-    parcours: str
+    journey: str

@@ -17,8 +17,8 @@ class CollegeYearCreate(CollegeYearBase):
 
 
 # Properties to receive via API on update
-class CollegeYearUpdate(CollegeYearBase):
-    pass
+class CollegeYearUpdate(BaseModel):
+    mean: Optional[float]
 
 
 class CollegeYearInDBBase(CollegeYearBase):

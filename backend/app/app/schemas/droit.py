@@ -5,25 +5,25 @@ from pydantic import BaseModel
 
 # Shared properties
 class DroitBase(BaseModel):
-    niveau: Optional[str]
+    level: Optional[str]
     droit: Optional[str]
-    annee: Optional[str]
+    year: Optional[str]
     uuid_mention: Optional[UUID]
 
 
 # Properties to receive via API on creation
 class DroitCreate(DroitBase):
-    niveau: str
+    level: str
     droit:str
-    annee: str
+    year: str
     uuid_mention: UUID
 
 
 # Properties to receive via API on update
 class DroitUpdate(DroitBase):
-    niveau: Optional[str]
+    level: Optional[str]
     droit: Optional[str]
-    annee: Optional[str]
+    year: Optional[str]
     uuid_mention: Optional[UUID]
 
 

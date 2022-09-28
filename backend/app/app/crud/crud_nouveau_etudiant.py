@@ -119,12 +119,12 @@ class CRUDEtudiantNouveau(CRUDBase[EtudiantNouveau, EtudiantNouveauCreate, Etudi
         conn.close()
         return out
 
-    def get_by_parcours(self, schema: str, uuid_parcours: str) -> Optional[EtudiantNouveau]:
+    def get_by_journey(self, schema: str, uuid_journey: str) -> Optional[EtudiantNouveau]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("nouveau_etudiant", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(table.columns.uuid_parcours == uuid_parcours)
+        sel = sel.where(table.columns.uuid_journey == uuid_journey)
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()

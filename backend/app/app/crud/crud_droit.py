@@ -14,9 +14,13 @@ class CRUDDroit(CRUDBase[Droit, DroitCreate, DroitUpdate]):
     def get_by_uuid(self, db: Session, *, uuid: str) -> Optional[Droit]:
         return db.query(Droit).filter(Droit.uuid == uuid).first()
 
+
+    def get_by_mention_and_year(self, db: Session, *, uuid_mention: str, year: str) -> Optional[Droit]:
+        return db.query(Droit).filter(and_(Droit.uuid_mention == uuid_mention, Droit.year == year)).all()
+
     
-    def get_by_niveau_and_annee(self, db: Session, *, niveau: str, annee:str, uuid_mention:str) -> Optional[Droit]:
-        return db.query(Droit).filter( and_(Droit.niveau == niveau, Droit.annee == annee, Droit.uuid_mention == uuid_mention)).first()
+    def get_by_level_and_year(self, db: Session, *, level: str, year:str, uuid_mention:str) -> Optional[Droit]:
+        return db.query(Droit).filter( and_(Droit.level == level, Droit.year == year, Droit.uuid_mention == uuid_mention)).first()
         
     def create(
         self, db: Session, *, obj_in: DroitCreate

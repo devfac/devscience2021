@@ -1,0 +1,149 @@
+<form nz-form [formGroup]="form" class="form" (ngSubmit)="submitForm()" nzLayout="vertical">
+        <div class="header-title" nz-row>
+            <nz-form-item>
+                <nz-form-label>
+                  {{ 'admin.home.college_year.title' | translate }}
+                </nz-form-label>
+                <nz-form-control >
+                  <nz-input-group>
+                    <nz-select
+                        [ngModel]="data"
+                        formControlName="collegeYear"
+                        [nzPlaceHolder]="'admin.home.college_year.title' | translate"
+                        >
+                        <nz-option *ngFor="let item of all_years"
+                            [nzLabel]="item.title"
+                            [nzValue]="item.title"
+                        >
+                        </nz-option>
+                    </nz-select>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item>
+                <nz-form-label style="margin-left: 30px;">
+                  {{ 'admin.home.mention.title' | translate }}
+                </nz-form-label>
+                <nz-form-control >
+                  <nz-input-group>
+                    <nz-select style="margin-left: 30px;"
+                        [ngModel]="data"
+                        formControlName="mention"
+                        [nzPlaceHolder]="'admin.home.mention.title' | translate"
+                        >
+                        <nz-option *ngFor="let item of all_mention"
+                            [nzLabel]="item.title"
+                            [nzValue]="item.uuid"
+                        >
+                        </nz-option>
+                    </nz-select>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item>
+                <nz-form-label style="margin-left: 30px;">
+                  {{ 'admin.home.journey.title' | translate }}
+                </nz-form-label>
+                <nz-form-control >
+                  <nz-input-group>
+                    <nz-select style="margin-left: 30px;"
+                        [ngModel]="data"
+                        formControlName="journey"
+                        [nzPlaceHolder]="'admin.home.journey.title' | translate"
+                        >
+                        <nz-option *ngFor="let item of all_journey"
+                            [nzLabel]="item.abbreviation"
+                            [nzValue]="item.uuid"
+                        >
+                        </nz-option>
+                    </nz-select>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item>
+                <nz-form-label style="margin-left: 30px;">
+                  {{ 'admin.home.journey.semester' | translate }}
+                </nz-form-label>
+                <nz-form-control >
+                  <nz-input-group>
+                    <nz-select style="margin-left: 30px;"
+                        [ngModel]="data"
+                        formControlName="semester"
+                        [nzPlaceHolder]="'admin.home.journey.semester' | translate"
+                        (ngModelChange)="getAllColumnsSession()"
+                        >
+                        <nz-option *ngFor="let item of listOfSemester"
+                            [nzLabel]="item"
+                            [nzValue]="item"
+                        >
+                        </nz-option>
+                    </nz-select>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item>
+                <nz-form-label style="margin-left: 30px;">
+                  {{ 'admin.home.note.session' | translate }}
+                </nz-form-label>
+                <nz-form-control >
+                  <nz-input-group>
+                    <nz-select style="margin-left: 30px;"
+                        [ngModel]="data"
+                        formControlName="session"
+                        [nzPlaceHolder]="'admin.home.note.session' | translate"
+                        (ngModelChange)="getAllColumnsSemester()"
+                        >
+                        <nz-option *ngFor="let item of listOfSession"
+                            [nzLabel]="item"
+                            [nzValue]="item"
+                        >
+                        </nz-option>
+                    </nz-select>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+    </div>
+  </form>
+
+  <div class="header">
+    <div class="header-text">
+        <h3>
+            {{'admin.home.note.title' | translate }}</h3>
+    </div>
+    <div class="button-text">
+        <button nz-button nzType="primary" (click)="submitForm()">
+            <span nz-icon nzType="plus" nzTheme="outline"></span>
+            {{'admin.home.create' | translate | uppercase}}
+        </button>
+        <label> | </label>
+        <button nz-button nzType="primary" (click)="submitForm()">
+            <span nz-icon nzType="delete" nzTheme="outline"></span>
+            {{'admin.home.delete' | translate | uppercase}}
+        </button>
+    </div>
+  </div>
+<nz-table #usersList [nzData]="all_columns" nzSize="small" [nzPageSize]="10" nzBordered > 
+    <thead>
+        <tr>
+            <th  *ngFor="let data of usersList.data">
+                <div style="width: auto;">
+                    {{data}}
+                </div>
+            </th>
+            <th nzRight> Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let data of usersList.data">
+            <td  *ngFor="let data of all_columns"> data</td>
+            <td nzRight>
+                <a nz-icon nzType="edit" nzTheme="fill" style="font-size: 20px; color: green;" ></a>
+                <nz-divider nzType="vertical"></nz-divider>
+                <a nz-icon nzType="delete" nzTheme="fill" style="font-size: 20px; color: red;" (click)="showConfirm(data.title, data.uuid)"></a>
+            </td>
+    </tbody>
+</nz-table>

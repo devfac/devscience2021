@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.get("/", response_model=List[schemas.Droit])
-def read_droits(
+def read_droit(
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -20,6 +20,20 @@ def read_droits(
     droit = crud.droit.get_multi(db=db)
     return droit
 
+
+@router.get("/by_mention", response_model=List[schemas.Droit])
+def read_droit(
+    *,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+    uuid_mention: str,
+    year: str,
+) -> Any:
+    """
+    Retrieve droits.
+    """
+    droit = crud.droit.get_by_mention_and_year(db=db, uuid_mention=uuid_mention, year=year)
+    return droit
 
 @router.post("/", response_model=List[schemas.Droit])
 def create_droit(
@@ -58,23 +72,21 @@ def update_droit(
     return crud.droit.get_multi(db=db)
 
 
-@router.get("/by_niveau_and_annee", response_model=schemas.Droit)
+@router.get("/by_level_and_year", response_model=schemas.Droit)
 def read_droit(
     *,
     db: Session = Depends(deps.get_db),
     uuid_mention: str,
-    annee:str,
-    niveau:str,
+    year:str,
+    level:str,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get droit by ID.
     """
-    droit = crud.droit.get_by_niveau_and_annee(db=db, niveau=niveau, annee=annee, uuid_mention=uuid_mention)
+    droit = crud.droit.get_by_level_and_year(db=db, level=level, year=year, uuid_mention=uuid_mention)
     if not droit:
         raise HTTPException(status_code=404, detail="droit not found")
-    if not crud.user.is_superuser(current_user):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
     return droit
 
 
