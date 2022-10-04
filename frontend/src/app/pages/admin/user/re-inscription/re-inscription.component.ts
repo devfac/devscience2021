@@ -7,7 +7,7 @@ import { CollegeYear } from '@app/models/collegeYear';
 import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
 import { Role } from '@app/models/role';
-import { AncienStudent } from '@app/models/student-ancien';
+import { AncienStudent, StudentColumn, ColumnItem } from '@app/models/student';
 import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import {AuthService} from '../../../../services/auth/auth.service'
@@ -31,6 +31,8 @@ export class ReInscriptionComponent implements OnInit {
   all_students: AncienStudent[] = []
   all_journey: Journey[] = []
   all_mention: Mention[] = []
+  listOfSemester = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
+  semesterTitles: any[] = []
   confirmModal?: NzModalRef
   form!: FormGroup;
   isvisible = false;
@@ -43,6 +45,74 @@ export class ReInscriptionComponent implements OnInit {
   options = {
     headers: this.headers
   }
+  listOfColumns: ColumnItem[] = [
+
+    {
+      name:"Num carte",
+      sortOrder: null,
+      sortFn: null,
+      sortDirections: ['ascend', 'descend', null],
+      filterMultiple: true,
+      listOfFilter: [],
+      filterFn: null
+    },
+    {
+      name:"Nom",
+      sortOrder: null,
+      sortFn: (a: StudentColumn, b:StudentColumn) => a.last_name.localeCompare(b.last_name),
+      sortDirections: ['ascend', 'descend', null],
+      filterMultiple: true,
+      listOfFilter: [],
+      filterFn: null
+    },
+
+    {
+      name:"Prenom",
+      sortOrder: null,
+      sortFn: null,
+      sortDirections: ['ascend', 'descend', null],
+      filterMultiple: true,
+      listOfFilter: [],
+      filterFn: null
+    },
+    {
+      name:"Semester inf",
+      sortOrder: null,
+      sortFn: (a: StudentColumn, b:StudentColumn) => a.inf_semester.localeCompare(b.inf_semester),
+      sortDirections: ['ascend','descend', null],
+      filterMultiple: false,
+      listOfFilter: this.semesterTitles,
+      filterFn:(semester: string, item: StudentColumn) => item.inf_semester.indexOf(semester) !== -1
+    },
+    {
+      name:"Semester sup",
+      sortOrder: null,
+      sortFn: (a: StudentColumn, b:StudentColumn) => a.sup_semester.localeCompare(b.sup_semester),
+      sortDirections: ['ascend','descend', null],
+      filterMultiple: false,
+      listOfFilter: this.semesterTitles,
+      filterFn:(semester: string, item: StudentColumn) => item.sup_semester.indexOf(semester) !== -1
+    },
+    {
+      name:"Parcours",
+      sortOrder: null,
+      sortFn: (a: StudentColumn, b:StudentColumn) => a.journey.abbreviation.localeCompare(b.journey.abbreviation),
+      sortDirections: ['ascend','descend', null],
+      filterMultiple: false,
+      listOfFilter: [],
+      filterFn:(list: string[], item: StudentColumn) => list.some(journey => item.journey.abbreviation.indexOf(journey) !== -1)
+    },
+    {
+      name:"Action",
+      sortOrder: null,
+      sortFn: null,
+      sortDirections: ['ascend', 'descend', null],
+      filterMultiple: true,
+      listOfFilter: [],
+      filterFn:null
+    },
+  ]
+
   constructor(
     private http: HttpClient, 
     private modal: NzModalService, 
@@ -77,6 +147,15 @@ export class ReInscriptionComponent implements OnInit {
           },
           error => console.error("error as ", error)
       );
+    }
+
+
+    for(let i=0; i<this.listOfSemester.length; i++){
+      this.semesterTitles.push(
+        {
+          text: this.listOfSemester[i], value: this.listOfSemester[i]
+        }
+      )
     }
     
     this.http.get<CollegeYear[]>(`${BASE_URL}/college_year/`, options).subscribe(

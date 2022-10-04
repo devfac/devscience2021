@@ -4,13 +4,17 @@
         <ul nz-menu nzMode="inline">
           <li nz-menu-group [nzTitle]="'admin.home.menu' | translate ">
             <ul>
+              <li nz-menu-item nzSelected routerLink="/user/reinscription"
+                [nzSelected]="router.routerState.snapshot.url === '/user/reinscription'">
+                <a routerLink="/user/reinscription">{{'admin.user.reinscription.title' | translate}}</a>
+              </li>
               <li nz-menu-item nzSelected routerLink="/user/inscription"
                 [nzSelected]="router.routerState.snapshot.url === '/user/inscription'">
                 <a routerLink="/user/inscription">{{'admin.user.inscription.title' | translate}}</a>
               </li>
-              <li nz-menu-item nzSelected routerLink="/user/reinscription"
-                [nzSelected]="router.routerState.snapshot.url === '/user/reinscription'">
-                <a routerLink="/user/reinscription">{{'admin.user.reinscription.title' | translate}}</a>
+              <li nz-menu-item nzSelected routerLink="/user/selection"
+                [nzSelected]="router.routerState.snapshot.url === '/user/selection'">
+                <a routerLink="/user/selection">{{'admin.user.selection.title' | translate}}</a>
               </li>
             </ul>
           </li>

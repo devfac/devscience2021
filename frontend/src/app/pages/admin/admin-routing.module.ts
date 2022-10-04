@@ -32,7 +32,7 @@ const routes: Routes = [
       {
         path: 'user',
         loadChildren: () => import('./user/user.module').then((m) => m.UserModule),
-        data: { breadcrumb: 'upload'},
+        data: { breadcrumb: 'user'},
         canActivate: [AuthGuardSuperUser],
       },
       {

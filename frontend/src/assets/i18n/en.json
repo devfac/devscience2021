@@ -162,9 +162,9 @@
       "bacc_serie":"Baccalaureat Serie",
       "work":"Job",
       "father_name":"father name",
-      "father_work":"father job",
+      "father_work":"father work",
       "mother_name":"mother name",
-      "mother_work":"mother job",
+      "mother_work":"mother work",
       "parent_address":"Parent address",
       "level":"Level",
       "plugged":"Plugged",
@@ -174,7 +174,8 @@
       "num_insc":"Inscription number",
       "mean":"Mean",
       "receip":"Droit d'inscription",
-      "add_receipt":" add Droit d'inscription"
+      "add_receipt":" add Droit d'inscription",
+      "situation":"Situation Famillial"
     },
     "user":{
       "create":"Add",
@@ -183,6 +184,10 @@
       },
       "reinscription":{
         "title":"Re-inscription"
+      },
+      "selection":{
+        "title":"Selection",
+        "is_selected":"Selected"
       }
     }
   },

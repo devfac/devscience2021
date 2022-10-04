@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CollegeYear } from '@app/models/collegeYear';
 import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
-import { Ue } from '@app/models/ue';
+import { ColumnItem, Ue, UeColumn } from '@app/models/ue';
 import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 
@@ -26,6 +26,7 @@ export class UeComponent implements OnInit {
   all_mention: Mention[] = []
   all_ue: Ue[] = []
   listOfSemester = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
+  semesterTitles: any[] = []
   confirmModal?: NzModalRef;
   form!: FormGroup;
   form_years!: FormGroup;
@@ -41,6 +42,53 @@ export class UeComponent implements OnInit {
     headers: this.headers
   }
 
+  listOfColumns: ColumnItem[] = [
+    {
+      name:"Title",
+      sortOrder: null,
+      sortFn: (a: UeColumn, b:UeColumn) => a.title.localeCompare(b.title),
+      sortDirections: ['ascend', 'descend', null],
+      filterMultiple: true,
+      listOfFilter: [],
+      filterFn: null
+    },
+    {
+      name:"Journey",
+      sortOrder: null,
+      sortFn: (a: UeColumn, b:UeColumn) => a.abbreviation_journey.localeCompare(b.abbreviation_journey),
+      sortDirections: ['ascend','descend', null],
+      filterMultiple: false,
+      listOfFilter: [],
+      filterFn:(list: string[], item: UeColumn) => list.some(journey => item.abbreviation_journey.indexOf(journey) !== -1)
+    },
+    {
+      name:"Semester",
+      sortOrder: null,
+      sortFn: (a: UeColumn, b:UeColumn) => a.semester.localeCompare(b.semester),
+      sortDirections: ['ascend','descend', null],
+      filterMultiple: false,
+      listOfFilter: this.semesterTitles,
+      filterFn:(semester: string, item: UeColumn) => item.semester.indexOf(semester) !== -1
+    },
+    {
+      name:"Poids",
+      sortOrder: null,
+      sortFn: null,
+      sortDirections: ['ascend', 'descend', null],
+      filterMultiple: true,
+      listOfFilter: [],
+      filterFn: null
+    },
+    {
+      name:"Action",
+      sortOrder: null,
+      sortFn: null,
+      sortDirections: ['ascend', 'descend', null],
+      filterMultiple: true,
+      listOfFilter: [],
+      filterFn:null
+    },
+  ]
   constructor(private http: HttpClient,  private modal: NzModalService, private fb: FormBuilder) { }
 
   ngOnInit(): void {
@@ -68,6 +116,14 @@ export class UeComponent implements OnInit {
       },
       error => console.error("error as ", error)
     );
+
+    for(let i=0; i<this.listOfSemester.length; i++){
+      this.semesterTitles.push(
+        {
+          text: this.listOfSemester[i], value: this.listOfSemester[i]
+        }
+      )
+    }
 
     this.form = this.fb.group({
       title: [null, [Validators.required]],

@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Journey } from '@app/models/journey';
+import { ColumnItem, Journey, JourneyColumn } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
 import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
@@ -24,6 +24,7 @@ export class JourneyComponent implements OnInit {
   all_journey: Journey[] = []
   all_mention: Mention[] = []
   listOfOptions = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
+  semesterTitles: any[] = []
   listOfTagsOptions =[] 
   confirmModal?: NzModalRef;
   form!: FormGroup;
@@ -37,6 +38,54 @@ export class JourneyComponent implements OnInit {
   options = {
     headers: this.headers
   }
+
+  listOfColumns: ColumnItem[] = [
+    {
+      name:"Title",
+      sortOrder: null,
+      sortFn: (a: JourneyColumn, b:JourneyColumn) => a.title.localeCompare(b.title),
+      sortDirections: ['ascend', 'descend', null],
+      filterMultiple: true,
+      listOfFilter: [],
+      filterFn: null
+    },
+    {
+      name:"Abbréviation",
+      sortOrder: null,
+      sortFn: (a: JourneyColumn, b:JourneyColumn) => a.abbreviation.localeCompare(b.abbreviation),
+      sortDirections: ['ascend','descend', null],
+      filterMultiple: false,
+      listOfFilter: [],
+      filterFn: null,
+    },
+    {
+      name:"Semester",
+      sortOrder: null,
+      sortFn: null,
+      sortDirections: [null],
+      filterMultiple: false,
+      listOfFilter: [],
+      filterFn: null
+    },
+    {
+      name:"Mention",
+      sortOrder: null,
+      sortFn: (a: JourneyColumn, b:JourneyColumn) => a.mention_title.localeCompare(b.mention_title),
+      sortDirections: ['ascend','descend', null],
+      filterMultiple: false,
+      listOfFilter: this.semesterTitles,
+      filterFn:(mention_title: string, item: JourneyColumn) => item.mention_title.indexOf(mention_title) !== -1
+    },
+    {
+      name:"Action",
+      sortOrder: null,
+      sortFn: null,
+      sortDirections: [null],
+      filterMultiple: false,
+      listOfFilter: [],
+      filterFn:null
+    },
+  ]
 
   constructor(private http: HttpClient,  private modal: NzModalService, private fb: FormBuilder) { }
 

@@ -150,9 +150,6 @@ export class EcComponent implements OnInit {
       )
     }
 
-    var test = localStorage.getItem('filter') || ''
-    this.titles=JSON.parse(test)
-    console.log(this.titles)
 
     this.http.get<CollegeYear[]>(`${BASE_URL}/college_year/`, options).subscribe(
       data => {

@@ -162,7 +162,7 @@
       "work":"Profession",
       "father_name":"Nom du père",
       "father_work":"Profession du père",
-      "mother_name":"Nom du mère",
+      "mother_name":"Nom de la mère",
       "mother_work":"Profession de la mère",
       "parent_address":"Adresse des parents",
       "level":"Niveau",
@@ -173,7 +173,8 @@
       "num_insc":"Numéro inscription",
       "mean":"Moyenne",
       "receipt":"Droit d'inscription",
-      "add_receipt":" Ajouter droit d'inscription"
+      "add_receipt":" Ajouter droit d'inscription",
+      "situation":"Situation Famillial"
 
     },
     "user":{
@@ -183,6 +184,10 @@
       },
       "reinscription":{
         "title":"Re-inscription"
+      },
+      "selection":{
+        "title":"Selection de dossier",
+        "is_selected":"Selecioné"
       }
     }
   },

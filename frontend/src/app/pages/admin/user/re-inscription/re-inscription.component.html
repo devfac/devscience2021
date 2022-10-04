@@ -62,12 +62,17 @@
   [nzScroll]="{ x: 200 + 'px' }"> 
       <thead>
           <tr>
-            <th> Num Carte</th>
-              <th> Nom</th>
-              <th> Prénom</th>
-              <th> Semestre</th>
-              <th> Parcours</th>
-              <th> Action</th>
+            <tr>
+              <th *ngFor="let column of listOfColumns"
+              [nzSortOrder]="column.sortOrder"
+              [nzSortFn]="column.sortFn"
+              [nzSortDirections]="column.sortDirections"
+              [nzFilterMultiple]="column.filterMultiple"
+              [nzFilters]="column.listOfFilter"
+              [nzFilterFn]="column.filterFn"
+              > 
+            {{ column.name}}
+          </th>
           </tr>
       </thead>
       <tbody>
@@ -75,7 +80,8 @@
               <td> {{data.num_carte}}</td>
               <td> {{data.last_name}}</td>
               <td> {{data.first_name}}</td>
-              <td> {{data.inf_semester}}, {{data.sup_semester}}</td>
+              <td> {{data.inf_semester}}</td>
+              <td> {{data.sup_semester}}</td>
               <td> {{data.journey.abbreviation}}</td>
               <td>
                   <a nz-icon nzType="edit" nzTheme="fill" style="font-size: 20px; color: green;"  (click)="showModalEdit(data.num_carte)"></a>

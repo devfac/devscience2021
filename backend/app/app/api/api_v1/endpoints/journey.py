@@ -25,6 +25,7 @@ def read_journey(
         journey = schemas.Journey(**jsonable_encoder(on_journey))
         mention = crud.mention.get_by_uuid(db=db, uuid=on_journey.uuid_mention)
         journey.mention = mention
+        journey.mention_title = mention.title
         list_journey.append(journey)
     return list_journey
 
@@ -49,6 +50,7 @@ def create_journey(
         journey = schemas.Journey(**jsonable_encoder(on_journey))
         mention = crud.mention.get_by_uuid(db=db, uuid=on_journey.uuid_mention)
         journey.mention = mention
+        journey.mention_title = mention.title
         list_journey.append(journey)
     return list_journey
 
@@ -76,6 +78,7 @@ def update_journey(
         journey = schemas.Journey(**jsonable_encoder(on_journey))
         mention = crud.mention.get_by_uuid(db=db, uuid=on_journey.uuid_mention)
         journey.mention = mention
+        journey.mention_title = mention.title
         list_journey.append(journey)
     return list_journey
 
@@ -96,6 +99,7 @@ def read_journey_by_uuid(
     journey = schemas.Journey(**jsonable_encoder(journey))
     mention = crud.mention.get_by_uuid(db=db, uuid=journey.uuid_mention)
     journey.mention = mention
+    journey.mention_title = mention.title
     return journey
 
 
@@ -117,6 +121,7 @@ def read_journey_by_mention(
         journey = schemas.Journey(**jsonable_encoder(on_journey))
         mention = crud.mention.get_by_uuid(db=db, uuid=journey.uuid_mention)
         journey.mention = mention
+        journey.mention_title = mention.title
         list_journey.append(journey)
     return list_journey
 
@@ -143,5 +148,6 @@ def delete_journey(
         journey = schemas.Journey(**jsonable_encoder(on_journey))
         mention = crud.mention.get_by_uuid(db=db, uuid=on_journey.uuid_mention)
         journey.mention = mention
+        journey.mention_title = mention.title
         list_journey.append(journey)
     return list_journey

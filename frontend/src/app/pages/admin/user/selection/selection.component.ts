@@ -3,21 +3,21 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CollegeYear } from '@app/models/collegeYear';
-import { Journey } from '@app/models/journey';
+import { Journey} from '@app/models/journey';
 import { Mention } from '@app/models/mention';
-import { AncienStudent, ColumnItem, StudentColumn } from '@app/models/student';
+import { AncienStudent, StudentColumn, ColumnItem  } from '@app/models/student';
 import { AuthService } from '@app/services/auth/auth.service';
 import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 
-const BASE_URL = environment.authApiURL;
 
+const BASE_URL = environment.authApiURL;
 @Component({
-  selector: 'app-inscription',
-  templateUrl: './inscription.component.html',
-  styleUrls: ['./inscription.component.less']
+  selector: 'app-selection',
+  templateUrl: './selection.component.html',
+  styleUrls: ['./selection.component.less']
 })
-export class InscriptionComponent implements OnInit {
+export class SelectionComponent implements OnInit {
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
     "Authorization": "Bearer "+localStorage.getItem("token")
@@ -73,7 +73,7 @@ export class InscriptionComponent implements OnInit {
       filterFn: null
     },
     {
-      name:"Level",
+      name:"Séléctioné",
       sortOrder: null,
       sortFn: null,
       sortDirections: ['ascend','descend', null],
@@ -142,7 +142,7 @@ export class InscriptionComponent implements OnInit {
         this.all_years = data,
         this.form.get('collegeYear')?.setValue(data[0].title)
         if(this.form.get('mention')?.value){
-          this.http.get<AncienStudent[]>(`${BASE_URL}/student/new_inscrit?college_year=`+data[0].title+`&uuid_mention=`+this.form.get('mention')?.value, options).subscribe(
+          this.http.get<AncienStudent[]>(`${BASE_URL}/student/new/all?college_year=`+data[0].title+`&uuid_mention=`+this.form.get('mention')?.value, options).subscribe(
             data => {this.all_students = data,
               console.log(data)},
             error => console.error("error as ", error)
@@ -172,7 +172,7 @@ export class InscriptionComponent implements OnInit {
     localStorage.setItem('numSelect', numSelect)
     localStorage.setItem("uuid_mention", this.form.get("mention")?.value)
     localStorage.setItem("college_years", this.form.get("collegeYear")?.value)
-    this.router.navigate(['/user/inscription_add'])
+    this.router.navigate(['/user/selection_add'])
   }
 
 
@@ -182,7 +182,7 @@ export class InscriptionComponent implements OnInit {
 
   getAllStudents(): void{
     if(this.form.get('collegeYear')?.value && this.form.get('mention')?.value){
-    this.http.get<any>(`${BASE_URL}/student/new_inscrit?college_year=`+this.form.get('collegeYear')?.value+`&uuid_mention=`+this.form.get('mention')?.value, this.options).subscribe(
+    this.http.get<any>(`${BASE_URL}/student/new/all?college_year=`+this.form.get('collegeYear')?.value+`&uuid_mention=`+this.form.get('mention')?.value, this.options).subscribe(
       data => this.all_students = data,
       error => console.error("error as ", error)
     );
@@ -192,7 +192,7 @@ export class InscriptionComponent implements OnInit {
   addStudent():void{
     localStorage.setItem("uuid_mention", this.form.get("mention")?.value)
     localStorage.setItem("college_years", this.form.get("collegeYear")?.value)
-    this.router.navigate(['/user/inscription_add'])
+    this.router.navigate(['/user/selection_add'])
     localStorage.setItem('numSelect', '')
   }
 

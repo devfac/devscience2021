@@ -38,11 +38,17 @@
     <nz-table #ueList [nzData]="all_ue" nzSize="small" [nzPageSize]="10" nzBordered [nzScroll]="{ x: 200 + 'px' }"> 
         <thead>
             <tr>
-                <th> Title</th>
-                <th> journey</th>
-                <th> Semester</th>
-                <th> Credit</th>
-                <th> Action</th>
+              <tr>
+                <th *ngFor="let column of listOfColumns"
+                [nzSortOrder]="column.sortOrder"
+                [nzSortFn]="column.sortFn"
+                [nzSortDirections]="column.sortDirections"
+                [nzFilterMultiple]="column.filterMultiple"
+                [nzFilters]="column.listOfFilter"
+                [nzFilterFn]="column.filterFn"
+                > 
+              {{ column.name}}
+            </th>
             </tr>
         </thead>
         <tbody>

@@ -133,20 +133,19 @@ class CRUDNewStudent(CRUDBase[Student, NewStudentCreate, NewStudentUpdate]):
     def get_by_num_select(self, db: Session, *, num_select: str) -> Optional[Student]:
         return db.query(Student).filter(Student.num_select == num_select).first()
 
-    def get_student_admis(self, db: Session, *, plugged: str, college_year) -> Optional[Student]:
-        print(plugged, college_year)
+    def get_student_admis(self, db: Session, *,uuid_mention: str, college_year) -> Optional[Student]:
         return db.query(Student).filter(
-            and_(Student.enter_year == college_year,
+            and_(Student.enter_years == college_year,
                  Student.is_selected == True,
                  Student.num_carte is not None,
-                 Student.plugged == plugged
+                 Student.uuid_mention == uuid_mention,
                  )).all()
 
     def get_by_mention(self, db: Session, *, uuid_mention: UUID, college_year: str) -> Optional[List[Student]]:
         return (
             db.query(Student).filter(
                 and_(Student.uuid_mention == uuid_mention,
-                     Student.enter_year == college_year
+                     Student.enter_years == college_year
                      )).all())
 
     def get_all_admis_by_mention(self, db: Session, *, uuid_mention: UUID, college_year: str) -> Optional[
@@ -154,14 +153,14 @@ class CRUDNewStudent(CRUDBase[Student, NewStudentCreate, NewStudentUpdate]):
         return (
             db.query(Student).filter(
                 and_(Student.uuid_mention == uuid_mention,
-                     Student.enter_year == college_year,
+                     Student.enter_years == college_year,
                      Student.is_selected == True
                      )).all())
 
     def get_by_jouney(self, db: Session, *, uuid_journey: UUID, college_year: str) -> Optional[List[Student]]:
         return (
             db.query(Student)
-            .filter(and_(Student.uuid_mention == uuid_journey, Student.enter_year == college_year))
+            .filter(and_(Student.uuid_mention == uuid_journey, Student.enter_years == college_year))
             .all())
 
     def create(

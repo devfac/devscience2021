@@ -13,11 +13,17 @@
     <nz-table #journeyList [nzData]="all_journey" nzSize="small" [nzPageSize]="10" nzBordered [nzScroll]="{ x: 200 + 'px' }"> 
         <thead>
             <tr>
-                <th> Title</th>
-                <th> Abreviation</th>
-                <th> Semester</th>
-                <th> Mention</th>
-                <th> Action</th>
+              <tr>
+                <th *ngFor="let column of listOfColumns"
+                [nzSortOrder]="column.sortOrder"
+                [nzSortFn]="column.sortFn"
+                [nzSortDirections]="column.sortDirections"
+                [nzFilterMultiple]="column.filterMultiple"
+                [nzFilters]="column.listOfFilter"
+                [nzFilterFn]="column.filterFn"
+                > 
+              {{ column.name}}
+            </th>
             </tr>
         </thead>
         <tbody>

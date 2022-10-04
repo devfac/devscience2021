@@ -41,6 +41,7 @@ class JourneyInDBBase(JourneyBase):
 # Additional properties to return via API
 class Journey(JourneyInDBBase):
     mention: Optional[Mention]
+    mention_title: Optional[str]
 
 
 # Additional properties stored in DB

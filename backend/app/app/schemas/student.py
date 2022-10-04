@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from app.schemas import Journey
+from app.schemas import Journey, Mention
 
 keys = [
     "num_carte",
@@ -45,10 +45,20 @@ class StudentBase(BaseModel):
     actual_years: Optional[str]
 
 
+class SelectStudentCreate(StudentBase):
+    num_select: Optional[str]
+    is_selected: Optional[bool] = False
+    enter_years: Optional[str]
+
+
 class SelectStudentBase(StudentBase):
     num_select: Optional[str]
     is_selected: Optional[bool] = False
     enter_years: Optional[str]
+    mention: Optional[Mention]
+
+    class Config:
+        orm_mode = True
 
 class Receipt(BaseModel):
     num: Optional[str]
@@ -136,6 +146,8 @@ class NewStudentUpdate(StudentBase):
     mother_name: Optional[str]
     mother_work: Optional[str]
     parent_address: Optional[str]
+    receipt: Optional[Receipt]
+    receipt_list: List[Optional[Receipt]]
     level: Optional[str]
     uuid_mention: Optional[UUID]
     uuid_journey: Optional[UUID]
@@ -186,7 +198,14 @@ class AncienStudentInDB(AncienStudentInDBBase):
 class NewStudent(NewStudentInDBBase):
     enter_year: Optional[str]
     num_carte: Optional[str]
+    is_selected: Optional[bool]
+    journey: Optional[Journey]
+    receipt: Optional[Receipt]
 
+class NewStudentSelect(NewStudentInDBBase):
+    enter_year: Optional[str]
+    num_select: Optional[str]
+    is_selected: Optional[bool]
 
 # Additional properties stored in DB
 class NewStudentInDB(NewStudentInDBBase):

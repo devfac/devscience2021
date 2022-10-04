@@ -18,4 +18,4 @@ from .resultat import Resultat
 from .diplome import Diplome, DiplomeCreate, DiplomeUpdate, DiplomeInDB
 from .droit import Droit, DroitUpdate, DroitCreate, DroitInDB
 from .student import AncienStudentCreate, AncienStudentUpdate, AncienStudent, AncienStudentInDB, CarteStudent
-from .student import NewStudent, NewStudentCreate, NewStudentUpdate, NewStudentInDB, SelectStudentBase
+from .student import NewStudent, NewStudentCreate, NewStudentUpdate, NewStudentInDB, SelectStudentBase, SelectStudentCreate
