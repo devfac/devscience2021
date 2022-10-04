@@ -1,0 +1,210 @@
+{
+  "server_error": "Errors occur on server",
+  "welcomeMessage": "Merci d'avoir rejoint {{ firstName }} !",
+  "welcomeContent": "C'est super de vous avoir!",
+  "home": "acceuil",
+  "Home": "Acceuil",
+  "about": "à propos",
+  "About": "À propos",
+  "Dashboard": "Dashboard",
+  "profile": "Mon compte",
+  "manage_profile": "Gérer profil",
+  "change_password": "Changer de mot de passe",
+  "sign_out": "Déconnecter",
+  "shared": {
+    "language_switcher": {
+      "en": "Anglais",
+      "fr": "Français"
+    }
+  },
+  "general_data":{
+    "title": "Titre",
+    "first_name": "Prénom",
+    "last_name": "Nom",
+    "save": "Sauvegarder"
+  },
+  "components": {
+    "notification_dropdown": {
+      "sure": "Are you sûre to hide/archive it ?",
+      "ok": "Ok",
+      "cancel": "Cancel",
+      "all": "All",
+      "unread": "Unread",
+      "view_more": "View more",
+      "view_all": "View all notifications",
+      "details": "Details",
+      "notifications": "Notifications",
+      "unread_notifications": "Unread",
+      "all_notifications": "All",
+      "archived": "Archived"
+    }
+  },
+  "admin": {
+    "profile": {
+      "manage_profile": "Manage Profile",
+      "general": {
+        "title": "Général",
+        "email": "Adresse email",
+        "firstname": "Prénom",
+        "lastname": "Nom",
+        "createAt": "Profile created",
+        "updateAt": "Profile updated",
+        "isadmin": "Admin",
+        "isactive": "Active",
+        "job": "Poste",
+        "mention": "Mention",
+        "issuperuser": "Super Admin"
+      },
+      "edit_password": {
+        "title": "Mot de passe",
+        "old_password": "Ancien mot de passe",
+        "old_password_error": "Entrer l'ancien mot de passe!",
+        "new_password": "Nouveau mot de passe",
+        "new_password_error": "mot de passe doit étre contient 8 caractère au minimum avec Majuscule, minuscule et nombre",
+        "confirm_password": "Confirmation mot de passe",
+        "confirm_password_error": "Entrer le confiramation de mot de passe!",
+        "confirm_password_mismatch": "Mot de passe confiramtion non valide!",
+        "edit_password": "Changer le mot de passe",
+        "confirm_password_notification": "Password confirmation",
+        "confirm_password_notification_content": "Your password has been chanded, to confirm it click here :"
+      }
+    },
+    "home":{
+      "create":"Créer",
+      "delete":"Supprimer",
+      "update":"Modifier",
+      "menu": "Menu",
+      "users":{
+        "add_users":"Ajouter ou modifier un utilisateur",
+        "title": "Utilisateurs",
+        "email": "E-mail",
+        "password": "Mot de passe",
+        "confirm_passowrd": "Corfirmer le mot de passe",
+        "email_error":"Veuillez entrer l'adresse e-mail!",
+        "password_error": "Veuillez entrer le mot de passe",
+        "confirm_password_error":"Veuillez entrer le mot de passe de confirmation"
+      },
+      "mention":{
+        "title": "Mention",
+        "abbreviation": "Abbreviation",
+        "plugged": "Branche",
+        "last_num_carte": "Dernier CE",
+        "title_error": "Entrer le titre",
+        "abbreviation_error": "Entrer l'abbreviation",
+        "plugged_error": "Entrer le branche",
+        "last_num_carte_error": "Entrer le dernier CE",
+        "add_mention": "Ajouter ou modifier un mention"
+      },
+      "journey":{
+        "title": "Parcours",
+        "abbreviation": "Abréviation",
+        "semester": "Semestre",
+        "title_error": "Entrer le parcour",
+        "semester_error": "Entrer le(s) semetre(s)",
+        "abbreviation_error": "Entrer l'abréviation",
+        "mention_error": "Choisir la mention",
+        "add_journey": "Ajouter ou modifier un parcours"
+      },
+      "role":{
+        "title": "Role",
+        "role_error": "Entrer le role",
+        "add_role": "Ajouter ou modifier un role"
+      },
+      "college_year":{
+        "title": "Année Universitaire",
+        "mean_error": "Entrer la moyenne",
+        "college_year_error": "Entrer l'anée universitaire",
+        "mean": "Moyenne"
+      },
+      "ue":{
+        "title": "Unité d'enseignement",
+        "title_error":"Entrer l'unité d'enseignement",
+        "credit":"Credit",
+        "credit_error":"Entrer le credit",
+        "semester":"Semestre"
+      },
+      "ec":{
+        "title": "Elément constitutif",
+        "title_error":"Entrer l'élément constitutif",
+        "weight":"Poids",
+        "weight_error":"Entrer le Poids",
+        "semester":"Semestre",
+        "semester_error":"Choisir le Semestre",
+        "value_ue_error":"Choisir le U.E",
+        "user":"Enseignant",
+        "optional":"Optionnel"
+      },
+      "note":{
+        "title":"Notes"
+      }
+    },
+    "student":{
+      "title":"Ajouter ou modifier un étudiant",
+      "first_name": "Prénom",
+      "last_name":"Nom",
+      "date_birth":"Date de naissance",
+      "place_birth":"Lieu de naissance",
+      "num_cin": "CIN N°",
+      "date_cin":"Date CIN",
+      "place_cin":"Lieu CIN",
+      "phone":"Téléphone",
+      "price_rigth": "Droit d'inscription",
+      "address":"Adresse",
+      "sex": "Sexe",
+      "type":"Type",
+      "photo": "Photo",
+      "nation": "Nationalité",
+      "num_receipt":"Numéro quintance",
+      "date_receipt":"Date quintance",
+      "bacc_year":"Baccalaureat Année",
+      "bacc_num":"Baccalaureat Numéro",
+      "bacc_serie":"Baccalaureat Serie",
+      "work":"Profession",
+      "father_name":"Nom du père",
+      "father_work":"Profession du père",
+      "mother_name":"Nom de la mère",
+      "mother_work":"Profession de la mère",
+      "parent_address":"Adresse des parents",
+      "level":"Niveau",
+      "plugged":"Branche",
+      "champ_error":"Cette champ est obbligatoire",
+      "num_carte":"Numéro Carte",
+      "num_select":"Numéro séléction",
+      "num_insc":"Numéro inscription",
+      "mean":"Moyenne",
+      "receipt":"Droit d'inscription",
+      "add_receipt":" Ajouter droit d'inscription",
+      "situation":"Situation Famillial"
+
+    },
+    "user":{
+      "create":"Ajouter",
+      "inscription":{
+        "title":"Inscription"
+      },
+      "reinscription":{
+        "title":"Re-inscription"
+      },
+      "selection":{
+        "title":"Selection de dossier",
+        "is_selected":"Selecioné"
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "email": "Adresse E-mail",
+      "email_placeholder": "Entrer votre adresse e-mail",
+      "email_error": "Veuillez entrer votre adresse e-mail!",
+      "password": "Mot de passe",
+      "password_placeholder": "Entrer votre mot de passe",
+      "password_error": "Veillez enter votre  mot de passe!",
+      "need_help": "Besoin d'aide, ",
+      "forgot_password": "Mot de passe oublié?",
+      "login": "Se Connecter",
+      "signin": "Connexion",
+      "new_to_wimse": "Nouveau chez WIMSE STORE?",
+      "create_account": "Créer votre compte WIMSE STORE"
+    }
+  }
+}

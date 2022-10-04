@@ -126,8 +126,8 @@ def create_anne(anne: str):
     return ann
 
 
-def create_num_carte(branche: str, num: str):
-    key: str = branche[0:1]
+def create_num_carte(plugged: str, num: str):
+    key: str = plugged[0:1]
     nbr_zero: int = 6 - len(num)
     response: str = "".join("0" for x in range(nbr_zero))
     return f'{key.upper()}{response}{num}'
@@ -139,7 +139,7 @@ def decode_schemas(schema: str):
 
 
 def creaate_registre(schema: str):
-    reg = schema[12:15]
+    reg = schema[2:4]
     return reg
 
 
@@ -216,7 +216,7 @@ def max_value(value_1: str, value_2: str) -> float:
 
 def get_niveau(sems_a: str, sems_b: str) -> str:
     if len(get_max(sems_a, sems_b)) == 0:
-        return "Invalid semestre"
+        return "Invalid semester"
     else:
         value_1 = get_max(sems_a, sems_b).upper().partition("S")[2]
     if int(value_1) <= 2:
@@ -233,7 +233,7 @@ def get_niveau(sems_a: str, sems_b: str) -> str:
 
 def get_niveau_(sems_a: str, sems_b: str) -> str:
     if len(get_max(sems_a, sems_b)) == 0:
-        return "Invalid semestre"
+        return "Invalid semester"
     else:
         value_1 = get_max(sems_a, sems_b).upper().partition("S")[2]
     if int(value_1) <= 2:
@@ -261,10 +261,10 @@ def get_niveau_long(niv: str) -> str:
         return "CINQUIÈME ANNÉE"
 
 
-def validation_semestre(etudiant: Any, sems: str, credit: int, total_cred: int, anne: str):
+def validation_semester(etudiant: Any, sems: str, credit: int, total_cred: int, anne: str):
     response = {}
     response["anne"] = anne
-    for index, sems_i in enumerate(etudiant.semestre):
+    for index, sems_i in enumerate(etudiant.semester):
         if sems == sems_i:
             if credit == total_cred:
                 response["status"] = f"Étudiant(e) ayant validé(e) la {total_cred} crédit définitive."
@@ -334,8 +334,8 @@ def get_status(note_ue: float) -> str:
         return "Validé"
 
 
-def test_semestre(semestre: list, sems_act) -> bool:
-    for sems in semestre:
+def test_semester(semester: list, sems_act) -> bool:
+    for sems in semester:
         if sems == sems_act:
             return True
     return False
@@ -406,6 +406,13 @@ def transpose(data: list) -> list:
         new_data.append(new_row)
     return new_data
 
+def find_in_list(list_: list, key_: str) -> int:
+    try:
+        index = list_.index(key_.lower())
+        return index
+    except Exception as e:
+        print(e)
+        return -1
 
 def convert_date(date: str) -> str:
     print("eto zw", date)

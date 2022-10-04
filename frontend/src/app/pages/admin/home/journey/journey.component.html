@@ -1,0 +1,128 @@
+<div class="container" ><div class="header">
+    <div class="header-text">
+        <h3>Journey list</h3>
+    </div>
+    <div class="button-text">
+        <button nz-button nzType="primary" (click)="showModal()">
+            <span nz-icon nzType="plus" nzTheme="outline"></span>
+            Ajouter
+        </button>
+    </div>
+        
+</div>
+    <nz-table #journeyList [nzData]="all_journey" nzSize="small" [nzPageSize]="10" nzBordered [nzScroll]="{ x: 200 + 'px' }"> 
+        <thead>
+            <tr>
+              <tr>
+                <th *ngFor="let column of listOfColumns"
+                [nzSortOrder]="column.sortOrder"
+                [nzSortFn]="column.sortFn"
+                [nzSortDirections]="column.sortDirections"
+                [nzFilterMultiple]="column.filterMultiple"
+                [nzFilters]="column.listOfFilter"
+                [nzFilterFn]="column.filterFn"
+                > 
+              {{ column.name}}
+            </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let data of journeyList.data">
+                <td> {{data.title}}</td>
+                <td> {{data.abbreviation}}</td>
+                <td> {{data.semester}}</td>
+                <td> {{data.mention.title}}</td>
+                <td>
+                    <a nz-icon nzType="edit" nzTheme="fill" style="font-size: 20px; color: green;"  (click)="showModalEdit(data.uuid)"></a>
+                    <nz-divider nzType="vertical"></nz-divider>
+                    <a nz-icon nzType="delete" nzTheme="fill" style="font-size: 20px; color: red;" (click)="showConfirm(data.title, data.uuid)"></a>
+                </td>
+                
+            </tr>
+        </tbody>
+    </nz-table>
+    <nz-modal [(nzVisible)]="isvisible" 
+              nzTitle="{{'admin.home.journey.add_journey' | translate}}" 
+              (nzOnCancel)="handleCancel()" 
+              nzMask="true"
+              nzMaskClosable="false" >
+    <div *nzModalContent>
+        <form nz-form [formGroup]="form" class="form" (ngSubmit)="submitForm()" nzLayout="vertical">
+            <nz-form-item>
+              <nz-form-label nzRequired>
+                {{ 'admin.home.journey.title' | translate }}
+              </nz-form-label>
+              <nz-form-control [nzErrorTip]="'admin.home.journey.title_error' | translate">
+                <nz-input-group>
+                  <input type="text" nz-input formControlName="title" appCustomAutoFocus
+                    [placeholder]="'admin.home.journey.title' | translate" />
+                </nz-input-group>
+              </nz-form-control>
+
+            </nz-form-item><nz-form-item>
+                <nz-form-label nzRequired>
+                  {{ 'admin.home.journey.abbreviation' | translate }}
+                </nz-form-label>
+                <nz-form-control [nzErrorTip]="'admin.home.journey.abbreviation_error' | translate">
+                  <nz-input-group>
+                    <input type="text" nz-input formControlName="abbreviation" appCustomAutoFocus
+                      [placeholder]="'admin.home.journey.abbreviation' | translate" />
+                  </nz-input-group>
+                </nz-form-control>
+
+              </nz-form-item>
+              <nz-form-item>
+                <nz-form-label nzRequired>
+                  {{ 'admin.profile.general.mention' | translate }}
+                </nz-form-label>
+                <nz-form-control [nzErrorTip]="'admin.home.journey.mention_error' | translate">
+                  <nz-input-group>
+                    <nz-select  style="width: 100%;"
+                        [ngModel]="data"
+                        formControlName="uuid_mention"
+                        [nzPlaceHolder]="'admin.home.mention.title' | translate"
+                        >
+                        <nz-option *ngFor="let item of all_mention"
+                            [nzLabel]="item.title"
+                            [nzValue]="item.uuid"
+                        >
+
+                        </nz-option>
+                    </nz-select>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+              <nz-form-item>
+                <nz-form-label nzRequired>
+                  {{ 'admin.home.journey.semester' | translate }}
+                </nz-form-label>
+                <nz-form-control [nzErrorTip]="'admin.home.journey.semester_error' | translate">
+                    <nz-input-group>
+                        <nz-select  style="width: 100%;"
+                            formControlName="semester"
+                            [nzMaxTagCount]="10"
+                            nzMode="multiple"
+                            [(ngModel)]="listOfTagsOptions"
+                            [nzPlaceHolder]="'admin.home.journey.semester' | translate"
+                            >
+                            <nz-option *ngFor="let item of listOfOptions"
+                                [nzLabel]="item"
+                                [nzValue]="item"
+                            >
+                            </nz-option>
+                        </nz-select>
+                    </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+            <nz-spin [nzSpinning]="isConfirmLoading">
+                <button nz-button class="form-button form-margin" [nzType]="'primary'">
+                  {{'general_data.save' | translate | uppercase}}
+                </button>
+            </nz-spin>
+        </form>
+    </div>
+    <div *nzModalFooter>
+        </div>
+</nz-modal>
+</div>
+

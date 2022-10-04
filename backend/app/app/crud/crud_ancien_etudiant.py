@@ -55,7 +55,7 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(table.columns.uuid_mention == uuid_mention)
-        sel = sel.order_by(table.columns.uuid_parcours.asc())
+        sel = sel.order_by(table.columns.uuid_journey.asc())
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
@@ -73,37 +73,37 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         conn.close()
         return out
 
-    def get_by_parcours(self, schema: str, uuid_parcours: str) -> Optional[EtudiantAncien]:
+    def get_by_journey(self, schema: str, uuid_journey: str) -> Optional[EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(table.columns.uuid_parcours == uuid_parcours)
+        sel = sel.where(table.columns.uuid_journey == uuid_journey)
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
         return out
 
-    def get_by_parcours_and_etat(self, schema: str, uuid_parcours: str, etat: str) -> Optional[EtudiantAncien]:
+    def get_by_journey_and_etat(self, schema: str, uuid_journey: str, etat: str) -> Optional[EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(and_(table.columns.uuid_parcours == uuid_parcours, table.columns.etat == etat))
+        sel = sel.where(and_(table.columns.uuid_journey == uuid_journey, table.columns.etat == etat))
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
         return out
 
-    def get_by_parcours_and_etat_and_moyenne(self, schema: str, uuid_parcours: str, etat: str, moyenne: float) -> \
+    def get_by_journey_and_etat_and_moyenne(self, schema: str, uuid_journey: str, etat: str, moyenne: float) -> \
             Optional[EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(and_(table.columns.uuid_parcours == uuid_parcours, table.columns.etat == etat,
+        sel = sel.where(and_(table.columns.uuid_journey == uuid_journey, table.columns.etat == etat,
                              table.columns.moyenne >= moyenne))
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
@@ -123,58 +123,58 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         conn.close()
         return out
 
-    def get_by_mention_and_niveau(self, schema: str, uuid_mention: str, semestre_grand: str) -> Optional[
+    def get_by_mention_and_niveau(self, schema: str, uuid_mention: str, semester_grand: str) -> Optional[
         EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(
-            and_(table.columns.uuid_mention == uuid_mention, table.columns.semestre_grand == semestre_grand))
+            and_(table.columns.uuid_mention == uuid_mention, table.columns.semester_grand == semester_grand))
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
         return out
 
-    def get_by_parcours_and_etat_and_niveau(self, schema: str, uuid_parcours: str, etat: str, sems_petit: str,
+    def get_by_journey_and_etat_and_niveau(self, schema: str, uuid_journey: str, etat: str, sems_petit: str,
                                             sems_grand: str) -> Optional[EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(and_(table.columns.uuid_parcours == uuid_parcours, table.columns.etat == etat,
-                             or_(table.columns.semestre_grand == sems_petit.upper(),
-                                 table.columns.semestre_grand == sems_grand.upper())))
+        sel = sel.where(and_(table.columns.uuid_journey == uuid_journey, table.columns.etat == etat,
+                             or_(table.columns.semester_grand == sems_petit.upper(),
+                                 table.columns.semester_grand == sems_grand.upper())))
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
         return out
 
-    def get_by_class(self, schema: str, uuid_parcours: UUID, semestre: str) -> Optional[EtudiantAncien]:
+    def get_by_class(self, schema: str, uuid_journey: UUID, semester: str) -> Optional[EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(and_(table.columns.uuid_parcours == uuid_parcours,
-                             or_(table.columns.semestre_petit == semestre.upper(),
-                                 table.columns.semestre_grand == semestre.upper())))
+        sel = sel.where(and_(table.columns.uuid_journey == uuid_journey,
+                             or_(table.columns.semester_petit == semester.upper(),
+                                 table.columns.semester_grand == semester.upper())))
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
         return out
 
-    def get_by_class_limit(self, schema: str, uuid_parcours: UUID, semestre: str, skip: int, limit: int) -> Optional[
+    def get_by_class_limit(self, schema: str, uuid_journey: UUID, semester: str, skip: int, limit: int) -> Optional[
         EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(and_(table.columns.uuid_parcours == uuid_parcours,
-                             or_(table.columns.semestre_petit == semestre.upper(),
-                                 table.columns.semestre_grand == semestre.upper())))
+        sel = sel.where(and_(table.columns.uuid_journey == uuid_journey,
+                             or_(table.columns.semester_petit == semester.upper(),
+                                 table.columns.semester_grand == semester.upper())))
         sel = sel.order_by(table.columns.nom.asc())
         sel = sel.offset(skip - 1)
         sel = sel.limit(limit)
@@ -183,28 +183,28 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         conn.close()
         return out
 
-    def get_by_semetre_and_mention(self, schema: str, uuid_mention: UUID, semestre_grand: str) -> Optional[
+    def get_by_semetre_and_mention(self, schema: str, uuid_mention: UUID, semester_grand: str) -> Optional[
         EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(
-            and_(table.columns.uuid_mention == uuid_mention, table.columns.semestre_grand == semestre_grand))
+            and_(table.columns.uuid_mention == uuid_mention, table.columns.semester_grand == semester_grand))
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
         return out
 
-    def get_for_stat(self, schema: str, uuid_parcours: str, semestre_grand: str, sexe: str, etat: str) -> Optional[
+    def get_for_stat(self, schema: str, uuid_journey: str, semester_grand: str, sexe: str, etat: str) -> Optional[
         EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(
-            and_(table.columns.uuid_parcours == uuid_parcours, table.columns.semestre_grand == semestre_grand,
+            and_(table.columns.uuid_journey == uuid_journey, table.columns.semester_grand == semester_grand,
                  table.columns.sexe == sexe, table.columns.etat == etat))
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
@@ -212,14 +212,14 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         conn.close()
         return out
 
-    def get_by_sexe_for_stat(self, schema: str, uuid_parcours: str, semestre_grand: str, sexe: str) -> Optional[
+    def get_by_sexe_for_stat(self, schema: str, uuid_journey: str, semester_grand: str, sexe: str) -> Optional[
         EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(
-            and_(table.columns.uuid_parcours == uuid_parcours, table.columns.semestre_grand == semestre_grand,
+            and_(table.columns.uuid_journey == uuid_journey, table.columns.semester_grand == semester_grand,
                  table.columns.sexe == sexe))
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
@@ -227,14 +227,14 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         conn.close()
         return out
 
-    def get_by_parcours_for_stat(self, schema: str, uuid_parcours: str, semestre_grand: str) -> Optional[
+    def get_by_journey_for_stat(self, schema: str, uuid_journey: str, semester_grand: str) -> Optional[
         EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(
-            and_(table.columns.uuid_parcours == uuid_parcours, table.columns.semestre_grand == semestre_grand))
+            and_(table.columns.uuid_journey == uuid_journey, table.columns.semester_grand == semester_grand))
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
@@ -252,15 +252,15 @@ class CRUDEtudiantAncien(CRUDBase[EtudiantAncien, EtudiantAncienCreate, Etudiant
         conn.close()
         return out
 
-    def get_by_parcour_and_etat_and_moyenne_and_niveau(self, schema: str, uuid_parcours: str, etat: str, moyenne: float,
+    def get_by_parcour_and_etat_and_moyenne_and_niveau(self, schema: str, uuid_journey: str, etat: str, moyenne: float,
                                                        sems_petit: str, sems_grand: str) -> Optional[EtudiantAncien]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("ancien_etudiant", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(and_(table.columns.uuid_parcours == uuid_parcours, table.columns.etat == etat,
-                             table.columns.moyenne >= moyenne, or_(table.columns.semestre_grand == sems_petit.upper(),
-                                                                   table.columns.semestre_grand == sems_grand.upper())))
+        sel = sel.where(and_(table.columns.uuid_journey == uuid_journey, table.columns.etat == etat,
+                             table.columns.moyenne >= moyenne, or_(table.columns.semester_grand == sems_petit.upper(),
+                                                                   table.columns.semester_grand == sems_grand.upper())))
         sel = sel.order_by(table.columns.nom.asc())
         result = conn.execute(sel)
         out = result.fetchall()

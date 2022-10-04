@@ -1,0 +1,8 @@
+<div style="margin-right: 16px">
+  <select class="custom-select" #selLang (change)="translation.setTranslationTo(selLang.value)">
+    <option *ngFor="let language of translation.translate.getLangs()" [value]="language"
+      [selected]="language === translation.translate.currentLang">
+      {{ language }}
+    </option>
+  </select>
+</div>

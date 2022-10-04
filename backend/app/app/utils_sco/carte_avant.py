@@ -32,19 +32,19 @@ class PDF(FPDF):
         i = 0
         while i < len(deux_et):
             num_carte = f"{deux_et[i]['num_carte']}"
-            niveau = f"Niveau: {deux_et[i]['niveau']}"
+            niveau = f"Niveau: {deux_et[i]['level']}"
 
             image = f"files/photos/profil.png"
             if os.path.exists(f"files/photos/{deux_et[i]['photo']}"):
                 image = f"files/photos/{deux_et[i]['photo']}"
-            info = f"Nom: {deux_et[i]['nom'].upper()}\n"
-            info += f"Prénom: {deux_et[i]['prenom']}\n"
-            info += f"Né(e) le: {convert_date(deux_et[i]['date_naiss'])} à {deux_et[i]['lieu_naiss']}\n"
+            info = f"Nom: {deux_et[i]['last_name'].upper()}\n"
+            info += f"Prénom: {deux_et[i]['first_name']}\n"
+            info += f"Né(e) le: {convert_date(deux_et[i]['date_birth'])} à {deux_et[i]['place_birth']}\n"
             if {deux_et[i]['num_cin']}:
                 info += f"CIN: {deux_et[i]['num_cin']} \n"
-                info += f"du {convert_date(deux_et[i]['date_cin'])} à {deux_et[i]['lieu_cin']} \n "
+                info += f"du {convert_date(deux_et[i]['date_cin'])} à {deux_et[i]['place_cin']} \n "
             info_ = f"CE: {num_carte}\n"
-            info_ += f"Parcours: {deux_et[i]['parcours'].upper()}\n"
+            info_ += f"journey: {deux_et[i]['journey'].upper()}\n"
             info_ += f"Mention: {data['mention']}\n"
 
             data_et = [deux_et[i]['num_carte'], data['key']]

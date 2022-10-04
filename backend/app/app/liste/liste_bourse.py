@@ -64,7 +64,7 @@ class PDF(FPDF):
                 if len(parcour[niv]) != 0:
                     pdf.add_page()
                     pdf.set_font("arial", "B", 12)
-                    pdf.cell(0, 5, txt=f"Parcours: {parcour['name']}", ln=1, align="L")
+                    pdf.cell(0, 5, txt=f"journey: {parcour['name']}", ln=1, align="L")
                     pdf.cell(1, 1, txt="", ln=1)
                     pdf.cell(0, 5, txt=f"Niveau:{get_niveau_long(niv)}", ln=1, align="L")
                     pdf.cell(1, 4, txt="", ln=1)

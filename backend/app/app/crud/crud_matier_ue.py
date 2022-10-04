@@ -1,15 +1,12 @@
+import uuid
 from typing import List, Optional
 
-from sqlalchemy import text
-from uuid import UUID
-from sqlalchemy.inspection import inspect
-
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session
 from sqlalchemy import MetaData, Table
+
 from app.crud.base import CRUDBase
-from app.schemas.matier import MatierUEUpdate, MatierUECreate, MatierUE
 from app.db.session import engine
+from app.schemas.matier import MatierUEUpdate, MatierUECreate, MatierUE
 
 
 class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
@@ -31,13 +28,13 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
         out = result.fetchall()
         return out
 
-    def get_by_class(self, schema: str, uuid_parcours: str, semestre: str) -> Optional[List[MatierUE]]:
+    def get_by_class(self, schema: str, uuid_journey: str, semester: str) -> Optional[List[MatierUE]]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("unite_enseing", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(table.c.semestre == semestre.upper())
-        sel = sel.where(table.c.uuid_parcours == uuid_parcours)
+        sel = sel.where(table.c.semester == semester.upper())
+        sel = sel.where(table.c.uuid_journey == uuid_journey)
         sel = sel.order_by(table.columns.title.asc())
         result = conn.execute(sel)
         out = result.fetchall()
@@ -51,21 +48,21 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(table.c.value == value)
-        sel = sel.where(table.c.semestre == obj_in_data['semestre'])
-        sel = sel.where(table.c.uuid_parcours == obj_in_data['uuid_parcours'])
+        sel = sel.where(table.c.semester == obj_in_data['semester'])
+        sel = sel.where(table.c.uuid_journey == obj_in_data['uuid_journey'])
         result = conn.execute(sel)
         out = result.fetchone()
         conn.close()
         return out
 
-    def get_by_value(self, schema: str, value: str, semestre: str, uuid_parcours: str) -> Optional[MatierUE]:
+    def get_by_value(self, schema: str, value: str, semester: str, uuid_journey: str) -> Optional[MatierUE]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("unite_enseing", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(table.c.value == value)
-        sel = sel.where(table.c.semestre == semestre)
-        sel = sel.where(table.c.uuid_parcours == uuid_parcours)
+        sel = sel.where(table.c.semester == semester)
+        sel = sel.where(table.c.uuid_journey == uuid_journey)
         result = conn.execute(sel)
         out = result.fetchone()
         conn.close()
@@ -84,6 +81,7 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
 
     def create_ue(self, schema: str, obj_in: MatierUECreate, value: str, key_unique) -> Optional[MatierUE]:
         obj_in_data = jsonable_encoder(obj_in)
+        obj_in_data["uuid"] = str(uuid.uuid4())
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()
         table = Table(f"unite_enseing", metadata, autoload=True)

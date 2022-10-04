@@ -61,7 +61,7 @@ def update_role(
     return crud.role.get_multi(db=db)
 
 
-@router.get("/by_uuid", response_model=schemas.Role)
+@router.get("/{uuid}", response_model=schemas.Role)
 def read_role(
     *,
     db: Session = Depends(deps.get_db),

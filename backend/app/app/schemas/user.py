@@ -1,6 +1,6 @@
 from typing import List, Optional, Any
 from uuid import UUID, uuid4
-
+from .mention import Mention
 from sqlalchemy.sql.sqltypes import String
 
 from pydantic import BaseModel, EmailStr
@@ -12,7 +12,7 @@ class UserBase(BaseModel):
     is_active: Optional[bool] = True
     is_admin: Optional[bool]
     is_superuser: bool = False
-    first_name: str
+    first_name: Optional[str]
     last_name: Optional[str]
     uuid_mention: Optional[List[str]]
     uuid_role: Optional[UUID]
@@ -40,9 +40,15 @@ class UserInDBBase(UserBase):
 
 # Additional properties to return via API
 class User(UserInDBBase):
-    pass
+    mention: Optional[List[Mention]]
+    role: Optional[str]
 
 
 # Additional properties stored in DB
 class UserInDB(UserInDBBase):
     hashed_password: str
+
+class UserLogin(UserBase):
+    mention: Optional[list]
+    role: Optional[str]
+    access_token: Optional[str]

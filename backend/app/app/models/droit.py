@@ -9,7 +9,7 @@ from app.db.base_class import Base
 
 class Droit(Base):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    niveau = Column(String)
+    level = Column(String)
     droit = Column(String)
-    annee = Column(String)
+    year = Column(String)
     uuid_mention = Column(UUID(as_uuid=True))

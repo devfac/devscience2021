@@ -4,6 +4,7 @@ from typing import Any
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from fastapi.encoders import jsonable_encoder
 
 from app import crud, models, schemas
 from app.api import deps
@@ -19,7 +20,7 @@ from app.utils import (
 router = APIRouter()
 
 
-@router.post("/login/access-token", response_model=schemas.Token)
+@router.post("/login/access-token", response_model=schemas.UserLogin)
 def login_access_token(
         db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
@@ -34,24 +35,33 @@ def login_access_token(
     elif not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    token = security.create_access_token(
-        data={"uuid": str(user.uuid), "email": form_data.username}, expires_delta=access_token_expires
-    )
-    role = crud.role.get_by_uuid(db, uuid=user.uuid_role)
-    if crud.user.is_superuser(user):
-        return {
-            "access_token": token,
-            "mention": [],
-            "role": "supperuser",
-            "token_type": "bearer",
-        }
+    if user.is_superuser:
+        permission = "super_admin"
     else:
-        return {
-            "access_token": token,
-            "mention": user.uuid_mention,
-            "role": role.title,
-            "token_type": "bearer",
-        }
+        permission = "user"
+
+    role = crud.role.get_by_uuid(db, uuid=user.uuid_role)
+    if role:
+        role_value = role.title
+    else:
+        role_value = "admin"
+    list_mention = []
+    if user.uuid_mention:
+        for uuid in user.uuid_mention:
+            mention = crud.mention.get_by_uuid(db=db, uuid=uuid)
+            if mention:
+                list_mention.append(mention.title)
+    token = security.create_access_token(
+        data={"uuid": str(user.uuid), "email": form_data.username, "permissions": permission, "role": role_value,
+              "mention": user.uuid_mention},
+        expires_delta=access_token_expires
+    )
+    token_data = deps.get_user(token)
+    user = crud.user.get(db=db, uuid=token_data.uuid)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user = schemas.UserLogin(**jsonable_encoder(user), access_token=token, role=role_value, mention=list_mention)
+    return user
 
 
 @router.post("/login/test-token", response_model=schemas.User)
@@ -60,6 +70,18 @@ def test_token(current_user: models.User = Depends(deps.get_current_user)) -> An
     Test access token
     """
     return current_user
+
+
+@router.post("/login/test-token/{token}", response_model=schemas.User)
+def test_token(token: str, db: Session = Depends(deps.get_db)) -> Any:
+    """
+    Test access token
+    """
+    token_data = deps.get_user(token)
+    user = crud.user.get(db=db, uuid=token_data.uuid)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 
 @router.post("/decode_token", response_model=schemas.TokenPayload)

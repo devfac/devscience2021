@@ -2,7 +2,7 @@ from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.utils import decode_schemas, get_credit, max_value
+from app.utils import decode_schemas, get_credit, max_value, create_anne
 from app import crud, models, schemas
 from app.api import deps
 
@@ -13,57 +13,57 @@ router = APIRouter()
 def inserts_etudiant(
         *,
         db: Session = Depends(deps.get_db),
-        schemas: str,
-        semestre: str,
+        schema: str,
+        semester: str,
         session: str,
-        uuid_parcours: str,
+        uuid_journey: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create table note.
     """
-    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schemas))
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
+    college_year = crud.college_year.get_by_title(db, schema)
+    if not college_year:
+        raise HTTPException(status_code=400, detail=f"{schema} not found.",
                             )
 
-    parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
-    if not parcours:
-        raise HTTPException(status_code=400, detail="Parcours not found")
+    journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
+    if not journey:
+        raise HTTPException(status_code=400, detail="journey not found")
     all_note = []
-    test_note = crud.note.check_table_exist(schemas, semestre, parcours.abreviation, session)
+    test_note = crud.note.check_table_exist(create_anne(schema), semester, journey.abbreviation, session)
     if not test_note:
         raise HTTPException(
             status_code=400,
-            detail=f"note_{parcours.abreviation.lower()}_{semestre.lower()}_{session.lower()} not found.",
+            detail=f"note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()} not found.",
         )
 
     if session.lower() == "rattrapage":
-        test_note = crud.note.check_table_exist(schemas, semestre, parcours.abreviation, "normal")
+        test_note = crud.note.check_table_exist(create_anne(schema), semester, journey.abbreviation, "normal")
         if not test_note:
             raise HTTPException(status_code=400,
-                                detail=f"note_{parcours.abreviation.lower()}_{semestre.lower()}_normal not found.",
+                                detail=f"note_{journey.abbreviation.lower()}_{semester.lower()}_normal not found.",
                                 )
         credit = 30
-        all_etudiant = crud.note.read_by_credit(schemas, semestre, parcours.abreviation, "normal", credit)
+        all_etudiant = crud.note.read_by_credit(create_anne(schema), semester, journey.abbreviation, "normal", credit)
         for etudiant in all_etudiant:
-            et_un = crud.note.read_by_num_carte(schemas, semestre, parcours.abreviation, session, etudiant.num_carte)
+            et_un = crud.note.read_by_num_carte(create_anne(schema), semester, journey.abbreviation, session, etudiant.num_carte)
             if not et_un:
-                crud.note.insert_note(schemas, semestre, parcours.abreviation, session, etudiant.num_carte)
-                crud.note.update_auto(schemas, semestre, parcours.abreviation, session, etudiant.num_carte)
-        all_note = crud.note.read_all_note(schemas, semestre, parcours.abreviation, session)
+                crud.note.insert_note(create_anne(schema), semester, journey.abbreviation, session, etudiant.num_carte)
+                crud.note.update_auto(create_anne(schema), semester, journey.abbreviation, session, etudiant.num_carte)
+        all_note = crud.note.read_all_note(create_anne(schema), semester, journey.abbreviation, session)
         return all_note
 
     else:
-        list = crud.ancien_etudiant.get_by_class(schemas, uuid_parcours, semestre)
+        list = crud.ancien_etudiant.get_by_class(create_anne(schema), uuid_journey, semester)
         if list is not None:
             for etudiant in list:
-                et_un = crud.note.read_by_num_carte(schemas, semestre, parcours.abreviation, session,
+                et_un = crud.note.read_by_num_carte(create_anne(schema), semester, journey.abbreviation, session,
                                                     etudiant.num_carte)
                 if not et_un:
-                    crud.note.insert_note(schemas, semestre, parcours.abreviation, session, etudiant.num_carte)
-                    crud.note.insert_note(schemas, semestre, parcours.abreviation, "final", etudiant.num_carte)
-        all_note = crud.note.read_all_note(schemas, semestre, parcours.abreviation, session)
+                    crud.note.insert_note(create_anne(schema), semester, journey.abbreviation, session, etudiant.num_carte)
+                    crud.note.insert_note(create_anne(schema), semester, journey.abbreviation, "final", etudiant.num_carte)
+        all_note = crud.note.read_all_note(create_anne(schema), semester, journey.abbreviation, session)
         return all_note
 
 
@@ -71,22 +71,22 @@ def inserts_etudiant(
 def get_all_notes(
         *,
         db: Session = Depends(deps.get_db),
-        schemas: str,
-        semestre: str,
+        schema: str,
+        semester: str,
         session: str,
-        uuid_parcours: str,
+        uuid_journey: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
-    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schemas))
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
+    college_year = crud.college_year.get_by_title(db, schema)
+    if not college_year:
+        raise HTTPException(status_code=400, detail=f"{schema} not found.",
                             )
 
-    parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
-    if not parcours:
-        raise HTTPException(status_code=400, detail="Parcours not found")
+    journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
+    if not journey:
+        raise HTTPException(status_code=400, detail="journey not found")
 
-    all_note = crud.note.read_all_note(schemas, semestre, parcours.abreviation, session)
+    all_note = crud.note.read_all_note(create_anne(schema), semester, journey.abbreviation, session)
     return all_note
 
 
@@ -94,10 +94,10 @@ def get_all_notes(
 def updates_note(
         *,
         db: Session = Depends(deps.get_db),
-        schemas: str,
-        semestre: str,
+        schema: str,
+        semester: str,
         session: str,
-        uuid_parcours: str,
+        uuid_journey: str,
         all_notes_ue: List[List[schemas.Note]],
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -105,33 +105,33 @@ def updates_note(
     Create table note.
     """
 
-    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schemas))
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
+    college_year = crud.college_year.get_by_title(db, schema)
+    if not college_year:
+        raise HTTPException(status_code=400, detail=f"{schema} not found.",
                             )
 
-    parcours = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours)
-    if not parcours:
-        raise HTTPException(status_code=400, detail="Parcours not found")
-    test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours.abreviation,
+    journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
+    if not journey:
+        raise HTTPException(status_code=400, detail="journey not found")
+    test_note = crud.note.check_table_exist(schema=create_anne(schema), semester=semester, journey=journey.abbreviation,
                                             session=session)
     if not test_note:
         raise HTTPException(status_code=400,
-                            detail=f"note_{parcours.abreviation.lower()}_{semestre.lower()}_{session.lower()} not found.",
+                            detail=f"note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()} not found.",
                             )
     moy_cred_in = {}
     moy_cred_in_fin = {}
     for notes in all_notes_ue:
         for note in notes:
-            et_un = crud.note.read_by_num_carte(schemas, semestre, parcours.abreviation, session, note.num_carte)
-            et_un_final = crud.note.read_by_num_carte(schemas, semestre, parcours.abreviation, "final", note.num_carte)
+            et_un = crud.note.read_by_num_carte(create_anne(schema), semester, journey.abbreviation, session, note.num_carte)
+            et_un_final = crud.note.read_by_num_carte(create_anne(schema), semester, journey.abbreviation, "final", note.num_carte)
             if et_un:
                 ue_in = {}
                 ue_in_final = {}
-                ecs = crud.matier_ec.get_by_value_ue(schemas, note.name, semestre, uuid_parcours)
+                ecs = crud.matier_ec.get_by_value_ue(create_anne(schema), note.name, semester, uuid_journey)
                 note_ue = 0
                 note_ue_final = 0
-                credit = crud.matier_ue.get_by_value(schemas, note.name, semestre, uuid_parcours).credit
+                credit = crud.matier_ue.get_by_value(create_anne(schema), note.name, semester, uuid_journey).credit
                 if len(note.ec) != len(ecs):
                     raise HTTPException(status_code=400, detail="ivalide EC for UE",
                                         )
@@ -146,7 +146,7 @@ def updates_note(
                     value_sess = et_un_final[f'ec_{note.ec[i].name}']
                     if value_sess is None:
                         value_sess = 0
-                    poids_ec = crud.matier_ec.get_by_value(schemas, ecs[i][2], semestre, uuid_parcours)
+                    poids_ec = crud.matier_ec.get_by_value(create_anne(schema), ecs[i][2], semester, uuid_journey)
                     note_ue += value_ec_note * float(poids_ec.poids)
                     note_ue_final += max_value(value_ec_note, value_sess) * float(poids_ec.poids)
                 ue_in[f'ue_{note.name}'] = note_ue
@@ -159,12 +159,12 @@ def updates_note(
                     ue_in_final[f'ec_{note_ec.name}'] = max_value(note_ec.note, value_sess)
                     print(max_value(note_ec.note, value_sess))
 
-                crud.note.update_note(schemas, semestre, parcours.abreviation, session, note.num_carte, ue_in)
-                crud.note.update_note(schemas, semestre, parcours.abreviation, "final", note.num_carte, ue_in_final)
-                et_un = crud.note.read_by_num_carte(schemas, semestre, parcours.abreviation, session, note.num_carte)
-                et_un_final = crud.note.read_by_num_carte(schemas, semestre, parcours.abreviation, "final",
+                crud.note.update_note(create_anne(schema), semester, journey.abbreviation, session, note.num_carte, ue_in)
+                crud.note.update_note(create_anne(schema), semester, journey.abbreviation, "final", note.num_carte, ue_in_final)
+                et_un = crud.note.read_by_num_carte(create_anne(schema), semester, journey.abbreviation, session, note.num_carte)
+                et_un_final = crud.note.read_by_num_carte(create_anne(schema), semester, journey.abbreviation, "final",
                                                           note.num_carte)
-                ues = crud.matier_ue.get_by_class(schemas, uuid_parcours, semestre)
+                ues = crud.matier_ue.get_by_class(create_anne(schema), uuid_journey, semester)
                 moy = 0
                 credit = 0
                 moy_fin = 0
@@ -190,10 +190,10 @@ def updates_note(
                     moy_cred_in_fin["moyenne"] = moy_fin / somme
                     moy_cred_in_fin["credit"] = credit_fin
 
-                    crud.note.update_note(schemas, semestre, parcours.abreviation, session, note.num_carte, moy_cred_in)
-                    crud.note.update_note(schemas, semestre, parcours.abreviation, "final", note.num_carte, moy_cred_in)
+                    crud.note.update_note(create_anne(schema), semester, journey.abbreviation, session, note.num_carte, moy_cred_in)
+                    crud.note.update_note(create_anne(schema), semester, journey.abbreviation, "final", note.num_carte, moy_cred_in)
 
-    all_note = crud.note.read_all_note(schemas, semestre, parcours.abreviation, session)
+    all_note = crud.note.read_all_note(create_anne(schema), semester, journey.abbreviation, session)
     return all_note
 
 
@@ -201,9 +201,9 @@ def updates_note(
 def delete_note(
         *,
         db: Session = Depends(deps.get_db),
-        schemas: str,
-        semestre: str,
-        uuid_parcours: str,
+        schema: str,
+        semester: str,
+        uuid_journey: str,
         num_carte: str,
         session: str,
         current_user: models.User = Depends(deps.get_current_active_user),
@@ -211,22 +211,22 @@ def delete_note(
     """
     Create table note.
     """
-    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schemas))
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
+    college_year = crud.college_year.get_by_title(db, schema)
+    if not college_year:
+        raise HTTPException(status_code=400, detail=f"{schema} not found.",
                             )
 
-    parcours = crud.parcours.get_by_uuid(db, uuid_parcours)
-    if not parcours:
-        raise HTTPException(status_code=400, detail="Parcours not found")
-    test_note = crud.note.check_table_exist(schemas=schemas, semestre=semestre, parcours=parcours.abreviation,
+    journey = crud.journey.get_by_uuid(db, uuid_journey)
+    if not journey:
+        raise HTTPException(status_code=400, detail="journey not found")
+    test_note = crud.note.check_table_exist(schema=create_anne(schema), semester=semester, journey=journey.abbreviation,
                                             session=session)
     if not test_note:
         raise HTTPException(status_code=400,
-                            detail=f"note_{parcours.abreviation.lower()}_{semestre.lower()}_{session.lower()} not found.",
+                            detail=f"note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()} not found.",
                             )
-    et_un = crud.note.read_by_num_carte(schemas, semestre, parcours.abreviation, session, num_carte)
+    et_un = crud.note.read_by_num_carte(create_anne(schema), semester, journey.abbreviation, session, num_carte)
     if et_un:
-        crud.note.delete_by_num_carte(schemas, semestre, parcours.abreviation, num_carte)
-    all_note = crud.note.read_all_note(schemas, semestre, parcours.abreviation)
+        crud.note.delete_by_num_carte(create_anne(schema), semester, journey.abbreviation, num_carte)
+    all_note = crud.note.read_all_note(create_anne(schema), semester, journey.abbreviation)
     return all_note
