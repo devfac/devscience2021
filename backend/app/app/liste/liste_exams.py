@@ -55,31 +55,32 @@ class PDF(FPDF):
 
         pdf.add_font("alger", "", "Algerian.ttf", uni=True)
 
-        pdf.image(image_univ, x=30, y=6, w=30, h=30)
-        pdf.image(image_fac, x=155, y=6, w=30, h=30)
+        #pdf.image(image_univ, x=30, y=6, w=30, h=30)
+        #pdf.image(image_fac, x=155, y=6, w=30, h=30)
 
-        numero = f" N° {data['skip']} à {data['limit']}"
+        num = f" N° {data['skip']} à {data['limit']}"
         titre4 = "UNIVERSITE DE FIANARANTSOA"
         titre5 = "FACULTE DES SCIENCES"
 
         mention = "MENTION:"
         mention_etudiant = f"{data['mention']}"
-        parcours = "PARCOURS:"
-        parcours_etudiant = f"{data['parcours']}"
-        semestre = "SEMESTRE:"
-        semestre_etudiant = f"{sems.upper()}"
+        journey = "journey:"
+        journey_etudiant = f"{data['journey']}"
+        semester = "semester:"
+        semester_etudiant = f"{sems.upper()}"
         anne = "ANNÉE UNIVERSITAIRE:"
         anne_univ = f"{data['anne']}"
         session = "SESSION:"
-        session_class = f"{data['session']}"
+        sessionclass = f"{data['session']}"
         salle = "SALLE:"
         salle_et = f"{data['salle']}"
-
+        """
         pdf.set_font("arial", "B", 12)
         pdf.cell(0, 6, txt=titre4, ln=1, align="C")
 
         pdf.set_font("arial", "B", 10)
         pdf.cell(0, 6, txt=titre5, ln=1, align="C")
+        """
         pdf.set_font("alger", "", 22)
         pdf.cell(0, 15, txt="", ln=1, align="C")
         pdf.cell(0, 15, txt=title, ln=1, align="C")
@@ -91,16 +92,16 @@ class PDF(FPDF):
         pdf.cell(0, 8, txt=mention_etudiant, ln=1)
 
         pdf.set_font("arial", "BI", 13)
-        pdf.cell(29, 8, txt=parcours, align="L")
+        pdf.cell(29, 8, txt=journey, align="L")
 
         pdf.set_font("arial", "I", 12)
-        pdf.cell(0, 8, txt=parcours_etudiant, ln=1)
+        pdf.cell(0, 8, txt=journey_etudiant, ln=1)
 
         pdf.set_font("arial", "BI", 13)
-        pdf.cell(28, 8, txt=semestre, align="L")
+        pdf.cell(28, 8, txt=semester, align="L")
 
         pdf.set_font("arial", "I", 12)
-        pdf.cell(0, 8, txt=semestre_etudiant, ln=1)
+        pdf.cell(0, 8, txt=semester_etudiant, ln=1)
 
         pdf.set_font("arial", "BI", 13)
         pdf.cell(56, 8, txt=anne, align="L")
@@ -112,7 +113,7 @@ class PDF(FPDF):
         pdf.cell(23, 8, txt=session, align="L")
 
         pdf.set_font("arial", "I", 12)
-        pdf.cell(0, 8, txt=session_class.upper(), ln=1)
+        pdf.cell(0, 8, txt=sessionclass.upper(), ln=1)
 
         pdf.set_font("arial", "BI", 13)
         pdf.cell(17, 8, txt=salle.upper(), align="L")
@@ -121,7 +122,7 @@ class PDF(FPDF):
         pdf.cell(11, 8, txt=salle_et)
 
         pdf.set_font("arial", "I", 12)
-        pdf.cell(0, 8, txt=numero, ln=1)
+        pdf.cell(0, 8, txt=num, ln=1)
 
     def create_list_examen(sems: str, parcour: str, data: Any, matiers: Any, etudiants: Any):
         pdf = PDF("P", "mm", "a4")

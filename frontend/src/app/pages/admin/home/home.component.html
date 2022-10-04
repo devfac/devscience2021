@@ -1,0 +1,47 @@
+<nz-layout class="inner-layout">
+  <nz-sider nzWidth="250px" nzTheme="light">
+    <nz-content class="inner-content">
+      <ul nz-menu nzMode="inline">
+        <li nz-menu-group [nzTitle]="'admin.home.menu' | translate ">
+          <ul>
+            <li nz-menu-item nzSelected routerLink="/home/users"
+              [nzSelected]="router.routerState.snapshot.url === '/home/users'">
+              <a routerLink="/home/users">{{'admin.home.users.title' | translate}}</a>
+            </li>
+            <li nz-menu-item nzSelected routerLink="/home/mention"
+            [nzSelected]="router.routerState.snapshot.url === '/home/mention'">
+            <a routerLink="/home/mention">{{'admin.home.mention.title' | translate}}</a>
+            </li>
+            <li nz-menu-item nzSelected routerLink="/home/journey"
+            [nzSelected]="router.routerState.snapshot.url === '/home/journey'">
+            <a routerLink="/home/journey">{{'admin.home.journey.title' | translate}}</a>
+            </li>
+            <li nz-menu-item nzSelected routerLink="/home/college-year"
+            [nzSelected]="router.routerState.snapshot.url === '/home/mention'">
+            <a routerLink="/home/college-year">{{'admin.home.college_year.title' | translate}}</a>
+            </li>
+            <li nz-menu-item nzSelected routerLink="/home/role"
+            [nzSelected]="router.routerState.snapshot.url === '/home/role'">
+            <a routerLink="/home/role">{{'admin.home.role.title' | translate}}</a>
+            </li>
+            <li nz-menu-item nzSelected routerLink="/home/ue"
+            [nzSelected]="router.routerState.snapshot.url === '/home/ue'">
+            <a routerLink="/home/ue">{{'admin.home.ue.title' | translate}}</a>
+            </li>
+            <li nz-menu-item nzSelected routerLink="/home/ec"
+            [nzSelected]="router.routerState.snapshot.url === '/home/ec'">
+            <a routerLink="/home/ec">{{'admin.home.ec.title' | translate}}</a>
+            </li>
+            <li nz-menu-item nzSelected routerLink="/home/note"
+            [nzSelected]="router.routerState.snapshot.url === '/home/note'">
+            <a routerLink="/home/note">{{'admin.home.note.title' | translate}}</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nz-content>
+  </nz-sider>
+  <nz-content class="inner-content" style="width: 100%">
+    <router-outlet></router-outlet>
+  </nz-content>
+</nz-layout>

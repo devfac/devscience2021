@@ -1,4 +1,5 @@
 from typing import Any, List
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -61,8 +62,8 @@ def update_mention(
         mention_oj['value']=decode_text(mention_in.title).lower()
     if mention_in.last_num_carte:
         mention_oj['last_num_carte']=mention_in.last_num_carte
-    if mention_in.branche:
-        mention_oj['branche']=decode_text(mention_in.branche)
+    if mention_in.plugged:
+        mention_oj['plugged']=decode_text(mention_in.plugged)
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid)
     if not mention:
         raise HTTPException(status_code=404, detail="Mention not found")
@@ -72,11 +73,11 @@ def update_mention(
     return crud.mention.get_multi(db=db)
 
 
-@router.get("/by_uuid", response_model=schemas.Mention)
+@router.get("/{uuid}", response_model=schemas.Mention)
 def read_mention(
     *,
     db: Session = Depends(deps.get_db),
-    uuid: str,
+    uuid: UUID,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """

@@ -7,24 +7,24 @@ from app.utils import convert_date
 def get_niveau_credit(niveau: str):
     niveau_ = {}
     if niveau == "L1":
-        niveau_["niveau"] = "PREMIERE ANNÉE DU LICENCE"
+        niveau_["level"] = "PREMIERE ANNÉE DU LICENCE"
         niveau_["credit"] = "60"
     elif niveau == "L2":
-        niveau_["niveau"] = "DEUXIEME ANNÉE DU LICENCE"
+        niveau_["level"] = "DEUXIEME ANNÉE DU LICENCE"
         niveau_["credit"] = "120"
     elif niveau == "L3":
-        niveau_["niveau"] = "TROISIÈME ANNÉE DU LICENCE"
+        niveau_["level"] = "TROISIÈME ANNÉE DU LICENCE"
         niveau_["credit"] = "180"
     elif niveau == "M1":
-        niveau_["niveau"] = "PREMIERE ANNÉE DU MASTER"
+        niveau_["level"] = "PREMIERE ANNÉE DU MASTER"
         niveau_["credit"] = "60"
     else:
-        niveau_["niveau"] = "DEUXIEME ANNÉE DU MASTER"
+        niveau_["level"] = "DEUXIEME ANNÉE DU MASTER"
         niveau_["credit"] = "120"
     return niveau_
 
 
-def attestation_validation_credit(num_carte: str, date: str, niveau: str, data: Any) -> str:
+def attestation_validation_credit(num_carte: str, date: str, data: Any) -> str:
     pdf = FPDF("P", "mm", "a4")
     pdf.add_page()
     pdf.l_margin = 20
@@ -42,20 +42,21 @@ def attestation_validation_credit(num_carte: str, date: str, niveau: str, data: 
     text_2 = "Soussigné, atteste que:"
 
     nom = "Nom:"
-    nom_etudiant = f"{data['nom']}"
+    nom_etudiant = f"{data['last_name']}"
     prenom = "Prénom:"
-    prenom_etudiant = f"{data['prenom']}"
+    prenom_etudiant = f"{data['first_name']}"
     naiss = "Né(e) le:"
-    naiss_etudiant = f"{convert_date(data['date_naiss'])} à {data['lieu_naiss']}"
+    naiss_etudiant = f"{convert_date(data['date_birth'])} à {data['place_birth']}"
     mention = "MENTION:"
     mention_etudiant = f"{data['mention']}"
-    parcours = "PARCOURS:"
-    parcours_etudiant = f"{data['parcours']}"
+    journey = "journey:"
+    journey_etudiant = f"{data['journey']}"
     registre = f"N° sur le registre:"
-    registre_etudiant = f"{num_carte} RI-{data['registre']}"
+    registre_etudiant = f"{num_carte} RI-{data['register']}"
 
-    text_3 = f"A validé les {get_niveau_credit(niveau.upper())['credit']} crédits de la {get_niveau_credit(niveau.upper())['niveau']}"
-    text_3_1 = f"en {data['parcours']}"
+    text_3 = f"A validé les {get_niveau_credit(data['level'])['credit']} " \
+             f"crédits de la {get_niveau_credit(data['level'])['level']}"
+    text_3_1 = f"en {data['journey']}"
     text_4 = "En foi de quoi, la présence d'attestation lui est delivré pour servir et valoir ce que le droit"
 
     text_5 = "Fianarantsoa, le "
@@ -123,10 +124,10 @@ def attestation_validation_credit(num_carte: str, date: str, niveau: str, data: 
     pdf.cell(0, 8, txt=mention_etudiant, ln=1)
 
     pdf.set_font("arial", "BUI", 12)
-    pdf.cell(27, 8, txt=parcours, ln=0, align="L")
+    pdf.cell(27, 8, txt=journey, ln=0, align="L")
 
     pdf.set_font("arial", "I", 12)
-    pdf.cell(0, 8, txt=parcours_etudiant, ln=1)
+    pdf.cell(0, 8, txt=journey_etudiant, ln=1)
 
     pdf.set_font("arial", "BUI", 12)
     pdf.cell(37, 8, txt=registre, ln=0, align="L")
@@ -156,7 +157,7 @@ if __name__ == "__main__":
     data = {"nom": "RALAITSIMANOLAKAVANA", "prenom": "Henri Franck",
             "date_naiss": "07 octobre 1995 ", "lieu_naiss": " Fianarantsoa",
             "niveau": "M2", "mention": "Mathématiques et Applications",
-            "parcours": "Mathématiques et Informatiques pous la Sciences Social",
+            "journey": "Mathématiques et Informatiques pous la Sciences Social",
             "registre": "20"}
 
     attestation_validation_credit("4465", "2020", "2020-2021", data)

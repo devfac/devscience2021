@@ -15,7 +15,7 @@ router = APIRouter()
 
 @router.get("/all_statistic/")
 def all_statistic_(
-        schemas: str,
+        college_year: str,
         uuid_mention: str,
         db: Session = Depends(deps.get_db),
         current_user: models.User = Depends(deps.get_current_active_user),
@@ -23,30 +23,30 @@ def all_statistic_(
     """
     all_statistic
     """
-    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schemas))
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.", )
+    college_years = crud.college_year.get_by_title(db=db, title=college_year)
+    if not college_years:
+        raise HTTPException(status_code=400, detail=f"{college_year} not found.", )
 
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
     if not mention:
         raise HTTPException(status_code=400, detail=f" Mention not found.", )
 
-    all_parcours = crud.parcours.get_by_mention(db=db, uuid_mention=uuid_mention)
+    all_journey = crud.journey.get_by_mention(db=db, uuid_mention=uuid_mention)
 
-    niveau_ = ["L1", "L2", "L3", "M1", "M2"]
-    all_niveau = [{"L1": ["S1", "S2"]}, {"L2": ["S3", "S4"]}, {"L3": ["S5", "S6"]}, {"M1": ["S7", "S8"]},
+    level_ = ["L1", "L2", "L3", "M1", "M2"]
+    all_level = [{"L1": ["S1", "S2"]}, {"L2": ["S3", "S4"]}, {"L3": ["S5", "S6"]}, {"M1": ["S7", "S8"]},
                   {"M2": ["S9", "S10"]}]
-    all_niveau_stat = [{"L1": []}, {"L2": []}, {"L3": []}, {"M1": []}, {"M2": []}]
+    all_level_stat = [{"L1": []}, {"L2": []}, {"L3": []}, {"M1": []}, {"M2": []}]
 
-    for index, niveau in enumerate(all_niveau):
-        for parcours in all_parcours:
-            if niveau[niveau_[index]][0] in parcours.semestre or niveau[niveau_[index]][1] in parcours.semestre:
-                info = {"name": parcours.abreviation.upper(), "uuid": parcours.uuid}
-                all_niveau_stat[index][niveau_[index]].append(info)
-    all_niveau_stat.append(
+    for index, level in enumerate(all_level):
+        for journey in all_journey:
+            if level[level_[index]][0] in journey.semester or level[level_[index]][1] in journey.semester:
+                info = {"name": journey.abbreviation.upper(), "uuid": journey.uuid}
+                all_level_stat[index][level_[index]].append(info)
+    all_level_stat.append(
         {"H": [{"name": "6 eme", "uuid": ""}, {"name": "7 eme", "uuid": ""}, {"name": "Doctorat", "uuid": ""}]})
-    data = {"anne": decode_schemas(schemas), "mention": mention.title}
-    file = all_statistic.PDF.create_all_statistic(data, all_niveau_stat, schemas)
+    data = {"anne": college_year, "mention": mention.title}
+    file = all_statistic.PDF.create_all_statistic(db, data, all_level_stat, college_year)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
 
@@ -68,7 +68,7 @@ def statistic_by_years(
     if not mention:
         raise HTTPException(status_code=400, detail=f" Mention not found.", )
 
-    all_parcours = crud.parcours.get_by_mention(db=db, uuid_mention=uuid_mention)
+    all_journey = crud.journey.get_by_mention(db=db, uuid_mention=uuid_mention)
 
     niveau_ = ["L1", "L2", "L3", "M1", "M2"]
     all_niveau = [{"L1": ["S1", "S2"]}, {"L2": ["S3", "S4"]}, {"L3": ["S5", "S6"]}, {"M1": ["S7", "S8"]},
@@ -76,10 +76,10 @@ def statistic_by_years(
     all_niveau_stat = [{"L1": []}, {"L2": []}, {"L3": []}, {"M1": []}, {"M2": []}]
 
     for index, niveau in enumerate(all_niveau):
-        for parcours in all_parcours:
-            if niveau[niveau_[index]][0] in parcours.semestre or niveau[niveau_[index]][1] in parcours.semestre:
-                info = {"name": parcours.abreviation.upper()}
-                etudiants = crud.ancien_etudiant.get_by_parcours_for_stat(schemas, str(parcours.uuid),
+        for journey in all_journey:
+            if niveau[niveau_[index]][0] in journey.semester or niveau[niveau_[index]][1] in journey.semester:
+                info = {"name": journey.abbreviation.upper()}
+                etudiants = crud.ancien_etudiant.get_by_journey_for_stat(schemas, str(journey.uuid),
                                                                           niveau[niveau_[index]][1])
                 info["etudiants"] = etudiants
                 all_niveau_stat[index][niveau_[index]].append(info)

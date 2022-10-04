@@ -1,0 +1,30 @@
+<div class="profile-container">
+  <button nz-button nz-dropdown nzPlacement="bottomRight" [nzDropdownMenu]="menu" nzTrigger="click"
+    class="profile-button">
+    <i nz-icon nzType="user"></i>{{ 'profile' | translate }}
+  </button>
+  <nz-dropdown-menu #menu="nzDropdownMenu">
+    <div class="profile-dropdown">
+      <div *ngIf="user" nz-typography nzEllipsis nzEllipsisRows="1">
+        {{user?.first_name}} {{user?.last_name}}
+      </div>
+      <ul nz-menu nzTheme="dark" class="profile-menu">
+        <li nz-menu-item routerLink="/profile">
+          <a routerLink="/profile">
+            <i nz-icon nzType="user"></i> <span>{{ 'manage_profile' | translate }}</span>
+          </a>
+        </li>
+        <li nz-menu-item routerLink="/profile/edit-password">
+          <a routerLink="/profile/edit-password">
+            <i nz-icon nzType="lock"></i><span>{{ 'change_password' | translate }}</span>
+          </a>
+        </li>
+        <li nz-menu-item routerLink="/auth/login" (click)="logout()">
+          <a routerLink="/auth/login" (click)="logout()">
+            <i nz-icon nzType="logout"></i><span>{{ 'sign_out' | translate }} </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nz-dropdown-menu>
+</div>

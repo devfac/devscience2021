@@ -7,7 +7,7 @@ from pydantic import BaseModel
 # Shared properties
 class DiplomeBase(BaseModel):
     diplome: Optional[str]
-    uuid_parcours: Optional[str]
+    uuid_journey: Optional[str]
     uuid_mention: Optional[str] 
 
 
@@ -16,14 +16,14 @@ class DiplomeCreate(DiplomeBase):
     uuid:Optional[UUID]
     num_carte: str
     diplome: str
-    uuid_parcours: UUID
+    uuid_journey: UUID
     uuid_mention: UUID
 
 
 # Properties to receive via API on update
 class DiplomeUpdate(DiplomeBase):
     diplome: Optional[str]
-    uuid_parcours: Optional[UUID]
+    uuid_journey: Optional[UUID]
     uuid_mention: Optional[UUID]
 
 

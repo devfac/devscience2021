@@ -35,10 +35,10 @@ def read_etudiant_ancienne(
     if etudiant:
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
-            parcours = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours)
-            print(un_etudiant.uuid_parcours)
-            if parcours:
-                et["parcours"] = parcours.abreviation
+            journey = crud.journey.get_by_uuid(db=db, uuid=un_etudiant.uuid_journey)
+            print(un_etudiant.uuid_journey)
+            if journey:
+                et["journey"] = journey.abbreviation
             list_et.append(et)
 
     logging_.script_logging("error",
@@ -75,7 +75,7 @@ def create_etudiant_ancien(
                                 f"Success")
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
-            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
+            et["journey"] = crud.journey.get_by_uuid(db=db, uuid=un_etudiant.uuid_journey).abbreviation
             list_et.append(et)
     return list_et
 
@@ -108,7 +108,7 @@ def update_etudiant(
                                 f"Success")
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
-            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
+            et["journey"] = crud.journey.get_by_uuid(db=db, uuid=un_etudiant.uuid_journey).abbreviation
             list_et.append(et)
     return list_et
 
@@ -136,7 +136,7 @@ def read_etudiant_by_num_carte(
                             f"GET:======={datetime.datetime.now()}=======Ancien etudiant========"
                             f"Success")
     et = json.loads(json.dumps(dict(etudiant), cls=UUIDEncoder))
-    et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=etudiant.uuid_parcours).abreviation
+    et["journey"] = crud.journey.get_by_uuid(db=db, uuid=etudiant.uuid_journey).abbreviation
     return et
 
 
@@ -160,24 +160,24 @@ def read_etudiant_by_mention(
                                 f"Success")
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
-            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
+            et["journey"] = crud.journey.get_by_uuid(db=db, uuid=un_etudiant.uuid_journey).abbreviation
             list_et.append(et)
     return list_et
 
 
-@router.get("/by_parcours/", response_model=List[schemas.EtudiantAncien])
-def read_etudiant_by_parcours(
+@router.get("/by_journey/", response_model=List[schemas.EtudiantAncien])
+def read_etudiant_by_journey(
         *,
         db: Session = Depends(deps.get_db),
         schema: str,
-        uuid_parcours: str,
+        uuid_journey: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Get etudiant by parcours.
+    Get etudiant by journey.
     """
     logging_ = ScriptLogging(current_user.email)
-    etudiant = crud.ancien_etudiant.get_by_parcours(schema=schema, uuid_parcours=uuid_parcours)
+    etudiant = crud.ancien_etudiant.get_by_journey(schema=schema, uuid_journey=uuid_journey)
     list_et = []
     if etudiant:
         logging_.script_logging("info",
@@ -185,7 +185,7 @@ def read_etudiant_by_parcours(
                                 f"Success")
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
-            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=uuid_parcours).abreviation
+            et["journey"] = crud.journey.get_by_uuid(db=db, uuid=uuid_journey).abbreviation
             list_et.append(et)
     return list_et
 
@@ -200,7 +200,7 @@ def read_etudiant_by_semstre_and_mention(
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Get etudiant by semestre and mention.
+    Get etudiant by semester and mention.
     """
     etudiant = crud.ancien_etudiant.get_by_semetre_and_mention(
         schema=schema, uuid_mention=uuid_mention, semetre_grand=semetre_grand)
@@ -208,7 +208,7 @@ def read_etudiant_by_semstre_and_mention(
     if etudiant:
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
-            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
+            et["journey"] = crud.journey.get_by_uuid(db=db, uuid=un_etudiant.uuid_journey).abbreviation
             list_et.append(et)
     return list_et
 
@@ -229,7 +229,7 @@ def read_etudiant_by_etat(
     if etudiant:
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
-            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
+            et["journey"] = crud.journey.get_by_uuid(db=db, uuid=un_etudiant.uuid_journey).abbreviation
             list_et.append(et)
     return list_et
 
@@ -251,7 +251,7 @@ def read_etudiant_by_etat_and_moyenne(
     if etudiant:
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
-            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
+            et["journey"] = crud.journey.get_by_uuid(db=db, uuid=un_etudiant.uuid_journey).abbreviation
             list_et.append(et)
     return list_et
 
@@ -261,19 +261,19 @@ def read_etudiant_by_class(
         *,
         db: Session = Depends(deps.get_db),
         schema: str,
-        uuid_parcours: str,
-        semestre: str,
+        uuid_journey: str,
+        semester: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get etudiant by class.
     """
-    etudiant = crud.ancien_etudiant.get_by_class(schema, uuid_parcours, semestre)
+    etudiant = crud.ancien_etudiant.get_by_class(schema, uuid_journey, semester)
     list_et = []
     if etudiant:
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
-            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
+            et["journey"] = crud.journey.get_by_uuid(db=db, uuid=un_etudiant.uuid_journey).abbreviation
             list_et.append(et)
     return list_et
 
@@ -298,7 +298,7 @@ def delete_etudiant(
     if etudiant:
         for un_etudiant in etudiant:
             et = json.loads(json.dumps(dict(un_etudiant), cls=UUIDEncoder))
-            et["parcours"] = crud.parcours.get_by_uuid(db=db, uuid=un_etudiant.uuid_parcours).abreviation
+            et["journey"] = crud.journey.get_by_uuid(db=db, uuid=un_etudiant.uuid_journey).abbreviation
             list_et.append(et)
     return list_et
 

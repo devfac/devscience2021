@@ -1,0 +1,53 @@
+<nz-layout>
+  <nz-header class="top-nav">
+    <div nz-row>
+      <div nz-col nzSpan="2" nzLg="0">
+        <span class="drawer-menu-trigger" (click)="openDrawer()">
+          <i class="trigger" nz-icon [nzType]="drawerVisible ? 'menu-unfold' : 'menu-fold'"></i>
+        </span>
+      </div>
+      <div nz-col nzSpan="4">
+        <div class="logo">
+          <a routerLink="/dashboard">
+            <img src="{{ config.appLogo }}" alt="{{ config.appTitle }}" />
+          </a>
+        </div>
+      </div>
+      <div nz-col nzSpan="0" nzLg="12">
+        <app-menu mode="horizontal"></app-menu>
+      </div>
+      <div nz-col nzFlex="auto">
+        <div class="right-menu">
+          <app-language-select></app-language-select>
+          <app-profil-dropdown></app-profil-dropdown>
+        </div>
+      </div>
+    </div>
+  </nz-header>
+  <nz-content class="outer-content">
+    <div>
+      <xng-breadcrumb>
+        <ng-container *xngBreadcrumbItem="let breadcrumb">
+          <ng-container>{{ breadcrumb | translate | titlecase }}</ng-container>
+        </ng-container>
+      </xng-breadcrumb>
+  
+    </div>
+    <div style="padding: 16px 0px; flex: 1">
+      <router-outlet></router-outlet>
+    </div>
+  </nz-content>
+  <nz-footer>{{ config.footerCopyright }}</nz-footer>
+</nz-layout>
+<nz-drawer
+  [nzClosable]="true"
+  [nzVisible]="drawerVisible"
+  [nzBodyStyle]="drawerBodyStyle"
+  (nzOnClose)="closeDrawer()"
+  nzPlacement="left"
+  nzTitle="Menu"
+>
+  <ng-container *nzDrawerContent>
+    <app-menu mode="inline" (closeDrawer)="closeDrawer()"></app-menu>
+  </ng-container>
+</nz-drawer>

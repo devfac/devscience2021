@@ -4,32 +4,32 @@ from pydantic import BaseModel
 
 
 # Shared properties
+from .journey import Journey
+from .mention import Mention
+
+
 class MatiertBase(BaseModel):
-    uuid: Optional[UUID]
     title: Optional[str] = None
-    semestre: Optional[str] = None
-    uuid_parcours: Optional[UUID] = None
-    uuid_mention: Optional[UUID] = None
+    semester: Optional[str] = None
+    uuid_journey: Optional[UUID] = None
 
 
 # Properties to receive via API on creation
 class MatierUECreate(MatiertBase):
     title: str
     credit: int
-    semestre: str
-    uuid_parcours: UUID
-    uuid_mention: UUID
+    semester: str
+    uuid_journey: UUID
 
 
 class MatierECCreate(MatiertBase):
     title: str
-    semestre: str
+    semester: str
     value_ue: str
-    poids: float
-    utilisateur: str
+    weight: float
+    users: Optional[str]
     is_optional: bool = False
-    uuid_parcours: UUID
-    uuid_mention: UUID
+    uuid_journey: UUID
 
 
 class MatierUEUpdate(BaseModel):
@@ -37,9 +37,9 @@ class MatierUEUpdate(BaseModel):
 
 
 class MatierECUpdate(BaseModel):
-    poids: Optional[float]
+    weight: Optional[float]
     value_ue: Optional[str]
-    utilisateur: Optional[str]
+    user: Optional[str]
     is_optional: Optional[bool]
 
 
@@ -53,12 +53,12 @@ class MatierUEInDBBase(MatiertBase):
 
 
 class MatierECInDBBase(MatiertBase):
-    poids: Optional[float]
+    weight: Optional[float]
     value: Optional[str]
     value_ue: Optional[str]
     is_optional: Optional[bool]
     key_unique: Optional[str]
-    utilisateur: Optional[str]
+    users: Optional[str]
 
     class Config:
         orm_mode = True
@@ -66,7 +66,9 @@ class MatierECInDBBase(MatiertBase):
 
 # Additional properties to return via API
 class MatierUE(MatierUEInDBBase):
-    pass
+    uuid: Optional[str]
+    journey: Optional[Journey]
+    abbreviation_journey: Optional[str]
 
 
 # Additional properties stored in DB
@@ -75,7 +77,9 @@ class MatierUEInDB(MatierUEInDBBase):
 
 
 class MatierEC(MatierECInDBBase):
-    pass
+    uuid: Optional[str]
+    journey: Optional[Journey]
+    abbreviation_journey: Optional[str]
 
 
 # Additional properties stored in DB
@@ -86,7 +90,7 @@ class MatierECInDB(MatierECInDBBase):
 class MatierUniEc(BaseModel):
     name: Optional[str]
     note: float
-    poids: float
+    weight: float
 
 
 class MatierUniUe(BaseModel):
