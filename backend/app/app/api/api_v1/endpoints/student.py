@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
-from app import crud, models, schemas
+from app import crud, models, schemas, utils
 from app.api import deps
 from app.schemas.student import Receipt
 from app.utils import create_num_carte, find_in_list
@@ -237,11 +237,14 @@ def update_student_selected(
     if not student or not student.is_selected:
         raise HTTPException(status_code=404, detail="Student not selected or not found")
 
+    student_in.receipt = ""
     if student.num_carte:
         student_in.num_carte = student.num_carte
     else:
         student_in.num_carte = create_num_carte(mention.plugged, str(num))
 
+    student_in.inf_semester = utils.get_sems_min(student.level)
+    student_in.sup_semester = utils.get_sems_max(student.level)
     crud.new_student.update(db=db, db_obj=student, obj_in=student_in)
     students = crud.new_student.get_all(db=db, college_year=student_in.actual_years)
     all_student = []
@@ -274,11 +277,65 @@ def read_student_by_num_carte(
             receipt = receipt.replace("'", '"')
             receipt = json.loads(receipt)
             if receipt['year'] == student.actual_years:
-                print(receipt)
                 stud.receipt = receipt
         if find_in_list(current_user.uuid_mention, str(stud.uuid_mention)) != -1:
             return stud
 
+
+@router.get("/new_selected", response_model=schemas.NewStudent)
+def read_student_by_num_select(
+        *,
+        db: Session = Depends(deps.get_db),
+        num_select: str,
+        current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Get student by num select.
+    """
+    student = crud.new_student.get_by_num_select(db=db, num_select=num_select)
+    if not student or not find_in_list(current_user.uuid_mention, str(student.uuid_mention)) != -1:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    if not student.is_selected:
+        raise HTTPException(status_code=404, detail="Student not selected")
+
+    if student.uuid_journey:
+        stud = schemas.NewStudent(**jsonable_encoder(student))
+        stud.journey = crud.journey.get_by_uuid(db=db, uuid=student.uuid_journey)
+        for receipt in student.receipt_list:
+            receipt = receipt.replace("'", '"')
+            receipt = json.loads(receipt)
+            if receipt['year'] == student.actual_years:
+                print(receipt)
+                stud.receipt = receipt
+        if find_in_list(current_user.uuid_mention, str(stud.uuid_mention)) != -1:
+            return stud
+    return student
+
+@router.get("/new_num_carte", response_model=schemas.NewStudent)
+def read_student_by_num_carte(
+        *,
+        db: Session = Depends(deps.get_db),
+        num_carte: str,
+        current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Get student by num select.
+    """
+    student = crud.new_student.get_by_num_carte(db=db, num_carte=num_carte)
+    if not student or not find_in_list(current_user.uuid_mention, str(student.uuid_mention)) != -1:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    if not student.is_selected:
+        raise HTTPException(status_code=404, detail="Student not selected")
+
+    if student.receipt_list:
+        for receipt in student.receipt_list:
+            receipt = receipt.replace("'", '"')
+            receipt = json.loads(receipt)
+            if receipt['year'] == student.actual_years:
+                student.receipt = receipt
+    return student
 
 @router.get("/new", response_model=schemas.NewStudent)
 def read_student_by_num_select(

@@ -21,10 +21,10 @@ export class UeComponent implements OnInit {
     "Authorization": "Bearer "+localStorage.getItem("token")
   })
   user = localStorage.getItem('user')
-  all_years: CollegeYear[] = []
-  all_journey: Journey[] = []
-  all_mention: Mention[] = []
-  all_ue: Ue[] = []
+  allYears: CollegeYear[] = []
+  allJourney: Journey[] = []
+  allMention: Mention[] = []
+  allUe: Ue[] = []
   listOfSemester = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
   semesterTitles: any[] = []
   confirmModal?: NzModalRef;
@@ -98,7 +98,7 @@ export class UeComponent implements OnInit {
 
     this.http.get<any>(`${BASE_URL}/mentions/`, options).subscribe(
       data => {
-        this.all_mention = data,
+        this.allMention = data,
         this.form.get('mention')?.setValue(data[0].uuid)
       },
       error => console.error("error as ", error)
@@ -106,11 +106,11 @@ export class UeComponent implements OnInit {
 
     this.http.get<any>(`${BASE_URL}/college_year/`, options).subscribe(
       data => {
-        this.all_years = data,
+        this.allYears = data,
         this.actualYear = data[0].title
         this.form.get('collegeYear')?.setValue(this.actualYear)
         this.http.get<any>(`${BASE_URL}/matier_ue/?schema=`+data[0].title, options).subscribe(
-          data => this.all_ue = data,
+          data => this.allUe = data,
           error => console.error("error as ", error)
         );
       },
@@ -139,7 +139,7 @@ export class UeComponent implements OnInit {
       nzTitle: "Voulez-vous supprimer "+name+"?",
       nzOnOk: () => {
         this.http.delete<any>(`${BASE_URL}/matier_ue/`+uuid+`?schema=`+this.form.get('collegeYear')?.value, this.options).subscribe(
-          data => this.all_ue = data,
+          data => this.allUe = data,
           error => console.error("error as ", error)
         );
       }
@@ -154,18 +154,20 @@ export class UeComponent implements OnInit {
       if (this.isEdit){
         this.form.get('title')?.disabled
         this.http.put<any>(`${BASE_URL}/matier_ue/`+this.uuid+`?schema=`+this.form.get('collegeYear')?.value, data, this.options).subscribe(
-          data => this.all_ue = data,
+          data => this.allUe = data,
           error => console.error("error as ", error)
         )
       }else{
         const data = {
           title: this.form.value.title,
           credit: this.form.value.credit,
+          value: "",
+          key_unique: "",
           uuid_journey: this.form.value.journey,
           semester: this.form.value.semester
         }
         this.http.post<any>(`${BASE_URL}/matier_ue/?schema=`+this.form.get('collegeYear')?.value,data, this.options).subscribe(
-          data => this.all_ue = data,
+          data => this.allUe = data,
           error => console.error("error as ", error)
         )
       }
@@ -194,7 +196,7 @@ export class UeComponent implements OnInit {
   showModalEdit(uuid: string): void{
     this.isEdit = true
     this.uuid = uuid
-    this.http.get<any>(`${BASE_URL}/matier_ue/`+uuid+`?schema=`+this.form.get('collegeYear')?.value, this.options).subscribe(
+    this.http.get<any>(`${BASE_URL}/matier_ue/by_uuid/?uuid=`+uuid+`&schema=`+this.form.get('collegeYear')?.value, this.options).subscribe(
       data => {
         this.form.get('title')?.setValue(data.title),
         this.form.get('credit')?.setValue(data.credit),
@@ -204,11 +206,11 @@ export class UeComponent implements OnInit {
         this.http.get<any>(`${BASE_URL}/journey/`+this.form.get('mention')?.value, this.options).subscribe(
           data_journey => {
               console.error("error as ", data_journey)
-              this.all_journey = data_journey
+              this.allJourney = data_journey
               this.form.get('journey')?.setValue(data.uuid_journey)
           },
           error => {
-            this.all_journey = []
+            this.allJourney = []
             console.error("error as ", error)
           }
         )
@@ -222,11 +224,11 @@ export class UeComponent implements OnInit {
     this.http.get<any>(`${BASE_URL}/journey/`+this.form.get('mention')?.value, this.options).subscribe(
       data => {
           console.error("error as ", data)
-          this.all_journey = data
+          this.allJourney = data
           this.form.get('journey')?.setValue('')
       },
       error => {
-        this.all_journey = []
+        this.allJourney = []
         console.error("error as ", error)
       }
     )

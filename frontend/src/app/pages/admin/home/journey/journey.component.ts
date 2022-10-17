@@ -21,8 +21,8 @@ export class JourneyComponent implements OnInit {
 
 
   
-  all_journey: Journey[] = []
-  all_mention: Mention[] = []
+  allJourney: Journey[] = []
+  allMention: Mention[] = []
   listOfOptions = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
   semesterTitles: any[] = []
   listOfTagsOptions =[] 
@@ -94,13 +94,13 @@ export class JourneyComponent implements OnInit {
       headers: this.headers
     }
     this.http.get<any>(`${BASE_URL}/journey/`, options).subscribe(
-      data => this.all_journey = data,
+      data => this.allJourney = data,
       error => console.error("error as ", error)
     );
 
     this.http.get<any>(`${BASE_URL}/mentions/`, this.options).subscribe(
       data =>{
-        this.all_mention = data
+        this.allMention = data
         },
         error => console.error("error as ", error)
     );
@@ -118,7 +118,7 @@ export class JourneyComponent implements OnInit {
       nzTitle: "Voulez-vous supprimer "+name+"?",
       nzOnOk: () => {
         this.http.delete<any>(`${BASE_URL}/mentions/?uuid=`+uuid, this.options).subscribe(
-          data => this.all_journey = data,
+          data => this.allJourney = data,
           error => console.error("error as ", error)
         );
       }
@@ -131,12 +131,12 @@ export class JourneyComponent implements OnInit {
       console.error(data)
       if (this.isEdit){
         this.http.put<any>(`${BASE_URL}/journey/?uuid=`+this.uuid, data, this.options).subscribe(
-          data => this.all_journey = data,
+          data => this.allJourney = data,
           error => console.error("error as ", error)
         )
       }else{
         this.http.post<any>(`${BASE_URL}/journey/`,data, this.options).subscribe(
-          data => this.all_journey = data,
+          data => this.allJourney = data,
           error => console.error("error as ", error)
         )
       }

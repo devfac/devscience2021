@@ -8,9 +8,6 @@ from sqlalchemy.sql.sqltypes import ARRAY
 import uuid
 from app.db.base_class import Base
 
-if TYPE_CHECKING:
-    from .semester_valide import semesterValide  # noqa: F401
-
 
 class Student(Base):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

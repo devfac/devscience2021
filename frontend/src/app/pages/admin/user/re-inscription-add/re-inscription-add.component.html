@@ -21,7 +21,7 @@
             [placeholder]="'admin.student.num_carte' | translate" nz-icon="plus"  />
         </nz-input-group>
       <ng-template #iconButton>
-          <i nz-icon nzType="plus"  class="button"></i>
+        <i nz-icon nzType="import"  class="button" (click)="getByNumCarte()"></i>
       </ng-template>
       </nz-form-control>
     </nz-form-item>
@@ -49,7 +49,7 @@
               formControlName="mention"
               [nzPlaceHolder]="'admin.home.mention.title' | translate"
               >
-              <nz-option *ngFor="let item of all_mention"
+              <nz-option *ngFor="let item of allMention"
                   [nzLabel]="item.title"
                   [nzValue]="item.uuid"
               >
@@ -68,7 +68,7 @@
               formControlName="journey"
               [nzPlaceHolder]="'admin.home.journey.title' | translate"
               >
-              <nz-option *ngFor="let item of all_journey"
+              <nz-option *ngFor="let item of allJourney"
                   [nzLabel]="item.title"
                   [nzValue]="item.uuid"
               >
@@ -293,7 +293,7 @@
                           formControlName="priceRigth"
                           [nzPlaceHolder]="'admin.student.receipt' | translate"
                           >
-                          <nz-option *ngFor="let item of all_price"
+                          <nz-option *ngFor="let item of allPrice"
                               [nzLabel]="item.droit+' | '+item.level"
                               [nzValue]="item.droit"
                           >

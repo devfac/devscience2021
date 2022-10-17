@@ -46,9 +46,11 @@ class StudentBase(BaseModel):
 
 
 class SelectStudentCreate(StudentBase):
-    num_select: Optional[str]
+    num_select: str
     is_selected: Optional[bool] = False
-    enter_years: Optional[str]
+    enter_years: str
+    level: str
+    telephone: Optional[str]
 
 
 class SelectStudentBase(StudentBase):
@@ -56,6 +58,8 @@ class SelectStudentBase(StudentBase):
     is_selected: Optional[bool] = False
     enter_years: Optional[str]
     mention: Optional[Mention]
+    level: Optional[str]
+    telephone: Optional[str]
 
     class Config:
         orm_mode = True
@@ -139,7 +143,7 @@ class NewStudentUpdate(StudentBase):
     baccalaureate_num: Optional[str]
     baccalaureate_center: Optional[str]
     baccalaureate_years: Optional[str]
-    baccalaureate_seri: Optional[str]
+    baccalaureate_series: Optional[str]
     work: Optional[str]
     father_name: Optional[str]
     father_work: Optional[str]
@@ -151,6 +155,8 @@ class NewStudentUpdate(StudentBase):
     level: Optional[str]
     uuid_mention: Optional[UUID]
     uuid_journey: Optional[UUID]
+    inf_semester: Optional[str]
+    sup_semester: Optional[str]
     is_selected: Optional[bool] = True
 
 
@@ -200,6 +206,9 @@ class NewStudent(NewStudentInDBBase):
     num_carte: Optional[str]
     is_selected: Optional[bool]
     journey: Optional[Journey]
+    receipt: Optional[Receipt]
+    situation: Optional[str]
+    telephone: Optional[str]
     receipt: Optional[Receipt]
 
 class NewStudentSelect(NewStudentInDBBase):

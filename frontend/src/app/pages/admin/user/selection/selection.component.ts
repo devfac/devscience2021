@@ -9,6 +9,7 @@ import { AncienStudent, StudentColumn, ColumnItem  } from '@app/models/student';
 import { AuthService } from '@app/services/auth/auth.service';
 import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
+import { DownloadService } from '../../download.service';
 
 
 const BASE_URL = environment.authApiURL;
@@ -24,14 +25,15 @@ export class SelectionComponent implements OnInit {
   })
 
   user = localStorage.getItem('user')
-  all_years: CollegeYear[] = []
-  all_students: AncienStudent[] = []
-  all_journey: Journey[] = []
-  all_mention: Mention[] = []
+  allYears: CollegeYear[] = []
+  allStudents: AncienStudent[] = []
+  allJourney: Journey[] = []
+  allMention: Mention[] = []
   listOfSemester = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
   semesterTitles: any[] = []
   confirmModal?: NzModalRef
   form!: FormGroup;
+  formList!: FormGroup
   isvisible = false;
   isConfirmLoading = false;
   isEdit = false;
@@ -97,6 +99,7 @@ export class SelectionComponent implements OnInit {
     private modal: NzModalService, 
     private fb: FormBuilder, 
     public router: Router, 
+    private downloads: DownloadService,
     private authUser: AuthService) { 
 
 
@@ -120,14 +123,13 @@ export class SelectionComponent implements OnInit {
     for(let i=0; i<user?.uuid_mention.length;i++){
       this.http.get<Mention>(`${BASE_URL}/mentions/`+user?.uuid_mention[i], this.options).subscribe(
         data =>{
-          this.all_mention.push(data)
+          this.allMention.push(data)
           this.form.get('mention')?.setValue(data.uuid)
           
           },
           error => console.error("error as ", error)
       );
     }
-
 
     for(let i=0; i<this.listOfSemester.length; i++){
       this.semesterTitles.push(
@@ -139,11 +141,11 @@ export class SelectionComponent implements OnInit {
     
     this.http.get<CollegeYear[]>(`${BASE_URL}/college_year/`, options).subscribe(
       data => {
-        this.all_years = data,
+        this.allYears = data,
         this.form.get('collegeYear')?.setValue(data[0].title)
         if(this.form.get('mention')?.value){
           this.http.get<AncienStudent[]>(`${BASE_URL}/student/new/all?college_year=`+data[0].title+`&uuid_mention=`+this.form.get('mention')?.value, options).subscribe(
-            data => {this.all_students = data,
+            data => {this.allStudents = data,
               console.log(data)},
             error => console.error("error as ", error)
           );
@@ -160,7 +162,7 @@ export class SelectionComponent implements OnInit {
       nzOnOk: () => {
         this.http.delete<AncienStudent[]>(`${BASE_URL}/student/new?num_select=`+numSelect+'&college_year='+this.form.value.collegeYear+'&uuid_mention='+
         this.form.value.mention, this.options).subscribe(
-          data => this.all_students = data,
+          data => this.allStudents = data,
           error => console.error("error as ", error)
         );
       }
@@ -175,6 +177,20 @@ export class SelectionComponent implements OnInit {
     this.router.navigate(['/user/selection_add'])
   }
 
+  download(): void {
+    const url: string = `${BASE_URL}/liste/list_selection/?college_year=`+this.form.get('collegeYear')?.value+`&uuid_mention=`+this.form.get('mention')?.value
+    this.downloads
+      .download(url, this.options)
+      .subscribe(blob => {
+        console.log(blob.stream)
+        const a = document.createElement('a')
+        const objectUrl = URL.createObjectURL(blob)
+        a.href = objectUrl
+        a.download = 'etudiants_séléctioné.pdf';
+        a.click();
+        URL.revokeObjectURL(objectUrl);
+      })
+  }
 
   handleCancel(): void{
     this.isvisible = false
@@ -183,7 +199,7 @@ export class SelectionComponent implements OnInit {
   getAllStudents(): void{
     if(this.form.get('collegeYear')?.value && this.form.get('mention')?.value){
     this.http.get<any>(`${BASE_URL}/student/new/all?college_year=`+this.form.get('collegeYear')?.value+`&uuid_mention=`+this.form.get('mention')?.value, this.options).subscribe(
-      data => this.all_students = data,
+      data => this.allStudents = data,
       error => console.error("error as ", error)
     );
     }

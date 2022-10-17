@@ -38,7 +38,7 @@ export interface AncienStudent{
     telephone: string,
     baccalaureate_num: string,
     baccalaureate_center: string,
-    baccalaureate_seri: string,
+    baccalaureate_series: string,
     work: string,
     father_name: string,
     father_work: string,
@@ -57,6 +57,12 @@ export interface StudentColumn{
     journey: Journey,
     is_selected: false,
     level: string,
+}
+
+export interface StudentInfo{
+    info: any;
+    Normal: any,
+    Rattrapage: any,
 }
 
 export interface ColumnItem{

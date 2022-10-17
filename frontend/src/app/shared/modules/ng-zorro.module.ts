@@ -23,7 +23,9 @@ import { NzTabsModule } from "ng-zorro-antd/tabs";
 import { NzTableModule} from "ng-zorro-antd/table";
 import { NzDividerModule } from "ng-zorro-antd/divider"
 import { NzSwitchModule } from "ng-zorro-antd/switch"
-import { NzDatePickerModule} from "ng-zorro-antd/date-picker"
+import { NzDatePickerModule} from "ng-zorro-antd/date-picker";
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 
 @NgModule({
   exports: [
@@ -51,7 +53,9 @@ import { NzDatePickerModule} from "ng-zorro-antd/date-picker"
     NzTableModule,
     NzDividerModule,
     NzSwitchModule,
-    NzDatePickerModule
+    NzDatePickerModule,
+    NzToolTipModule,
+    NzInputNumberModule,
   ],
 })
 export class NgZorroModule { }

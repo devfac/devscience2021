@@ -23,11 +23,11 @@ export class EcComponent implements OnInit {
   })
   user = localStorage.getItem('user')
   collegeYear = localStorage.getItem('year')
-  all_years: CollegeYear[] = []
-  all_journey: Journey[] = []
-  all_mention: Mention[] = []
-  all_ec: Ec[] = []
-  all_ue: Ue[] = []
+  allYears: CollegeYear[] = []
+  allJourney: Journey[] = []
+  allMention: Mention[] = []
+  allEc: Ec[] = []
+  allUe: Ue[] = []
   listOfSemester = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
   semesterTitles: any[] = []
   confirmModal?: NzModalRef;
@@ -136,7 +136,7 @@ export class EcComponent implements OnInit {
 
     this.http.get<Mention[]>(`${BASE_URL}/mentions/`, options).subscribe(
       data => {
-        this.all_mention = data,
+        this.allMention = data,
         this.form.get('mention')?.setValue(data[0].uuid)
       },
       error => console.error("error as ", error)
@@ -153,12 +153,12 @@ export class EcComponent implements OnInit {
 
     this.http.get<CollegeYear[]>(`${BASE_URL}/college_year/`, options).subscribe(
       data => {
-        this.all_years = data,
+        this.allYears = data,
         this.actualYear = data[0].title
         this.form.get('collegeYear')?.setValue(this.actualYear)
         localStorage.setItem('year', data[0].title)
         this.http.get<Ec[]>(`${BASE_URL}/matier_ec/?schema=`+data[0].title, options).subscribe(
-          data => this.all_ec = data,
+          data => this.allEc = data,
           error => console.error("error as ", error)
         );
       },
@@ -170,7 +170,7 @@ export class EcComponent implements OnInit {
       nzTitle: "Voulez-vous supprimer "+name+"?",
       nzOnOk: () => {
         this.http.delete<any>(`${BASE_URL}/matier_ec/?schema=`+this.form.get('collegeYear')?.value+`&uuid=`+uuid, this.options).subscribe(
-          data => this.all_ec = data,
+          data => this.allEc = data,
           error => console.error("error as ", error)
         );
       }
@@ -184,19 +184,21 @@ export class EcComponent implements OnInit {
         weight: this.form.value.weight,
         semester: this.form.value.semester,
         value_ue: this.form.value.valueUe,
-        users: this.form.value.user,
+        teacher: this.form.value.user,
+        value: "",
+        key_unique: "",
         is_optional: this.form.value.isOptional
       }
       this.isConfirmLoading = true
       console.error(data)
       if (this.isEdit){
         this.http.put<any>(`${BASE_URL}/matier_ec/?schema=`+this.form.get('collegeYear')?.value+`&uuid=`+this.uuid, data, this.options).subscribe(
-          data => this.all_ec = data,
+          data => this.allEc = data,
           error => console.error("error as ", error)
         )
       }else{
-        this.http.post<any>(`${BASE_URL}/matier_ec/?schema=`+this.form.get('collegeYear')?.value,data, this.options).subscribe(
-          data => this.all_ec = data,
+        this.http.post<any>(`${BASE_URL}/matier_ec/`,data, this.options).subscribe(
+          data => this.allEc = data,
           error => console.error("error as ", error)
         )
       }
@@ -224,7 +226,7 @@ export class EcComponent implements OnInit {
   showModalEdit(uuid: string): void{
     this.isEdit = true
     this.uuid = uuid
-    this.http.get<any>(`${BASE_URL}/matier_ec/`+uuid+`/?schema=`+this.form.get('collegeYear')?.value, this.options).subscribe(
+    this.http.get<any>(`${BASE_URL}/matier_ec/by_uuid/?uuid=`+uuid+`&schema=`+this.form.get('collegeYear')?.value, this.options).subscribe(
       data => {
         console.error(data)
         this.form.get('title')?.setValue(data.title),
@@ -238,11 +240,11 @@ export class EcComponent implements OnInit {
         this.http.get<any>(`${BASE_URL}/journey/`+this.form.get('mention')?.value, this.options).subscribe(
           data_journey => {
               console.error("error as ", data_journey)
-              this.all_journey = data_journey
+              this.allJourney = data_journey
               this.form.get('journey')?.setValue(data.uuid_journey)
           },
           error => {
-            this.all_journey = []
+            this.allJourney = []
             console.error("error as ", error)
           }
         )
@@ -253,12 +255,12 @@ export class EcComponent implements OnInit {
   }
   getAllUe(): void{
     if (this.form.get('journey')?.value && this.form.get('semester')?.value)
-    this.http.get<any>(`${BASE_URL}/matier_ue/`+this.form.get('semester')?.value+'/'+this.form.get('journey')?.value+'/?schema='+this.form.get('collegeYear')?.value, this.options).subscribe(
+    this.http.get<any>(`${BASE_URL}/matier_ue/get_by_class?semester=`+this.form.get('semester')?.value+'&uuid_journey='+this.form.get('journey')?.value, this.options).subscribe(
       data => {
-          this.all_ue = data
+          this.allUe = data
       },
       error => {
-        this.all_ue = []
+        this.allUe = []
         console.error("error as ", error)
       }
     )
@@ -267,11 +269,11 @@ export class EcComponent implements OnInit {
     this.http.get<any>(`${BASE_URL}/journey/`+this.form.get('mention')?.value, this.options).subscribe(
       data => {
           console.error("error as ", data)
-          this.all_journey = data
+          this.allJourney = data
           this.form.get('journey')?.setValue('')
       },
       error => {
-        this.all_journey = []
+        this.allJourney = []
         console.error("error as ", error)
       }
     )

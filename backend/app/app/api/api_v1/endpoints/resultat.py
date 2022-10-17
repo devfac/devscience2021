@@ -3,7 +3,7 @@ from typing import Any, List
 from app import crud, models, schemas
 from app.api import deps
 from app.resultat import result_by_ue, result_by_session
-from app.utils import decode_schemas, get_credit, get_status, test_semester
+from app.utils import decode_schemas, get_credit, get_status, test_semester, create_anne
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse
@@ -24,7 +24,7 @@ def get_all_notes(
     journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
     if not journey:
         raise HTTPException(status_code=400, detail="journey not found")
-    all_note = crud.note.read_all_note(schemas, semester, journey.abbreviation, session)
+    all_note = crud.note.read_all_note(create_anne(schemas), semester, journey.abbreviation, session)
     return all_note
 
 
@@ -160,15 +160,15 @@ def get_by_matier_pdf(
         db: Session = Depends(deps.get_db),
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
-    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
-    if not anne_univ:
+    college_year = crud.college_year.get_by_title(db, title=schema)
+    if not college_year:
         raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",
                             )
 
     journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
     if not journey:
         raise HTTPException(status_code=400, detail="journey not found")
-    matier_ue = crud.matier_ue.get_by_value(schema=schema, value=value_ue, semester=semester,
+    matier_ue = crud.matier_ue.get_by_value(schema=create_anne(schema), value=value_ue, semester=semester,
                                             uuid_journey=uuid_journey)
     if not matier_ue:
         raise HTTPException(status_code=400, detail="value ue not found")
@@ -177,7 +177,7 @@ def get_by_matier_pdf(
     value_matier.append(f"ue_{value_ue}")
     titre_note.append("N° Carte")
     titre_note.append(matier_ue.title)
-    value_ec = crud.matier_ec.get_by_value_ue(schema, value_ue, semester, uuid_journey)
+    value_ec = crud.matier_ec.get_by_value_ue(create_anne(schema), value_ue, semester, uuid_journey)
     for ec in value_ec:
         value_matier.append(f"ec_{ec.value}")
         titre_note.append(ec.title)
@@ -187,7 +187,7 @@ def get_by_matier_pdf(
     matier = ','.join(tuple(value_matier))
     notes = []
     mention = crud.mention.get_by_uuid(db=db, uuid=journey.uuid_mention)
-    all_note = crud.note.read_note_by_ue(schema, semester, journey.abbreviation.lower(), session, matier)
+    all_note = crud.note.read_note_by_ue(create_anne(schema), semester, journey.abbreviation.lower(), session, matier)
     etudiant_admis = []
     etudiant_admis_compense = []
     for note in jsonable_encoder(all_note):
@@ -200,9 +200,9 @@ def get_by_matier_pdf(
             etudiants['Status'] = get_status(float(note[f"ue_{value_ue}"]))
             if note[f"ue_{value_ue}"] >= 10:
                 info_etudiants = {'N° Carte': note["num_carte"]}
-                un_etudiant = crud.ancien_etudiant.get_by_num_carte(schema=schema, num_carte=note['num_carte'])
-                info_etudiants['nom'] = un_etudiant["nom"]
-                info_etudiants['prenom'] = un_etudiant["prenom"]
+                un_etudiant = crud.ancien_student.get_by_num_carte(db=db, num_carte=note['num_carte'])
+                info_etudiants['nom'] = un_etudiant.last_name
+                info_etudiants['prenom'] = un_etudiant.first_name
                 etudiant_admis.append(info_etudiants)
         else:
             etudiants['Crédit'] = get_credit(float(0), matier_ue.credit)
@@ -210,16 +210,16 @@ def get_by_matier_pdf(
 
         if session.lower() == "rattrapage":
             if note[f"ue_{value_ue}"] is not None and note[f"ue_{value_ue}"] < 10:
-                validation = crud.semetre_valide.get_by_num_carte(schema=schema, num_carte=note["num_carte"])
+                validation = crud.semester_valide.get_by_num_carte(schema=create_anne(schema), num_carte=note["num_carte"])
                 if validation:
                     if test_semester(validation.semester, semester):
                         info_etudiants = {'N° Carte': note["num_carte"]}
-                        un_etudiant = crud.ancien_etudiant.get_by_num_carte(schema=schema, num_carte=note['num_carte'])
-                        info_etudiants['nom'] = un_etudiant["nom"]
-                        info_etudiants['prenom'] = un_etudiant["prenom"]
+                        un_etudiant = crud.ancien_student.get_by_num_carte(db=db, num_carte=note['num_carte'])
+                        info_etudiants['nom'] = un_etudiant.last_name
+                        info_etudiants['prenom'] = un_etudiant.first_name
                         etudiant_admis_compense.append(info_etudiants)
         notes.append(etudiants)
-    data = {'mention': mention.title, 'journey': journey.title, 'anne': decode_schemas(schema), 'session': session}
+    data = {'mention': mention.title, 'journey': journey.title, 'anne': schema, 'session': session}
     file = result_by_ue.PDF.create_result_by_ue(semester, journey, data, list(titre_note), notes, etudiant_admis,
                                                 etudiant_admis_compense)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)

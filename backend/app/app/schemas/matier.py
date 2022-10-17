@@ -1,8 +1,6 @@
 from typing import List, Optional
 from uuid import UUID
 from pydantic import BaseModel
-
-
 # Shared properties
 from .journey import Journey
 from .mention import Mention
@@ -20,6 +18,8 @@ class MatierUECreate(MatiertBase):
     credit: int
     semester: str
     uuid_journey: UUID
+    value: str
+    key_unique: str
 
 
 class MatierECCreate(MatiertBase):
@@ -27,9 +27,11 @@ class MatierECCreate(MatiertBase):
     semester: str
     value_ue: str
     weight: float
-    users: Optional[str]
+    teacher: Optional[str]
     is_optional: bool = False
     uuid_journey: UUID
+    value: str
+    key_unique: str
 
 
 class MatierUEUpdate(BaseModel):
@@ -39,7 +41,7 @@ class MatierUEUpdate(BaseModel):
 class MatierECUpdate(BaseModel):
     weight: Optional[float]
     value_ue: Optional[str]
-    user: Optional[str]
+    teacher: Optional[str]
     is_optional: Optional[bool]
 
 
@@ -58,7 +60,7 @@ class MatierECInDBBase(MatiertBase):
     value_ue: Optional[str]
     is_optional: Optional[bool]
     key_unique: Optional[str]
-    users: Optional[str]
+    teacher: Optional[str]
 
     class Config:
         orm_mode = True
@@ -69,7 +71,6 @@ class MatierUE(MatierUEInDBBase):
     uuid: Optional[str]
     journey: Optional[Journey]
     abbreviation_journey: Optional[str]
-
 
 # Additional properties stored in DB
 class MatierUEInDB(MatierUEInDBBase):
@@ -104,3 +105,9 @@ class MatierUni(BaseModel):
     num_carte: Optional[str]
     moyenne: Optional[float]
     ue: Optional[List[MatierUniUe]]
+
+
+class MatierUEEC(MatierUEInDBBase):
+    uuid: Optional[str]
+    ec:Optional[List[MatierEC]]
+

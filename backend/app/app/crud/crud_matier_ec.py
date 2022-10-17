@@ -29,7 +29,7 @@ class CRUDMatierEC(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         out = result.fetchall()
         return out
 
-    def get_by_class(self, schema: str, uuid_journey: UUID, semester: str) -> Optional[MatierEC]:
+    def get_by_class(self, schema: str, uuid_journey: str, semester: str) -> Optional[MatierEC]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("element_const", metadata,autoload=True)
         conn = engine.connect()

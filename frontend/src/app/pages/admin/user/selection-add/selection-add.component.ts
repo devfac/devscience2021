@@ -2,7 +2,7 @@ import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { typeSex, typeEtudiant, typeNation } from '@app/data/data';
+import { typeSex, typeEtudiant, typeNation, typeLevel } from '@app/data/data';
 import { CollegeYear } from '@app/models/collegeYear';
 import { Droit } from '@app/models/droit';
 import { Journey } from '@app/models/journey';
@@ -27,7 +27,7 @@ export class SelectionAddComponent implements OnInit {
   })
 
 
-  all_year: CollegeYear[] = []
+  allYear: CollegeYear[] = []
   confirmModal?: NzModalRef;
   form!: FormGroup;
   formDialog!: FormGroup
@@ -39,10 +39,12 @@ export class SelectionAddComponent implements OnInit {
   url:any ="assets/images/profil.png";
   msg= "";
   isDisabled: boolean = false
-  all_mention: Mention[] = []
+  allMention: Mention[] = []
   typeSex = typeSex
   typeEtudiant = typeEtudiant
   typeNation = typeNation
+  typeLevel = typeLevel
+  isInscrit: boolean = false
   options = {
     headers: this.headers
   }
@@ -56,7 +58,9 @@ export class SelectionAddComponent implements OnInit {
       dateBirth: "1995-10-07",
       placeBirth:this.makeRandom(8),
       sex: "Masculin",
-      isSelected: false
+      isSelected: false,
+      level: 'L1',
+      phone: '034 88 763 04'
 
   }
   setDefaultValueForm: () => void;
@@ -74,6 +78,8 @@ export class SelectionAddComponent implements OnInit {
       dateBirth: [null, [Validators.required]],
       placeBirth: [null, [Validators.required]],
       sex: [null, [Validators.required]],
+      level: [null, [Validators.required]],
+      phone: [null],
       numCin: [null],
       dateCin: [null],
       placeCin: [null],
@@ -88,13 +94,22 @@ export class SelectionAddComponent implements OnInit {
     let options = {
       headers: this.headers
     }
+    this.http.get<Mention>(`${BASE_URL}/mentions/`+localStorage.getItem("uuid_mention"), options).subscribe(
+      data =>{ 
+        this.allMention.push(data),
+        this.form.get("mention")?.setValue(data.uuid)
+      },
+      error => console.error("error as ", error)
+    );
+
     const numSelect = localStorage.getItem('numSelect')
     if(numSelect && numSelect.length>0){
       this.isEdit = true
       this.http.get<AncienStudent>(`${BASE_URL}/student/new?num_select=`+localStorage.getItem("numSelect"), options).subscribe(
         data =>{ 
+          console.log(data)
           this.form.get('numSelect')?.setValue(data.num_select)
-          this.form.get('mention')?.setValue(data.mention)
+          this.form.get('mention')?.setValue(data.uuid_mention)
           this.form.get('firstName')?.setValue(data.first_name)
           this.form.get('lastName')?.setValue(data.last_name)
           this.form.get('address')?.setValue(data.address)
@@ -108,20 +123,17 @@ export class SelectionAddComponent implements OnInit {
           this.form.get('placeCin')?.setValue(data.place_cin)
           this.form.get('nation')?.setValue(data.nation)
           this.form.get('isSelected')?.setValue(data.is_selected)
-          console.error(data.receipt)
+          this.form.get('level')?.setValue(data.level)
+          this.form.get('phone')?.setValue(data.telephone)
+          if (data.num_carte.length > 0){
+            this.isInscrit = true
+            console.log(data.num_carte)
+            console.log(this.isInscrit)
+          }
         },
         error => console.error("error as ", error)
       );
     }
-
-    this.http.get<Mention>(`${BASE_URL}/mentions/`+localStorage.getItem("uuid_mention"), options).subscribe(
-      data =>{ 
-        this.all_mention.push(data),
-        this.form.get("mention")?.setValue(data.uuid)
-      },
-      error => console.error("error as ", error)
-    );
-
   }
   
   submitForm(): void {
@@ -146,11 +158,13 @@ export class SelectionAddComponent implements OnInit {
           enter_years: localStorage.getItem('college_years'),
           num_select: this.form.value.numSelect,
           is_selected: this.form.value.isSelected,
+          level: this.form.value.level,
+          telephone: this.form.value.phone,
         }
         console.error(body)
           this.http.post<any>(`${BASE_URL}/student/new`,body, this.options).subscribe(
             data => {
-              this.all_year = data,
+              this.allYear = data,
               this.router.navigate(['/user/selection'])},
             error => console.error("error as ", error)
           )

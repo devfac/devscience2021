@@ -11,7 +11,7 @@ from .semester_valide import SemesterValide, SemesterValideInDB, SemesterValideC
 from .etudiant import EtudiantAncien, EtudiantAncienCreate,EtudiantAncienUpdate,EtudiantAncienInDB, keys,EtudiantCarte
 from .etudiant import EtudiantNouveau, EtudiantNouveauCreate, EtudiantNouveauUpdate, EtudiantNouveauInDB, SelectEtudiantBase
 from .matier import MatierEC, MatierECCreate, MatierECInDB, MatierECUpdate
-from .matier import MatierUE, MatierUECreate, MatierUEInDB, MatierUEUpdate
+from .matier import MatierUE, MatierUECreate, MatierUEInDB, MatierUEUpdate, MatierUEEC
 from .matier import MatierUni
 from .note import Note
 from .resultat import Resultat

@@ -21,7 +21,7 @@
             [placeholder]="'admin.student.num_select' | translate" nz-icon="plus"  />
         </nz-input-group>
       <ng-template #iconButton>
-          <i nz-icon nzType="plus"  class="button" (click)="getStudentByNumSelect()"></i>
+          <i nz-icon nzType="import"  class="button" (click)="getStudentByNumSelect()"></i>
       </ng-template>
       </nz-form-control>
     </nz-form-item>
@@ -39,7 +39,7 @@
               formControlName="mention"
               [nzPlaceHolder]="'admin.home.mention.title' | translate"
               >
-              <nz-option *ngFor="let item of all_mention"
+              <nz-option *ngFor="let item of allMention"
                   [nzLabel]="item.title"
                   [nzValue]="item.uuid"
               >
@@ -58,7 +58,7 @@
               formControlName="journey"
               [nzPlaceHolder]="'admin.home.journey.title' | translate"
               >
-              <nz-option *ngFor="let item of all_journey"
+              <nz-option *ngFor="let item of allJourney"
                   [nzLabel]="item.title"
                   [nzValue]="item.uuid"
               >
@@ -114,7 +114,7 @@
     </nz-form-item>
   </div>
   <div nz-row>
-    <nz-form-item nz-col nzSpan="15">
+    <nz-form-item nz-col nzSpan="8">
       <nz-form-label>
         {{ 'admin.student.address' | translate }}
       </nz-form-label>
@@ -122,6 +122,18 @@
         <nz-input-group >
           <input nz-input type="text" formControlName="address"
             [placeholder]="'admin.student.address' | translate" />
+        </nz-input-group>
+      </nz-form-control>
+    </nz-form-item>
+    <div nz-col nzSpan="1"></div> 
+    <nz-form-item nz-col nzSpan="6">
+      <nz-form-label>
+        {{ 'admin.student.phone' | translate }}
+      </nz-form-label>
+      <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+        <nz-input-group >
+          <input nz-input type="text" formControlName="phone"
+            [placeholder]="'admin.student.phone' | translate" />
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>
@@ -282,17 +294,17 @@
       <div nz-col nzSpan="1"></div>
       <nz-form-item nz-col nzSpan="6">
         <nz-form-label>
-          {{ 'admin.student.phone' | translate }}
+          {{ 'admin.student.bacc_center' | translate }}
         </nz-form-label>
         <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
           <nz-input-group >
-            <input nz-input type="text" formControlName="phone"
-              [placeholder]="'admin.student.phone' | translate" />
+            <input nz-input type="text" formControlName="baccCenter"
+              [placeholder]="'admin.student.bacc_center' | translate" />
           </nz-input-group>
         </nz-form-control>
       </nz-form-item>
       <div nz-col nzSpan="1"></div> 
-    <nz-form-item nz-col nzSpan="6">
+      <nz-form-item nz-col nzSpan="6">
       <nz-form-label>
         {{ 'admin.student.situation' | translate }}
       </nz-form-label>
@@ -309,8 +321,8 @@
           </nz-option>
         </nz-select>
       </nz-form-control>
-    </nz-form-item>
-  </div>
+      </nz-form-item>
+    </div>
 
   <div nz-row>
     <nz-form-item nz-col nzSpan="15">
@@ -377,25 +389,6 @@
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>
-    <div nz-col nzSpan="1"></div> 
-    <nz-form-item nz-col nzSpan="6">
-      <nz-form-label>
-        {{ 'admin.student.level' | translate }}
-      </nz-form-label>
-      <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-select
-          nzAllowClear
-          formControlName="level"
-          [nzPlaceHolder]="'admin.student.level' | translate"
-          >
-          <nz-option *ngFor="let item of typeLevel"
-              [nzLabel]="item.label"
-              [nzValue]="item.value"
-          >
-          </nz-option>
-        </nz-select>
-      </nz-form-control>
-    </nz-form-item>
   </div>
   <nz-modal [(nzVisible)]="isvisible" 
               nzTitle="{{'admin.student.add_receipt' | translate}}" 
@@ -414,7 +407,7 @@
                           formControlName="priceRigth"
                           [nzPlaceHolder]="'admin.student.receipt' | translate"
                           >
-                          <nz-option *ngFor="let item of all_price"
+                          <nz-option *ngFor="let item of allPrice"
                               [nzLabel]="item.droit+' | '+item.level"
                               [nzValue]="item.droit"
                           >

@@ -11,6 +11,7 @@ import { AncienStudent, StudentColumn, ColumnItem } from '@app/models/student';
 import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import {AuthService} from '../../../../services/auth/auth.service'
+import { DownloadService } from '../../download.service';
 
 
 const BASE_URL = environment.authApiURL;
@@ -27,16 +28,18 @@ export class ReInscriptionComponent implements OnInit {
   })
 
   user = localStorage.getItem('user')
-  all_years: CollegeYear[] = []
-  all_students: AncienStudent[] = []
-  all_journey: Journey[] = []
-  all_mention: Mention[] = []
-  listOfSemester = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
+  allYears: CollegeYear[] = []
+  allStudents: AncienStudent[] = []
+  allJourney: Journey[] = []
+  allMention: Mention[] = []
+  listOfSemester?: string[] = []
   semesterTitles: any[] = []
   confirmModal?: NzModalRef
   form!: FormGroup;
+  formList!: FormGroup;
   isvisible = false;
   isConfirmLoading = false;
+  listOfData: any[] = []
   isEdit = false;
   title = '';
   data = ""
@@ -118,6 +121,7 @@ export class ReInscriptionComponent implements OnInit {
     private modal: NzModalService, 
     private fb: FormBuilder, 
     public router: Router, 
+    private downloads: DownloadService,
     private authUser: AuthService) { 
 
 
@@ -130,7 +134,12 @@ export class ReInscriptionComponent implements OnInit {
       collegeYear: [null],
       uuidRole: [null, [Validators.required]],
       uuidMention: [[], [Validators.required]],
+      filter: [null],
     });
+    this.formList = this.fb.group({
+      semester: [null, [Validators.required]],
+      journey: [null, [Validators.required]]
+    })
   }
 
   ngOnInit(): void {
@@ -141,8 +150,15 @@ export class ReInscriptionComponent implements OnInit {
     for(let i=0; i<user?.uuid_mention.length;i++){
       this.http.get<Mention>(`${BASE_URL}/mentions/`+user?.uuid_mention[i], this.options).subscribe(
         data =>{
-          this.all_mention.push(data)
+          this.allMention.push(data)
           this.form.get('mention')?.setValue(data.uuid)
+
+          if(localStorage.getItem('uuid_mention')){
+            this.form.get('mention')?.setValue(localStorage.getItem('uuid_mention'))
+          }else{
+            this.form.get('mention')?.setValue(data.uuid)
+            localStorage.setItem('uuid_mention', data.uuid)
+          }
           
           },
           error => console.error("error as ", error)
@@ -150,28 +166,37 @@ export class ReInscriptionComponent implements OnInit {
     }
 
 
-    for(let i=0; i<this.listOfSemester.length; i++){
+    for(let i=0; i<11; i++){
       this.semesterTitles.push(
         {
-          text: this.listOfSemester[i], value: this.listOfSemester[i]
+          text: "S"+(i+1), value: "S"+(i+1)
         }
       )
     }
     
     this.http.get<CollegeYear[]>(`${BASE_URL}/college_year/`, options).subscribe(
       data => {
-        this.all_years = data,
+        this.allYears = data,
         this.form.get('collegeYear')?.setValue(data[0].title)
         if(this.form.get('mention')?.value){
           this.http.get<AncienStudent[]>(`${BASE_URL}/student/ancien?college_year=`+data[0].title+`&uuid_mention=`+this.form.get('mention')?.value, options).subscribe(
-            data => this.all_students = data,
+            data => {
+              this.allStudents = data
+              this.listOfData = [...data]
+            },
             error => console.error("error as ", error)
           );
         }
       },
       error => console.error("error as ", error)
     );
-  
+
+    this.http.get<Journey[]>(`${BASE_URL}/journey/`+localStorage.getItem("uuid_mention"), this.options).subscribe(
+      data =>{ 
+        this.allJourney=data
+      },
+      error => console.error("error as ", error)
+    );
 
   }
   showConfirm(name: string, numCarte: string): void{
@@ -180,7 +205,7 @@ export class ReInscriptionComponent implements OnInit {
       nzOnOk: () => {
         this.http.delete<AncienStudent[]>(`${BASE_URL}/student/ancien?num_carte=`+numCarte+'&college_year='+this.form.value.collegeYear+'&uuid_mention='+
         this.form.value.mention, this.options).subscribe(
-          data => this.all_students = data,
+          data => this.allStudents = data,
           error => console.error("error as ", error)
         );
       }
@@ -203,11 +228,42 @@ export class ReInscriptionComponent implements OnInit {
   getAllStudents(): void{
     if(this.form.get('collegeYear')?.value && this.form.get('mention')?.value){
     this.http.get<any>(`${BASE_URL}/student/ancien?college_year=`+this.form.get('collegeYear')?.value+`&uuid_mention=`+this.form.get('mention')?.value, this.options).subscribe(
-      data => this.all_students = data,
+      data => {
+        this.allStudents = data
+        this.listOfData = [...data]
+      },
       error => console.error("error as ", error)
     );
     }
   }
+
+  getStudentByNumCarte(): void{
+    const numSelect = this.form.get('numSelect')?.value
+    if(numSelect && numSelect.length>0){
+    this.http.get<AncienStudent>(`${BASE_URL}/student/new_selected?num_select=`+numSelect, this.options).subscribe(
+      data =>{ 
+        console.log(data)
+        this.form.get('mention')?.setValue(data.uuid_mention)
+        this.form.get('firstName')?.setValue(data.first_name)
+        this.form.get('lastName')?.setValue(data.last_name)
+        this.form.get('address')?.setValue(data.address)
+        this.form.get('level')?.setValue(data.level)
+        this.form.get('dateBirth')?.setValue(data.date_birth)
+        this.form.get('placeBirth')?.setValue(data.place_birth)
+        this.form.get('sex')?.setValue(data.sex)
+        this.form.get('dateCin')?.setValue(data.date_cin)
+        this.form.get('placeCin')?.setValue(data.place_cin)
+        this.form.get('numCin')?.setValue(data.num_cin)
+        this.form.get('sex')?.setValue(data.sex)
+        this.form.get('dateCin')?.setValue(data.date_cin)
+        this.form.get('placeCin')?.setValue(data.place_cin)
+        this.form.get('baccYear')?.setValue(data.baccalaureate_years)
+        this.form.get('nation')?.setValue(data.nation)
+  },
+  error => console.error("error as ", error)
+    )
+}
+}
 
   addStudent():void{
     localStorage.setItem("uuid_mention", this.form.get("mention")?.value)
@@ -223,6 +279,52 @@ export class ReInscriptionComponent implements OnInit {
     }, 3000);
   }
 
+  showModal(): void{
+    this.isEdit = false;
+    this.isvisible = true;
+    this.http.get<Journey[]>(`${BASE_URL}/journey/`+localStorage.getItem("uuid_mention"), this.options).subscribe(
+      data =>{ 
+        this.allJourney=data
+      },
+      error => console.error("error as ", error)
+    );
+  }
+
+  download(): void {
+    const url: string = `${BASE_URL}/liste/list_inscrit/?college_year=`
+    +this.form.get('collegeYear')?.value+`&uuid_journey=`
+    +this.formList.get('journey')?.value+'&semester='+this.formList.get('semester')?.value
+    this.downloads
+      .download(url, this.options)
+      .subscribe(blob => {
+        console.log(blob.stream)
+        const a = document.createElement('a')
+        const objectUrl = URL.createObjectURL(blob)
+        a.href = objectUrl
+        const journey = this.allJourney.find((item: Journey) => item.uuid === this.formList.value.journey)
+        this.listOfSemester = journey?.semester
+        a.download = 'list_etudiants'+journey?.abbreviation+'_'+this.formList.get('semester')?.value+'.pdf';
+        a.click();
+        URL.revokeObjectURL(objectUrl);
+      })
+      this.isvisible=false
+  }
 
 
+  changeJourney(): void{
+    if(this.formList.value.journey ){
+      console.log(this.formList.value.journey)
+      localStorage.setItem('journey', this.formList.value.journey)
+
+      const journey = this.allJourney.find((item: Journey) => item.uuid === this.formList.value.journey)
+      this.listOfSemester = journey?.semester
+    }
+  }
+  changeFilter(){
+    if(this.form.value.filter){
+      this.listOfData = this.allStudents.filter((item: any) => item.journey.uuid === this.form.value.filter)
+    }else{
+      this.listOfData = this.allStudents
+    }
+  }
 }

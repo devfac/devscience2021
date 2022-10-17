@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { DetailsNoteComponent } from '../home/details-note/details-note.component';
+import { NoteComponent } from '../home/note/note.component';
 import { InscriptionAddComponent } from './inscription-add/inscription-add.component';
 import { InscriptionComponent } from './inscription/inscription.component';
 import { ReInscriptionAddComponent } from './re-inscription-add/re-inscription-add.component';
@@ -44,6 +46,16 @@ children: [
   path: 'inscription_add',
   component: InscriptionAddComponent,
   data: { breadcrumb: 'admin.user.inscription.title' },
+},
+{
+  path: 'note',
+  component: NoteComponent,
+  data: { breadcrumb: 'admin.home.note.title' },
+},
+{
+  path: 'note-details',
+  component: DetailsNoteComponent,
+  data: { breadcrumb: 'admin.details.note.title' },
 },
 ]
 },

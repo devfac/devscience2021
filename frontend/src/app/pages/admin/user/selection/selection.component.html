@@ -12,7 +12,7 @@
                     [nzPlaceHolder]="'admin.home.college_year.title' | translate"
                     (ngModelChange)="getAllStudents()"
                     >
-                    <nz-option *ngFor="let item of all_years"
+                    <nz-option *ngFor="let item of allYears"
                         [nzLabel]="item.title"
                         [nzValue]="item.title"
                     >
@@ -34,7 +34,7 @@
                     [nzPlaceHolder]="'admin.home.mention.title' | translate"
                     (ngModelChange)="getAllStudents()"
                     >
-                    <nz-option *ngFor="let item of all_mention"
+                    <nz-option *ngFor="let item of allMention"
                         [nzLabel]="item.title"
                         [nzValue]="item.uuid"
                     >
@@ -56,9 +56,13 @@
             <span nz-icon nzType="plus" nzTheme="outline"></span>
             {{'admin.user.create' | translate | uppercase}}
         </button>
+        <nz-divider nzType="vertical"></nz-divider>
+        <button nz-button nzType="primary" (click)="download()">
+          <span nz-icon nzType="printer" nzTheme="outline"></span>
+      </button>
     </div>
   </div>
-  <nz-table #studentList [nzData]="all_students" nzSize="small" [nzPageSize]="10" nzBordered 
+  <nz-table #studentList [nzData]="allStudents" nzSize="small" [nzPageSize]="10" nzBordered 
   [nzScroll]="{ x: 200 + 'px' }"> 
       <thead>
           <tr>

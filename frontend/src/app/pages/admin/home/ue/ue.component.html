@@ -12,7 +12,7 @@
                 formControlName="collegeYear"
                 [nzPlaceHolder]="'admin.home.college_year.title' | translate"
                 >
-                <nz-option *ngFor="let item of all_years"
+                <nz-option *ngFor="let item of allYears"
                     [nzLabel]="item.title"
                     [nzValue]="item.title"
                 >
@@ -35,7 +35,7 @@
         </button>
     </div>
   </div>
-    <nz-table #ueList [nzData]="all_ue" nzSize="small" [nzPageSize]="10" nzBordered [nzScroll]="{ x: 200 + 'px' }"> 
+    <nz-table #ueList [nzData]="allUe" nzSize="small" [nzPageSize]="10" nzBordered [nzScroll]="{ x: 200 + 'px' }"> 
         <thead>
             <tr>
               <tr>
@@ -111,7 +111,7 @@
                         (ngModelChange)="getAllJourney()"
                         [nzDisabled]="isEdit"
                         >
-                        <nz-option *ngFor="let item of all_mention"
+                        <nz-option *ngFor="let item of allMention"
                             [nzLabel]="item.title"
                             [nzValue]="item.uuid"
                         >
@@ -133,7 +133,7 @@
                         [nzPlaceHolder]="'admin.home.journey.title' | translate"
                         [nzDisabled]="isEdit"
                         >
-                        <nz-option *ngFor="let item of all_journey"
+                        <nz-option *ngFor="let item of allJourney"
                             [nzLabel]="item.title"
                             [nzValue]="item.uuid"
                         >

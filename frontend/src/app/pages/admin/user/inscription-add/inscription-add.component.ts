@@ -2,7 +2,7 @@ import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { typeSex, typeEtudiant, typeNation, typeSituation, typeSerie, typeLevel } from '@app/data/data';
+import { typeSex, typeEtudiant, typeNation, typeSituation, typeSerie } from '@app/data/data';
 import { CollegeYear } from '@app/models/collegeYear';
 import { Droit } from '@app/models/droit';
 import { Journey } from '@app/models/journey';
@@ -26,7 +26,7 @@ export class InscriptionAddComponent implements OnInit {
     "Authorization": "Bearer "+localStorage.getItem("token")
   })
 
-  all_year: CollegeYear[] = []
+  allYear: CollegeYear[] = []
   confirmModal?: NzModalRef;
   form!: FormGroup;
   formDialog!: FormGroup
@@ -38,31 +38,20 @@ export class InscriptionAddComponent implements OnInit {
   url:any ="assets/images/profil.png";
   msg= "";
   isDisabled: boolean = false
-  all_mention: Mention[] = []
-  all_journey: Journey[] = []
-  all_price: Droit[] = []
-  all_receipt: Receipt[] = []
+  allMention: Mention[] = []
+  allJourney: Journey[] = []
+  allPrice: Droit[] = []
+  allReceipt: Receipt[] = []
   typeSex = typeSex
   typeSituation = typeSituation
   typeNation = typeNation
   typeSerie = typeSerie
-  typeLevel = typeLevel
   options = {
     headers: this.headers
   }
   defaultValue = {
-      mention:"54928ac0-af4f-419e-abc0-09fd3a400597",
       journey:"6b877d4c-dd5b-4efa-9a2e-3871027067e8",
-      numInsc: this.makeRandom(8),
-      firstName: this.makeRandom(12),
-      lastName: this.makeRandom(20),
-      address: this.makeRandom(30),
-      nation: "Malagasy",
-      dateBirth: "1995-10-07",
-      placeBirth:this.makeRandom(8),
-      sex: "Masculin",
       baccYear: "2020",
-      type: "Passant",
       situation: "Célibataire",
       telephone: "",
       baccNum: this.makeRandom(8),
@@ -74,7 +63,6 @@ export class InscriptionAddComponent implements OnInit {
       motherName: this.makeRandom(12)+" "+this.makeRandom(8),
       motherWork: this.makeRandom(8),
       parentAddress: this.makeRandom(12)+" "+this.makeRandom(3),
-      level: "L1",
 
   }
   setDefaultValueForm: () => void;
@@ -92,7 +80,7 @@ export class InscriptionAddComponent implements OnInit {
       lastName: [null, [Validators.required]],
       address: [null, [Validators.required]],
       nation: [null, [Validators.required]],
-      phone: [null, [Validators.required]],
+      phone: [null],
       dateBirth: [null, [Validators.required]],
       placeBirth: [null, [Validators.required]],
       sex: [null, [Validators.required]],
@@ -113,7 +101,6 @@ export class InscriptionAddComponent implements OnInit {
       motherName: [null],
       motherWork: [null],
       parentAddress: [null],
-      level: [null, [Validators.required]],
 
     });
 
@@ -154,15 +141,15 @@ export class InscriptionAddComponent implements OnInit {
     const numSelect = localStorage.getItem('numSelect')
     if(numSelect && numSelect.length>0){
       this.isEdit = true
-      this.http.get<AncienStudent>(`${BASE_URL}/student/new?num_select=`+numSelect, options).subscribe(
+      this.http.get<AncienStudent>(`${BASE_URL}/student/new_selected?num_select=`+numSelect, options).subscribe(
         data =>{ 
-          this.form.get('numSelect')?.setValue(data.num_carte)
+          console.log(data)
+          this.form.get('numSelect')?.setValue(data.num_select)
           this.form.get('mention')?.setValue(data.mention)
           this.form.get('journey')?.setValue(data.journey.uuid)
           this.form.get('firstName')?.setValue(data.first_name)
           this.form.get('lastName')?.setValue(data.last_name)
           this.form.get('address')?.setValue(data.address)
-          this.form.get('level')?.setValue(data.level)
           this.form.get('dateBirth')?.setValue(data.date_birth)
           this.form.get('placeBirth')?.setValue(data.place_birth)
           this.form.get('sex')?.setValue(data.sex)
@@ -179,17 +166,17 @@ export class InscriptionAddComponent implements OnInit {
           this.formDialog.get('dateReceipt')?.setValue(data.receipt.date)
           this.formDialog.get('priceRigth')?.setValue(data.receipt.price)
 
-          this.form.get('situation')?.setValue(data.sex)
-          this.form.get('telephone')?.setValue(data.sex)
-          this.form.get('baccNum')?.setValue(data.sex)
-          this.form.get('baccCenter')?.setValue(data.sex)
-          this.form.get('baccSeri')?.setValue(data.sex)
-          this.form.get('work')?.setValue(data.sex)
-          this.form.get('fatherName')?.setValue(data.sex)
-          this.form.get('fatherWork')?.setValue(data.sex)
-          this.form.get('motherName')?.setValue(data.sex)
-          this.form.get('motherWork')?.setValue(data.sex)
-          this.form.get('parentAddress')?.setValue(data.sex)
+          this.form.get('situation')?.setValue(data.situation)
+          this.form.get('telephone')?.setValue(data.telephone)
+          this.form.get('baccNum')?.setValue(data.baccalaureate_center)
+          this.form.get('baccCenter')?.setValue(data.baccalaureate_center)
+          this.form.get('baccSerie')?.setValue(data.baccalaureate_series)
+          this.form.get('work')?.setValue(data.work)
+          this.form.get('fatherName')?.setValue(data.father_name)
+          this.form.get('fatherWork')?.setValue(data.father_work)
+          this.form.get('motherName')?.setValue(data.mother_name)
+          this.form.get('motherWork')?.setValue(data.mother_work)
+          this.form.get('parentAddress')?.setValue(data.parent_address)
           this.url = `${BASE_URL}/student/photo?name_file=`+data.photo
           console.error(data.receipt)
         },
@@ -201,7 +188,7 @@ export class InscriptionAddComponent implements OnInit {
 
     this.http.get<Mention>(`${BASE_URL}/mentions/`+localStorage.getItem("uuid_mention"), options).subscribe(
       data =>{ 
-        this.all_mention.push(data),
+        this.allMention.push(data),
         this.form.get("mention")?.setValue(data.uuid)
       },
       error => console.error("error as ", error)
@@ -209,7 +196,7 @@ export class InscriptionAddComponent implements OnInit {
 
     this.http.get<Journey[]>(`${BASE_URL}/journey/`+localStorage.getItem("uuid_mention"), options).subscribe(
       data =>{ 
-        this.all_journey=data
+        this.allJourney=data
       },
       error => console.error("error as ", error)
     );
@@ -217,7 +204,7 @@ export class InscriptionAddComponent implements OnInit {
     this.http.get<Droit[]>(`${BASE_URL}/droit/by_mention?uuid_mention=`+
       localStorage.getItem("uuid_mention")+'&year='+localStorage.getItem("college_years"), options).subscribe(
       data =>{ 
-        this.all_price=data
+        this.allPrice=data
       },
       error => console.error("error as ", error)
     );
@@ -248,67 +235,69 @@ export class InscriptionAddComponent implements OnInit {
       const title = this.form.value.title
       const mean = this.form.value.mean
       this.isConfirmLoading = true
-      
+      let photo = null
       const formData = new FormData();
-      formData.append("uploaded_file", this.uploadedImage)
-      this.http.post<any>(`${BASE_URL}/student/upload_photo/?num_carte=`+this.form.value.numCarte,formData, this.options).subscribe(
-        data =>{ 
-          console.error(data)
-          if(data.filename){
-            const body = 
-            {
-              last_name: this.form.value.lastName,
-              first_name: this.form.value.firstName,
-              date_birth: this.form.value.dateBirth,
-              place_birth: this.form.value.placeBirth,
-              address: this.form.value.address,
-              sex: this.form.value.sex,
-              nation: this.form.value.nation,
-              num_cin: this.form.value.numCin,
-              date_cin: this.form.value.dateCin,
-              place_cin: this.form.value.placeCin,
-              uuid_mention: this.form.value.mention,
-              actual_years: localStorage.getItem('college_years'),
-              num_select: this.form.value.numSelect,
-              receipt: {
-                num: this.formDialog.get('numReceipt')?.value,
-                date: this.formDialog.get('dateReceipt')?.value,
-                price: this.formDialog.get('priceRigth')?.value,
-                year: localStorage.getItem('college_years')
-              },
-              receipt_list: [],
-              mean: this.form.value.mean,
-              baccalaureate_years: this.form.value.baccYear,
-              type: this.form.value.type,
-              photo: data.filename,
-              uuid_journey: this.form.value.journey,
-              level: this.form.value.level,
-
-              situation: this.form.value.level,
-              telephone: this.form.value.telephone,
-              baccalaureate_num: this.form.value.baccNum,
-              baccalaureate_center: this.form.value.baccCenter,
-              baccalaureate_seri: this.form.value.baccSeri,
-              work: this.form.value.work,
-              father_name: this.form.value.fatherName,
-              father_work: this.form.value.fatherWork,
-              mother_name: this.form.value.motherName,
-              mother_work: this.form.value.motherWork,
-              parent_address: this.form.value.parentAddress,
-
+      if (this.url !== "assets/images/profil.png"){
+        formData.append("uploaded_file", this.uploadedImage)
+        this.http.post<any>(`${BASE_URL}/student/upload_photo/?num_carte=`+this.form.value.numCarte,formData, this.options).subscribe(
+          data =>{ 
+            console.error(data)
+            if(data.filename){
+              photo = data.filename
             }
-            console.error(body)
-              this.http.put<AncienStudent>(`${BASE_URL}/student/new?num_select=`+this.form.value.numSelect,body, this.options).subscribe(
-                data => {
-                  this.router.navigate(['/user/inscription'])},
-                error => console.error("error as ", error)
-              )
-          }
-        },
-        error => console.error("error as ", error)
-      );
+          },
+          error => console.error("error as ", error)
+        );
+      }
+      const body = 
+        {
+          last_name: this.form.value.lastName,
+          first_name: this.form.value.firstName,
+          date_birth: this.form.value.dateBirth,
+          place_birth: this.form.value.placeBirth,
+          address: this.form.value.address,
+          sex: this.form.value.sex,
+          nation: this.form.value.nation,
+          num_cin: this.form.value.numCin,
+          date_cin: this.form.value.dateCin,
+          place_cin: this.form.value.placeCin,
+          uuid_mention: this.form.value.mention,
+          actual_years: localStorage.getItem('college_years'),
+          num_select: this.form.value.numSelect,
+          receipt: {
+            num: this.formDialog.get('numReceipt')?.value,
+            date: this.formDialog.get('dateReceipt')?.value,
+            price: this.formDialog.get('priceRigth')?.value,
+            year: localStorage.getItem('college_years')
+          },
+          receipt_list: [],
+          mean: this.form.value.mean,
+          baccalaureate_years: this.form.value.baccYear,
 
-      
+          type: "Passant",
+          photo: photo,
+          uuid_journey: this.form.value.journey,
+
+          situation: this.form.value.situation,
+          telephone: this.form.value.telephone,
+          baccalaureate_num: this.form.value.baccNum,
+          baccalaureate_center: this.form.value.baccCenter,
+          baccalaureate_series: this.form.value.baccSerie,
+          work: this.form.value.work,
+          father_name: this.form.value.fatherName,
+          father_work: this.form.value.fatherWork,
+          mother_name: this.form.value.motherName,
+          mother_work: this.form.value.motherWork,
+          parent_address: this.form.value.parentAddress,
+
+        }
+        console.error(body)
+          this.http.put<AncienStudent>(`${BASE_URL}/student/new?num_select=`+this.form.value.numSelect,body, this.options).subscribe(
+            data => {
+              this.router.navigate(['/user/inscription'])},
+            error => console.error("error as ", error)
+          )
+
       this.isvisible = false,
       this.isConfirmLoading = false
     } else {
@@ -347,7 +336,7 @@ export class InscriptionAddComponent implements OnInit {
   getStudentByNumSelect(): void{
     const numSelect = this.form.get('numSelect')?.value
     if(numSelect && numSelect.length>0){
-    this.http.get<AncienStudent>(`${BASE_URL}/student/new?num_select=`+numSelect, this.options).subscribe(
+    this.http.get<AncienStudent>(`${BASE_URL}/student/new_selected?num_select=`+numSelect, this.options).subscribe(
       data =>{ 
         console.log(data)
         this.form.get('mention')?.setValue(data.uuid_mention)

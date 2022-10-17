@@ -268,7 +268,7 @@ def read_etudiant_by_class(
     """
     Get etudiant by class.
     """
-    etudiant = crud.ancien_etudiant.get_by_class(schema, uuid_journey, semester)
+    etudiant = crud.ancien_etudiant.get_by_class(schema=schema, uuid_journey=uuid_journey, semester=semester)
     list_et = []
     if etudiant:
         for un_etudiant in etudiant:

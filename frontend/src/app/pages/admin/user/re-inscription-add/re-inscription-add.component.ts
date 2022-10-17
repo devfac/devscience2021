@@ -31,7 +31,7 @@ export class ReInscriptionAddComponent implements OnInit {
 
   master_1 = [{label:"S7", value:"S7",checked:false, disabled:false}, {label:"S8", value:"S8",checked:false, disabled:false}] 
   master_2 = [{label:"S9", value:"S9",checked:false, disabled:false}, {label:"S10", value:"S10",checked:false, disabled:false}] 
-  all_year: CollegeYear[] = []
+  allYear: CollegeYear[] = []
   confirmModal?: NzModalRef;
   form!: FormGroup;
   formDialog!: FormGroup
@@ -43,10 +43,10 @@ export class ReInscriptionAddComponent implements OnInit {
   url:any ="assets/images/profil.png";
   msg= "";
   isDisabled: boolean = false
-  all_mention: Mention[] = []
-  all_journey: Journey[] = []
-  all_price: Droit[] = []
-  all_receipt: Receipt[] = []
+  allMention: Mention[] = []
+  allJourney: Journey[] = []
+  allPrice: Droit[] = []
+  allReceipt: Receipt[] = []
   typeSex = typeSex
   typeEtudiant = typeEtudiant
   typeNation = typeNation
@@ -70,6 +70,7 @@ export class ReInscriptionAddComponent implements OnInit {
       mean: 10,
       baccYear: "2020",
       type: "Passant",
+      phone: "034 88 763 04"
 
   }
   setDefaultValueForm: () => void;
@@ -164,11 +165,14 @@ export class ReInscriptionAddComponent implements OnInit {
           this.form.get('baccYear')?.setValue(data.baccalaureate_years)
           this.form.get('type')?.setValue(data.type)
           this.form.get('nation')?.setValue(data.nation)
+          this.form.get('phone')?.setValue(data.telephone)
           this.form.get('receipt')?.setValue(data.receipt.num)
           this.formDialog.get('numReceipt')?.setValue(data.receipt.num)
           this.formDialog.get('dateReceipt')?.setValue(data.receipt.date)
           this.formDialog.get('priceRigth')?.setValue(data.receipt.price)
-          this.url = `${BASE_URL}/student/photo?name_file=`+data.photo
+          if (data.photo){
+            this.url = `${BASE_URL}/student/photo?name_file=`+data.photo
+          }
           console.error(data.receipt)
         },
         error => console.error("error as ", error)
@@ -177,7 +181,7 @@ export class ReInscriptionAddComponent implements OnInit {
 
     this.http.get<Mention>(`${BASE_URL}/mentions/`+localStorage.getItem("uuid_mention"), options).subscribe(
       data =>{ 
-        this.all_mention.push(data),
+        this.allMention.push(data),
         this.form.get("mention")?.setValue(data.uuid)
       },
       error => console.error("error as ", error)
@@ -185,7 +189,7 @@ export class ReInscriptionAddComponent implements OnInit {
 
     this.http.get<Journey[]>(`${BASE_URL}/journey/`+localStorage.getItem("uuid_mention"), options).subscribe(
       data =>{ 
-        this.all_journey=data
+        this.allJourney=data
       },
       error => console.error("error as ", error)
     );
@@ -193,7 +197,7 @@ export class ReInscriptionAddComponent implements OnInit {
     this.http.get<Droit[]>(`${BASE_URL}/droit/by_mention?uuid_mention=`+
       localStorage.getItem("uuid_mention")+'&year='+localStorage.getItem("college_years"), options).subscribe(
       data =>{ 
-        this.all_price=data
+        this.allPrice=data
       },
       error => console.error("error as ", error)
     );
@@ -204,7 +208,7 @@ export class ReInscriptionAddComponent implements OnInit {
       nzTitle: "Voulez-vous supprimer "+name+"?",
       nzOnOk: () => {
         this.http.delete<any>(`${BASE_URL}/mentions/?uuid=`+uuid, this.options).subscribe(
-          data => this.all_year = data,
+          data => this.allYear = data,
           error => console.error("error as ", error)
         );
       }
@@ -235,55 +239,59 @@ export class ReInscriptionAddComponent implements OnInit {
       const title = this.form.value.title
       const mean = this.form.value.mean
       this.isConfirmLoading = true
+      let photo = this.form.value.numCarte+".jpg"
       
       const formData = new FormData();
       formData.append("uploaded_file", this.uploadedImage)
-      this.http.post<any>(`${BASE_URL}/student/upload_photo/?num_carte=`+this.form.value.numCarte,formData, this.options).subscribe(
-        data =>{ 
-          console.error(data)
-          if(data.filename){
-            const body = 
-            {
-              last_name: this.form.value.lastName,
-              first_name: this.form.value.firstName,
-              date_birth: this.form.value.dateBirth,
-              place_birth: this.form.value.placeBirth,
-              address: this.form.value.address,
-              sex: this.form.value.sex,
-              nation: this.form.value.nation,
-              num_cin: this.form.value.numCin,
-              date_cin: this.form.value.dateCin,
-              place_cin: this.form.value.placeCin,
-              uuid_mention: this.form.value.mention,
-              actual_years: localStorage.getItem('college_years'),
-              num_carte: this.form.value.numCarte,
-              receipt: {
-                num: this.formDialog.get('numReceipt')?.value,
-                date: this.formDialog.get('dateReceipt')?.value,
-                price: this.formDialog.get('priceRigth')?.value,
-                year: localStorage.getItem('college_years')
-              },
-              receipt_list: [],
-              mean: this.form.value.mean,
-              baccalaureate_years: this.form.value.baccYear,
-              type: this.form.value.type,
-              photo: data.filename,
-              uuid_journey: this.form.value.journey,
-              inf_semester: this.form.value.infSemester,
-              sup_semester: this.form.value.supSemester
+      console.log(this.url)
+      if(this.url !== "assets/images/profil.png"){
+        this.http.post<any>(`${BASE_URL}/student/upload_photo/?num_carte=`+this.form.value.numCarte,formData, this.options).subscribe(
+          data =>{ 
+            console.error(data)
+            if(data.filename){
+              photo = data.filename
             }
-            console.error(body)
-              this.http.post<any>(`${BASE_URL}/student/ancien`,body, this.options).subscribe(
-                data => {
-                  this.all_year = data,
-                  this.router.navigate(['/user/reinscription'])},
-                error => console.error("error as ", error)
-              )
-          }
-        },
-        error => console.error("error as ", error)
-      );
-
+          },
+          error => console.error("error as ", error)
+        );
+      }
+      const body = 
+        {
+          last_name: this.form.value.lastName,
+          first_name: this.form.value.firstName,
+          date_birth: this.form.value.dateBirth,
+          place_birth: this.form.value.placeBirth,
+          address: this.form.value.address,
+          sex: this.form.value.sex,
+          nation: this.form.value.nation,
+          num_cin: this.form.value.numCin,
+          date_cin: this.form.value.dateCin,
+          place_cin: this.form.value.placeCin,
+          uuid_mention: this.form.value.mention,
+          actual_years: localStorage.getItem('college_years'),
+          num_carte: this.form.value.numCarte,
+          receipt: {
+            num: this.formDialog.get('numReceipt')?.value,
+            date: this.formDialog.get('dateReceipt')?.value,
+            price: this.formDialog.get('priceRigth')?.value,
+            year: localStorage.getItem('college_years')
+          },
+          receipt_list: [],
+          mean: this.form.value.mean,
+          phone: this.form.value.phone,
+          baccalaureate_years: this.form.value.baccYear,
+          type: this.form.value.type,
+          photo: photo,
+          uuid_journey: this.form.value.journey,
+          inf_semester: this.form.value.infSemester,
+          sup_semester: this.form.value.supSemester
+        }
+        console.error(body)
+          this.http.post<any>(`${BASE_URL}/student/ancien`,body, this.options).subscribe(
+            data => {
+              this.router.navigate(['/user/reinscription'])},
+            error => console.error("error as ", error)
+          )
       
       this.isvisible = false,
       this.isConfirmLoading = false
@@ -445,6 +453,47 @@ export class ReInscriptionAddComponent implements OnInit {
       return text
     }
 
+    getByNumCarte(): void{
+      if(this.form.get('numCarte')?.value){
+        this.isEdit = true
+        this.http.get<AncienStudent>(`${BASE_URL}/student/num_carte?num_carte=`+this.form.get('numCarte')?.value, this.options).subscribe(
+          data =>{ 
+            this.form.get('numCarte')?.setValue(data.num_carte)
+            this.form.get('mention')?.setValue(data.mention)
+            this.form.get('journey')?.setValue(data.journey.uuid)
+            this.form.get('firstName')?.setValue(data.first_name)
+            this.form.get('lastName')?.setValue(data.last_name)
+            this.form.get('address')?.setValue(data.address)
+            this.form.get('infSemester')?.setValue(data.inf_semester)
+            this.form.get('supSemester')?.setValue(data.sup_semester)
+            this.form.get('dateBirth')?.setValue(data.date_birth)
+            this.form.get('placeBirth')?.setValue(data.place_birth)
+            this.form.get('sex')?.setValue(data.sex)
+            this.form.get('dateCin')?.setValue(data.date_cin)
+            this.form.get('placeCin')?.setValue(data.place_cin)
+            this.form.get('numCin')?.setValue(data.num_cin)
+            this.form.get('sex')?.setValue(data.sex)
+            this.form.get('dateCin')?.setValue(data.date_cin)
+            this.form.get('placeCin')?.setValue(data.place_cin)
+            this.form.get('mean')?.setValue(data.mean)
+            this.form.get('baccYear')?.setValue(data.baccalaureate_years)
+            this.form.get('type')?.setValue(data.type)
+            this.form.get('nation')?.setValue(data.nation)
+            this.form.get('phone')?.setValue(data.telephone)
+            this.form.get('receipt')?.setValue(data.receipt.num)
+            this.formDialog.get('numReceipt')?.setValue(data.receipt.num)
+            this.formDialog.get('dateReceipt')?.setValue(data.receipt.date)
+            this.formDialog.get('priceRigth')?.setValue(data.receipt.price)
+            if (data.photo){
+              this.url = `${BASE_URL}/student/photo?name_file=`+data.photo
+            }
+            console.error(data.receipt)
+          },
+          error => console.error("error as ", error)
+        );
+      }
+  
+    }
     
 
   }

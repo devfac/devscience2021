@@ -30,7 +30,9 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         columns = []
         table_ = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         for index, table in enumerate(table_.columns):
-            columns.append(str(table).partition(".")[2])
+            if str(table).partition(".")[2] != 'num_carte' and str(table).partition(".")[2] != 'moyenne' \
+                    and str(table).partition(".")[2] != 'credit':
+                columns.append(str(table).partition(".")[2])
         return columns
 
     def insert_note(self, schema: str, semester: str, journey: str, session: str, num_carte: str):
@@ -48,6 +50,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
+        sel = sel.order_by(table.columns.num_carte.asc())
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
@@ -193,9 +196,9 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn = engine.connect()
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         dele = table.delete()
-        dele = dele.where(table.columns.num_carte == {num_carte})
+        dele = dele.where(table.columns.num_carte == num_carte)
         conn.execute(dele)
-        conn.close
+        conn.close()
 
     def read_ue_moyenne(self, schema: str, semester: str, journey: str, session: str, num_carte: str,
                         obj_in: str) -> Any:

@@ -12,7 +12,7 @@
         </div>
             
     </div>
-    <nz-table #usersList [nzData]="all_users" nzSize="small" [nzPageSize]="10" nzBordered [nzScroll]="{ x: 200 + 'px' }"> 
+    <nz-table #usersList [nzData]="allUsers" nzSize="small" [nzPageSize]="10" nzBordered [nzScroll]="{ x: 200 + 'px' }"> 
         <thead>
             <tr>
                 <th> Email</th>
@@ -106,7 +106,7 @@
                         formControlName="uuidMention"
                         [nzPlaceHolder]="'admin.profile.general.mention' | translate"
                         >
-                        <nz-option *ngFor="let item of all_mention"
+                        <nz-option *ngFor="let item of allMention"
                             [nzLabel]="item.title"
                             [nzValue]="item.uuid"
                         >
@@ -126,7 +126,7 @@
                             formControlName="uuidRole"
                             [nzPlaceHolder]="'admin.profile.general.job' | translate"
                             >
-                            <nz-option *ngFor="let item of all_role"
+                            <nz-option *ngFor="let item of allRole"
                                 [nzLabel]="item.title"
                                 [nzValue]="item.uuid"
                             >

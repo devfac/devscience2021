@@ -43,7 +43,7 @@ def list_examen(
                             )
     data = {}
     matiers = {}
-    ues = crud.matier_ue.get_by_class(create_anne(college_years), uuid_journey, semester)
+    ues = crud.matier_ue.get_by_class(create_anne(college_year), uuid_journey, semester)
     if len(ues) == 0:
         raise HTTPException(
             status_code=400,
@@ -65,7 +65,9 @@ def list_examen(
         all_ue.append(ues_)
     matiers['ue'] = all_ue
 
-    students = crud.ancien_etudiant.get_by_class_limit(create_anne(college_year), uuid_journey, semester, skip, limit)
+    students = crud.ancien_student.get_by_class_limit(db=db, uuid_journey=uuid_journey,uuid_mention=uuid_mention,
+                                                      semester=semester,college_year=college_year,
+                                                      offset=skip, limit=limit)
 
     all_students = []
     if len(students) == 0:
@@ -77,9 +79,9 @@ def list_examen(
         un_et = crud.note.read_by_num_carte(create_anne(college_year),
                                             semester, journey.abbreviation, session, on_student.num_carte)
         if un_et:
-            student = {"last_name": on_student["last_name"],
-                       "first_name": on_student["first_name"],
-                       "num_carte": on_student['num_carte']}
+            student = {"last_name": on_student.last_name,
+                       "first_name": on_student.first_name,
+                       "num_carte": on_student.num_carte}
             all_students.append(student)
 
     data['mention'] = mention.title
@@ -89,7 +91,7 @@ def list_examen(
     data['salle'] = salle
     data['skip'] = skip
     data['limit'] = limit
-    file = liste_exams.PDF.create_list_examen(semester, journey, data, matiers, all_students)
+    file = liste_exams.PDF.create_list_examen(semester, journey.abbreviation, data, matiers, all_students)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
 

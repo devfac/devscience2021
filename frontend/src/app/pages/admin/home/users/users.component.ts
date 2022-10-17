@@ -22,9 +22,9 @@ export class UsersComponent implements OnInit {
     "Authorization": "Bearer "+localStorage.getItem("token")
   })
 
-  all_users: User[] = []
-  all_role: Role[] = []
-  all_mention: Mention[] = []
+  allUsers: User[] = []
+  allRole: Role[] = []
+  allMention: Mention[] = []
   confirmModal?: NzModalRef
   form!: FormGroup;
   isvisible = false;
@@ -44,17 +44,17 @@ export class UsersComponent implements OnInit {
     }
     
     this.http.get<any>(`${BASE_URL}/users/get_all`, this.options).subscribe(
-      data => this.all_users = data,
+      data => this.allUsers = data,
       error => console.error("error as ", error)
     );
     this.http.get<any>(`${BASE_URL}/roles/`, options).subscribe(
-      data => this.all_role = data,
+      data => this.allRole = data,
       error => console.error("error as ", error)
     );
 
     this.http.get<any>(`${BASE_URL}/mentions/`, this.options).subscribe(
       data =>{
-        this.all_mention = data
+        this.allMention = data
         },
         error => console.error("error as ", error)
     );
@@ -75,7 +75,7 @@ export class UsersComponent implements OnInit {
       nzTitle: "Voulez-vous supprimer "+name+"?",
       nzOnOk: () => {
         this.http.delete<any>(`${BASE_URL}/users/?uuid=`+uuid, this.options).subscribe(
-          data => this.all_users = data,
+          data => this.allUsers = data,
           error => console.error("error as ", error)
         );
       }
@@ -132,13 +132,13 @@ export class UsersComponent implements OnInit {
           data = data2
         }
         this.http.put<any>(`${BASE_URL}/users/?uuid=`+this.uuid, data, this.options).subscribe(
-          data => this.all_users = data,
+          data => this.allUsers = data,
           error => console.error("error as ", error)
         )
       }else{
         console.error(data1)
         this.http.post<any>(`${BASE_URL}/users/`,data1, this.options).subscribe(
-          data => this.all_users = data,
+          data => this.allUsers = data,
           error => console.error("error as ", error)
         )
       }

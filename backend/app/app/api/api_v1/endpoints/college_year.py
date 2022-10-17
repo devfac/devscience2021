@@ -39,13 +39,7 @@ def create_college_year(
     if crud.user.is_superuser(current_user):
         college_year = crud.college_year.get_by_title(db, title=college_year_in.title)
         if not college_year:
-            college_year = crud.college_year.create(db=db, obj_in=college_year_in)
-            try:
-                schem_et = create_anne(college_year.title)
-                engine.execute(CreateSchema(schem_et))
-                models.etudiant.create(schem_et)
-            except sqlalchemy.exc.ProgrammingError as e:
-                print(e)
+            crud.college_year.create(db=db, obj_in=college_year_in)
         else:
             raise HTTPException(
                 status_code=400,

@@ -23,7 +23,7 @@ api_router.include_router(matier_ue.router, prefix="/matier_ue", tags=["unité d
 api_router.include_router(matier_ec.router, prefix="/matier_ec", tags=["éléments constitutif"])
 #api_router.include_router(ancien_etudiants.router, prefix="/ancien_etudiants", tags=["ancien etudiants"])
 api_router.include_router(student.router, prefix="/student", tags=["students"])
-api_router.include_router(nouveau_etudiants.router, prefix="/nouveau_etudiants", tags=["nouveaux etudiants"])
+#api_router.include_router(nouveau_etudiants.router, prefix="/nouveau_etudiants", tags=["nouveaux etudiants"])
 api_router.include_router(semester_valide.router, prefix="/semester_valide", tags=["semester valide"])
 api_router.include_router(scolarites.router, prefix="/scolarites", tags=["scolarites"])
 api_router.include_router(diplome.router, prefix="/diplome", tags=["diplome"])

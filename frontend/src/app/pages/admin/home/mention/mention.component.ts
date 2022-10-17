@@ -19,7 +19,7 @@ export class MentionComponent implements OnInit {
     "Authorization": "Bearer "+localStorage.getItem("token")
   })
 
-  all_mention: Mention[] = []
+  allMention: Mention[] = []
   confirmModal?: NzModalRef;
   form!: FormGroup;
   isvisible = false;
@@ -35,7 +35,7 @@ export class MentionComponent implements OnInit {
 
   ngOnInit(): void {
     this.http.get<any>(`${BASE_URL}/mentions/`, this.options).subscribe(
-      data => this.all_mention = data,
+      data => this.allMention = data,
       error => console.error("error as ", error)
     );
 
@@ -51,7 +51,7 @@ export class MentionComponent implements OnInit {
       nzTitle: "Voulez-vous supprimer "+name+"?",
       nzOnOk: () => {
         this.http.delete<any>(`${BASE_URL}/mentions/?uuid=`+uuid, this.options).subscribe(
-          data => this.all_mention = data,
+          data => this.allMention = data,
           error => console.error("error as ", error)
         );
       }
@@ -72,12 +72,12 @@ export class MentionComponent implements OnInit {
       }
       if (this.isEdit){
         this.http.put<any>(`${BASE_URL}/mentions/?uuid=`+this.uuid, body, this.options).subscribe(
-          data => this.all_mention = data,
+          data => this.allMention = data,
           error => console.error("error as ", error)
         )
       }else{
         this.http.post<any>(`${BASE_URL}/mentions/`,body, this.options).subscribe(
-          data => this.all_mention = data,
+          data => this.allMention = data,
           error => console.error("error as ", error)
         )
       }

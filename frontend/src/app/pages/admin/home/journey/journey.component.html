@@ -10,7 +10,7 @@
     </div>
         
 </div>
-    <nz-table #journeyList [nzData]="all_journey" nzSize="small" [nzPageSize]="10" nzBordered [nzScroll]="{ x: 200 + 'px' }"> 
+    <nz-table #journeyList [nzData]="allJourney" nzSize="small" [nzPageSize]="10" nzBordered [nzScroll]="{ x: 200 + 'px' }"> 
         <thead>
             <tr>
               <tr>
@@ -82,7 +82,7 @@
                         formControlName="uuid_mention"
                         [nzPlaceHolder]="'admin.home.mention.title' | translate"
                         >
-                        <nz-option *ngFor="let item of all_mention"
+                        <nz-option *ngFor="let item of allMention"
                             [nzLabel]="item.title"
                             [nzValue]="item.uuid"
                         >

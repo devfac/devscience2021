@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Router, RouterModule, Routes } from '@angular/router';
 import { CollegeYearComponent } from './college-year/college-year.component';
+import { DetailsNoteComponent } from './details-note/details-note.component';
 import { EcComponent } from './ec/ec.component';
 import { HomeComponent } from './home.component';
 import { JourneyComponent } from './journey/journey.component';
@@ -57,6 +58,11 @@ const routes: Routes = [
       path: 'note',
       component: NoteComponent,
       data: { breadcrumb: 'admin.home.note.title' },
+    },
+    {
+      path: 'note-details',
+      component: DetailsNoteComponent,
+      data: { breadcrumb: 'admin.home.details.title' },
     },
   ]
  },

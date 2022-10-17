@@ -24,10 +24,10 @@ export class InscriptionComponent implements OnInit {
   })
 
   user = localStorage.getItem('user')
-  all_years: CollegeYear[] = []
-  all_students: AncienStudent[] = []
-  all_journey: Journey[] = []
-  all_mention: Mention[] = []
+  allYears: CollegeYear[] = []
+  allStudents: AncienStudent[] = []
+  allJourney: Journey[] = []
+  allMention: Mention[] = []
   listOfSemester = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
   semesterTitles: any[] = []
   confirmModal?: NzModalRef
@@ -38,14 +38,14 @@ export class InscriptionComponent implements OnInit {
   title = '';
   data = ""
   uuid= "";
-
+  listOfData: any[] = []
   options = {
     headers: this.headers
   }
   listOfColumns: ColumnItem[] = [
 
     {
-      name:"Num select",
+      name:"Num Carte",
       sortOrder: null,
       sortFn: null,
       sortDirections: ['ascend', 'descend', null],
@@ -82,6 +82,15 @@ export class InscriptionComponent implements OnInit {
       filterFn:(semester: string, item: StudentColumn) => item.inf_semester.indexOf(semester) !== -1
     },
     {
+      name:"Parcours",
+      sortOrder: null,
+      sortFn: null,
+      sortDirections: ['ascend','descend', null],
+      filterMultiple: false,
+      listOfFilter:[] ,
+      filterFn:(semester: string, item: StudentColumn) => item.inf_semester.indexOf(semester) !== -1
+    },
+    {
       name:"Action",
       sortOrder: null,
       sortFn: null,
@@ -109,6 +118,7 @@ export class InscriptionComponent implements OnInit {
       collegeYear: [null],
       uuidRole: [null, [Validators.required]],
       uuidMention: [[], [Validators.required]],
+      filter: [null],
     });
   }
 
@@ -120,7 +130,7 @@ export class InscriptionComponent implements OnInit {
     for(let i=0; i<user?.uuid_mention.length;i++){
       this.http.get<Mention>(`${BASE_URL}/mentions/`+user?.uuid_mention[i], this.options).subscribe(
         data =>{
-          this.all_mention.push(data)
+          this.allMention.push(data)
           this.form.get('mention')?.setValue(data.uuid)
           
           },
@@ -139,12 +149,14 @@ export class InscriptionComponent implements OnInit {
     
     this.http.get<CollegeYear[]>(`${BASE_URL}/college_year/`, options).subscribe(
       data => {
-        this.all_years = data,
+        this.allYears = data,
         this.form.get('collegeYear')?.setValue(data[0].title)
         if(this.form.get('mention')?.value){
           this.http.get<AncienStudent[]>(`${BASE_URL}/student/new_inscrit?college_year=`+data[0].title+`&uuid_mention=`+this.form.get('mention')?.value, options).subscribe(
-            data => {this.all_students = data,
-              console.log(data)},
+            data => {
+              this.allStudents = data    
+              this.listOfData = [... data]
+            },
             error => console.error("error as ", error)
           );
         }
@@ -152,6 +164,12 @@ export class InscriptionComponent implements OnInit {
       error => console.error("error as ", error)
     );
   
+    this.http.get<Journey[]>(`${BASE_URL}/journey/`+localStorage.getItem("uuid_mention"), this.options).subscribe(
+      data =>{ 
+        this.allJourney=data
+      },
+      error => console.error("error as ", error)
+    );
 
   }
   showConfirm(name: string, numSelect: string): void{
@@ -160,7 +178,10 @@ export class InscriptionComponent implements OnInit {
       nzOnOk: () => {
         this.http.delete<AncienStudent[]>(`${BASE_URL}/student/new?num_select=`+numSelect+'&college_year='+this.form.value.collegeYear+'&uuid_mention='+
         this.form.value.mention, this.options).subscribe(
-          data => this.all_students = data,
+          data => {
+            this.allStudents = data
+            this.listOfData = [... data]
+          },
           error => console.error("error as ", error)
         );
       }
@@ -183,7 +204,10 @@ export class InscriptionComponent implements OnInit {
   getAllStudents(): void{
     if(this.form.get('collegeYear')?.value && this.form.get('mention')?.value){
     this.http.get<any>(`${BASE_URL}/student/new_inscrit?college_year=`+this.form.get('collegeYear')?.value+`&uuid_mention=`+this.form.get('mention')?.value, this.options).subscribe(
-      data => this.all_students = data,
+      data => {
+        this.allStudents = data
+        this.listOfData = [... data]
+      },
       error => console.error("error as ", error)
     );
     }
@@ -203,6 +227,13 @@ export class InscriptionComponent implements OnInit {
     }, 3000);
   }
 
+  changeFilter(){
+    if(this.form.value.filter){
+      this.listOfData = this.allStudents.filter((item: any) => item.journey.uuid === this.form.value.filter)
+    }else{
+      this.listOfData = this.allStudents
+    }
+  }
 
 
 }

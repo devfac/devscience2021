@@ -44,9 +44,9 @@ class PDF(FPDF):
                 pdf.cell(1, 7, txt="", ln=1)
                 pdf.set_font("arial", "BI", 10)
                 pdf.cell(1, 5, txt="")
-                pdf.cell(22, 5, txt=num, border=1)
+                pdf.cell(25, 5, txt=num, border=1)
                 pdf.cell(1, 5, txt="")
-                pdf.cell(166, 5, txt=nom_et_prenom, border=1, ln=0, align="C")
+                pdf.cell(163, 5, txt=nom_et_prenom, border=1, ln=0, align="C")
                 num_ = 1
                 for i, etudiant in enumerate(etudiants[niv]):
                     num_select_ = etudiant["num_select"]
@@ -54,10 +54,10 @@ class PDF(FPDF):
                     pdf.cell(1, 7, txt="", ln=1)
                     pdf.set_font("arial", "I", 10)
                     pdf.cell(1, 5, txt="")
-                    pdf.cell(22, 5, txt=num_select_, border=1, ln=0)
+                    pdf.cell(25, 5, txt=num_select_, border=1, ln=0)
                     pdf.cell(1, 5, txt="")
                     pdf.set_font("arial", "I", 10)
-                    pdf.cell(166, 5, txt=name, border=1, ln=0, align="L")
+                    pdf.cell(163, 5, txt=name, border=1, ln=0, align="L")
                     num_ += 1
 
         pdf.output(f"files/list_select_{mention}.pdf", "F")

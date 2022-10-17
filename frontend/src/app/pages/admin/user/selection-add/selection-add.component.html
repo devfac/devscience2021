@@ -6,18 +6,16 @@
         {{ 'admin.student.num_select' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate" >
-        <nz-input-group nzAddOnBefore="N°"  [nzAddOnAfter]="iconButton" *ngIf="isEdit">
-          <input nz-input type="number" formControlName="numSelect" [readonly]="isEdit"
-            [placeholder]="'admin.student.num_select' | translate" nz-icon="plus"  />
+        <nz-input-group nzAddOnBefore="N°"  [nzAddOnAfter]="iconButton" >
+          <input nz-input type="number" formControlName="numSelect" *ngIf="!isEdit" [readonly]="isEdit"
+            [placeholder]="'admin.student.num_select' | translate"  />
+          
+            <input nz-input type="text" formControlName="numSelect"  *ngIf="isEdit"  [readonly]="isEdit"
+            [placeholder]="'admin.student.num_select' | translate" />
         </nz-input-group>
 
-        <nz-input-group nzAddOnBefore="N°"  [nzAddOnAfter]="iconButton" *ngIf="!isEdit">
-          <input nz-input type="text" formControlName="numSelect" [readonly]="!isEdit"
-              [placeholder]="'admin.student.num_select' | translate" nz-icon="plus"  />
-        </nz-input-group>
-           
       <ng-template #iconButton>
-          <i nz-icon nzType="plus"  class="button"></i>
+          <i nz-icon nzType="import"  class="button"></i>
       </ng-template>
       </nz-form-control>
     </nz-form-item>
@@ -31,8 +29,9 @@
                 nzAllowClear
                 formControlName="mention"
                 [nzPlaceHolder]="'admin.home.mention.title' | translate"
+                [nzDisabled]="isInscrit"
                 >
-                <nz-option *ngFor="let item of all_mention"
+                <nz-option *ngFor="let item of allMention"
                     [nzLabel]="item.title"
                     [nzValue]="item.uuid"
                 >
@@ -51,6 +50,7 @@
                     formControlName="isSelected"
                     [nzCheckedChildren]="checkedTemplate"
                     [nzUnCheckedChildren]="unCheckedTemplate"
+                    [nzDisabled]="isInscrit"
                 >
                 </nz-switch>
                 <ng-template #checkedTemplate><span nz-icon nzType="check"></span></ng-template>
@@ -61,7 +61,7 @@
   </div>
 
   <div nz-row>
-    <nz-form-item nz-col nzSpan="15">
+    <nz-form-item nz-col nzSpan="8">
       <nz-form-label>
         {{ 'admin.student.last_name' | translate }}
       </nz-form-label>
@@ -84,9 +84,21 @@
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>
+    <div nz-col nzSpan="1"></div>
+    <nz-form-item nz-col nzSpan="6">
+      <nz-form-label>
+        {{ 'admin.student.phone' | translate }}
+      </nz-form-label>
+      <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+        <nz-input-group >
+          <input nz-input type="text" formControlName="phone"
+            [placeholder]="'admin.student.phone' | translate" />
+        </nz-input-group>
+      </nz-form-control>
+    </nz-form-item>
   </div>
   <div nz-row>
-    <nz-form-item nz-col nzSpan="15">
+    <nz-form-item nz-col nzSpan="8">
       <nz-form-label>
         {{ 'admin.student.address' | translate }}
       </nz-form-label>
@@ -95,6 +107,25 @@
           <input nz-input type="text" formControlName="address"
             [placeholder]="'admin.student.address' | translate" />
         </nz-input-group>
+      </nz-form-control>
+    </nz-form-item>
+    <div nz-col nzSpan="1"></div> 
+    <nz-form-item nz-col nzSpan="6">
+      <nz-form-label>
+        {{ 'admin.student.level' | translate }}
+      </nz-form-label>
+      <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+        <nz-select
+          nzAllowClear
+          formControlName="level"
+          [nzPlaceHolder]="'admin.student.level' | translate"
+          >
+          <nz-option *ngFor="let item of typeLevel"
+              [nzLabel]="item.label"
+              [nzValue]="item.value"
+          >
+          </nz-option>
+        </nz-select>
       </nz-form-control>
     </nz-form-item>
     <div nz-col nzSpan="1"></div>

@@ -1,5 +1,7 @@
 from typing import Any, List
 from fpdf import FPDF
+from app.liste.header import header
+
 
 
 def set_orientation(nbr: int) -> str:
@@ -73,18 +75,7 @@ def get_type_response(session: str, type: str) -> str:
 
 class PDF(FPDF):
     def add_title(pdf: FPDF, data: Any, sems: str, title: str):
-        pdf.add_font("alger", "", "Algerian.ttf", uni=True)
-
-        image_univ = "images/logo_univ.jpg"
-        image_fac = "images/logo_science.jpg"
-
-        pdf.add_font("alger", "", "Algerian.ttf", uni=True)
-
-        pdf.image(image_univ, x=30, y=6, w=30, h=30)
-        pdf.image(image_fac, x=155, y=6, w=30, h=30)
-
-        titre4 = "UNIVERSITE DE FIANARANTSOA"
-        titre5 = "FACULTE DES SCIENCES"
+        header(pdf)
 
         mention = "MENTION:"
         mention_etudiant = f"{data['mention']}"
@@ -97,11 +88,6 @@ class PDF(FPDF):
         session = "SESSION:"
         sessionclass = f"{data['session']}"
 
-        pdf.set_font("arial", "B", 12)
-        pdf.cell(0, 6, txt=titre4, ln=1, align="C")
-
-        pdf.set_font("arial", "B", 10)
-        pdf.cell(0, 6, txt=titre5, ln=1, align="C")
         pdf.set_font("alger", "", 15)
         pdf.cell(0, 15, txt="", ln=1, align="C")
         pdf.cell(0, 15, txt=title, ln=1, align="C")
@@ -113,13 +99,13 @@ class PDF(FPDF):
         pdf.cell(0, 8, txt=mention_etudiant, ln=1)
 
         pdf.set_font("arial", "BI", 13)
-        pdf.cell(29, 8, txt=journey, align="L")
+        pdf.cell(24, 8, txt=journey, align="L")
 
         pdf.set_font("arial", "I", 12)
         pdf.cell(0, 8, txt=journey_etudiant, ln=1)
 
         pdf.set_font("arial", "BI", 13)
-        pdf.cell(28, 8, txt=semester, align="L")
+        pdf.cell(24, 8, txt=semester, align="L")
 
         pdf.set_font("arial", "I", 12)
         pdf.cell(0, 8, txt=semester_etudiant, ln=1)
@@ -180,5 +166,5 @@ class PDF(FPDF):
         pdf.cell(100, 5, txt="", align="L")
         pdf.cell(0, 5, txt=text_4, ln=1, align="L")
 
-        pdf.output(f"files/resultat_{sems}_{parcour.abreviation}_{session}.pdf", "F")
-        return f"files/resultat_{sems}_{parcour.abreviation}_{session}.pdf"
+        pdf.output(f"files/resultat_{sems}_{parcour}_{session}.pdf", "F")
+        return f"files/resultat_{sems}_{parcour}_{session}.pdf"

@@ -10,9 +10,9 @@ class PDF(FPDF):
         header(pdf)
         mention = "MENTION:"
         mention_etudiant = f"{data['mention']}"
-        journey = "journey:"
+        journey = "Parcours:"
         journey_etudiant = f"{data['journey']}"
-        semester = "semester:"
+        semester = "Semestre:"
         semester_etudiant = f"{sems.upper()}"
         anne = "ANNÉE UNIVERSITAIRE:"
         anne_univ = f"{data['anne']}"
@@ -28,13 +28,13 @@ class PDF(FPDF):
         pdf.cell(0, 8, mention_etudiant, 0, 1)
 
         pdf.set_font("arial", "BI", 13)
-        pdf.cell(29, 8, txt=journey, ln=0, align="L")
+        pdf.cell(24, 8, txt=journey, ln=0, align="L")
 
         pdf.set_font("arial", "I", 12)
         pdf.cell(0, 8, txt=journey_etudiant, ln=1)
 
         pdf.set_font("arial", "BI", 13)
-        pdf.cell(28, 8, txt=semester, ln=0, align="L")
+        pdf.cell(24, 8, txt=semester, ln=0, align="L")
 
         pdf.set_font("arial", "I", 12)
         pdf.cell(0, 8, txt=semester_etudiant, ln=1)
@@ -61,9 +61,9 @@ class PDF(FPDF):
         pdf.cell(1, 5, txt="")
         pdf.cell(12, 5, txt=num, border=1)
         pdf.cell(1, 5, txt="")
-        pdf.cell(18, 5, txt=num_c, border=1)
+        pdf.cell(25, 5, txt=num_c, border=1)
         pdf.cell(1, 5, txt="")
-        pdf.cell(160, 5, txt=nom_et_prenom, border=1, align="C")
+        pdf.cell(155, 5, txt=nom_et_prenom, border=1, align="C")
         num_ = 1
         for i, etudiant in enumerate(etudiants):
             num_carte_ = etudiant["num_carte"]
@@ -73,10 +73,10 @@ class PDF(FPDF):
             pdf.cell(1, 5, txt="")
             pdf.cell(12, 5, txt=str(num_), border=1)
             pdf.cell(1, 5, txt="")
-            pdf.cell(18, 5, txt=num_carte_, border=1)
+            pdf.cell(25, 5, txt=num_carte_, border=1)
             pdf.cell(1, 5, txt="")
             pdf.set_font("arial", "I", 10)
-            pdf.cell(160, 5, txt=name, border=1, align="L")
+            pdf.cell(155, 5, txt=name, border=1, align="L")
             num_ += 1
 
         pdf.output(f"files/list_inscit_{sems}_{parcour}.pdf", "F")

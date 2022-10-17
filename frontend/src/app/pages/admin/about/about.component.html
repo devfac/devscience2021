@@ -1,5 +1,21 @@
-<nz-layout class="inner-layout">
-  <nz-content class="inner-content">
-    <h2>{{'about' | translate}}</h2>
-  </nz-content>
-</nz-layout>
+<nz-table #colSpanTable [nzData]="listOfData" nzBordered>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Age</th>
+      <th colspan="2">Home phone</th>
+      <th>Address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of colSpanTable.data; index as i">
+      <td>{{ data.name }}</td>
+        <ng-container>
+          <td>{{ data.age }}</td>
+          <td>{{ data.tel }}</td>
+          <td>{{ data.phone }}</td>
+          <td>{{ data.address }}</td>
+        </ng-container>
+    </tr>
+  </tbody>
+</nz-table>

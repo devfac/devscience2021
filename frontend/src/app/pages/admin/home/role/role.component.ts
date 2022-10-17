@@ -20,7 +20,7 @@ export class RoleComponent implements OnInit {
     'Accept': 'application/json',
     "Authorization": "Bearer "+localStorage.getItem("token")
   })
-  all_role: Role[] = []
+  allRole: Role[] = []
   confirmModal?: NzModalRef;
   form!: FormGroup;
   isvisible = false;
@@ -38,7 +38,7 @@ export class RoleComponent implements OnInit {
       headers: this.headers
     }
     this.http.get<any>(`${BASE_URL}/roles/`, options).subscribe(
-      data => this.all_role = data,
+      data => this.allRole = data,
       error => console.error("error as ", error)
     );
 
@@ -52,7 +52,7 @@ export class RoleComponent implements OnInit {
       nzTitle: "Voulez-vous supprimer "+name+"?",
       nzOnOk: () => {
         this.http.delete<any>(`${BASE_URL}/roles/?uuid=`+uuid, this.options).subscribe(
-          data => this.all_role = data,
+          data => this.allRole = data,
           error => console.error("error as ", error)
         );
       }
@@ -68,12 +68,12 @@ export class RoleComponent implements OnInit {
       }
       if (this.isEdit){
         this.http.put<any>(`${BASE_URL}/roles/?uuid=`+this.uuid, body, this.options).subscribe(
-          data => this.all_role = data,
+          data => this.allRole = data,
           error => console.error("error as ", error)
         )
       }else{
         this.http.post<any>(`${BASE_URL}/roles/`,body, this.options).subscribe(
-          data => this.all_role = data,
+          data => this.allRole = data,
           error => console.error("error as ", error)
         )
       }

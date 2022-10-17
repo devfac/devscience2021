@@ -1,11 +1,12 @@
 from .college_year import CollegeYear
 from .droit import Droit
-from .etudiant import create
 from .journey import Journey
-from .matier import create
 from .mention import Mention
 from .note import create_table_note
 from .role import Role
 from .semester import Semester
 from .user import User
 from .student import Student
+from .matier import TeachingUnit
+from .matier import  ConstituentElement
+from .interaction import Diploma, Validation, Interaction

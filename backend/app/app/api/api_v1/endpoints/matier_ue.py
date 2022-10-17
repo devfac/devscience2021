@@ -15,16 +15,12 @@ router = APIRouter()
 def read_ue(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve unité d'enseingement.
     """
-    college_year = crud.college_year.get_by_title(db, schema)
-    if not college_year:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-    ues = crud.matier_ue.get_all(schema=create_anne(schema))
+    ues = crud.teaching_unit.get_all(db=db)
     list_ue = []
     for on_ue in ues:
         ue = schemas.MatierUE(**jsonable_encoder(on_ue))
@@ -41,26 +37,22 @@ def create_ue(
         *,
         db: Session = Depends(deps.get_db),
         ue_in: schemas.MatierUECreate,
-        schema: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create unité d'enseingement.
     """
-    college_year = crud.college_year.get_by_title(db, schema)
-    if not college_year:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-
     journey = crud.journey.get_by_uuid(db=db, uuid=ue_in.uuid_journey)
     if not journey:
         raise HTTPException(status_code=400, detail=f"Journey not found.", )
 
-    value = decode_text(ue_in.title).lower()
-    key_unique = decode_text(f"{value}_{ue_in.semester}_{journey.abbreviation}").lower()
-    matier_ue = crud.matier_ue.get_by_schema(schema=create_anne(schema), obj_in=ue_in, value=value)
-    if matier_ue:
+    ue_in.value = decode_text(ue_in.title).lower()
+    ue_in.key_unique = decode_text(f"{ue_in.value}_{ue_in.semester}_{journey.abbreviation}").lower()
+    teaching_unit = crud.teaching_unit.get_by_key_unique(db=db ,key_unique=ue_in.key_unique)
+    if teaching_unit:
         raise HTTPException(status_code=404, detail="U.E already exists")
-    ues = crud.matier_ue.create_ue(schema=create_anne(schema), obj_in=ue_in, value=value, key_unique=key_unique)
+    ues = crud.teaching_unit.create(db=db, obj_in=ue_in)
+    ues = crud.teaching_unit.get_all(db=db)
     list_ue = []
     for on_ue in ues:
         ue = schemas.MatierUE(**jsonable_encoder(on_ue))
@@ -76,7 +68,6 @@ def create_ue(
 def update_ue(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         ue_in: schemas.MatierUEUpdate,
         uuid: str,
         current_user: models.User = Depends(deps.get_current_active_user),
@@ -84,13 +75,12 @@ def update_ue(
     """
     Update unité d'enseingement.
     """
-    college_year = crud.college_year.get_by_title(db, schema)
-    if not college_year:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-    ue = crud.matier_ue.get_by_uuid(schema=create_anne(schema), uuid=uuid)
+
+    ue = crud.teaching_unit.get_by_uuid(db=db, uuid=uuid)
     if not ue:
         raise HTTPException(status_code=404, detail="U.E not found")
-    ues = crud.matier_ue.update_ue(schema=create_anne(schema), obj_in=ue_in, uuid=uuid)
+    ues = crud.teaching_unit.update(db=db, obj_in=ue_in, db_obj=ue)
+    ues = crud.teaching_unit.get_all(db=db)
     list_ue = []
     for on_ue in ues:
         ue = schemas.MatierUE(**jsonable_encoder(on_ue))
@@ -101,8 +91,7 @@ def update_ue(
         list_ue.append(ue)
     return list_ue
 
-
-@router.get("/{uuid}", response_model=schemas.MatierUE)
+@router.get("/by_uuid/", response_model=schemas.MatierUE)
 def get_by_uuid(
         *,
         db: Session = Depends(deps.get_db),
@@ -116,7 +105,7 @@ def get_by_uuid(
     college_year = crud.college_year.get_by_title(db, schema)
     if not college_year:
         raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-    ue = crud.matier_ue.get_by_uuid(schema=create_anne(schema), uuid=uuid)
+    ue = crud.teaching_unit.get_by_uuid(db=db, uuid=uuid)
     if not ue:
         raise HTTPException(status_code=404, detail="U.E not found")
     ue = schemas.MatierUE(**jsonable_encoder(ue))
@@ -126,12 +115,12 @@ def get_by_uuid(
         ue.abbreviation_journey = journey.abbreviation
     return ue
 
-@router.get("/{semester}/{uuid_journey}/"
+
+@router.get("/get_by_class"
             "", response_model=List[schemas.MatierUE])
 def get_by_class(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         semester: str,
         uuid_journey: str,
         current_user: models.User = Depends(deps.get_current_active_user),
@@ -139,15 +128,11 @@ def get_by_class(
     """
     get unité d'enseingement.
     """
-    college_year = crud.college_year.get_by_title(db, schema)
-    if not college_year:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-
     journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
     if not journey:
         raise HTTPException(status_code=404, detail="Journey not found")
 
-    ues = crud.matier_ue.get_by_class(schema=create_anne(schema), uuid_journey=uuid_journey, semester=semester)
+    ues = crud.teaching_unit.get_by_class(db=db, uuid_journey=uuid_journey, semester=semester)
     if not ues:
         raise HTTPException(status_code=404, detail="U.E not found")
     list_ue = []
@@ -155,6 +140,36 @@ def get_by_class(
         ue = schemas.MatierUE(**jsonable_encoder(on_ue))
         ue.journey = journey
         ue.abbreviation_journey = journey.abbreviation
+        list_ue.append(ue)
+    return list_ue
+
+
+@router.get("/get_by_class_with_ec"
+            "", response_model=List[schemas.MatierUEEC])
+def get_by_class(
+        *,
+        db: Session = Depends(deps.get_db),
+        semester: str,
+        uuid_journey: str,
+        current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    get unité d'enseingement.
+    """
+    journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
+    if not journey:
+        raise HTTPException(status_code=404, detail="Journey not found")
+
+    ues = crud.teaching_unit.get_by_class(db=db, uuid_journey=uuid_journey, semester=semester)
+    if not ues:
+        raise HTTPException(status_code=404, detail="U.E not found")
+    list_ue = []
+    for on_ue in ues:
+        ue = schemas.MatierUEEC(**jsonable_encoder(on_ue))
+        ecs = crud.constituent_element.get_by_value_ue(db=db, value_ue=ue.value,
+                                             semester=semester, uuid_journey=uuid_journey
+                                             )
+        ue.ec = ecs
         list_ue.append(ue)
     return list_ue
 
@@ -173,15 +188,16 @@ def delete_ue(
     college_year = crud.college_year.get_by_title(db=db, title=schema)
     if not college_year:
         raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-    ue = crud.matier_ue.get_by_uuid(schema=create_anne(schema), uuid=uuid)
+    ue = crud.teaching_unit.get_by_uuid(db=db, uuid=uuid)
     if not ue:
         raise HTTPException(status_code=404, detail="U.E not found")
 
-    ecs = crud.matier_ec.get_by_value_ue(schema=create_anne(schema),
+    ecs = crud.constituent_element.get_by_value_ue(db=db,
                                          value_ue=ue.value, semester=ue.semester, uuid_journey=ue.uuid_journey)
     for ec in ecs:
-        crud.matier_ec.delete_ec(schema=create_anne(schema), uuid=ec.uuid)
-    ues = crud.matier_ue.delete_ue(schema=create_anne(schema), uuid=uuid)
+        crud.constituent_element.remove(db=db, id=ec.uuid)
+    ues = crud.teaching_unit.remove(db=db, id=uuid)
+    ues = crud.teaching_unit.get_all(db=db)
     list_ue = []
     for on_ue in ues:
         ue = schemas.MatierUE(**jsonable_encoder(on_ue))

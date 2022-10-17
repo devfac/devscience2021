@@ -21,7 +21,7 @@ export class CollegeYearComponent implements OnInit {
 
 
   
-  all_year: CollegeYear[] = []
+  allYear: CollegeYear[] = []
   confirmModal?: NzModalRef;
   form!: FormGroup;
   isvisible = false;
@@ -42,7 +42,7 @@ export class CollegeYearComponent implements OnInit {
       headers: this.headers
     }
     this.http.get<any>(`${BASE_URL}/college_year/`, options).subscribe(
-      data => this.all_year = data,
+      data => this.allYear = data,
       error => console.error("error as ", error)
     );
 
@@ -57,7 +57,7 @@ export class CollegeYearComponent implements OnInit {
       nzTitle: "Voulez-vous supprimer "+name+"?",
       nzOnOk: () => {
         this.http.delete<any>(`${BASE_URL}/mentions/?uuid=`+uuid, this.options).subscribe(
-          data => this.all_year = data,
+          data => this.allYear = data,
           error => console.error("error as ", error)
         );
       }
@@ -75,12 +75,12 @@ export class CollegeYearComponent implements OnInit {
       }
       if (this.isEdit){
         this.http.put<any>(`${BASE_URL}/college_year/?uuid=`+this.uuid, body, this.options).subscribe(
-          data => this.all_year = data,
+          data => this.allYear = data,
           error => console.error("error as ", error)
         )
       }else{
         this.http.post<any>(`${BASE_URL}/college_year/`,body, this.options).subscribe(
-          data => this.all_year = data,
+          data => this.allYear = data,
           error => console.error("error as ", error)
         )
       }

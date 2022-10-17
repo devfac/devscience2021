@@ -21,6 +21,8 @@
     "@angular/router": "~12.2.0",
     "@ngx-translate/core": "^13.0.0",
     "@ngx-translate/http-loader": "^7.0.0",
+    "file-saver": "^2.0.5",
+    "ng-apexcharts": "^1.7.1",
     "ng-zorro-antd": "^12.1.1",
     "ngx-socket-io": "~4.1.0",
     "rxjs": "~6.6.0",
