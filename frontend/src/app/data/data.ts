@@ -4,7 +4,7 @@ export const typeEtudiant=[
         {label:"Redoublant",value:"Redoublant"},
         {label:"Triplant ou plus",value:"Triplant ou plus"},
     ]
-export const    typeNation=[
+export const typeNation=[
         {label:"Malagasy",value:"Malagasy"},
         {label:"Africaine",value:"Africaine"},
         {label:"Asiatique",value:"Asiatique"},

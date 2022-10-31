@@ -16,12 +16,17 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.CollegeYear])
 def read_college_year(
         db: Session = Depends(deps.get_db),
+        limit: int = 100,
+        offset: int = 0,
+        order: str = "desc",
+        order_by: str = "title",
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve anne universitaire.
     """
-    college_year = crud.college_year.get_multi(db)
+    college_year = crud.college_year.get_multi(db=db, order=order, order_by=order_by, limit=limit, skip=offset)
+    print(college_year)
     return college_year
 
 

@@ -1,0 +1,14 @@
+export interface QueryParams {
+  semester?: string | null;
+  session?: string | null;
+  pageIndex: number,
+  pageSize: number,
+  sortField: string | null,
+  sortOrder: string | null,
+}
+
+export interface otherQueryParams {
+  uuid_journey?: string | null;
+  uuid_mention?: string | null;
+  college_year?: string | null  ;
+}

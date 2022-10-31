@@ -16,28 +16,28 @@ from app.db.session import engine
 
 class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
 
-    def check_table_exist(self, schema: str, semester: str, journey: str, session: str) -> bool:
-        metadata = MetaData(schema=schema)
+    def check_table_exist( self, semester: str, journey: str, session: str) -> bool:
+        metadata = MetaData()
         metadata.reflect(bind=engine)
         for table in metadata.tables:
-            table_name = table.replace(f'{schema}.', '')
+            table_name = table.replace('.', '')
             if table_name == f"note_{journey.lower()}_{semester.lower()}_{session.lower()}":
                 return True
         return False
 
-    def check_columns_exist(self, schema: str, semester: str, journey: str, session: str) -> Optional[List[str]]:
-        metadata = MetaData(schema=schema, bind=engine)
+    def check_columns_exist(self, semester: str, journey: str, session: str) -> Optional[List[str]]:
+        metadata = MetaData(bind=engine)
         columns = []
         table_ = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         for index, table in enumerate(table_.columns):
-            if str(table).partition(".")[2] != 'num_carte' and str(table).partition(".")[2] != 'moyenne' \
+            if str(table).partition(".")[2] != 'num_carte' and str(table).partition(".")[2] != 'mean' \
                     and str(table).partition(".")[2] != 'credit':
                 columns.append(str(table).partition(".")[2])
         return columns
 
-    def insert_note(self, schema: str, semester: str, journey: str, session: str, num_carte: str):
-        obj_in_data = jsonable_encoder({num_carte})
-        metadata = MetaData(schema=schema, bind=engine)
+    def insert_note(self, semester: str, journey: str, session: str, num_carte: str, year: str):
+        obj_in_data = jsonable_encoder({num_carte, year})
+        metadata = MetaData(bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
         ins = insert(table=table)
@@ -45,19 +45,20 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.execute(ins)
         conn.close()
 
-    def read_all_note(self, schema: str, semester: str, journey: str, session: str):
-        metadata = MetaData(schema=schema, bind=engine)
+    def read_all_note(self, semester: str, journey: str, session: str, year:str):
+        metadata = MetaData(bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
+        sel = sel.where(table.columns.year == year)
         sel = sel.order_by(table.columns.num_carte.asc())
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
         return out
 
-    def read_note_succes(self, schema: str, semester: str, journey: str, session: str, value_matier: str):
-        metadata = MetaData(schema=schema, bind=engine)
+    def read_note_succes(self, semester: str, journey: str, session: str, value_matier: str):
+        metadata = MetaData(bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
         result = conn.execute(f"SELECT num_carte, {value_matier} FROM {table} WHERE {value_matier} >= 10 ")
@@ -65,8 +66,8 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.close()
         return out
 
-    def read_note_by_ue(self, schema: str, semester: str, journey: str, session: str, list_ue: list):
-        metadata = MetaData(schema=schema, bind=engine)
+    def read_note_by_ue(self,semester: str, journey: str, session: str, list_ue: list):
+        metadata = MetaData(bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
         result = conn.execute(f"SELECT num_carte, {list_ue} FROM {table} ")
@@ -74,8 +75,8 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.close()
         return out
 
-    def read_note_failed(self, schema: str, semester: str, journey: str, session: str, value_matier: str):
-        metadata = MetaData(schema=schema, bind=engine)
+    def read_note_failed(self, semester: str, journey: str, session: str, value_matier: str):
+        metadata = MetaData(bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
         result = conn.execute(
@@ -139,14 +140,13 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         metadata = MetaData(schema=schema, bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
-        result = conn.execute(f"SELECT num_carte,moyenne FROM {table} WHERE moyenne >= {moyenne}")
+        result = conn.execute(f"SELECT num_carte,mean FROM {table} WHERE mean >= {moyenne}")
         out = result.fetchall()
         conn.close()
         return out
 
-    def update_note(self, schema: str, semester: str, journey: str, session: str, num_carte: str, ue_in: Any):
-        metadata = MetaData(schema=schema, bind=engine)
-        conn = engine.connect()
+    def update_note(self, semester: str, journey: str, session: str, num_carte: str, ue_in: Any):
+        metadata = MetaData(bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
         up = update(table=table)
@@ -154,8 +154,8 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         up = up.where(table.columns.num_carte == num_carte)
         conn.execute(up)
 
-    def read_by_num_carte(self, schema: str, semester: str, journey: str, session: str, num_carte: str) -> Any:
-        metadata = MetaData(schema=schema, bind=engine)
+    def read_by_num_carte(self, semester: str, journey: str, session: str, num_carte: str) -> Any:
+        metadata = MetaData(bind=engine)
         conn = engine.connect()
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         sel = table.select()
@@ -165,8 +165,8 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.close()
         return out
 
-    def update_auto(self, schema: str, semester: str, journey: str, session: str, num_carte: str):
-        metadata = MetaData(schema=schema, bind=engine)
+    def update_auto(self, semester: str, journey: str, session: str, num_carte: str):
+        metadata = MetaData(bind=engine)
         conn = engine.connect()
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         table_norm = Table(f"note_{journey.lower()}_{semester.lower()}_normal", metadata, autoload=True)
@@ -180,19 +180,20 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.execute(up)
         conn.close()
 
-    def read_by_credit(self, schema: str, semester: str, journey: str, session: str, credit: int) -> Any:
-        metadata = MetaData(schema=schema, bind=engine)
+    def read_by_credit(self, semester: str, journey: str, session: str, credit: int, year:str) -> Any:
+        metadata = MetaData(bind=engine)
         conn = engine.connect()
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         sel = table.select()
         sel = sel.where(table.columns.credit < credit)
+        sel = sel.where(table.columns.year == year)
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
         return out
 
-    def delete_by_num_carte(self, schema: str, semester: str, journey: str, session: str, num_carte: str):
-        metadata = MetaData(schema=schema, bind=engine)
+    def delete_by_num_carte(self,semester: str, journey: str, session: str, num_carte: str):
+        metadata = MetaData(bind=engine)
         conn = engine.connect()
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         dele = table.delete()

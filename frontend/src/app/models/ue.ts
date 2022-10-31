@@ -23,6 +23,7 @@ export interface UeEc{
     ec: Ec[]
 }
 
+
 export interface UeColumn{
     title: string;
     semester: string,

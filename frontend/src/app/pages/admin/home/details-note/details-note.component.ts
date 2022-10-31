@@ -4,7 +4,9 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { StudentInfo } from '@app/models/student';
 import { Ue, UeEc } from '@app/models/ue';
 import { environment } from '@environments/environment';
+import { DownloadService } from '../../download.service';
 import { UtilsService } from '../../utils.service';
+import { HomeService } from '../home.service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -26,19 +28,24 @@ export class DetailsNoteComponent implements OnInit {
   matier: UeEc[] = []
   allColumns: any[] = []
   form!: FormGroup;
-  semester?: any 
+  semester?: string | null
   isSpinning: boolean = false
+  check: boolean = false
+  initialise: boolean = false
   constructor(
     private http: HttpClient,
     private fb: FormBuilder, 
-    public utils: UtilsService
+    public utils: UtilsService,
+    private downloads: DownloadService,
+    private service: HomeService
     ) { 
       this.form = this.fb.group({
         name: [null],
         mention: [null],
         journey: [null],
         semester: [null],
-        note: [null]
+        note: [null],
+        isSelected: [null]
       })
     }
 
@@ -51,7 +58,6 @@ export class DetailsNoteComponent implements OnInit {
     return str.substring(3)
   }
   getStatus(normal: number, rattrapage: number): string {
-    console.log(Number(normal), Number(rattrapage))
     if(Number(normal) <  Number(rattrapage)){
       return 'sup'
     }else if(Number(normal) ===  Number(rattrapage)){
@@ -62,20 +68,11 @@ export class DetailsNoteComponent implements OnInit {
       return ''
     }
   }
-  ngOnInit(): void {
+  async ngOnInit(){
     this.isSpinning = true 
     this.semester = localStorage.getItem('semester')
 
-    this.http.get<UeEc[]>(`${BASE_URL}/matier_ue/get_by_class_with_ec?schema=`+localStorage.getItem('collegeYear')+
-      `&semester=`+localStorage.getItem('semester')+
-      `&uuid_journey=`+localStorage.getItem('journey'), this.options).subscribe(
-        data => 
-            {this.matier = data
-            console.log(data)
-          },
-
-        error => console.error("error as ", error)
-      )
+    this.matier = await this.service.getMatier(localStorage.getItem('collegeYear'), this.semester, localStorage.getItem('journey')).toPromise()
 
     this.http.get<any>(`${BASE_URL}/notes/view_details?schema=`+localStorage.getItem('collegeYear')+
     `&semester=`+localStorage.getItem('semester')+
@@ -83,18 +80,60 @@ export class DetailsNoteComponent implements OnInit {
     `&num_carte=`+localStorage.getItem('numDetails'), this.options).subscribe(
       data => {
         this.infoStudent = data
-        console.log(data)
         this.form.get('name')?.setValue(data.info.last_name+" "+data.info.first_name)
         this.form.get('mention')?.setValue(data.info.journey.mention.title)
         this.form.get('journey')?.setValue(data.info.journey.title)
         this.form.get('semester')?.setValue(data.info.inf_semester+" | " +data.info.sup_semester)
+        this.form.get('isSelected')?.setValue(data.info.validation)
+        this.check = data.info.validation
         this.isSpinning = false 
+        this.initialise = true
     },
       error => {console.error("error as ", error)
     }
     )
 
   }
+  async changeValidation(){
+  let validation: any = {}
+  if (this.initialise){
+    if (this.check){
+      for (let index = 1; index<= 10; index++){
+        if ("S"+index === this.semester) {
+            validation["s"+index] = 'null'; 
+            break;
+        }
+      }
+    }else{
+      for (let index = 1; index<= 10; index++){
+        if ("S"+index === this.semester) {
+            validation["s"+index] = localStorage.getItem('collegeYear');
+            break;
+        }
+      }
+    }
+    this.check = !this.check
+    validation['num_carte'] = this.infoStudent.info.num_carte
+     await this.service.createValidation(validation, this.semester).toPromise()
+  }
+  }
+
+  relever(): void{
+    const url: string = `${BASE_URL}/scolarites/relever?num_carte=`+this.infoStudent.info.num_carte+
+    `&college_year=`+localStorage.getItem('collegeYear')+`&uuid_journey=`+localStorage.getItem('journey')+
+    `&semester=`+this.semester
+    this.downloads
+      .download(url, this.options)
+      .subscribe(blob => {
+        const a = document.createElement('a')
+        const objectUrl = URL.createObjectURL(blob)
+        a.href = objectUrl
+        a.download = "relever"+this.infoStudent.info.num_carte+'.pdf';
+        a.click();
+        URL.revokeObjectURL(objectUrl);
+      })
+  }
+
 
   expandSet = new Set<string>();
   onExpandChange(id: string, checked: boolean): void {

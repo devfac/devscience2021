@@ -5,13 +5,14 @@ from .crud_role import role
 from .crud_journey import journey
 from .crud_semester import semester
 from .crud_college_years import college_year
-from .crud_semester_valide import semester_valide
+from .crud_validation import validation
 from .crud_matier import teaching_unit, constituent_element
 from .crud_note import note
 from .crud_save import save
-from .crud_diplome import diplome
+from .crud_diploma import diploma
 from .crud_droit import droit
 from .crud_student import new_student, ancien_student
+from .crud_interaction import interaction
 # For a new basic set of CRUD operations you could just do
 
 # from .base import CRUDBase

@@ -46,7 +46,6 @@
 
       </div>
   <div class="header">
-
     <nz-select
       [ngModel]="data"
       formControlName="filter"
@@ -73,36 +72,14 @@
     </div>
   </div>
 </form>
-  <nz-table #studentList [nzData]="listOfData" nzSize="small" [nzPageSize]="10" nzBordered 
-  [nzScroll]="{ x: 200 + 'px' }"> 
-      <thead>
-          <tr>
-            <tr>
-              <th *ngFor="let column of listOfColumns"
-              [nzSortOrder]="column.sortOrder"
-              [nzSortFn]="column.sortFn"
-              [nzSortDirections]="column.sortDirections"
-              [nzFilterMultiple]="column.filterMultiple"
-              [nzFilters]="column.listOfFilter"
-              [nzFilterFn]="column.filterFn"
-              > 
-            {{ column.name}}
-          </th>
-          </tr>
-      </thead>
-      <tbody>
-          <tr *ngFor="let data of studentList.data">
-              <td> {{data.num_carte}}</td>
-              <td> {{data.last_name}}</td>
-              <td> {{data.first_name}}</td>
-              <td> {{data.level}}</td>
-              <td> {{data.journey.abbreviation}}</td>
-              <td>
-                <a nz-icon nzType="edit" nzTheme="fill" style="font-size: 20px; color: green;"  (click)="showModalEdit(data.num_select)"></a>
-                <nz-divider nzType="vertical"></nz-divider>
-                <a nz-icon nzType="delete" nzTheme="fill" style="font-size: 20px; color: red;" (click)="showConfirm(data.first_name, data.num_select)"></a>
-            </td>
-              
-          </tr>
-      </tbody>
-  </nz-table>
+<app-datatable-crud
+[title]="'admin.product.product_list.title' | translate"
+[headers]="headers"
+[fetchDataFn]="fetchData"
+[width]="500"
+[actions]="actions"
+(delete)="onDelete($event)"
+(edit)="onEdit($event)"
+(add)="onAdd()"
+classNames="product-list-table"
+></app-datatable-crud>

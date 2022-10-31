@@ -18,7 +18,7 @@ from uuid import UUID
 from app.core.config import settings
 from unidecode import unidecode
 from app.db.session import engine
-
+from app import schemas
 
 def send_email(
         email_to: str,
@@ -144,8 +144,8 @@ def creaate_registre(schema: str):
 
 
 def decode_text(text: str) -> str:
-    strd = text.replace(" ", "_")
-    return unidecode(strd)
+    str_ = text.replace(" ", "_")
+    return unidecode(str_.replace("-", "_"))
 
 
 def get_max(sems_a: str, sems_b: str) -> str:
@@ -261,20 +261,18 @@ def get_niveau_long(niv: str) -> str:
         return "CINQUIÈME ANNÉE"
 
 
-def validation_semester(etudiant: Any, sems: str, credit: int, total_cred: int, anne: str):
-    response = {}
-    response["anne"] = anne
-    for index, sems_i in enumerate(etudiant.semester):
-        if sems == sems_i:
-            if credit == total_cred:
-                response["status"] = f"Étudiant(e) ayant validé(e) la {total_cred} crédit définitive."
-                response["code"] = True
-            else:
-                response["status"] = f"Étudiant(e) ayant validé(e) la {total_cred} crédit par compensation."
-                response["code"] = True
+def validation_semester(sems_i: str, credit: int, total_cred: int, anne: str):
+    response = {"anne": anne}
+    if sems_i:
+        if credit == total_cred:
+            response["status"] = f"Étudiant(e) ayant validé(e) la {total_cred} crédit définitive."
+            response["code"] = True
         else:
-            response["status"] = "Étudiant(e) redoublé(e)"
-            response["code"] = False
+            response["status"] = f"Étudiant(e) ayant validé(e) la {total_cred} crédit par compensation."
+            response["code"] = True
+    else:
+        response["status"] = "Étudiant(e) redoublé(e)"
+        response["code"] = False
     return response
 
 
@@ -341,7 +339,7 @@ def test_semester(semester: list, sems_act) -> bool:
     return False
 
 
-def send_new_account(email_to: str, password: str) -> str:
+def send_new_account(email_to: str, password: str) -> any:
     smtp_server = settings.SMTP_SERVER
     smtp_port = settings.SMTP_PORT
     sender_email = settings.EMAILS_FROM_EMAIL
@@ -427,6 +425,27 @@ def convert_date(date: str) -> str:
     print(jours, mois_ - 1, annee)
 
     return f"{jours} {mois[mois_ - 1]} {annee}"
+
+def create_model(interactions: List[schemas.ValueUEEC]):
+    result = []
+    last_ue = {}
+    ue = {'name':None, 'credit':None, 'ec':[], 'type':'ue', 'value':0.0}
+    ecs  = []
+    name = ''
+    interactions.append(ue)
+    for interaction in interactions:
+        if interaction['type'] == "ue":
+            last_ue = {'name':ue['name'], 'credit':ue['credit'], 'ec':ecs}
+            ue = {'name': interaction['name'], 'credit': interaction['value'], 'ec': ecs}
+            ecs  = []
+        else:
+            ec = {'name':interaction['name'], 'weight':interaction['value']}
+            ecs.append(ec)
+        if last_ue['name'] and last_ue['name'] != name:
+            result.append(last_ue)
+            name = last_ue['name']
+    return result
+
 
 
 class UUIDEncoder(json.JSONEncoder):

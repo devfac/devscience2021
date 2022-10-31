@@ -1,28 +1,33 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CollegeYear } from '@app/models/collegeYear';
-import { ColumnItem, Ec, EcColumn } from '@app/models/ec';
+import { Ec } from '@app/models/ec';
 import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
+import { QueryParams } from '@app/models/query';
+import { TableHeader } from '@app/models/table';
 import { Ue } from '@app/models/ue';
-import { environment } from '@environments/environment';
+import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
+import { parseQueryParams } from '@app/shared/utils';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
+import { CollegeYearService } from '../college-year/college-year.service';
+import { JourneyService } from '../journey/journey.service';
+import { MentionService } from '../mention/mention.service';
+import { UeService } from '../ue/ue.service';
+import { EcService } from './ec.service';
 
-const BASE_URL = environment.authApiURL;
 
 @Component({
   selector: 'app-ec',
   templateUrl: './ec.component.html',
   styleUrls: ['./ec.component.less']
 })
-export class EcComponent implements OnInit {
-  private headers =  new HttpHeaders({
-    'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
-  })
+export class EcComponent implements OnInit, AfterContentInit {
+  @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
+  headers: TableHeader[] = [];
+
   user = localStorage.getItem('user')
-  collegeYear = localStorage.getItem('year')
+  collegeYear = localStorage.getItem('collegeYear')
   allYears: CollegeYear[] = []
   allJourney: Journey[] = []
   allMention: Mention[] = []
@@ -38,110 +43,83 @@ export class EcComponent implements OnInit {
   title = '';
   uuid= "";
   data = ""
-  actualYear: string = ""
+  initialise: boolean = false
+  actualYear: string | null = ""
   titles: any[] = []
-  
+  actions = {
+    add: true,
+    edit: true,
+    delete: true,
+    detail: false,
+  };
 
-  listOfColumns: ColumnItem[] = [
-    {
-      name:"Title",
-      sortOrder: null,
-      sortFn: (a: EcColumn, b:EcColumn) => a.title.localeCompare(b.title),
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn: null
-    },
-    {
-      name:"Journey",
-      sortOrder: null,
-      sortFn: (a: EcColumn, b:EcColumn) => a.abbreviation_journey.localeCompare(b.abbreviation_journey),
-      sortDirections: ['ascend','descend', null],
-      filterMultiple: false,
-      listOfFilter: this.titles,
-      filterFn:(list: string[], item: EcColumn) => list.some(journey => item.abbreviation_journey.indexOf(journey) !== -1)
-    },
-    {
-      name:"Semester",
-      sortOrder: null,
-      sortFn: (a: EcColumn, b:EcColumn) => a.semester.localeCompare(b.semester),
-      sortDirections: ['ascend','descend', null],
-      filterMultiple: false,
-      listOfFilter: this.semesterTitles,
-      filterFn:(semester: string, item: EcColumn) => item.semester.indexOf(semester) !== -1
-    },
-    {
-      name:"Poids",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn: null
-    },
-    {
-      name:"Ue",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn:null
-    },
-    {
-      name:"Action",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn:null
-    },
-  ]
 
-  options = {
-    headers: this.headers
-  }
-
-  constructor(private http: HttpClient,  private modal: NzModalService, private fb: FormBuilder) { 
+  constructor(
+    private modal: NzModalService, 
+    private fb: FormBuilder,
+    private service: EcService,
+    private serviceJourney: JourneyService,
+    private serviceMention: MentionService,
+    private serviceYears: CollegeYearService,
+    private serviceUe: UeService
+    ) { 
     this.form = this.fb.group({
     title: [null, [Validators.required]],
     semester: [null, [Validators.required]],
     valueUe: [null, [Validators.required]],
     journey: [null, [Validators.required]],
     weight: [null, [Validators.required]],
-    mention: [null, [Validators.required]],
+    uuidMention: [null, [Validators.required]],
     isOptional: [null],
     user: [null, ],
     collegeYear: [null],
   });
-  this.http.get<Journey[]>(`${BASE_URL}/journey/`, this.options).subscribe(
-    data_journey => {
-        for(let i=0; i<data_journey.length; i++){
-          this.titles.push(
-            {
-              text: data_journey[i].abbreviation, value: data_journey[i].abbreviation
-            }
-          )
-        }
-        localStorage.setItem('filter', JSON.stringify(this.titles))
-    },
-  )
 }
+  ngAfterContentInit(): void {
+    this.headers = [
+    {
+      title: 'Title',
+      selector: 'title',
+      width: "190px",
+      isSortable: true,
+    },{
+      title: 'Parcours',
+      selector: 'abbreviation_journey',
+      isSortable: false,
+    },{
+      title: 'Semestre',
+      selector: 'semester',
+      isSortable: true,
+    },{
+      title: 'Ue',
+      selector: 'value_ue',
+      isSortable: true,
+    },{
+      title: 'Poids',
+      selector: 'weight',
+      isSortable: true,
+    },
+  ];
+  }
 
-  ngOnInit(): void {
-    let options = {
-      headers: this.headers
+  async ngOnInit(){
+    this.fetchData = this.fetchData.bind(this)
+
+    let journey: Journey[] = await this.serviceJourney.getDataPromise().toPromise()
+    this.testStorage('journey', journey[0].uuid)
+    
+    for(let i=0; i<journey.length; i++){
+      this.titles.push(
+        {
+          text: journey[i].abbreviation, value: journey[i].abbreviation
+        }
+      )
     }
+    localStorage.setItem('filter', JSON.stringify(this.titles))
 
-    this.http.get<Mention[]>(`${BASE_URL}/mentions/`, options).subscribe(
-      data => {
-        this.allMention = data,
-        this.form.get('mention')?.setValue(data[0].uuid)
-      },
-      error => console.error("error as ", error)
-    );
-
+    this.allMention = await this.serviceMention.getDataPromise().toPromise()
+    this.testStorage('mention', this.allMention[0].uuid)
+    
     for(let i=0; i<this.listOfSemester.length; i++){
       this.semesterTitles.push(
         {
@@ -149,34 +127,45 @@ export class EcComponent implements OnInit {
         }
       )
     }
-
-
-    this.http.get<CollegeYear[]>(`${BASE_URL}/college_year/`, options).subscribe(
-      data => {
-        this.allYears = data,
-        this.actualYear = data[0].title
-        this.form.get('collegeYear')?.setValue(this.actualYear)
-        localStorage.setItem('year', data[0].title)
-        this.http.get<Ec[]>(`${BASE_URL}/matier_ec/?schema=`+data[0].title, options).subscribe(
-          data => this.allEc = data,
-          error => console.error("error as ", error)
-        );
-      },
-      error => console.error("error as ", error)
-    );
   }
-  showConfirm(name?: string, uuid?: string): void{
+
+ 
+  fetchData(params?: QueryParams){
+    return this.service.getDataObservable(parseQueryParams(params))
+  }
+
+  testStorage(key: string, value: string){
+    if(localStorage.getItem(key)){
+      this.form.get(key)?.setValue(localStorage.getItem(key))
+    }else{
+      localStorage.setItem(key, value)
+      this.form.get(key)?.setValue(localStorage.getItem(key))
+    }
+  }
+
+  showConfirm(name: string, uuid: string): void{
     this.confirmModal = this.modal.confirm({
       nzTitle: "Voulez-vous supprimer "+name+"?",
       nzOnOk: () => {
-        this.http.delete<any>(`${BASE_URL}/matier_ec/?schema=`+this.form.get('collegeYear')?.value+`&uuid=`+uuid, this.options).subscribe(
-          data => this.allEc = data,
-          error => console.error("error as ", error)
-        );
-      }
-    })
-  }
-  submitForm(): void {
+        this.service.deletData(uuid)
+        this.datatable.fetchData()
+        }
+      })
+    }
+
+    onDelete(row: any) {
+      this.showConfirm(row.title, row.uuid);
+    }
+
+    onEdit(row: any) {
+      this.showModalEdit(row.uuid);
+    }
+
+    onAdd() {
+      this.showModal();
+    }
+  
+  async submitForm(){
     if (this.form.valid) {
       const data = {
         title: this.form.value.title,
@@ -192,15 +181,11 @@ export class EcComponent implements OnInit {
       this.isConfirmLoading = true
       console.error(data)
       if (this.isEdit){
-        this.http.put<any>(`${BASE_URL}/matier_ec/?schema=`+this.form.get('collegeYear')?.value+`&uuid=`+this.uuid, data, this.options).subscribe(
-          data => this.allEc = data,
-          error => console.error("error as ", error)
-        )
+        await this.service.updateData(this.uuid, data).toPromise()
+        this.datatable.fetchData()
       }else{
-        this.http.post<any>(`${BASE_URL}/matier_ec/`,data, this.options).subscribe(
-          data => this.allEc = data,
-          error => console.error("error as ", error)
-        )
+        await this.service.addData(data).toPromise()
+        this.datatable.fetchData()
       }
       
       this.isvisible = false,
@@ -223,60 +208,37 @@ export class EcComponent implements OnInit {
     this.form.get('isOptional')?.setValue(false)
   }
 
-  showModalEdit(uuid: string): void{
+  async showModalEdit(uuid: string){
     this.isEdit = true
     this.uuid = uuid
-    this.http.get<any>(`${BASE_URL}/matier_ec/by_uuid/?uuid=`+uuid+`&schema=`+this.form.get('collegeYear')?.value, this.options).subscribe(
-      data => {
-        console.error(data)
-        this.form.get('title')?.setValue(data.title),
-        this.form.get('weight')?.setValue(data.weight),
-        this.form.get('semester')?.setValue(data.semester)
-        this.form.get('mention')?.setValue(data.journey.uuid_mention)
-        this.form.get('journey')?.setValue(data.uuid_journey)
-        this.form.get('valueUe')?.setValue(data.value_ue)
-        this.form.get('user')?.setValue(data.users)
-        this.form.get('isOptional')?.setValue(data.is_optional)
-        this.http.get<any>(`${BASE_URL}/journey/`+this.form.get('mention')?.value, this.options).subscribe(
-          data_journey => {
-              console.error("error as ", data_journey)
-              this.allJourney = data_journey
-              this.form.get('journey')?.setValue(data.uuid_journey)
-          },
-          error => {
-            this.allJourney = []
-            console.error("error as ", error)
-          }
-        )
-      },
-      error => console.error("error as ", error)
-    );
+    let data: any = await this.service.getData(uuid).toPromise()
+    this.form.get('uuidMention')?.setValue(data.journey.uuid_mention)
+    this.form.get('journey')?.setValue(data.journey.uuid)
+    this.form.get('title')?.setValue(data.title),
+    this.form.get('weight')?.setValue(data.weight),
+    this.form.get('semester')?.setValue(data.semester)
+    this.form.get('valueUe')?.setValue(data.value_ue)
+    this.form.get('user')?.setValue(data.users)
+    this.form.get('isOptional')?.setValue(data.is_optional)
+
+    if(this.form.get('uuidMention')?.value){
+      this.allJourney = await this.serviceJourney.getDataByMention(this.form.get('uuidMention')?.value).toPromise()
+    }
+
+    if (this.form.get('journey')?.value && this.form.get('semester')?.value){
+      this.allUe = await this.serviceUe.getDataPromise(this.form.get('semester')?.value, this.form.get('journey')?.value).toPromise()
+    }
+
     this.isvisible = true
   }
-  getAllUe(): void{
-    if (this.form.get('journey')?.value && this.form.get('semester')?.value)
-    this.http.get<any>(`${BASE_URL}/matier_ue/get_by_class?semester=`+this.form.get('semester')?.value+'&uuid_journey='+this.form.get('journey')?.value, this.options).subscribe(
-      data => {
-          this.allUe = data
-      },
-      error => {
-        this.allUe = []
-        console.error("error as ", error)
-      }
-    )
+ async getAllUe(){
+    if (this.form.get('journey')?.value && this.form.get('semester')?.value){
+      this.allUe = await this.serviceUe.getDataPromise(this.form.get('semester')?.value, this.form.get('journey')?.value).toPromise()}
   }
-  getAllJourney(): void{
-    this.http.get<any>(`${BASE_URL}/journey/`+this.form.get('mention')?.value, this.options).subscribe(
-      data => {
-          console.error("error as ", data)
-          this.allJourney = data
-          this.form.get('journey')?.setValue('')
-      },
-      error => {
-        this.allJourney = []
-        console.error("error as ", error)
-      }
-    )
+  async getAllJourney(){
+    if(this.form.get('uuidMention')?.value){
+      this.allJourney = await this.serviceJourney.getDataByMention(this.form.get('uuidMention')?.value).toPromise()
+    }
   }
   handleCancel(): void{
     this.isvisible = false

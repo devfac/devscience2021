@@ -12,12 +12,14 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.Droit])
 def read_droit(
     db: Session = Depends(deps.get_db),
+        limit: int = 100,
+        offset: int = 0,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve droits.
     """
-    droit = crud.droit.get_multi(db=db)
+    droit = crud.droit.get_multi(db=db, limit=limit, skip=offset)
     return droit
 
 

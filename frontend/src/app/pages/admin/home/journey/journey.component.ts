@@ -1,10 +1,15 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ColumnItem, Journey, JourneyColumn } from '@app/models/journey';
+import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
+import { QueryParams } from '@app/models/query';
+import { TableHeader } from '@app/models/table';
+import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
 import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
+import { MentionService } from '../mention/mention.service';
+import { JourneyService } from './journey.service';
+import { parseQueryParams } from '@app/shared/utils';
 
 const BASE_URL = environment.authApiURL;
 
@@ -13,17 +18,13 @@ const BASE_URL = environment.authApiURL;
   templateUrl: './journey.component.html',
   styleUrls: ['./journey.component.less']
 })
-export class JourneyComponent implements OnInit {
-  private headers =  new HttpHeaders({
-    'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
-  })
+export class JourneyComponent implements OnInit, AfterContentInit { 
+  @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
+  headers: TableHeader[] = [];
 
-
-  
   allJourney: Journey[] = []
   allMention: Mention[] = []
-  listOfOptions = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
+  listOfOptions = ['S1' ,'S2' ,'S3' ,'S4' ,'S5' ,'S6' ,'S7' ,'S8' ,'S9' ,'S10']
   semesterTitles: any[] = []
   listOfTagsOptions =[] 
   confirmModal?: NzModalRef;
@@ -31,114 +32,96 @@ export class JourneyComponent implements OnInit {
   isvisible = false;
   isConfirmLoading = false;
   isEdit = false;
-  title = '';
-  uuid= "";
-  data = ""
+  uuid= '';
 
-  options = {
-    headers: this.headers
-  }
+  actions = {
+    add: true,
+    edit: true,
+    delete: true,
+    detail: false,
+  };
 
-  listOfColumns: ColumnItem[] = [
-    {
-      name:"Title",
-      sortOrder: null,
-      sortFn: (a: JourneyColumn, b:JourneyColumn) => a.title.localeCompare(b.title),
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn: null
-    },
-    {
-      name:"Abbréviation",
-      sortOrder: null,
-      sortFn: (a: JourneyColumn, b:JourneyColumn) => a.abbreviation.localeCompare(b.abbreviation),
-      sortDirections: ['ascend','descend', null],
-      filterMultiple: false,
-      listOfFilter: [],
-      filterFn: null,
-    },
-    {
-      name:"Semester",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: [null],
-      filterMultiple: false,
-      listOfFilter: [],
-      filterFn: null
-    },
-    {
-      name:"Mention",
-      sortOrder: null,
-      sortFn: (a: JourneyColumn, b:JourneyColumn) => a.mention_title.localeCompare(b.mention_title),
-      sortDirections: ['ascend','descend', null],
-      filterMultiple: false,
-      listOfFilter: this.semesterTitles,
-      filterFn:(mention_title: string, item: JourneyColumn) => item.mention_title.indexOf(mention_title) !== -1
-    },
-    {
-      name:"Action",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: [null],
-      filterMultiple: false,
-      listOfFilter: [],
-      filterFn:null
-    },
-  ]
-
-  constructor(private http: HttpClient,  private modal: NzModalService, private fb: FormBuilder) { }
-
-  ngOnInit(): void {
-    let options = {
-      headers: this.headers
-    }
-    this.http.get<any>(`${BASE_URL}/journey/`, options).subscribe(
-      data => this.allJourney = data,
-      error => console.error("error as ", error)
-    );
-
-    this.http.get<any>(`${BASE_URL}/mentions/`, this.options).subscribe(
-      data =>{
-        this.allMention = data
-        },
-        error => console.error("error as ", error)
-    );
-
-    this.form = this.fb.group({
+  constructor(
+    private modal: NzModalService, 
+    private fb: FormBuilder, 
+    private service: JourneyService,
+    private serviceMention: MentionService
+    ) {  this.form = this.fb.group({
       title: [null, [Validators.required]],
       abbreviation: [null, [Validators.required]],
-      uuid_mention: [null, [Validators.required]],
-      semester: [[], [Validators.required]],
+      uuidMention: [null, [Validators.required]],
+      semesterList: [[], [Validators.required]],
     });
-
+}
+  ngAfterContentInit(): void {
+    this.headers = [
+    {
+      title: 'Title',
+      selector: 'title',
+      isSortable: true,
+    },
+    {
+      title: 'Abbréviation',
+      selector: 'abbreviation',
+      width:'150px',
+      isSortable: true,
+    },
+    {
+      title: 'Semestre',
+      selector: 'semester',
+      width:'120px',
+      isSortable: true,
+    },
+    {
+      title: 'Mention',
+      selector: 'mention',
+      isSortable: true,
+    },
+  ];
   }
-  showConfirm(name?: string, uuid?: string): void{
+
+  async ngOnInit(){
+    this.fetchData = this.fetchData.bind(this)
+    this.allMention = await this.serviceMention.getDataPromise().toPromise()
+  }
+
+  fetchData(params?: QueryParams){
+    return this.service.getDataObservable(parseQueryParams(params))
+  }
+
+  showConfirm(name: string, uuid: string){
     this.confirmModal = this.modal.confirm({
-      nzTitle: "Voulez-vous supprimer "+name+"?",
-      nzOnOk: () => {
-        this.http.delete<any>(`${BASE_URL}/mentions/?uuid=`+uuid, this.options).subscribe(
-          data => this.allJourney = data,
-          error => console.error("error as ", error)
-        );
+      nzTitle: 'Voulez-vous supprimer '+name+'?',
+      nzOnOk: async () => {
+        this.service.deletData(uuid)
+        this.datatable.fetchData()
       }
     })
   }
-  submitForm(): void {
+
+  onDelete(row: any) {
+    this.showConfirm(row.title, row.uuid);
+  }
+
+  onEdit(row: any) {
+    this.showModalEdit(row.uuid);
+  }
+
+  onAdd() {
+    this.showModal();
+  }
+  
+  async submitForm(){
     if (this.form.valid) {
       const data = this.form.getRawValue()
       this.isConfirmLoading = true
       console.error(data)
       if (this.isEdit){
-        this.http.put<any>(`${BASE_URL}/journey/?uuid=`+this.uuid, data, this.options).subscribe(
-          data => this.allJourney = data,
-          error => console.error("error as ", error)
-        )
+        await this.service.updateData(this.uuid, data).toPromise()
+        this.datatable.fetchData()
       }else{
-        this.http.post<any>(`${BASE_URL}/journey/`,data, this.options).subscribe(
-          data => this.allJourney = data,
-          error => console.error("error as ", error)
-        )
+        await this.service.addData(data).toPromise()
+        this.datatable.fetchData()
       }
       
       this.isvisible = false,
@@ -158,23 +141,19 @@ export class JourneyComponent implements OnInit {
     this.isvisible = true;
     this.form.get('title')?.setValue('');
     this.form.get('abbreviation')?.setValue('');
-    this.form.get('uuid_mention')?.setValue('');
-    this.form.get('semester')?.setValue([""]);
+    this.form.get('uuidMention')?.setValue('');
+    this.form.get('semesterList')?.setValue(['S1', 'S2']);
   }
 
-  showModalEdit(uuid: string): void{
+  async showModalEdit(uuid: string){
     this.isEdit = true
     this.uuid = uuid
-    this.http.get<any>(`${BASE_URL}/journey/by_uuid/`+uuid, this.options).subscribe(
-      data => {
-        this.form.get('title')?.setValue(data.title),
-        this.form.get('abbreviation')?.setValue(data.abbreviation),
-        this.form.get('uuid_mention')?.setValue(data.mention.uuid),
-        this.form.get('semester')?.setValue(data.semester)
-        console.error(data.mention.title)
-      },
-      error => console.error("error as ", error)
-    );
+    let data: any = await this.service.getData(uuid).toPromise()
+    this.form.get('title')?.setValue(data.title),
+    this.form.get('abbreviation')?.setValue(data.abbreviation),
+    this.form.get('uuidMention')?.setValue(data.mention.uuid),
+    this.form.get('semesterList')?.setValue(data.semester)
+    console.error(data.semester)
     this.isvisible = true
   }
 

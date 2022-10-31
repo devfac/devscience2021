@@ -1,12 +1,12 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { QueryParams } from '@app/models/query';
 import { Role } from '@app/models/role';
-import { environment } from '@environments/environment';
+import { TableHeader } from '@app/models/table';
+import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
+import { parseQueryParams } from '@app/shared/utils';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
-
-
-const BASE_URL = environment.authApiURL;
+import { RoleService } from './role.service';
 
 
 @Component({
@@ -14,12 +14,10 @@ const BASE_URL = environment.authApiURL;
   templateUrl: './role.component.html',
   styleUrls: ['./role.component.less']
 })
-export class RoleComponent implements OnInit {
+export class RoleComponent implements OnInit, AfterContentInit {
+  @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
+  headers: TableHeader[] = [];
 
-  private headers =  new HttpHeaders({
-    'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
-  })
   allRole: Role[] = []
   confirmModal?: NzModalRef;
   form!: FormGroup;
@@ -28,38 +26,64 @@ export class RoleComponent implements OnInit {
   isEdit = false;
   title = '';
   uuid= "";
+  actions = {
+    add: true,
+    edit: true,
+    delete: true,
+    detail: false,
+  };
 
-  options = {
-    headers: this.headers
-  }
-  constructor(private http: HttpClient, private modal: NzModalService, private fb: FormBuilder) { }
+  constructor(
+    private modal: NzModalService, 
+    private fb: FormBuilder,
+    private service: RoleService
+    ) {
+      this.form = this.fb.group({
+        title: [null, [Validators.required]],
+      }); }
+
+  ngAfterContentInit(): void {
+    this.headers = [
+    {
+      title: 'Title',
+      selector: 'title',
+      isSortable: true,
+    },
+  ];
+}
+
   ngOnInit(): void {
-    let options = {
-      headers: this.headers
-    }
-    this.http.get<any>(`${BASE_URL}/roles/`, options).subscribe(
-      data => this.allRole = data,
-      error => console.error("error as ", error)
-    );
-
-    this.form = this.fb.group({
-      title: [null, [Validators.required]],
-    });
+    this.fetchData = this.fetchData.bind(this)
   }
 
-  showConfirm(name?: string, uuid?: string): void{
+  fetchData(params?: QueryParams){
+    return this.service.getDataObservable(parseQueryParams(params))
+  }
+
+  showConfirm(name: string, uuid: string): void{
     this.confirmModal = this.modal.confirm({
       nzTitle: "Voulez-vous supprimer "+name+"?",
       nzOnOk: () => {
-        this.http.delete<any>(`${BASE_URL}/roles/?uuid=`+uuid, this.options).subscribe(
-          data => this.allRole = data,
-          error => console.error("error as ", error)
-        );
+        this.service.deletData(uuid)
+        this.datatable.fetchData()
       }
     })
   }
 
-  submitForm(): void {
+  onDelete(row: any) {
+    this.showConfirm(row.title, row.uuid);
+  }
+
+  onEdit(row: any) {
+    this.showModalEdit(row.uuid);
+  }
+
+  onAdd() {
+    this.showModal();
+  }
+  
+
+  async submitForm(){
     if (this.form.valid) {
       const title = this.form.value.title
       this.isConfirmLoading = true
@@ -67,15 +91,12 @@ export class RoleComponent implements OnInit {
         title: title
       }
       if (this.isEdit){
-        this.http.put<any>(`${BASE_URL}/roles/?uuid=`+this.uuid, body, this.options).subscribe(
-          data => this.allRole = data,
-          error => console.error("error as ", error)
-        )
+        await this.service.updateData(this.uuid, body).toPromise()
+        this.datatable.fetchData()
+        
       }else{
-        this.http.post<any>(`${BASE_URL}/roles/`,body, this.options).subscribe(
-          data => this.allRole = data,
-          error => console.error("error as ", error)
-        )
+        await this.service.addData(body).toPromise()
+        this.datatable.fetchData()
       }
       
       this.isvisible = false,
@@ -96,13 +117,12 @@ export class RoleComponent implements OnInit {
     this.form.get('title')?.setValue('');
   }
 
-  showModalEdit(uuid: string): void{
+  async showModalEdit(uuid: string){
     this.isEdit = true
     this.uuid = uuid
-    this.http.get<any>(`${BASE_URL}/roles/`+uuid, this.options).subscribe(
-      data => this.form.get('title')?.setValue(data.title),
-      error => console.error("error as ", error)
-    );
+      let data: any = await this.service.getData(uuid).toPromise()
+      this.form.get('title')?.setValue(data.title),
+     
     this.isvisible = true
   }
 

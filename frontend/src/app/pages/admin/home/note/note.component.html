@@ -1,5 +1,5 @@
 
-      <form nz-form [formGroup]="form" class="form" (ngSubmit)="submitForm()" nzLayout="vertical">
+      <form nz-form [formGroup]="form" class="form" nzLayout="vertical">
         <div class="header-title" nz-row>
             <nz-form-item>
                 <nz-form-label>
@@ -28,7 +28,7 @@
                 </nz-form-label>
                 <nz-form-control >
                   <nz-input-group>
-                    <nz-select style="margin-left: 30px;"
+                    <nz-select style="margin-left: 30px; width: 95%;"
                         [ngModel]="data"
                         formControlName="mention"
                         [nzPlaceHolder]="'admin.home.mention.title' | translate"
@@ -50,7 +50,7 @@
                 </nz-form-label>
                 <nz-form-control >
                   <nz-input-group>
-                    <nz-select style="margin-left: 30px;"
+                    <nz-select style="margin-left: 30px; width: 85%;"
                         [ngModel]="data"
                         formControlName="journey"
                         (ngModelChange)="changeJourney()"
@@ -72,7 +72,7 @@
                 </nz-form-label>
                 <nz-form-control >
                   <nz-input-group>
-                    <nz-select style="margin-left: 30px;"
+                    <nz-select style="margin-left: 30px; width: 85%;"
                         [ngModel]="data"
                         formControlName="semester"
                         [nzPlaceHolder]="'admin.home.journey.semester' | translate"
@@ -94,7 +94,7 @@
                 </nz-form-label>
                 <nz-form-control >
                   <nz-input-group>
-                    <nz-select style="margin-left: 30px;"
+                    <nz-select style="margin-left: 30px; width: 80%;"
                         [ngModel]="data"
                         formControlName="session"
                         [nzPlaceHolder]="'admin.home.note.session' | translate"
@@ -112,7 +112,7 @@
       </div>
   </form>
 
-  <div class="header" [formGroup]="form">
+  <div class="header" [formGroup]="form"  *ngIf="showTable">
     <div class="header-text" >
       <button nz-button nzType="primary" (click)="deleteTable()"  *ngIf="!authService.getPermission()">
         <span nz-icon nzType="delete" nzTheme="outline"></span>
@@ -197,7 +197,7 @@
         [nzPlaceHolder]="'admin.home.note.matier' | translate"
         (ngModelChange)="resetTableEc()"
         [nzAllowClear]="true"
-        style="width: 30%;"
+        style="width: 20%;"
         >
         <nz-option *ngFor="let item of matierEc"
             [nzLabel]="item.title"
@@ -225,7 +225,7 @@
       </button>
     </div>
     <div class="button-text">
-        <button nz-button nzType="primary" (click)="submitForm()" *ngIf="!authService.getPermission()"
+        <button nz-button nzType="primary" *ngIf="!authService.getPermission()"
         nz-tooltip
         nzTooltipTitle="{{'admin.toolpit.create' | translate}}">
           <span nz-icon nzType="table" nzTheme="outline" ></span>
@@ -256,136 +256,209 @@
         </button>
     </div>
   </div>
+  <div *ngIf="!showTable && !authService.getPermission()">
+    <nz-divider nzType="horizontal"></nz-divider>
+    <nz-steps [nzCurrent]="current">
+      <nz-step nzTitle="Choisir les matier"></nz-step>
+      <nz-step nzTitle="Créer la table"></nz-step>
+      <nz-step nzTitle="Términé"></nz-step>
+    </nz-steps>
 
-  <div nz-row>
-    <nz-spin [nzSpinning]="isSpinning">
-      <nz-table #allData [nzData]="listOfDisplayData" [nzScroll]="{ x: '100px', y:'380px'}" 
-      [nzPageSize]="6" 
-      nzBordered
-      [nzFooter]="message"
-      nz-col
-      nz-span="20"
-      >
-        <thead>
+    <div class="steps-content">
+      <nz-table
+      #rowSelectionTable
+      [nzData]="matier"
+      (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
+      [nzScroll]="{ x: '100px', y:'300px'}"
+      [nzShowPagination]="false"
+      *ngIf="current === 0"
+    >
+      <thead>
+        <tr>
+          <th></th>
+          <th
+            [(nzChecked)]="checked"
+            [nzIndeterminate]="indeterminate"
+            (nzCheckedChange)="onAllChecked($event)"
+          ></th>
+          <th>Name</th>
+          <th>Credit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let data of rowSelectionTable.data">
             <tr >
-              <th nzLeft [nzWidth]="'120px'" > Num Carte</th>
-                <th *ngFor="let data of allColumns" [nzWidth]="'200px'" >{{data.name}}
-                  </th>
-                <th nzRight [nzWidth]="'120px'"> Moyenne</th>
-                <th nzRight [nzWidth]="'80px'"> Crédit</th>
-                <th nzRight [nzWidth]="'90px'" > Action</th>
+              <td [nzExpand]="expandSet.has(data.uuid)" (nzExpandChange)="onExpandChange(data.uuid, $event)"></td>
+              <td [nzChecked]="setOfCheckedId.has(data.value)" (nzCheckedChange)="onItemChecked(data.value, $event)"></td>
+              <td>{{ data.title }}</td>
+              <td>{{ data.credit }}</td>
             </tr>
-        </thead>
-        <tbody>
-              <tr *ngFor="let student of allData.data">
-                <ng-container *ngIf="!editCache[student['num_carte']].edit; else editTemplate">
-                    <td nzLeft> {{student['num_carte']}}</td>
-                    <td  *ngFor="let columns of allColumns" >{{student[columns.value]}} 
-                      </td>
-                    <td nzRight > 
-                      <input type="number" nz-input [(ngModel)]="student['moyenne']" readonly/>
-                    </td>
-                    <td nzRight > {{student['credit']}}</td>
-                    <td  nzRight>
-                      <a nz-icon nzType="eye" nzTheme="fill" style="font-size: 20px;" (click)="viewNoteDetails(student['num_carte'])"  
-                        *ngIf="authService.getPermission()"
-                        nz-tooltip
-                        nzTooltipTitle="{{'admin.toolpit.view' | translate}}"></a>
-                      <nz-divider nzType="vertical" *ngIf="authService.getPermission()"> | </nz-divider>
-                      <a nz-icon nzType="edit" nzTheme="fill" style="font-size: 20px; color: green;" (click)="startEdit(student['num_carte'])" 
-                          *ngIf="authService.getPermission()" 
-                          nz-tooltip
-                          nzTooltipTitle="{{'admin.toolpit.edit' | translate}}"></a>
-                          <nz-divider nzType="vertical" *ngIf="!authService.getPermission()"> | </nz-divider>
-                      <a nz-icon nzType="delete" nzTheme="fill" 
-                      style="font-size: 20px; color: red;" 
-                      (click)="showConfirmStudent(student['num_carte'])"
-                      *ngIf="!authService.getPermission()"
-                      ></a>
-                    </td>
-                </ng-container>
-                <ng-template #editTemplate>
-                  <td nzLeft > {{student['num_carte']}}</td>
-                  <td  *ngFor="let columns of allColumns"> 
-                      <input type="number" nz-input 
-                      [(ngModel)]="student[columns.value]" 
-                      *ngIf="getColumsType(columns.value)==='ec_'" 
-                      [min]="0"
-                      [max]="20"/>
-                    </td>
-                    <td nzRight > 
-                      <input type="number" nz-input [(ngModel)]="student['moyenne']" readonly/>
-                    </td>
-                  <td nzRight > {{student['credit']}}</td>
-                  <td  nzRight>
-                    <a nz-icon nzType="save" nzTheme="fill" style="font-size: 20px; color: blue;" (click)="saveEdit(student['num_carte'])"
-                    nz-tooltip
-                    nzTooltipTitle="{{'admin.toolpit.save' | translate}}"></a>
-                    <nz-divider nzType="vertical"> | </nz-divider>
-                    <a nz-icon nzType="left-circle" nzTheme="outline" style="font-size: 20px;" (click)="cancelEdit(student['num_carte'])"
-                    nz-tooltip
-                    nzTooltipTitle="{{'admin.toolpit.cancel' | translate}}"></a>
-                  </td>
-              </ng-template>
-              </tr>
-        </tbody>
-      </nz-table>
-      <nz-modal [(nzVisible)]="visibleDialog" 
-              nzTitle="{{'admin.home.note.list' | translate}}" 
-              (nzOnCancel)="handleCancel()" 
-              nzMask="true"
-              nzMaskClosable="false" >
-        <div *nzModalContent>
-            <form nz-form [formGroup]="form" class="form" (ngSubmit)="listExam()" nzLayout="vertical">
-              <nz-form-item>
-                <nz-form-label nzRequired>
-                  {{ 'admin.home.note.salle' | translate }}
-                </nz-form-label>
-                <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-                  <nz-input-group>
-                    <input type="text" nz-input formControlName="salle" appCustomAutoFocus
-                      [placeholder]="'admin.home.note.salle' | translate" />
+            <tr [nzExpand]="expandSet.has(data.uuid)">
+              <ng-container *ngFor="let ec of data.ec">
+                  <nz-input-group [nzAddOnBefore]="ec.title" >
+                      <input nz-input type="text" readonly  
+                      [placeholder]="ec.weight "/>
                   </nz-input-group>
-                </nz-form-control>
-              </nz-form-item>
-              
-                <nz-form-item>
-                  <nz-form-label nzRequired>
-                    {{ 'admin.home.note.from' | translate }}
-                  </nz-form-label>
-                  <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-                    <nz-input-group>
-                      <input type="number" nz-input formControlName="from" 
-                        [min]="1" 
-                        appCustomAutoFocus
-                        [placeholder]="'admin.home.note.from' | translate" />
-                    </nz-input-group>
-                  </nz-form-control>
-                </nz-form-item>
-                
-                <nz-form-item>
-                  <nz-form-label nzRequired>
-                    {{ 'admin.home.note.to' | translate }}
-                  </nz-form-label>
-                  <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-                    <nz-input-group>
-                      <input type="number" nz-input formControlName="to" [min]="1" appCustomAutoFocus
-                        [placeholder]="'admin.home.note.to' | translate" />
-                    </nz-input-group>
-                  </nz-form-control>
-                </nz-form-item>
-
-                <nz-spin [nzSpinning]="isConfirmLoading">
-                    <button nz-button class="form-button form-margin" [nzType]="'primary'">
-                      {{'general_data.save' | translate | uppercase}}
-                    </button>
-                </nz-spin>
-            </form>
-        </div>
-        <div *nzModalFooter>
-            </div>
-    </nz-modal>
-    
-    </nz-spin>
+              </ng-container>
+              </tr>
+        </ng-container>
+      </tbody>
+    </nz-table>
+      <nz-descriptions  *ngIf="current === 1" [nzTitle]="'admin.home.note.table_name' | translate :{name: tableName}"
+        nzLayout="vertical">
+        <nz-descriptions-item [nzTitle]="'admin.home.note.nbr_ue' | translate">{{totalUe}}
+        </nz-descriptions-item>
+        <nz-descriptions-item [nzTitle]="'admin.home.note.nbr_ec' | translate">{{totalEc}}
+        </nz-descriptions-item>
+        <nz-descriptions-item [nzTitle]="'admin.home.note.year' | translate">{{year}}
+        </nz-descriptions-item>
+      </nz-descriptions>
     </div>
+    <div class="steps-action">
+      <button nz-button nzType="default" (click)="pre()" *ngIf="current > 0"[disabled]="form.valid">
+        <span>Previous</span>
+      </button>
+      <button nz-button nzType="default" (click)="next()" *ngIf="current < 2"[disabled]="form.valid">
+        <span>Next</span>
+      </button>
+      <button nz-button nzType="primary" (click)="done()" *ngIf="current === 2" [disabled]="form.valid">
+        <span>Done</span>
+      </button>
+    </div>
+  </div>
+     
+
+<nz-spin [nzSpinning]="isSpinning">
+  <nz-table 
+  #allData 
+  [nzData]="listOfDisplayData"
+  nzBordered  
+  [nzScroll]="{ x: '1200px', y: '240px' }"
+  class="note">
+    <thead>
+      <tr>
+        <th rowspan="2" nzLeft [nzWidth]="'120px'"> Num Carte</th>
+        
+        <th *ngFor="let data of allColumnUe" [colspan]="data['nbr_ec']" >
+          <a>{{data.name}}</a>
+        </th>
+        <th rowspan="2" nzRight [nzWidth]="'120px'">Moyenne</th>
+        <th rowspan="2" nzRight [nzWidth]="'120px'">Crédit</th>
+        <th rowspan="2" nzRight [nzWidth]="'120px'">Action</th>
+      </tr>
+      <tr><th *ngFor="let data of allColumnEc" >
+        <a>{{data.name}}</a>
+      </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let student of allData.data">
+
+        <ng-container *ngIf="!editCache[student['num_carte']].edit; else editTemplate">
+          <td nzLeft> {{student['num_carte']}}</td>
+          <td  *ngFor="let columns of allColumnEc" >{{student['ec_'+columns.value]}} 
+            </td>
+          <td nzRight > 
+            <input type="number" nz-input [(ngModel)]="student['mean']" readonly/>
+          </td>
+          <td nzRight > {{student['credit']}}</td>
+          <td  nzRight>
+            <a nz-icon nzType="eye" nzTheme="fill" style="font-size: 20px;" (click)="viewNoteDetails(student['num_carte'])"  
+              *ngIf="authService.getPermission()"
+              nz-tooltip
+              nzTooltipTitle="{{'admin.toolpit.view' | translate}}"></a>
+            <nz-divider nzType="vertical" *ngIf="authService.getPermission()"> | </nz-divider>
+            <a nz-icon nzType="edit" nzTheme="fill" style="font-size: 20px; color: green;" (click)="startEdit(student['num_carte'])" 
+                *ngIf="authService.getPermission()" 
+                nz-tooltip
+                nzTooltipTitle="{{'admin.toolpit.edit' | translate}}"></a>
+                <nz-divider nzType="vertical" *ngIf="!authService.getPermission()"> | </nz-divider>
+            <a nz-icon nzType="delete" nzTheme="fill" style="font-size: 20px; color: red;" (click)="showConfirmStudent(student['num_carte'])"
+                *ngIf="!authService.getPermission()" ></a>
+                <nz-divider nzType="vertical"> | </nz-divider>
+            <span nz-icon nzType="check-circle" style="font-size: 20px; color: green;" *ngIf="student['validation']" ></span>
+            <span nz-icon nzType="close-circle" style="font-size: 20px; color: red;" *ngIf="!student['validation']" ></span>
+          </td>
+      </ng-container>
+      <ng-template #editTemplate>
+        <td nzLeft > {{student['num_carte']}}</td>
+        <td  *ngFor="let columns of allColumnEc"> 
+            <input type="number" nz-input 
+            [(ngModel)]="student['ec_'+columns.value]" 
+            [min]="0"
+            [max]="20"/>
+          </td>
+          <td nzRight > 
+            <input type="number" nz-input [(ngModel)]="student['mean']" readonly/>
+          </td>
+        <td nzRight > {{student['credit']}}</td>
+        <td  nzRight>
+          <a nz-icon nzType="save" nzTheme="fill" style="font-size: 20px; color: blue;" (click)="saveEdit(student['num_carte'])"
+          nz-tooltip
+          nzTooltipTitle="{{'admin.toolpit.save' | translate}}"></a>
+          <nz-divider nzType="vertical"> | </nz-divider>
+          <a nz-icon nzType="left-circle" nzTheme="outline" style="font-size: 20px;" (click)="cancelEdit(student['num_carte'])"
+          nz-tooltip
+          nzTooltipTitle="{{'admin.toolpit.cancel' | translate}}"></a>
+        </td> 
+    </ng-template>
+      </tr>
+    </tbody>
+  </nz-table>
+  <nz-modal [(nzVisible)]="visibleDialog" 
+      nzTitle="{{'admin.home.note.list' | translate}}" 
+      (nzOnCancel)="handleCancel()" 
+      nzMask="true"
+      nzMaskClosable="false" >
+      <div *nzModalContent>
+      <form nz-form [formGroup]="form" class="form" (ngSubmit)="listExam()" nzLayout="vertical">
+      <nz-form-item>
+        <nz-form-label nzRequired>
+          {{ 'admin.home.note.salle' | translate }}
+        </nz-form-label>
+        <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+          <nz-input-group>
+            <input type="text" nz-input formControlName="salle" appCustomAutoFocus
+              [placeholder]="'admin.home.note.salle' | translate" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label nzRequired>
+            {{ 'admin.home.note.from' | translate }}
+          </nz-form-label>
+          <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+            <nz-input-group>
+              <input type="number" nz-input formControlName="from" 
+                [min]="1" 
+                appCustomAutoFocus
+                [placeholder]="'admin.home.note.from' | translate" />
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+        
+        <nz-form-item>
+          <nz-form-label nzRequired>
+            {{ 'admin.home.note.to' | translate }}
+          </nz-form-label>
+          <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+            <nz-input-group>
+              <input type="number" nz-input formControlName="to" [min]="1" appCustomAutoFocus
+                [placeholder]="'admin.home.note.to' | translate" />
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-spin [nzSpinning]="isConfirmLoading">
+            <button nz-button class="form-button form-margin" [nzType]="'primary'">
+              {{'general_data.save' | translate | uppercase}}
+            </button>
+        </nz-spin>
+      </form>
+      </div>
+      <div *nzModalFooter>
+      </div>
+      </nz-modal>
+  </nz-spin>
     

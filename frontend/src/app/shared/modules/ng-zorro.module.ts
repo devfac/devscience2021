@@ -26,6 +26,7 @@ import { NzSwitchModule } from "ng-zorro-antd/switch"
 import { NzDatePickerModule} from "ng-zorro-antd/date-picker";
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { NzStepsModule } from 'ng-zorro-antd/steps';
 
 @NgModule({
   exports: [
@@ -56,6 +57,7 @@ import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
     NzDatePickerModule,
     NzToolTipModule,
     NzInputNumberModule,
+    NzStepsModule,
   ],
 })
 export class NgZorroModule { }

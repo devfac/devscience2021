@@ -22,6 +22,26 @@
             <nz-input-group nzAddOnBefore="Semestre" >
                 <input nz-input type="text" readonly [nzBorderless]="true" formControlName="semester"/>
             </nz-input-group>
+            <nz-divider nzType="vertical"></nz-divider>
+            <nz-input-group nzAddOnBefore="Validé">
+              <nz-divider nzType="vertical"></nz-divider>
+                <nz-switch nz-col
+                    formControlName="isSelected"
+                    [nzCheckedChildren]="checkedTemplate"
+                    [nzUnCheckedChildren]="unCheckedTemplate"
+                    (ngModelChange)="changeValidation()"
+                >
+                </nz-switch>
+                <ng-template #checkedTemplate><span nz-icon nzType="check"></span></ng-template>
+                <ng-template #unCheckedTemplate><span nz-icon nzType="close"></span></ng-template>
+            </nz-input-group>
+            <nz-divider nzType="vertical"></nz-divider>
+            <nz-input-group nzAddOnBefore="Relever" >
+              <nz-divider nzType="vertical"></nz-divider>
+              <button nz-button nzType="primary" (click)="relever()" class="button">
+                <span nz-icon nzType="printer" nzTheme="outline"></span>
+            </button>
+            </nz-input-group>
             </nz-form-control>
         </nz-form-item>
     </nz-spin>
@@ -37,7 +57,7 @@
                 nzSize="small"
                 [nzShowPagination]="false"
                 nzTitle="Session Normal"
-                [nzFooter]="' Credit: '+infoStudent['Normal']['credit']+' Moyenne: '+infoStudent['Normal']['moyenne']"
+                [nzFooter]="' Credit: '+infoStudent['Normal']['credit']+' Moyenne: '+infoStudent['Normal']['mean']"
                  >
                 <thead>
                   <tr>
@@ -80,7 +100,7 @@
                 nzSize="small"
                 [nzShowPagination]="false"
                 nzTitle="Session Rattrapage"
-                [nzFooter]="' Credit: '+infoStudent['Rattrapage']['credit']+' Moyenne: '+infoStudent['Rattrapage']['moyenne']"
+                [nzFooter]="' Credit: '+infoStudent['Rattrapage']['credit']+' Moyenne: '+infoStudent['Rattrapage']['mean']"
                  >
                 <thead>
                   <tr>

@@ -194,6 +194,7 @@ class NewStudentInDBBase(StudentBase):
 class AncienStudent(AncienStudentInDBBase):
     journey: Optional[Journey]
     receipt: Optional[Receipt]
+    validation: Optional[bool]
 
 
 # Additional properties stored in DB

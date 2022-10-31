@@ -148,7 +148,11 @@
         "salle":"Salle",
         "from":"Depuis",
         "to":"à" ,
-        "filter": "Filtrer par"
+        "filter": "Filtrer par",
+        "table_name":"Table note : {{name}}",
+        "nbr_ue": "Nombre d'UE",
+        "nbr_ec": "Nombre d'Ec",
+        "year": "Année"
       },
       "details":{
         "title":"note details",

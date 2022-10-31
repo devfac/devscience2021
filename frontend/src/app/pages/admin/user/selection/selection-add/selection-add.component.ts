@@ -11,7 +11,7 @@ import { Receipt } from '@app/models/receipt';
 import { AncienStudent } from '@app/models/student';
 import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
-import { UserService } from '../user.service';
+import { UserService } from '../../user.service';
 
 const BASE_URL = environment.authApiURL;
 

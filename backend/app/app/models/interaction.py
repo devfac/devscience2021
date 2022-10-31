@@ -38,11 +38,10 @@ class Interaction(Base):
     s8 = Column(ARRAY(String))
     s9 = Column(ARRAY(String))
     s10 = Column(ARRAY(String))
-    num_carte = Column(String, ForeignKey("student.num_carte"))
+    college_year = Column(String)
     uuid_journey = Column(UUID(as_uuid=True), ForeignKey("journey.uuid"))
 
     journey = relationship("Journey", foreign_keys=[uuid_journey])
-    student = relationship("Student", foreign_keys=[num_carte])
 
 class Diploma(Base):
     __tablename__ = "diploma"

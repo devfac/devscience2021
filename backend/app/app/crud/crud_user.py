@@ -37,14 +37,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db.refresh(db_obj)
         return db_obj
 
-    def get_multi(
-        self, db: Session
-    ) -> List[User]:
-        return (
-            db.query(self.model)
-            .all()
-        )
-
     def update(
         self, db: Session, *, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]
     ) -> User:

@@ -1,0 +1,105 @@
+<div class="top-content" *ngIf="actions.add || title">
+  <span
+    *ngIf="canBack"
+    nz-icon
+    nzType="arrow-left"
+    nzTheme="outline"
+    class="back"
+    (click)="back()"
+  ></span>
+  <h2>{{ title }}</h2>
+  <div class="search">
+    <ng-container *ngIf="searchTemplate">
+      <ng-container *ngTemplateOutlet="searchTemplate"></ng-container>
+    </ng-container>
+  </div>
+  <div class="actions">
+    <button
+      *ngIf="actions.add"
+      nz-button
+      nzType="primary"
+      (click)="onAdd()"
+      style="padding: 0px 16px"
+    >
+      <i nz-icon nzType="plus"></i>
+      {{ 'add' | translate | titlecase }}
+    </button>
+  </div>
+</div>
+
+<app-datatable
+  [tableId]="tableId"
+  [headers]="headers"
+  [headerSpan]="headerSpan"
+  [headerData]="headerData"
+  [data]="data"
+  [dataStocks]="listOfData"
+  [width]="width"
+  [loading]="loading"
+  [pageIndex]="pageIndex"
+  [pageSize]="pageSize"
+  [idSelector]="'id'"
+  [total]="total"
+  [editCache]="editCache"
+  [childrenDataHeader]="childrenDataHeader"
+  [childrenDataSpan]="childrenDataSpan"
+  [classNames]="classNames"
+  [classExpand]="classExpand"
+  [isSelectable]="isSelectable"
+  [selectedId]="selectedId"
+  (startEdit)="startEdit($event)"
+  (saveEdit)="saveEdit($event, data)"
+  (canceltEdit)="cancelEdit($event, data)"
+  (saveStockEdit)="saveStockEdit($event, data)"
+  (cancelStocktEdit)="cancelStockEdit($event, listOfData, data)"
+  [showPagination]="showPagination"
+  (selectionChange)="onSelectionChange($event)"
+  (queryParamsChange)="onQueryParamsChange($event)"
+></app-datatable>
+
+<ng-template #actionsTemplate let-row="row">
+  <button
+    *ngIf="!isDeletedRow(row) && actions.edit"
+    nz-button
+    nzType="text"
+    nzShape="circle"
+    nzSize="small"
+    nz-tooltip
+    [nzTooltipTitle]="'edit' | translate"
+  >
+    <i nz-icon nzType="edit" nzTheme="outline" style="color: #398edf" (click)="onEdit(row)"></i>
+  </button>
+  <button
+    *ngIf="!isDeletedRow(row) && actions.delete"
+    nz-button
+    nzType="text"
+    nzShape="circle"
+    nzSize="small"
+    nz-tooltip
+    [nzTooltipTitle]="'delete' | translate"
+  >
+    <i nz-icon nzType="delete" nzTheme="outline" style="color: #eb2f96" (click)="onDelete(row)"></i>
+  </button>
+  <button
+    *ngIf="!isDeletedRow(row) && actions.detail"
+    nz-button
+    nzType="text"
+    nzShape="circle"
+    nzSize="small"
+    nz-tooltip
+    [nzTooltipTitle]="'detail' | translate"
+  >
+    <i nz-icon nzType="eye" nzTheme="outline" (click)="onDetail(row)"></i>
+  </button>
+  <button
+    *ngIf="isDeletedRow(row) && actions.restore"
+    nz-button
+    nzType="text"
+    nzShape="circle"
+    nzSize="small"
+    nz-tooltip
+    [nzTooltipTitle]="'restore' | translate"
+  >
+    <i nz-icon nzType="redo" nzTheme="outline" style="color: #19c245" (click)="onRestore(row)"></i>
+  </button>
+</ng-template>

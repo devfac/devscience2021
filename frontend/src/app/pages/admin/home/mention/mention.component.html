@@ -1,39 +1,15 @@
-<div class="container" ><div class="header">
-    <div class="header-text">
-        <h3>Mention list</h3>
-    </div>
-    <div class="button-text">
-        <button nz-button nzType="primary" (click)="showModal()">
-            <span nz-icon nzType="plus" nzTheme="outline"></span>
-            Ajouter
-        </button>
-    </div>
-        
-</div>
-    <nz-table #mentionList [nzData]="allMention" nzSize="small" [nzPageSize]="10" nzBordered [nzScroll]="{ x: 200 + 'px' }"> 
-        <thead>
-            <tr>
-                <th> Title</th>
-                <th> Abreviation</th>
-                <th> Branche</th>
-                <th> Last CE</th>
-                <th> Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let data of mentionList.data">
-                <td> {{data.title}}</td>
-                <td> {{data.abbreviation}}</td>
-                <td> {{data.plugged}}</td>
-                <td> {{data.last_num_carte}}</td>
-                <td>
-                    <a nz-icon nzType="edit" nzTheme="fill" style="font-size: 20px; color: green;" (click)="showModalEdit(data.uuid)"></a>
-                    <nz-divider nzType="vertical"></nz-divider>
-                    <a nz-icon nzType="delete" nzTheme="fill" style="font-size: 20px; color: red;" (click)="showConfirm(data.title, data.uuid)"></a>
-                </td>
-            </tr>
-        </tbody>
-    </nz-table>
+<app-datatable-crud
+[title]="'admin.product.product_list.title' | translate"
+[headers]="headers"
+[fetchDataFn]="fetchData"
+[width]="500"
+[actions]="actions"
+(delete)="onDelete($event)"
+(edit)="onEdit($event)"
+(add)="onAdd()"
+classNames="product-list-table"
+></app-datatable-crud>
+
     <nz-modal [(nzVisible)]="isvisible" 
               nzTitle="{{'admin.home.mention.add_mention' | translate}}" 
               (nzOnCancel)="handleCancel()" 
@@ -97,4 +73,3 @@
         <div *nzModalFooter>
             </div>
     </nz-modal>
-</div>

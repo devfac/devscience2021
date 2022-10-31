@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 from app.crud.base import CRUDBase
 from app.models.college_year import CollegeYear
@@ -26,15 +27,6 @@ class CRUDYear(CRUDBase[CollegeYear, CollegeYearCreate, CollegeYearUpdate]):
         db.commit()
         db.refresh(db_obj)
         return db_obj
-
-    def get_multi(
-            self, db: Session,
-    ) -> List[CollegeYear]:
-        return (
-            db.query(self.model)
-                .order_by(CollegeYear.title.desc())
-                .all()
-        )
 
     def get_actual_value(
             self, db: Session,

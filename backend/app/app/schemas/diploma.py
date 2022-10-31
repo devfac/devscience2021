@@ -5,29 +5,24 @@ from pydantic import BaseModel
 
 
 # Shared properties
-class DiplomeBase(BaseModel):
-    diplome: Optional[str]
-    uuid_journey: Optional[str]
-    uuid_mention: Optional[str] 
+class DiplomaBase(BaseModel):
+    num_carte: Optional[str]
+    licence_title: Optional[str]
+    master_title: Optional[str] 
 
 
 # Properties to receive via API on creation
-class DiplomeCreate(DiplomeBase):
-    uuid:Optional[UUID]
+class DiplomaCreate(DiplomaBase):
     num_carte: str
-    diplome: str
-    uuid_journey: UUID
-    uuid_mention: UUID
 
 
 # Properties to receive via API on update
-class DiplomeUpdate(DiplomeBase):
-    diplome: Optional[str]
+class DiplomaUpdate(DiplomaBase):
     uuid_journey: Optional[UUID]
     uuid_mention: Optional[UUID]
 
 
-class DiplomeInDBBase(DiplomeBase):
+class DiplomaInDBBase(DiplomaBase):
     uuid: Optional[UUID]
 
     class Config:
@@ -35,10 +30,10 @@ class DiplomeInDBBase(DiplomeBase):
 
 
 # Additional properties to return via API
-class Diplome(DiplomeInDBBase):
-    num_carte: Optional[str]
+class Diploma(DiplomaInDBBase):
+    pass
 
 
 # Additional properties stored in DB
-class DiplomeInDB(DiplomeInDBBase):
-    Pass
+class DiplomaInDB(DiplomaInDBBase):
+    pass

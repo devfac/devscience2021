@@ -1,16 +1,24 @@
 import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CollegeYear } from '@app/models/collegeYear';
 import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
+import { otherQueryParams, QueryParams } from '@app/models/query';
 import { AncienStudent, ColumnItem, StudentColumn } from '@app/models/student';
+import { TableHeader } from '@app/models/table';
 import { AuthService } from '@app/services/auth/auth.service';
+import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
+import { parseQueryParams } from '@app/shared/utils';
 import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
+import { CollegeYearService } from '../../home/college-year/college-year.service';
+import { JourneyService } from '../../home/journey/journey.service';
+import { MentionService } from '../../home/mention/mention.service';
+import { InscriptionService } from './inscription.service';
 
-const BASE_URL = environment.authApiURL;
+const CODE = "inscription"
 
 @Component({
   selector: 'app-inscription',
@@ -18,10 +26,9 @@ const BASE_URL = environment.authApiURL;
   styleUrls: ['./inscription.component.less']
 })
 export class InscriptionComponent implements OnInit {
-  private headers =  new HttpHeaders({
-    'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
-  })
+  @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
+  headers: TableHeader[] = [];
+
 
   user = localStorage.getItem('user')
   allYears: CollegeYear[] = []
@@ -39,74 +46,26 @@ export class InscriptionComponent implements OnInit {
   data = ""
   uuid= "";
   listOfData: any[] = []
-  options = {
-    headers: this.headers
-  }
-  listOfColumns: ColumnItem[] = [
+  keyMention = CODE+"mention"
+  keyYear = CODE+"collegeYear"
 
-    {
-      name:"Num Carte",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn: null
-    },
-    {
-      name:"Nom",
-      sortOrder: null,
-      sortFn: (a: StudentColumn, b:StudentColumn) => a.last_name.localeCompare(b.last_name),
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn: null
-    },
-
-    {
-      name:"Prenom",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn: null
-    },
-    {
-      name:"Level",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: ['ascend','descend', null],
-      filterMultiple: false,
-      listOfFilter: this.semesterTitles,
-      filterFn:(semester: string, item: StudentColumn) => item.inf_semester.indexOf(semester) !== -1
-    },
-    {
-      name:"Parcours",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: ['ascend','descend', null],
-      filterMultiple: false,
-      listOfFilter:[] ,
-      filterFn:(semester: string, item: StudentColumn) => item.inf_semester.indexOf(semester) !== -1
-    },
-    {
-      name:"Action",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn:null
-    },
-  ]
-
+  actions = {
+    add: true,
+    edit: true,
+    delete: true,
+    detail: false,
+  };
+  
   constructor(
-    private http: HttpClient, 
     private modal: NzModalService, 
     private fb: FormBuilder, 
     public router: Router, 
-    private authUser: AuthService) { 
+    private authUser: AuthService, 
+    private serviceJourney: JourneyService,
+    private serviceMention: MentionService,
+    private serviceYears: CollegeYearService,
+    private service: InscriptionService,
+    ) { 
 
 
     this.form = this.fb.group({
@@ -122,20 +81,41 @@ export class InscriptionComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    let options = {
-      headers: this.headers
-    }
+
+  ngAfterContentInit(): void {
+    this.headers = [
+    {
+      title: 'Num Select',
+      selector: 'num_select',
+      isSortable: true,
+    },{
+      title: 'Nom',
+      selector: 'last_name',
+      isSortable: true,
+    },{
+      title: 'Prenom',
+      selector: 'first_name',
+      isSortable: true,
+    },{
+      title: 'Niveau',
+      selector: 'level',
+      isSortable: true,
+    },{
+      title: 'Parcours',
+      selector: 'journey.abbreviation',
+      isSortable: true,
+    },
+  ];
+  }
+
+ async ngOnInit() {
+  this.fetchData = this.fetchData.bind(this)
+
     const user = this.authUser.userValue
     for(let i=0; i<user?.uuid_mention.length;i++){
-      this.http.get<Mention>(`${BASE_URL}/mentions/`+user?.uuid_mention[i], this.options).subscribe(
-        data =>{
-          this.allMention.push(data)
-          this.form.get('mention')?.setValue(data.uuid)
+      let mention = await this.serviceMention.getData(user?.uuid_mention[i]).toPromise()
+      this.allMention.push(mention)
           
-          },
-          error => console.error("error as ", error)
-      );
     }
 
 
@@ -147,45 +127,49 @@ export class InscriptionComponent implements OnInit {
       )
     }
     
-    this.http.get<CollegeYear[]>(`${BASE_URL}/college_year/`, options).subscribe(
-      data => {
-        this.allYears = data,
-        this.form.get('collegeYear')?.setValue(data[0].title)
-        if(this.form.get('mention')?.value){
-          this.http.get<AncienStudent[]>(`${BASE_URL}/student/new_inscrit?college_year=`+data[0].title+`&uuid_mention=`+this.form.get('mention')?.value, options).subscribe(
-            data => {
-              this.allStudents = data    
-              this.listOfData = [... data]
-            },
-            error => console.error("error as ", error)
-          );
-        }
-      },
-      error => console.error("error as ", error)
-    );
+    this.allYears = await this.serviceYears.getDataPromise().toPromise()
+    this.testStorage('collegeYear', this.allYears[0].title)
   
-    this.http.get<Journey[]>(`${BASE_URL}/journey/`+localStorage.getItem("uuid_mention"), this.options).subscribe(
-      data =>{ 
-        this.allJourney=data
-      },
-      error => console.error("error as ", error)
-    );
+    this.allJourney = await this.serviceJourney.getDataByMention(localStorage.getItem(this.keyMention)).toPromise()
+  }
 
+  
+  testStorage(key: string, value: string){
+    if(localStorage.getItem(key)){
+      this.form.get(key)?.setValue(localStorage.getItem(key))
+    }else{
+      localStorage.setItem(key, value)
+      this.form.get(key)?.setValue(localStorage.getItem(key))
+    }
+  }
+
+  fetchData(params?: QueryParams){
+    let otherParams: otherQueryParams = {
+      college_year: localStorage.getItem(this.keyYear),
+      uuid_mention: localStorage.getItem(this.keyMention),
+    }
+    return this.service.getDataObservable(parseQueryParams(params,otherParams))
   }
   showConfirm(name: string, numSelect: string): void{
     this.confirmModal = this.modal.confirm({
       nzTitle: "Voulez-vous supprimer "+name+"?",
-      nzOnOk: () => {
-        this.http.delete<AncienStudent[]>(`${BASE_URL}/student/new?num_select=`+numSelect+'&college_year='+this.form.value.collegeYear+'&uuid_mention='+
-        this.form.value.mention, this.options).subscribe(
-          data => {
-            this.allStudents = data
-            this.listOfData = [... data]
-          },
-          error => console.error("error as ", error)
-        );
+      nzOnOk: async () => {
+        await this.service.deletData(numSelect)
+        this.datatable.fetchData()
       }
     })
+  }
+
+  onDelete(row: any) {
+    this.showConfirm(row.title, row.uuid);
+  }
+
+  onEdit(row: any) {
+    this.showModalEdit(row.uuid);
+  }
+
+  onAdd() {
+    this.addStudent();
   }
   
   showModalEdit(numSelect: string): void{
@@ -202,20 +186,13 @@ export class InscriptionComponent implements OnInit {
   }
 
   getAllStudents(): void{
-    if(this.form.get('collegeYear')?.value && this.form.get('mention')?.value){
-    this.http.get<any>(`${BASE_URL}/student/new_inscrit?college_year=`+this.form.get('collegeYear')?.value+`&uuid_mention=`+this.form.get('mention')?.value, this.options).subscribe(
-      data => {
-        this.allStudents = data
-        this.listOfData = [... data]
-      },
-      error => console.error("error as ", error)
-    );
+    if(this.form.get(this.keyYear)?.value && this.form.get(this.keyMention)?.value){this.datatable.fetchData()
     }
   }
 
   addStudent():void{
-    localStorage.setItem("uuid_mention", this.form.get("mention")?.value)
-    localStorage.setItem("college_years", this.form.get("collegeYear")?.value)
+    localStorage.setItem("mention", this.form.get("mention")?.value)
+    localStorage.setItem("collegeYear", this.form.get("collegeYear")?.value)
     this.router.navigate(['/user/inscription_add'])
     localStorage.setItem('numSelect', '')
   }

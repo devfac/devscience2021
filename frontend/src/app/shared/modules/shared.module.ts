@@ -9,6 +9,8 @@ import { ScrollingModule } from "@angular/cdk/scrolling";
 import { NotificationStatusDirective } from "../directives/notification-status/notification-status.directive";
 import { CustomAutoFocusDirective } from '../directives/custom-auto-focus/custom-auto-focus.directive';
 import { CustomBackgroundDirective } from '../directives/custom-background/custom-background.directive';
+import { DatatableComponent } from '../components/datatable/datatable.component';
+import { DatatableCrudComponent } from '../components/datatable-crud/datatable-crud.component';
 //import { CurrencyPricePipe } from '../pipes/currency-price/currency-price.pipe';
 
 @NgModule({
@@ -33,6 +35,8 @@ import { CustomBackgroundDirective } from '../directives/custom-background/custo
     CustomBackgroundDirective,
     CustomAutoFocusDirective,
     ScrollingModule,
+    DatatableComponent,
+    DatatableCrudComponent
    // CurrencyPricePipe,
   ],
   declarations: [
@@ -40,6 +44,8 @@ import { CustomBackgroundDirective } from '../directives/custom-background/custo
     NotificationStatusDirective,
     CustomAutoFocusDirective,
     CustomBackgroundDirective,
+    DatatableComponent,
+    DatatableCrudComponent,
     // CurrencyPricePipe,
   ],
 })

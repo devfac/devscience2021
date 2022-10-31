@@ -11,7 +11,8 @@ import { Receipt } from '@app/models/receipt';
 import { AncienStudent } from '@app/models/student';
 import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
-import { UserService } from '../user.service';
+import { HomeService } from '../../../home/home.service';
+import { UserService } from '../../user.service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -69,7 +70,12 @@ export class InscriptionAddComponent implements OnInit {
   blob = new Blob(["assets/images/profil.png"])
   uploadedImage: File = new File([this.blob], 'profile.png');
 
-  constructor(private http: HttpClient, private modal: NzModalService, private fb: FormBuilder, private service: UserService, 
+  constructor(
+    private http: HttpClient, 
+    private modal: NzModalService, 
+    private fb: FormBuilder, 
+    private service: UserService, 
+    private homeService: HomeService,
     public router: Router ) {
 
     this.form = this.fb.group({
@@ -134,15 +140,14 @@ export class InscriptionAddComponent implements OnInit {
     this.uploadedImage = event.target.files[0]
    }
 
-  ngOnInit(): void {
+  async ngOnInit(){
     let options = {
       headers: this.headers
     }
     const numSelect = localStorage.getItem('numSelect')
     if(numSelect && numSelect.length>0){
       this.isEdit = true
-      this.http.get<AncienStudent>(`${BASE_URL}/student/new_selected?num_select=`+numSelect, options).subscribe(
-        data =>{ 
+      let  data = await this.homeService.getStudentByNumSelect(numSelect).toPromise()
           console.log(data)
           this.form.get('numSelect')?.setValue(data.num_select)
           this.form.get('mention')?.setValue(data.mention)
@@ -179,30 +184,17 @@ export class InscriptionAddComponent implements OnInit {
           this.form.get('parentAddress')?.setValue(data.parent_address)
           this.url = `${BASE_URL}/student/photo?name_file=`+data.photo
           console.error(data.receipt)
-        },
-        error => console.error("error as ", error)
-      );
     }else{
       this.isEdit=false
     }
 
-    this.http.get<Mention>(`${BASE_URL}/mentions/`+localStorage.getItem("uuid_mention"), options).subscribe(
-      data =>{ 
-        this.allMention.push(data),
-        this.form.get("mention")?.setValue(data.uuid)
-      },
-      error => console.error("error as ", error)
-    );
+    let mention = await this.homeService.getMentionByUuid(localStorage.getItem('mention')).toPromise()
+    this.allMention.push(mention)
 
-    this.http.get<Journey[]>(`${BASE_URL}/journey/`+localStorage.getItem("uuid_mention"), options).subscribe(
-      data =>{ 
-        this.allJourney=data
-      },
-      error => console.error("error as ", error)
-    );
+    this.allJourney = await this.homeService.getAllJourney(localStorage.getItem("mention")).toPromise()
 
     this.http.get<Droit[]>(`${BASE_URL}/droit/by_mention?uuid_mention=`+
-      localStorage.getItem("uuid_mention")+'&year='+localStorage.getItem("college_years"), options).subscribe(
+      localStorage.getItem("mention")+'&year='+localStorage.getItem("collegeYear"), options).subscribe(
       data =>{ 
         this.allPrice=data
       },

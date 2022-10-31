@@ -23,13 +23,4 @@ class CRUDSemester(CRUDBase[Semester, SemesterCreate, SemesterUpdate]):
         db.refresh(db_obj)
         return db_obj
 
-    def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100
-    ) -> List[Semester]:
-        return (
-            db.query(self.model)
-            .all()
-        )
-
-
 semester = CRUDSemester(Semester)

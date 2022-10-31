@@ -1,44 +1,14 @@
-<div class="container" >
-    
-    <div class="header">
-        <div class="header-text">
-            <h3>Users list</h3>
-        </div>
-        <div class="button-text">
-            <button nz-button nzType="primary" (click)="showModal()">
-                <span nz-icon nzType="user-add" nzTheme="outline"></span>
-                Ajouter
-            </button>
-        </div>
-            
-    </div>
-    <nz-table #usersList [nzData]="allUsers" nzSize="small" [nzPageSize]="10" nzBordered [nzScroll]="{ x: 200 + 'px' }"> 
-        <thead>
-            <tr>
-                <th> Email</th>
-                <th> Firstname</th>
-                <th> Lastname</th>
-                <th> Mention</th>
-                <th> Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let data of usersList.data">
-                <td> {{data.email}}</td>
-                <td> {{data.first_name}}</td>
-                <td> {{data.last_name}}</td>
-                <td> 
-                    <p  *ngFor="let title_mention of data.mention">{{title_mention.title}}, </p>
-                </td>
-                <td>
-                    <a nz-icon nzType="edit" nzTheme="fill" style="font-size: 20px; color: green;" (click)="showModalEdit(data.uuid)"></a>
-                    <nz-divider nzType="vertical"></nz-divider>
-                    <a nz-icon nzType="delete" nzTheme="fill" style="font-size: 20px; color: red;" (click)="showConfirm(data.email, data.uuid)"></a>
-                </td>
-                
-            </tr>
-        </tbody>
-    </nz-table>
+<app-datatable-crud
+[title]="'admin.product.product_list.title' | translate"
+[headers]="headers"
+[fetchDataFn]="fetchData"
+[width]="500"
+[actions]="actions"
+(delete)="onDelete($event)"
+(edit)="onEdit($event)"
+(add)="onAdd()"
+classNames="product-list-table"
+></app-datatable-crud>
 
     <nz-modal [(nzVisible)]="isvisible" 
               nzTitle="{{'admin.home.users.add_users' | translate}}" 
@@ -183,4 +153,3 @@
     <div *nzModalFooter>
         </div>
 </nz-modal>
-</div>

@@ -46,6 +46,7 @@ class MatierECUpdate(BaseModel):
 
 
 class MatierUEInDBBase(MatiertBase):
+    uuid: UUID
     credit: Optional[int]
     value: Optional[str]
     key_unique: Optional[str]
@@ -55,6 +56,7 @@ class MatierUEInDBBase(MatiertBase):
 
 
 class MatierECInDBBase(MatiertBase):
+    uuid: UUID
     weight: Optional[float]
     value: Optional[str]
     value_ue: Optional[str]
@@ -68,7 +70,6 @@ class MatierECInDBBase(MatiertBase):
 
 # Additional properties to return via API
 class MatierUE(MatierUEInDBBase):
-    uuid: Optional[str]
     journey: Optional[Journey]
     abbreviation_journey: Optional[str]
 
@@ -78,7 +79,6 @@ class MatierUEInDB(MatierUEInDBBase):
 
 
 class MatierEC(MatierECInDBBase):
-    uuid: Optional[str]
     journey: Optional[Journey]
     abbreviation_journey: Optional[str]
 

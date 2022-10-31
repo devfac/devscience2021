@@ -1,78 +1,40 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterContentInit, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { TableHeader } from '@app/models/table';
+import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
+import { AboutService } from './about.service';
 
 @Component({
   selector: 'app-about',
   templateUrl: './about.component.html',
   styleUrls: ['./about.component.less'],
 })
-export class AboutComponent implements OnInit {
+export class AboutComponent implements OnInit, AfterContentInit {
+  @ViewChild(DatatableCrudComponent)
+  datatable!: DatatableCrudComponent;
+  headers: TableHeader[] = [];
+  constructor(
+    public service: AboutService,){}
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
+    this.fetchData = this.fetchData.bind(this)
   }
-  listOfData = [
-    {
-      key: '1',
-      name: 'John Brown',
-      age: 32,
-      tel: '0571-22098909',
-      phone: 18889898989,
-      address: 'New York No. 1 Lake Park'
-    },
-    {
-      key: '2',
-      name: 'Jim Green',
-      tel: '0571-22098333',
-      phone: 18889898888,
-      age: 42,
-      address: 'London No. 1 Lake Park'
-    },
-    {
-      key: '3',
-      name: 'Joe Black',
-      age: 32,
-      tel: '0575-22098909',
-      phone: 18900010002,
-      address: 'Sidney No. 1 Lake Park'
-    },
-    {
-      key: '4',
-      name: 'Jim Red',
-      age: 18,
-      tel: '0575-22098909',
-      phone: 18900010002,
-      address: 'London No. 2 Lake Park'
-    },
-    {
-      key: '5',
-      name: 'Jake White',
-      age: 18,
-      tel: '0575-22098909',
-      phone: 18900010002,
-      address: 'Dublin No. 2 Lake Park'
-    },
-    {
-      key: '6',
-      name: 'Jake White',
-      age: 18,
-      tel: '0575-22098909',
-      phone: 18900010002,
-      address: 'Dublin No. 2 Lake Park'
-    },
-    {
-      key: '7',
-      name: 'Jake White',
-      age: 18,
-      tel: '0575-22098909',
-      phone: 18900010002,
-      address: 'Dublin No. 2 Lake Park'
-    },
-    {
-      key: '8',
-      name: 'Jake White',
-      age: 18,
-      tel: '0575-22098909',
-      phone: 18900010002,
-      address: 'Dublin No. 2 Lake Park'
-    }
-  ];
+
+  fetchData(){
+    return this.service.getDataObservable()
+  }
+
+  ngAfterContentInit(): void {
+    this.headers = [
+      {
+        title: 'Titre',
+        selector: 'title',
+        isSortable: true,
+      },
+      {
+        title: 'Code',
+        selector: 'code',
+        isSortable: true,
+      },
+    ];
+  }
+
 }

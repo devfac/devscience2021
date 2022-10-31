@@ -15,16 +15,16 @@ router = APIRouter()
 def read_ec(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
+        limit: int = 100,
+        offset: int = 0,
+        order: str = "asc",
+        order_by: str = "title",
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve élément constitutif.
     """
-    college_year = crud.college_year.get_by_title(db, schema)
-    if not college_year:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-    ecs = crud.constituent_element.get_all(db=db)
+    ecs = crud.constituent_element.get_multi(db=db, limit=limit, skip=offset, order_by=order_by, order=order)
     list_ec = []
     for on_ec in ecs:
         ec = schemas.MatierEC(**jsonable_encoder(on_ec))
@@ -40,7 +40,6 @@ def read_ec(
 def get_by_class(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         semester: str,
         uuid_journey: str,
         current_user: models.User = Depends(deps.get_current_active_user),
@@ -48,10 +47,6 @@ def get_by_class(
     """
     get unité d'enseingement.
     """
-    college_year = crud.college_year.get_by_title(db, schema)
-    if not college_year:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-
     journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
     if not journey:
         raise HTTPException(status_code=404, detail="Journey not found")
@@ -73,7 +68,6 @@ def get_by_class(
 def read_by_value_ue(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         value_ue: str,
         semester: str,
         uuid_journey: str,
@@ -82,11 +76,8 @@ def read_by_value_ue(
     """
     Retrieve élément constitutif by value_ue.
     """
-    college_year = crud.college_year.get_by_title(db, schema)
-    if not college_year:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-    ecs = crud.constituent_element.get_by_value_ue(db=db,
-                                               value_ue=value_ue, semester=semester, uuid_journey=uuid_journey)
+    ecs = crud.constituent_element.get_by_value_ue(db=db,value_ue=value_ue,
+                                                   semester=semester, uuid_journey=uuid_journey)
     list_ec = []
     for on_ec in ecs:
         ec = schemas.MatierEC(**jsonable_encoder(on_ec))
@@ -102,7 +93,6 @@ def read_by_value_ue(
 def read_by_value(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         value: str,
         semester: str,
         uuid_journey: str,
@@ -111,9 +101,6 @@ def read_by_value(
     """
     Retrieve élément constitutif by value_ue.
     """
-    college_year = crud.college_year.get_by_title(db, schema)
-    if not college_year:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
     constituent_element = crud.constituent_element.get_by_value(db=db,
                                                value=value, semester=semester, uuid_journey=uuid_journey)
     return constituent_element
@@ -123,16 +110,12 @@ def read_by_value(
 def read_by_uuid(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         uuid: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve élément constitutif by uuid.
     """
-    college_year = crud.college_year.get_by_title(db, schema)
-    if not college_year:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
     ec = crud.constituent_element.get_by_uuid(db=db, uuid=uuid)
     if not ec:
         raise HTTPException(status_code=404, detail="E.C not found")
@@ -181,7 +164,6 @@ def create_ec(
 def update_ec(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         ec_in: schemas.MatierECUpdate,
         uuid: str,
         current_user: models.User = Depends(deps.get_current_active_user),
@@ -189,9 +171,6 @@ def update_ec(
     """
     Update élément constitutif.
     """
-    college_year = crud.college_year.get_by_title(db, schema)
-    if not college_year:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
     ec = crud.constituent_element.get_by_uuid(db=db, uuid=uuid)
     if not ec:
         raise HTTPException(status_code=404, detail="E.C not found")
@@ -212,16 +191,12 @@ def update_ec(
 def delete_ec(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         uuid: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Delete élément constitutifs.
     """
-    college_year = crud.college_year.get_by_title(db, schema)
-    if not college_year:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
     ec = crud.constituent_element.get_by_uuid(db=db, uuid=uuid)
     if not ec:
         raise HTTPException(status_code=404, detail="E.C not found")

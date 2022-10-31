@@ -5,7 +5,7 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, text
 from app.models.student import Student
 from app.schemas.student import AncienStudentCreate, AncienStudentUpdate, NewStudentUpdate, NewStudentCreate
 
@@ -15,11 +15,15 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
     def get_by_num_carte(self, db: Session, *, num_carte: str) -> Optional[Student]:
         return db.query(Student).filter(Student.num_carte == num_carte).first()
 
-    def get_by_mention(self, db: Session, *, uuid_mention: UUID, college_year: str) -> Optional[List[Student]]:
+    def get_by_mention(self, db: Session, *, uuid_mention: UUID,
+                       college_year: str, limit:int, skip: int,
+                       order: str = 'asc', order_by: str = "last_name") -> Optional[List[Student]]:
         return (
             db.query(Student)
             .filter(and_(Student.uuid_mention == uuid_mention, Student.actual_years == college_year))
-            .order_by(Student.last_name.asc())
+            .order_by(text(f"{order_by} {order}"))
+            .offset(skip)
+            .limit(limit)
             .all())
 
     def get_by_class_limit(self,db: Session,
@@ -27,8 +31,10 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
             uuid_mention: str,
             semester: str,
             college_year: str,
-            offset: int,
+            skip: int,
             limit: int,
+            order: int,
+            order_by: int
     ) -> List[Student]:
         if semester.upper() == 'S1':
             return (
@@ -39,8 +45,8 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
                     or_(Student.inf_semester == semester.upper(),
                         Student.sup_semester == semester.upper())
                 ))
-                .order_by(Student.last_name.asc())
-                .offset(offset)
+                .order_by(text(f"{order_by} {order}"))
+                .offset(skip)
                 .limit(limit)
                 .all()
             )
@@ -54,8 +60,8 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
                     or_(Student.inf_semester == semester.upper(),
                         Student.sup_semester == semester.upper())
                 ))
-                .order_by(Student.last_name.asc())
-                .offset(offset)
+                .order_by(text(f"{order_by} {order}"))
+                .offset(skip)
                 .limit(limit)
                 .all()
             )
@@ -63,20 +69,29 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
 
     def get_by_sup_semester_and_mention(
             self, db: Session, *, sup_semester: str,
-            uuid_mention: UUID, college_year: str) -> Optional[List[Student]]:
+            uuid_mention: UUID, college_year: str,
+            limit: int, skip: int, order: str = "asc", order_by:str = "last_name"
+    ) -> Optional[List[Student]]:
         return (
             db.query(Student)
             .filter(and_(Student.uuid_mention == uuid_mention,
                          Student.sup_semester == sup_semester,
                          Student.actual_years == college_year))
-            .order_by(Student.last_name.asc())
+            .order_by(text(f"{order_by} {order}"))
+            .offset(skip)
+            .limit(limit)
             .all())
 
-    def get_by_jouney(self, db: Session, *, uuid_journey: UUID, college_year: str) -> Optional[List[Student]]:
+    def get_by_jouney(self, db: Session, *, uuid_journey: UUID,
+                      college_year: str, limit:int, skip: int,
+                      order: str = "asc", order_by: str = "last_name",
+                      ) -> Optional[List[Student]]:
         return (
             db.query(Student)
             .filter(and_(Student.uuid_mention == uuid_journey, Student.actual_years == college_year))
-            .order_by(Student.last_name.asc())
+            .order_by(text(f"{order_by} {order}"))
+            .offset(skip)
+            .limit(limit)
             .all())
 
     def create(
@@ -90,7 +105,8 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
         return db_obj
 
     def get_all(
-            self, db: Session, college_year: str
+            self, db: Session, college_year: str, limit: int, skip: int,
+            order: str = "asc", order_by: str = "last_name"
     ) -> List[Student]:
         return (
             db.query(Student)
@@ -98,7 +114,9 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
                 Student.actual_years == college_year,
                 Student.uuid_journey is not None
             ))
-            .order_by(Student.last_name.asc())
+            .order_by(text(f"{order_by} {order}"))
+            .offset(skip)
+            .limit(limit)
             .all()
         )
 
@@ -108,6 +126,10 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
             uuid_mention: str,
             semester: str,
             college_year: str,
+            limit: int,
+            skip: int,
+            order: str = "asc",
+            order_by: str = "last_name",
     ) -> List[Student]:
         if semester.upper() == 'S1':
             return (
@@ -118,7 +140,9 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
                     or_(Student.inf_semester == semester.upper(),
                         Student.sup_semester == semester.upper())
                 ))
-                .order_by(Student.last_name.asc())
+                .order_by(text(f"{order_by} {order}"))
+                .offset(skip)
+                .limit(limit)
                 .all()
             )
         else:
@@ -131,7 +155,9 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
                     or_(Student.inf_semester == semester.upper(),
                         Student.sup_semester == semester.upper())
                 ))
-                .order_by(Student.last_name.asc())
+                .order_by(text(f"{order_by} {order}"))
+                .offset(skip)
+                .limit(limit)
                 .all()
             )
 
@@ -140,7 +166,12 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
                      semester: str,
                      sex: str,
                      type: str,
-                     college_year: str) -> Optional[List[Student]]:
+                     college_year: str,
+                     limit: int = 500,
+                     skip: int = 0,
+                     order: str = "asc",
+                     order_by: str = "last_name"
+                     ) -> Optional[List[Student]]:
         return (
             db.query(Student)
             .filter(
@@ -149,13 +180,19 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
                      Student.sup_semester == semester,
                      Student.type == type,
                      Student.sex == sex))
+            .order_by(text(f"{order_by} {order}"))
+            .offset(skip)
+            .limit(limit)
             .all())
 
     def get_by_sex_for_stat(self, db: Session, *,
                             uuid_journey: UUID,
                             semester: str,
                             sex: str,
-                            college_year: str) -> Optional[List[Student]]:
+                            college_year: str,
+                            limit: int = 500,
+                            skip: int = 0
+                            ) -> Optional[List[Student]]:
         return (
             db.query(Student)
             .filter(
@@ -163,18 +200,25 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
                      Student.actual_years == college_year,
                      Student.sup_semester == semester,
                      Student.sex == sex))
+            .offset(skip)
+            .limit(limit)
             .all())
 
     def get_by_journey_for_stat(self, db: Session, *,
                             uuid_journey: UUID,
                             semester: str,
-                            college_year: str) -> Optional[List[Student]]:
+                            college_year: str,
+                            limit: int = 500,
+                            skip: int = 0
+                            ) -> Optional[List[Student]]:
         return (
             db.query(Student)
             .filter(
                 and_(Student.uuid_journey == uuid_journey,
                      Student.actual_years == college_year,
                      Student.sup_semester == semester))
+            .offset(skip)
+            .limit(limit)
             .all())
 
     def remove_carte(self, db: Session, *, num_carte: str) -> Student:
@@ -195,34 +239,56 @@ class CRUDNewStudent(CRUDBase[Student, NewStudentCreate, NewStudentUpdate]):
     def get_by_num_carte(self, db: Session, *, num_carte: str) -> Optional[Student]:
         return db.query(Student).filter(Student.num_carte == num_carte).first()
 
-    def get_student_admis(self, db: Session, *,uuid_mention: str, college_year) -> Optional[Student]:
-        return db.query(Student).filter(
-            and_(Student.enter_years == college_year,
-                 Student.is_selected == True,
-                 Student.num_carte is not None,
-                 Student.uuid_mention == uuid_mention,
-                 )).all()
+    def get_student_admis(self, db: Session, *,uuid_mention: str, college_year) -> \
+            Optional[Student]:
+        return(db.query(Student).filter(
+                 and_(Student.enter_years == college_year,
+                     Student.is_selected == True,
+                     Student.num_carte is not None,
+                     Student.uuid_mention == uuid_mention,
+                     ))
+                .all())
 
-    def get_by_mention(self, db: Session, *, uuid_mention: UUID, college_year: str) -> Optional[List[Student]]:
+    def get_by_mention(self, db: Session, *, uuid_mention: UUID,
+                       college_year: str, limit: int, skip: int,
+                       order: str = "asc", order_by: str = "last_name",
+                       ) -> Optional[List[Student]]:
         return (
             db.query(Student).filter(
                 and_(Student.uuid_mention == uuid_mention,
                      Student.enter_years == college_year
-                     )).all())
+                     ))
+            .order_by(text(f"{order_by} {order}"))
+            .offset(skip)
+            .limit(limit)
+            .all())
 
-    def get_all_admis_by_mention(self, db: Session, *, uuid_mention: UUID, college_year: str) -> Optional[
+    def get_all_admis_by_mention(self, db: Session, *, uuid_mention: UUID,
+                                 college_year: str, limit: int, skip: int,
+                                 order: str = "asc", order_by: str = "last_name"
+                                 ) -> Optional[
         List[Student]]:
         return (
             db.query(Student).filter(
                 and_(Student.uuid_mention == uuid_mention,
                      Student.enter_years == college_year,
                      Student.is_selected == True
-                     )).all())
+                     ))
+            .order_by(text(f"{order_by} {order}"))
+            .offset(skip)
+            .limit(limit)
+            .all())
 
-    def get_by_jouney(self, db: Session, *, uuid_journey: UUID, college_year: str) -> Optional[List[Student]]:
+    def get_by_jouney(self, db: Session, *, uuid_journey: UUID,
+                      college_year: str, limit: int, skip: int,
+                      order: str = "asc", order_by: str = "last_name",
+                      ) -> Optional[List[Student]]:
         return (
             db.query(Student)
             .filter(and_(Student.uuid_mention == uuid_journey, Student.enter_years == college_year))
+            .order_by(text(f"{order_by} {order}"))
+            .offset(skip)
+            .limit(limit)
             .all())
 
     def create(
@@ -236,11 +302,15 @@ class CRUDNewStudent(CRUDBase[Student, NewStudentCreate, NewStudentUpdate]):
         return db_obj
 
     def get_all(
-            self, db: Session, college_year: str
+        self, db: Session, *, skip: int = 0, limit: int = 100, college_year: str,
+            order: str = "asc", order_by: str = "last_name",
     ) -> List[Student]:
         return (
             db.query(Student)
             .filter(Student.enter_years == college_year)
+            .order_by(text(f"{order_by} {order}"))
+            .offset(skip)
+            .limit(limit)
             .all()
         )
 

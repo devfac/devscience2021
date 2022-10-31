@@ -2,11 +2,11 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DetailsNoteComponent } from '../home/details-note/details-note.component';
 import { NoteComponent } from '../home/note/note.component';
-import { InscriptionAddComponent } from './inscription-add/inscription-add.component';
+import { InscriptionAddComponent } from './inscription/inscription-add/inscription-add.component';
 import { InscriptionComponent } from './inscription/inscription.component';
-import { ReInscriptionAddComponent } from './re-inscription-add/re-inscription-add.component';
+import { ReInscriptionAddComponent } from './re-inscription/re-inscription-add/re-inscription-add.component';
 import { ReInscriptionComponent } from './re-inscription/re-inscription.component';
-import { SelectionAddComponent } from './selection-add/selection-add.component';
+import { SelectionAddComponent } from './selection/selection-add/selection-add.component';
 import { SelectionComponent } from './selection/selection.component';
 import { UserComponent } from './user.component';
 

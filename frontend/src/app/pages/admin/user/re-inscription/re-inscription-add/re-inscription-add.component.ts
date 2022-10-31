@@ -9,9 +9,10 @@ import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { Droit } from '@app/models/droit';
 import { Receipt } from '@app/models/receipt';
-import { UserService } from '../user.service';
+import { UserService } from '../../user.service';
 import { Router } from '@angular/router';
 import { AncienStudent } from '@app/models/student';
+import { HomeService } from '../../../home/home.service';
 const BASE_URL = environment.authApiURL;
 @Component({
   selector: 'app-re-inscription-add',
@@ -77,7 +78,12 @@ export class ReInscriptionAddComponent implements OnInit {
   blob = new Blob(["assets/images/profil.png"])
   uploadedImage: File = new File([this.blob], 'profile.png');
 
-  constructor(private http: HttpClient, private modal: NzModalService, private fb: FormBuilder, private service: UserService, 
+  constructor(
+    private http: HttpClient, 
+    private modal: NzModalService, 
+    private fb: FormBuilder, 
+    private service: UserService,
+    private homeService: HomeService, 
     public router: Router ) {
 
     this.form = this.fb.group({
@@ -135,7 +141,7 @@ export class ReInscriptionAddComponent implements OnInit {
     this.uploadedImage = event.target.files[0]
    }
 
-  ngOnInit(): void {
+  async ngOnInit(){
     let options = {
       headers: this.headers
     }
@@ -187,12 +193,7 @@ export class ReInscriptionAddComponent implements OnInit {
       error => console.error("error as ", error)
     );
 
-    this.http.get<Journey[]>(`${BASE_URL}/journey/`+localStorage.getItem("uuid_mention"), options).subscribe(
-      data =>{ 
-        this.allJourney=data
-      },
-      error => console.error("error as ", error)
-    );
+    this.allJourney = await this.homeService.getAllJourney(localStorage.getItem('mention')).toPromise()
 
     this.http.get<Droit[]>(`${BASE_URL}/droit/by_mention?uuid_mention=`+
       localStorage.getItem("uuid_mention")+'&year='+localStorage.getItem("college_years"), options).subscribe(

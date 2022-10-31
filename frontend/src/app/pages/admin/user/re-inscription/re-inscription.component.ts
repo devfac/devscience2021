@@ -191,7 +191,7 @@ export class ReInscriptionComponent implements OnInit {
       error => console.error("error as ", error)
     );
 
-    this.http.get<Journey[]>(`${BASE_URL}/journey/`+localStorage.getItem("uuid_mention"), this.options).subscribe(
+    this.http.get<Journey[]>(`${BASE_URL}/journey/by_uuid_mention/`+localStorage.getItem("uuid_mention"), this.options).subscribe(
       data =>{ 
         this.allJourney=data
       },
@@ -282,7 +282,7 @@ export class ReInscriptionComponent implements OnInit {
   showModal(): void{
     this.isEdit = false;
     this.isvisible = true;
-    this.http.get<Journey[]>(`${BASE_URL}/journey/`+localStorage.getItem("uuid_mention"), this.options).subscribe(
+    this.http.get<Journey[]>(`${BASE_URL}/journey/by_uuid_mention/`+localStorage.getItem("uuid_mention"), this.options).subscribe(
       data =>{ 
         this.allJourney=data
       },

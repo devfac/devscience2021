@@ -1,0 +1,251 @@
+<nz-table
+  #table
+  [nzBordered]="false"
+  nzShowSizeChanger
+  [nzData]="data"
+  [nzScroll]="{ x: width + 'px' }"
+  [nzLoading]="loading"
+  [nzFrontPagination]="false"
+  [nzShowPagination]="showPagination"
+  [nzTotal]="total"
+  [nzShowTotal]="totalTemplate"
+  [nzPageSize]="pageSize"
+  [nzPageIndex]="pageIndex"
+  [class]="classNames"
+  (nzQueryParams)="queryParamsChange.emit($event)"
+>
+  <thead>
+    <tr style="user-select: none">
+      <th *ngIf="isSelectable" nzWidth="50px"></th>
+      <th *ngIf="childrenDataHeader.length > 0" nzWidth="60px"></th>
+      <th
+        *ngFor="let header of headers; trackBy: trackByIdSelector"
+        [nzRight]="header.type === TableHeaderType.ACTION"
+        [nzWidth]="header.width ? header.width : null"
+        [nzColumnKey]="header.selector"
+        [colSpan]="header.colspan ? header.colspan : 1"
+        [rowSpan]="header.rowspan ? header.rowspan : 1"
+        [nzSortFn]="header.isSortable || null"
+        [nzShowSort]="header.isSortable"
+      >
+        {{ header.title | translate }}
+      </th>
+    </tr>
+
+    <tr *ngIf="headerSpan.length > 0">
+      <th *ngIf="childrenDataHeader.length > 0" nzWidth="60px"></th>
+      <th
+        *ngFor="let header of headerSpan; trackBy: trackByIdSelector"
+        [nzRight]="header.type === TableHeaderType.ACTION"
+        [nzWidth]="header.width ? header.width : null"
+        [nzColumnKey]="header.selector"
+        [colSpan]="header.colspan ? header.colspan : 1"
+        [rowSpan]="header.rowspan ? header.rowspan : 1"
+        [nzSortFn]="header.isSortable || null"
+        [nzShowSort]="header.isSortable"
+      >
+        {{ header.title | translate }}
+      </th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <ng-template ngFor let-row [ngForOf]="table.data">
+      <tr>
+        <td *ngIf="childrenDataHeader.length > 0" [(nzExpand)]="row.expand"></td>
+        <td
+          *ngIf="isSelectable"
+          [nzChecked]="+row[idSelector] === selectedId"
+          (nzCheckedChange)="onItemChecked(+row[idSelector], $event)"
+        ></td>
+        <ng-container *ngIf="headerData.length > 0">
+          <td
+            *ngFor="let header of headerData"
+            [nzRight]="header.type === TableHeaderType.ACTION"
+            [style]="header.style"
+          >
+            <ng-container *ngIf="header.template">
+              <ng-container
+                *ngTemplateOutlet="
+                  header.template;
+                  context: { value: row[header.selector], row: row }
+                "
+              ></ng-container>
+            </ng-container>
+
+            <ng-container *ngIf="!header.template">
+              <ng-container *ngIf="!header.btnType; else templateBtn">
+                <ng-container *ngIf="childrenDataHeader.length === 0; else editTemplate1">
+                  <ng-container *ngIf="!editCache[row.id].edit; else editTemplate1">
+                    <ng-container *ngIf="!header.editable; else teplateNum">
+                        {{
+                          (row[header.selector] !== null
+                            ? header.formatter
+                              ? header.formatter(getValue(row, header.selector))
+                              : getValue(row, header.selector)
+                            : '-'
+                          ) | translate
+                        }}
+                    </ng-container>
+                    <ng-template #teplateNum
+                      ><nz-input-group nzAddOnBefore="€">
+                        <input type="number" readonly nz-input [(ngModel)]="row[header.selector]" />
+                      </nz-input-group>
+                    </ng-template>
+                  </ng-container>
+                </ng-container>
+                <ng-template #editTemplate1>
+                  <ng-container *ngIf="header.editable; else editTemplate">
+                    <input type="number" nz-input [(ngModel)]="row[header.selector]" />
+                  </ng-container>
+                  <ng-template #editTemplate
+                    >{{
+                      (row[header.selector] !== null
+                        ? header.formatter
+                          ? header.formatter(getValue(row, header.selector))
+                          : getValue(row, header.selector)
+                        : '-'
+                      ) | translate
+                    }}
+                  </ng-template>
+                </ng-template>
+              </ng-container>
+              <ng-template #templateBtn>
+                <ng-container *ngIf="!editCache[row.id].edit; else editTemplate1">
+                  <button>
+                    <span nz-icon nzType="edit" nzTheme="outline" (click)="onEdit(row.id)"></span>
+                  </button>
+                </ng-container>
+
+                <ng-template #editTemplate1>
+                  <button>
+                    <span nz-icon nzType="save" nzTheme="outline" (click)="savedEdit(row)"></span>
+                  </button>
+                  <nz-divider nzType="vertical"></nz-divider>
+                  <button>
+                    <span nz-icon nzType="left" nzTheme="outline" (click)="cancEdit(row.id)"></span>
+                  </button>
+                </ng-template>
+              </ng-template>
+            </ng-container>
+          </td>
+        </ng-container>
+
+        <ng-container *ngIf="headerData.length === 0">
+          <td
+            *ngFor="let header of headers"
+            [nzRight]="header.type === TableHeaderType.ACTION"
+            [style]="header.style"
+          >
+            <ng-container *ngIf="header.template">
+              <ng-container
+                *ngTemplateOutlet="
+                  header.template;
+                  context: { value: row[header.selector], row: row }
+                "
+              ></ng-container>
+            </ng-container>
+            <ng-container *ngIf="!header.template">
+              {{
+                (row[header.selector] !== null
+                  ? header.formatter
+                    ? header.formatter(getValue(row, header.selector))
+                    : getValue(row, header.selector)
+                  : '-'
+                ) | translate
+              }}
+            </ng-container>
+          </td>
+        </ng-container>
+      </tr>
+
+      <tr [nzExpand]="row.expand">
+        <nz-table
+          #innerTable
+          [nzData]="row.stocks"
+          nzSize="middle"
+          [nzShowPagination]="false"
+          [class]="classExpand"
+          nzBordered
+        >
+          <thead>
+            <tr>
+              <th *ngFor="let header of childrenDataHeader" [colspan]="1">
+                {{ header.title | translate }}
+              </th>
+              <th>Action</th>
+            </tr>
+            <tr>
+              <ng-container *ngFor="let header of childrenDataHeader">
+                <th *ngFor="let header of childrenDataSpan">
+                  {{ header.title | translate }}
+                </th>
+              </ng-container>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let data of innerTable.data">
+              <ng-container *ngIf="!editCache[data.id].edit; else editTemplate">
+                <td *ngFor="let header of childrenDataHeader">
+                  <ng-container>
+                    <span>{{ data[header.selector] }}</span>
+                  </ng-container>
+                </td>
+                <td>
+                  <button>
+                    <span nz-icon nzType="edit" nzTheme="outline" (click)="onEdit(data.id)"></span>
+                  </button>
+                </td>
+              </ng-container>
+              <ng-template #editTemplate
+                ><td *ngFor="let header of childrenDataHeader">
+                  <ng-container *ngIf="header.selector === 'departurePortId'; else search">
+                    <div nz-row>
+                      <input
+                        nz-col
+                        type="text"
+                        nz-input
+                        [(ngModel)]="data[header.selector]"
+                        nzSpan="16"
+                      />
+                      <div nz-col nzSpan="2"></div>
+                      <button>
+                        <span nz-icon nzType="search" nzTheme="outline"></span>
+                      </button>
+                    </div>
+                  </ng-container>
+                  <ng-template #search>
+                    <input type="number" nz-input [(ngModel)]="data[header.selector]" />
+                  </ng-template>
+                </td>
+                <td>
+                  <button>
+                    <span
+                      nz-icon
+                      nzType="save"
+                      nzTheme="outline"
+                      (click)="savedStockEdit(data)"
+                    ></span>
+                  </button>
+                  <nz-divider nzType="vertical"></nz-divider>
+                  <button>
+                    <span
+                      nz-icon
+                      nzType="left"
+                      nzTheme="outline"
+                      (click)="cancelStocEdit(data.id, row.id)"
+                    ></span>
+                  </button>
+                </td>
+              </ng-template>
+            </tr>
+          </tbody>
+        </nz-table>
+      </tr>
+    </ng-template>
+    <div style="height: 4px"></div>
+  </tbody>
+</nz-table>
+<ng-template #totalTemplate let-total>
+  {{ 'total' | translate }}: {{ total }} {{ 'items' | translate }}
+</ng-template>

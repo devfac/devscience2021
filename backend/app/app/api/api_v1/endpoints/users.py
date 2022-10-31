@@ -15,12 +15,14 @@ router = APIRouter()
 @router.get("/get_all/", response_model=List[schemas.User])
 def read_users(
     db: Session = Depends(deps.get_db),
+    limit: int = 100,
+    offset: int = 0,
     current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
     """
     Retrieve users.
     """
-    users = crud.user.get_multi(db=db)
+    users = crud.user.get_multi(db=db, limit=limit, skip=offset)
     all_users = []
     for on_user in users:
         user = schemas.User(**jsonable_encoder(on_user))
