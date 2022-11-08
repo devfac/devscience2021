@@ -78,11 +78,11 @@ def update_mention(
     return crud.mention.get_multi(db=db)
 
 
-@router.get("/{uuid}", response_model=schemas.Mention)
+@router.get("/by_uuid/", response_model=schemas.Mention)
 def read_mention(
     *,
     db: Session = Depends(deps.get_db),
-    uuid: UUID,
+    uuid: str,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """

@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { StudentInfo } from '@app/models/student';
@@ -28,7 +28,7 @@ export class DetailsNoteComponent implements OnInit {
   matier: UeEc[] = []
   allColumns: any[] = []
   form!: FormGroup;
-  semester?: string | null
+  semester!: string | null;
   isSpinning: boolean = false
   check: boolean = false
   initialise: boolean = false
@@ -36,7 +36,7 @@ export class DetailsNoteComponent implements OnInit {
     private http: HttpClient,
     private fb: FormBuilder, 
     public utils: UtilsService,
-    private downloads: DownloadService,
+    private utilsService: UtilsService,
     private service: HomeService
     ) { 
       this.form = this.fb.group({
@@ -70,7 +70,9 @@ export class DetailsNoteComponent implements OnInit {
   }
   async ngOnInit(){
     this.isSpinning = true 
-    this.semester = localStorage.getItem('semester')
+    if(localStorage.getItem('semester') !== null){
+      this.semester = localStorage.getItem('semester')
+    }
 
     this.matier = await this.service.getMatier(localStorage.getItem('collegeYear'), this.semester, localStorage.getItem('journey')).toPromise()
 
@@ -117,7 +119,21 @@ export class DetailsNoteComponent implements OnInit {
      await this.service.createValidation(validation, this.semester).toPromise()
   }
   }
-
+async relever(){
+  let year = localStorage.getItem('collegeYear')
+  let journey = localStorage.getItem('journey')
+  if( year !== null && journey !== null && this.semester){
+    let url: string = `${BASE_URL}/scolarites/relever`;
+    let params = new HttpParams()
+    .append('num_carte', this.infoStudent.info.num_carte)
+    .append('college_year', year)
+    .append('uuid_journey', journey)
+    .append('semester', this.semester)
+  let name = "relever "+this.infoStudent.info.num_carte
+  this.utilsService.download(url, params, name)
+}
+  }
+/*
   relever(): void{
     const url: string = `${BASE_URL}/scolarites/relever?num_carte=`+this.infoStudent.info.num_carte+
     `&college_year=`+localStorage.getItem('collegeYear')+`&uuid_journey=`+localStorage.getItem('journey')+
@@ -133,7 +149,7 @@ export class DetailsNoteComponent implements OnInit {
         URL.revokeObjectURL(objectUrl);
       })
   }
-
+*/
 
   expandSet = new Set<string>();
   onExpandChange(id: string, checked: boolean): void {

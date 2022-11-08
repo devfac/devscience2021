@@ -1,19 +1,26 @@
-import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
+import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http';
+import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { User } from '@app/models';
 import { CollegeYear } from '@app/models/collegeYear';
 import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
-import { Role } from '@app/models/role';
+import { QueryParams, otherQueryParams } from '@app/models/query';
 import { AncienStudent, StudentColumn, ColumnItem } from '@app/models/student';
+import { TableHeader } from '@app/models/table';
+import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
+import { parseQueryParams } from '@app/shared/utils';
 import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import {AuthService} from '../../../../services/auth/auth.service'
 import { DownloadService } from '../../download.service';
+import { CollegeYearService } from '../../home/college-year/college-year.service';
+import { JourneyService } from '../../home/journey/journey.service';
+import { MentionService } from '../../home/mention/mention.service';
+import { UtilsService } from '../../utils.service';
+import { ReInscriptionService } from './re-inscription.service';
 
-
+const CODE = "reinscription"
 const BASE_URL = environment.authApiURL;
 
 @Component({
@@ -21,18 +28,16 @@ const BASE_URL = environment.authApiURL;
   templateUrl: './re-inscription.component.html',
   styleUrls: ['./re-inscription.component.less']
 })
-export class ReInscriptionComponent implements OnInit {
-  private headers =  new HttpHeaders({
-    'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
-  })
+export class ReInscriptionComponent implements OnInit, AfterContentInit {
+  @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
+  headers: TableHeader[] = [];
 
   user = localStorage.getItem('user')
   allYears: CollegeYear[] = []
+  listOfSemester = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
   allStudents: AncienStudent[] = []
   allJourney: Journey[] = []
   allMention: Mention[] = []
-  listOfSemester?: string[] = []
   semesterTitles: any[] = []
   confirmModal?: NzModalRef
   form!: FormGroup;
@@ -40,14 +45,23 @@ export class ReInscriptionComponent implements OnInit {
   isvisible = false;
   isConfirmLoading = false;
   listOfData: any[] = []
+  keyMention = CODE+"mention"
+  keyYear = CODE+"collegeYear"
+  keyNum = CODE+"numCarte"
   isEdit = false;
   title = '';
   data = ""
   uuid= "";
+  isLoading: boolean = false
 
-  options = {
-    headers: this.headers
-  }
+  actions = {
+    add: true,
+    edit: true,
+    delete: true,
+    detail: false,
+    print: true,
+  };
+  
   listOfColumns: ColumnItem[] = [
 
     {
@@ -122,7 +136,12 @@ export class ReInscriptionComponent implements OnInit {
     private fb: FormBuilder, 
     public router: Router, 
     private downloads: DownloadService,
-    private authUser: AuthService) { 
+    private authUser: AuthService, 
+    private serviceJourney: JourneyService,
+    private serviceMention: MentionService,
+    private serviceYears: CollegeYearService,
+    private service: ReInscriptionService,
+    private utlisService: UtilsService) { 
 
 
     this.form = this.fb.group({
@@ -130,10 +149,9 @@ export class ReInscriptionComponent implements OnInit {
       firstName: [null, [Validators.required]],
       lastName: [null, [Validators.required]],
       isAdmin: [false],
-      mention: [null],
       collegeYear: [null],
       uuidRole: [null, [Validators.required]],
-      uuidMention: [[], [Validators.required]],
+      mention: [[], [Validators.required]],
       filter: [null],
     });
     this.formList = this.fb.group({
@@ -142,134 +160,137 @@ export class ReInscriptionComponent implements OnInit {
     })
   }
 
-  ngOnInit(): void {
-    let options = {
-      headers: this.headers
-    }
+  ngAfterContentInit(): void {
+    this.headers = [
+    {
+      title: 'Num Carte',
+      selector: 'num_carte',
+      width: "100px",
+      isSortable: true,
+    },{
+      title: 'Nom',
+      selector: 'last_name',
+      width:"250px",
+      isSortable: true,
+    },{
+      title: 'Prenom',
+      selector: 'first_name',
+      width: "150px",
+      isSortable: true,
+    },{
+      title: 'Semestre Inf.',
+      selector: 'inf_semester',
+      width: "100px",
+      isSortable: true,
+    },{
+      title: 'Semestre sup.',
+      selector: 'sup_semester',
+      width: "100px",
+      isSortable: true,
+    },{
+      title: 'Parcours',
+      selector: 'journey.abbreviation',
+      width: "100px",
+      isSortable: true,
+    },
+  ];
+  }
+
+  async ngOnInit(){
     const user = this.authUser.userValue
     for(let i=0; i<user?.uuid_mention.length;i++){
-      this.http.get<Mention>(`${BASE_URL}/mentions/`+user?.uuid_mention[i], this.options).subscribe(
-        data =>{
-          this.allMention.push(data)
-          this.form.get('mention')?.setValue(data.uuid)
-
-          if(localStorage.getItem('uuid_mention')){
-            this.form.get('mention')?.setValue(localStorage.getItem('uuid_mention'))
-          }else{
-            this.form.get('mention')?.setValue(data.uuid)
-            localStorage.setItem('uuid_mention', data.uuid)
-          }
+      let mention = await this.serviceMention.getData(user?.uuid_mention[i]).toPromise()
+      this.allMention.push(mention)
           
-          },
-          error => console.error("error as ", error)
-      );
     }
 
-
-    for(let i=0; i<11; i++){
+    
+    for(let i=0; i<this.listOfSemester.length; i++){
       this.semesterTitles.push(
         {
-          text: "S"+(i+1), value: "S"+(i+1)
+          text: this.listOfSemester[i], value: this.listOfSemester[i]
         }
       )
     }
+    this.allYears = await this.serviceYears.getDataPromise().toPromise()
     
-    this.http.get<CollegeYear[]>(`${BASE_URL}/college_year/`, options).subscribe(
-      data => {
-        this.allYears = data,
-        this.form.get('collegeYear')?.setValue(data[0].title)
-        if(this.form.get('mention')?.value){
-          this.http.get<AncienStudent[]>(`${BASE_URL}/student/ancien?college_year=`+data[0].title+`&uuid_mention=`+this.form.get('mention')?.value, options).subscribe(
-            data => {
-              this.allStudents = data
-              this.listOfData = [...data]
-            },
-            error => console.error("error as ", error)
-          );
-        }
-      },
-      error => console.error("error as ", error)
-    );
-
-    this.http.get<Journey[]>(`${BASE_URL}/journey/by_uuid_mention/`+localStorage.getItem("uuid_mention"), this.options).subscribe(
-      data =>{ 
-        this.allJourney=data
-      },
-      error => console.error("error as ", error)
-    );
-
+    if(this.testStorage(this.keyMention, this.allMention[0].uuid) && 
+    this.testStorage(this.keyYear, this.allYears[0].title)){
+      let uuidMention = localStorage.getItem(this.keyMention)
+      if(uuidMention !== null){
+        this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()}
+        this.fetchData = this.fetchData.bind(this)
+        this.isLoading = true
+    }
   }
+  testStorage(key: string, value: string): boolean{
+    if(localStorage.getItem(key)){
+      this.form.get(key.substring(CODE.length))?.setValue(localStorage.getItem(key))
+    }else{
+      localStorage.setItem(key, value)
+      this.form.get(key.substring(CODE.length))?.setValue(localStorage.getItem(key))
+    }
+    console.log(key.substring(CODE.length), value)
+    return true
+  }
+
+  fetchData(params?: QueryParams){
+    let otherParams: otherQueryParams = {
+      college_year: localStorage.getItem(this.keyYear),
+      uuid_mention: localStorage.getItem(this.keyMention),
+    }
+    return this.service.getDataObservable(parseQueryParams(params,otherParams))
+  }
+
   showConfirm(name: string, numCarte: string): void{
     this.confirmModal = this.modal.confirm({
       nzTitle: "Voulez-vous supprimer "+name+"?",
-      nzOnOk: () => {
-        this.http.delete<AncienStudent[]>(`${BASE_URL}/student/ancien?num_carte=`+numCarte+'&college_year='+this.form.value.collegeYear+'&uuid_mention='+
-        this.form.value.mention, this.options).subscribe(
-          data => this.allStudents = data,
-          error => console.error("error as ", error)
-        );
+      nzOnOk: async () => {
+        await this.service.deletData(numCarte)
+        this.datatable.fetchData()
       }
     })
   }
   
   showModalEdit(numCarte: string): void{
     this.isEdit = true
-    localStorage.setItem('numCarte', numCarte)
-    localStorage.setItem("uuid_mention", this.form.get("mention")?.value)
-    localStorage.setItem("college_years", this.form.get("collegeYear")?.value)
+    localStorage.setItem(this.keyNum, numCarte)
+    localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)
+    localStorage.setItem(this.keyYear, this.form.get(this.keyYear.substring(CODE.length))?.value)
     this.router.navigate(['/user/reinscription_add'])
   }
 
 
+  onDelete(row: any) {
+    this.showConfirm(row.title, row.uuid);
+  }
+
+  onEdit(row: any) {
+    this.showModalEdit(row.num_carte);
+  }
+
+  onAdd() {
+    this.addStudent();
+  }
+  
   handleCancel(): void{
     this.isvisible = false
   }
 
   getAllStudents(): void{
-    if(this.form.get('collegeYear')?.value && this.form.get('mention')?.value){
-    this.http.get<any>(`${BASE_URL}/student/ancien?college_year=`+this.form.get('collegeYear')?.value+`&uuid_mention=`+this.form.get('mention')?.value, this.options).subscribe(
-      data => {
-        this.allStudents = data
-        this.listOfData = [...data]
-      },
-      error => console.error("error as ", error)
-    );
+    if(this.form.get(this.keyYear.substring(CODE.length))?.value && 
+    this.form.get(this.keyMention.substring(CODE.length))?.value && this.isLoading){
+      localStorage.setItem(this.keyYear, this.form.get(this.keyYear.substring(CODE.length))?.value)
+      localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)
+      this.datatable.fetchData()
     }
   }
 
-  getStudentByNumCarte(): void{
-    const numSelect = this.form.get('numSelect')?.value
-    if(numSelect && numSelect.length>0){
-    this.http.get<AncienStudent>(`${BASE_URL}/student/new_selected?num_select=`+numSelect, this.options).subscribe(
-      data =>{ 
-        console.log(data)
-        this.form.get('mention')?.setValue(data.uuid_mention)
-        this.form.get('firstName')?.setValue(data.first_name)
-        this.form.get('lastName')?.setValue(data.last_name)
-        this.form.get('address')?.setValue(data.address)
-        this.form.get('level')?.setValue(data.level)
-        this.form.get('dateBirth')?.setValue(data.date_birth)
-        this.form.get('placeBirth')?.setValue(data.place_birth)
-        this.form.get('sex')?.setValue(data.sex)
-        this.form.get('dateCin')?.setValue(data.date_cin)
-        this.form.get('placeCin')?.setValue(data.place_cin)
-        this.form.get('numCin')?.setValue(data.num_cin)
-        this.form.get('sex')?.setValue(data.sex)
-        this.form.get('dateCin')?.setValue(data.date_cin)
-        this.form.get('placeCin')?.setValue(data.place_cin)
-        this.form.get('baccYear')?.setValue(data.baccalaureate_years)
-        this.form.get('nation')?.setValue(data.nation)
-  },
-  error => console.error("error as ", error)
-    )
-}
-}
-
   addStudent():void{
-    localStorage.setItem("uuid_mention", this.form.get("mention")?.value)
-    localStorage.setItem("college_years", this.form.get("collegeYear")?.value)
+    localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)
+    localStorage.setItem(this.keyYear, this.form.get(this.keyYear.substring(CODE.length))?.value)
     this.router.navigate(['/user/reinscription_add'])
-    localStorage.setItem('numCarte', '')
+    localStorage.setItem(this.keyNum, '')
   }
 
   handleOk(): void{
@@ -279,45 +300,15 @@ export class ReInscriptionComponent implements OnInit {
     }, 3000);
   }
 
-  showModal(): void{
-    this.isEdit = false;
-    this.isvisible = true;
-    this.http.get<Journey[]>(`${BASE_URL}/journey/by_uuid_mention/`+localStorage.getItem("uuid_mention"), this.options).subscribe(
-      data =>{ 
-        this.allJourney=data
-      },
-      error => console.error("error as ", error)
-    );
-  }
-
-  download(): void {
-    const url: string = `${BASE_URL}/liste/list_inscrit/?college_year=`
-    +this.form.get('collegeYear')?.value+`&uuid_journey=`
-    +this.formList.get('journey')?.value+'&semester='+this.formList.get('semester')?.value
-    this.downloads
-      .download(url, this.options)
-      .subscribe(blob => {
-        console.log(blob.stream)
-        const a = document.createElement('a')
-        const objectUrl = URL.createObjectURL(blob)
-        a.href = objectUrl
-        const journey = this.allJourney.find((item: Journey) => item.uuid === this.formList.value.journey)
-        this.listOfSemester = journey?.semester
-        a.download = 'list_etudiants'+journey?.abbreviation+'_'+this.formList.get('semester')?.value+'.pdf';
-        a.click();
-        URL.revokeObjectURL(objectUrl);
-      })
-      this.isvisible=false
-  }
-
-
   changeJourney(): void{
     if(this.formList.value.journey ){
       console.log(this.formList.value.journey)
       localStorage.setItem('journey', this.formList.value.journey)
 
       const journey = this.allJourney.find((item: Journey) => item.uuid === this.formList.value.journey)
-      this.listOfSemester = journey?.semester
+      if (journey){
+      this.listOfSemester = journey.semester
+    }
     }
   }
   changeFilter(){
@@ -326,5 +317,30 @@ export class ReInscriptionComponent implements OnInit {
     }else{
       this.listOfData = this.allStudents
     }
+  }
+
+  async showModal(){
+    this.isEdit = false;
+    this.isvisible = true;
+    let mention = localStorage.getItem(this.keyMention)
+    if (mention){
+      this.allJourney = await this.serviceJourney.getDataByMention(mention).toPromise()}
+  }
+  startDownload(){
+    let url: string = `${BASE_URL}/liste/list_inscrit/`;
+
+    let params = new HttpParams()
+      .append('college_year', this.form.get('collegeYear')?.value)
+      .append('uuid_journey', this.formList.get('journey')?.value)
+      .append('semester', this.formList.get('semester')?.value);
+
+    const journey = this.allJourney.find((item: Journey) => item.uuid === this.formList.value.journey);
+    let name: string = 'list_etudiants'+journey?.abbreviation+'_'+this.formList.get('semester')?.value;
+    this.utlisService.download(url, params, name);
+    this.isvisible = false;
+  }
+
+  download(){
+    this.showModal()
   }
 }

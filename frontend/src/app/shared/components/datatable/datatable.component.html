@@ -1,10 +1,11 @@
 <nz-table
   #table
-  [nzBordered]="false"
+  [nzBordered]="true"
   nzShowSizeChanger
   [nzData]="data"
   [nzScroll]="{ x: width + 'px' }"
   [nzLoading]="loading"
+  nzSize="small"
   [nzFrontPagination]="false"
   [nzShowPagination]="showPagination"
   [nzTotal]="total"
@@ -12,6 +13,7 @@
   [nzPageSize]="pageSize"
   [nzPageIndex]="pageIndex"
   [class]="classNames"
+  [nzFooter]="messageTemplate"
   (nzQueryParams)="queryParamsChange.emit($event)"
 >
   <thead>
@@ -20,7 +22,8 @@
       <th *ngIf="childrenDataHeader.length > 0" nzWidth="60px"></th>
       <th
         *ngFor="let header of headers; trackBy: trackByIdSelector"
-        [nzRight]="header.type === TableHeaderType.ACTION"
+        [nzRight]="header.type === TableHeaderType.ACTION || header.type === TableHeaderType.RIGHT"
+        [nzLeft]="header.type === TableHeaderType.LEFT"
         [nzWidth]="header.width ? header.width : null"
         [nzColumnKey]="header.selector"
         [colSpan]="header.colspan ? header.colspan : 1"
@@ -36,7 +39,8 @@
       <th *ngIf="childrenDataHeader.length > 0" nzWidth="60px"></th>
       <th
         *ngFor="let header of headerSpan; trackBy: trackByIdSelector"
-        [nzRight]="header.type === TableHeaderType.ACTION"
+        [nzRight]="header.type === TableHeaderType.ACTION || header.type === TableHeaderType.RIGHT"
+        [nzLeft]="header.type === TableHeaderType.LEFT"
         [nzWidth]="header.width ? header.width : null"
         [nzColumnKey]="header.selector"
         [colSpan]="header.colspan ? header.colspan : 1"
@@ -60,8 +64,9 @@
         ></td>
         <ng-container *ngIf="headerData.length > 0">
           <td
-            *ngFor="let header of headerData"
-            [nzRight]="header.type === TableHeaderType.ACTION"
+            *ngFor="let header of headerData" 
+            [nzRight]="header.type === TableHeaderType.ACTION || header.type === TableHeaderType.RIGHT"
+            [nzLeft]="header.type === TableHeaderType.LEFT"
             [style]="header.style"
           >
             <ng-container *ngIf="header.template">
@@ -75,28 +80,19 @@
 
             <ng-container *ngIf="!header.template">
               <ng-container *ngIf="!header.btnType; else templateBtn">
-                <ng-container *ngIf="childrenDataHeader.length === 0; else editTemplate1">
-                  <ng-container *ngIf="!editCache[row.id].edit; else editTemplate1">
-                    <ng-container *ngIf="!header.editable; else teplateNum">
-                        {{
-                          (row[header.selector] !== null
-                            ? header.formatter
-                              ? header.formatter(getValue(row, header.selector))
-                              : getValue(row, header.selector)
-                            : '-'
-                          ) | translate
-                        }}
-                    </ng-container>
-                    <ng-template #teplateNum
-                      ><nz-input-group nzAddOnBefore="€">
-                        <input type="number" readonly nz-input [(ngModel)]="row[header.selector]" />
-                      </nz-input-group>
-                    </ng-template>
+                  <ng-container *ngIf="!editCache[row.num_carte].edit; else editTemplate1">
+                     {{
+                      (row[header.selector] !== null
+                        ? header.formatter
+                          ? header.formatter(getValue(row, header.selector))
+                          : getValue(row, header.selector)
+                        : '-'
+                      ) | translate
+                    }}
                   </ng-container>
-                </ng-container>
                 <ng-template #editTemplate1>
                   <ng-container *ngIf="header.editable; else editTemplate">
-                    <input type="number" nz-input [(ngModel)]="row[header.selector]" />
+                    <input type="number" nz-input [(ngModel)]="row[header.selector]" [min]="0" [max]="20" />
                   </ng-container>
                   <ng-template #editTemplate
                     >{{
@@ -111,19 +107,73 @@
                 </ng-template>
               </ng-container>
               <ng-template #templateBtn>
-                <ng-container *ngIf="!editCache[row.id].edit; else editTemplate1">
-                  <button>
-                    <span nz-icon nzType="edit" nzTheme="outline" (click)="onEdit(row.id)"></span>
+                <ng-container *ngIf="!editCache[row.num_carte].edit; else editTemplate1">
+                  <button
+                    nz-button
+                    nzType="text"
+                    nzShape="circle"
+                    nzSize="small"
+                    nz-tooltip
+                    [nzTooltipTitle]="'edit' | translate"
+                  >
+                    <i
+                      nz-icon
+                      nzType="edit"
+                      nzTheme="outline"
+                      style="color: #398edf"
+                      (click)="onEdit(row.num_carte)"
+                    ></i>
+                  </button>
+                  <button
+                    nz-button
+                    nzType="text"
+                    nzShape="circle"
+                    nzSize="small"
+                    nz-tooltip
+                    [nzTooltipTitle]="'edit' | translate"
+                  >
+                    <i
+                      nz-icon
+                      nzType="eye"
+                      nzTheme="outline"
+                      style="color: #000"
+                      (click)="onView(row.num_carte)"
+                    ></i>
                   </button>
                 </ng-container>
 
                 <ng-template #editTemplate1>
-                  <button>
-                    <span nz-icon nzType="save" nzTheme="outline" (click)="savedEdit(row)"></span>
+                  <button
+                    nz-button
+                    nzType="text"
+                    nzShape="circle"
+                    nzSize="small"
+                    nz-tooltip
+                    [nzTooltipTitle]="'save' | translate"
+                  >
+                    <i
+                      nz-icon
+                      nzType="save"
+                      nzTheme="outline"
+                      style="color: #398edf"
+                      (click)="savedEdit(row)"
+                    ></i>
                   </button>
-                  <nz-divider nzType="vertical"></nz-divider>
-                  <button>
-                    <span nz-icon nzType="left" nzTheme="outline" (click)="cancEdit(row.id)"></span>
+                  <button
+                    nz-button
+                    nzType="text"
+                    nzShape="circle"
+                    nzSize="small"
+                    nz-tooltip
+                    [nzTooltipTitle]="'cancel' | translate"
+                  >
+                    <i
+                      nz-icon
+                      nzType="close"
+                      nzTheme="outline"
+                      style="color: #df3939"
+                      (click)="cancEdit(row.num_carte)"
+                    ></i>
                   </button>
                 </ng-template>
               </ng-template>
@@ -134,7 +184,8 @@
         <ng-container *ngIf="headerData.length === 0">
           <td
             *ngFor="let header of headers"
-            [nzRight]="header.type === TableHeaderType.ACTION"
+            [nzRight]="header.type === TableHeaderType.ACTION || header.type === TableHeaderType.RIGHT"
+            [nzLeft]="header.type === TableHeaderType.LEFT"
             [style]="header.style"
           >
             <ng-container *ngIf="header.template">
@@ -158,94 +209,14 @@
           </td>
         </ng-container>
       </tr>
-
-      <tr [nzExpand]="row.expand">
-        <nz-table
-          #innerTable
-          [nzData]="row.stocks"
-          nzSize="middle"
-          [nzShowPagination]="false"
-          [class]="classExpand"
-          nzBordered
-        >
-          <thead>
-            <tr>
-              <th *ngFor="let header of childrenDataHeader" [colspan]="1">
-                {{ header.title | translate }}
-              </th>
-              <th>Action</th>
-            </tr>
-            <tr>
-              <ng-container *ngFor="let header of childrenDataHeader">
-                <th *ngFor="let header of childrenDataSpan">
-                  {{ header.title | translate }}
-                </th>
-              </ng-container>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let data of innerTable.data">
-              <ng-container *ngIf="!editCache[data.id].edit; else editTemplate">
-                <td *ngFor="let header of childrenDataHeader">
-                  <ng-container>
-                    <span>{{ data[header.selector] }}</span>
-                  </ng-container>
-                </td>
-                <td>
-                  <button>
-                    <span nz-icon nzType="edit" nzTheme="outline" (click)="onEdit(data.id)"></span>
-                  </button>
-                </td>
-              </ng-container>
-              <ng-template #editTemplate
-                ><td *ngFor="let header of childrenDataHeader">
-                  <ng-container *ngIf="header.selector === 'departurePortId'; else search">
-                    <div nz-row>
-                      <input
-                        nz-col
-                        type="text"
-                        nz-input
-                        [(ngModel)]="data[header.selector]"
-                        nzSpan="16"
-                      />
-                      <div nz-col nzSpan="2"></div>
-                      <button>
-                        <span nz-icon nzType="search" nzTheme="outline"></span>
-                      </button>
-                    </div>
-                  </ng-container>
-                  <ng-template #search>
-                    <input type="number" nz-input [(ngModel)]="data[header.selector]" />
-                  </ng-template>
-                </td>
-                <td>
-                  <button>
-                    <span
-                      nz-icon
-                      nzType="save"
-                      nzTheme="outline"
-                      (click)="savedStockEdit(data)"
-                    ></span>
-                  </button>
-                  <nz-divider nzType="vertical"></nz-divider>
-                  <button>
-                    <span
-                      nz-icon
-                      nzType="left"
-                      nzTheme="outline"
-                      (click)="cancelStocEdit(data.id, row.id)"
-                    ></span>
-                  </button>
-                </td>
-              </ng-template>
-            </tr>
-          </tbody>
-        </nz-table>
-      </tr>
     </ng-template>
     <div style="height: 4px"></div>
   </tbody>
 </nz-table>
 <ng-template #totalTemplate let-total>
   {{ 'total' | translate }}: {{ total }} {{ 'items' | translate }}
+</ng-template>
+
+<ng-template #messageTemplate>
+   {{ message }} 
 </ng-template>

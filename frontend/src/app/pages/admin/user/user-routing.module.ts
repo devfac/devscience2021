@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { DashboardComponent } from '../dashboard/dashboard.component';
 import { DetailsNoteComponent } from '../home/details-note/details-note.component';
 import { NoteComponent } from '../home/note/note.component';
 import { InscriptionAddComponent } from './inscription/inscription-add/inscription-add.component';
@@ -8,6 +9,7 @@ import { ReInscriptionAddComponent } from './re-inscription/re-inscription-add/r
 import { ReInscriptionComponent } from './re-inscription/re-inscription.component';
 import { SelectionAddComponent } from './selection/selection-add/selection-add.component';
 import { SelectionComponent } from './selection/selection.component';
+import { UploadComponent } from './upload/upload.component';
 import { UserComponent } from './user.component';
 
 const routes: Routes = [{ path: '',
@@ -15,12 +17,17 @@ component: UserComponent,
 children: [
  {
    path: '', pathMatch: 'full',
-   redirectTo: '/user/reinscription',
+   redirectTo: '/user/dashboard',
  },
  {
   path: 'selection',
   component: SelectionComponent,
   data: { breadcrumb: 'admin.user.selection.title' },
+},
+{
+  path: 'dashboard',
+  component: DashboardComponent,
+  data: { breadcrumb: 'admin.user.dashboard.title' },
 },
  {
    path: 'inscription',
@@ -51,6 +58,11 @@ children: [
   path: 'note',
   component: NoteComponent,
   data: { breadcrumb: 'admin.home.note.title' },
+},
+{
+  path: 'upload',
+  component: UploadComponent,
+  data: { breadcrumb: 'admin.user.upload.title' },
 },
 {
   path: 'note-details',

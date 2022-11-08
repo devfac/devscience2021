@@ -1,28 +1,36 @@
 import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { AfterContentInit, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CollegeYear } from '@app/models/collegeYear';
 import { Journey} from '@app/models/journey';
 import { Mention } from '@app/models/mention';
+import { QueryParams, otherQueryParams } from '@app/models/query';
 import { AncienStudent, StudentColumn, ColumnItem  } from '@app/models/student';
+import { TableHeader } from '@app/models/table';
 import { AuthService } from '@app/services/auth/auth.service';
+import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
+import { parseQueryParams } from '@app/shared/utils';
 import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { DownloadService } from '../../download.service';
-
+import { CollegeYearService } from '../../home/college-year/college-year.service';
+import { JourneyService } from '../../home/journey/journey.service';
+import { MentionService } from '../../home/mention/mention.service';
+import { SelectionService } from './selection.service';
 
 const BASE_URL = environment.authApiURL;
+const CODE = "selection"
+
 @Component({
   selector: 'app-selection',
   templateUrl: './selection.component.html',
   styleUrls: ['./selection.component.less']
 })
-export class SelectionComponent implements OnInit {
-  private headers =  new HttpHeaders({
-    'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
-  })
+export class SelectionComponent implements OnInit, AfterContentInit {
+  @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
+  @ViewChild('isSelected', { static: true }) isSelected!: TemplateRef<any>;
+  headers: TableHeader[] = [];
 
   user = localStorage.getItem('user')
   allYears: CollegeYear[] = []
@@ -40,67 +48,29 @@ export class SelectionComponent implements OnInit {
   title = '';
   data = ""
   uuid= "";
+  keyMention = CODE+"mention"
+  keyYear = CODE+"collegeYear"
+  keyNum = CODE+"numSelect"
+  isLoading: boolean = false
 
-  options = {
-    headers: this.headers
-  }
-  listOfColumns: ColumnItem[] = [
-
-    {
-      name:"Num select",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn: null
-    },
-    {
-      name:"Nom",
-      sortOrder: null,
-      sortFn: (a: StudentColumn, b:StudentColumn) => a.last_name.localeCompare(b.last_name),
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn: null
-    },
-
-    {
-      name:"Prenom",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn: null
-    },
-    {
-      name:"Séléctioné",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: ['ascend','descend', null],
-      filterMultiple: false,
-      listOfFilter: this.semesterTitles,
-      filterFn:(semester: string, item: StudentColumn) => item.inf_semester.indexOf(semester) !== -1
-    },
-    {
-      name:"Action",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn:null
-    },
-  ]
-
+  actions = {
+    add: true,
+    edit: true,
+    delete: true,
+    detail: false,
+  };
   constructor(
     private http: HttpClient, 
     private modal: NzModalService, 
     private fb: FormBuilder, 
     public router: Router, 
     private downloads: DownloadService,
-    private authUser: AuthService) { 
+    private authUser: AuthService,
+    private serviceJourney: JourneyService,
+    private serviceMention: MentionService,
+    private serviceYears: CollegeYearService,
+    private service: SelectionService,
+    ) { 
 
 
     this.form = this.fb.group({
@@ -115,20 +85,36 @@ export class SelectionComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    let options = {
-      headers: this.headers
-    }
+  ngAfterContentInit(): void {
+    this.headers = [
+    {
+      title: 'Num Select',
+      selector: 'num_select',
+      isSortable: true,
+    },{
+      title: 'Nom',
+      selector: 'last_name',
+      width:"280px",
+      isSortable: true,
+    },{
+      title: 'Prenom',
+      selector: 'first_name',
+      isSortable: true,
+    },{
+      title: 'Séléctioné',
+      selector: 'is_selected',
+      template: this.isSelected,
+      isSortable: false,
+    },
+  ]
+  }
+  
+  async ngOnInit() {
     const user = this.authUser.userValue
     for(let i=0; i<user?.uuid_mention.length;i++){
-      this.http.get<Mention>(`${BASE_URL}/mentions/`+user?.uuid_mention[i], this.options).subscribe(
-        data =>{
-          this.allMention.push(data)
-          this.form.get('mention')?.setValue(data.uuid)
+      let mention = await this.serviceMention.getData(user?.uuid_mention[i]).toPromise()
+      this.allMention.push(mention)
           
-          },
-          error => console.error("error as ", error)
-      );
     }
 
     for(let i=0; i<this.listOfSemester.length; i++){
@@ -139,44 +125,70 @@ export class SelectionComponent implements OnInit {
       )
     }
     
-    this.http.get<CollegeYear[]>(`${BASE_URL}/college_year/`, options).subscribe(
-      data => {
-        this.allYears = data,
-        this.form.get('collegeYear')?.setValue(data[0].title)
-        if(this.form.get('mention')?.value){
-          this.http.get<AncienStudent[]>(`${BASE_URL}/student/new/all?college_year=`+data[0].title+`&uuid_mention=`+this.form.get('mention')?.value, options).subscribe(
-            data => {this.allStudents = data,
-              console.log(data)},
-            error => console.error("error as ", error)
-          );
-        }
-      },
-      error => console.error("error as ", error)
-    );
-  
+    this.allYears = await this.serviceYears.getDataPromise().toPromise()
+    
+    if(this.testStorage(this.keyMention, this.allMention[0].uuid) && 
+    this.testStorage(this.keyYear, this.allYears[0].title)){
+      let uuidMention = localStorage.getItem(this.keyMention)
+      if(uuidMention !== null){
+        this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()}
+        this.fetchData = this.fetchData.bind(this)
+        this.isLoading = true
+    }
 
+  }
+  
+  testStorage(key: string, value: string): boolean{
+    if(localStorage.getItem(key)){
+      this.form.get(key.substring(CODE.length))?.setValue(localStorage.getItem(key))
+    }else{
+      localStorage.setItem(key, value)
+      this.form.get(key.substring(CODE.length))?.setValue(localStorage.getItem(key))
+    }
+    console.log(key.substring(CODE.length), value)
+    return true
+  }
+
+  fetchData(params?: QueryParams){
+    let otherParams: otherQueryParams = {
+      college_year: localStorage.getItem(this.keyYear),
+      uuid_mention: localStorage.getItem(this.keyMention),
+    }
+    return this.service.getDataObservable(parseQueryParams(params,otherParams))
   }
   showConfirm(name: string, numSelect: string): void{
     this.confirmModal = this.modal.confirm({
       nzTitle: "Voulez-vous supprimer "+name+"?",
-      nzOnOk: () => {
-        this.http.delete<AncienStudent[]>(`${BASE_URL}/student/new?num_select=`+numSelect+'&college_year='+this.form.value.collegeYear+'&uuid_mention='+
-        this.form.value.mention, this.options).subscribe(
-          data => this.allStudents = data,
-          error => console.error("error as ", error)
-        );
+      nzOnOk: async () => {
+        await this.service.deletData(numSelect)
+        this.datatable.fetchData()
       }
     })
   }
   
-  showModalEdit(numSelect: string): void{
-    this.isEdit = true
-    localStorage.setItem('numSelect', numSelect)
-    localStorage.setItem("uuid_mention", this.form.get("mention")?.value)
-    localStorage.setItem("college_years", this.form.get("collegeYear")?.value)
-    this.router.navigate(['/user/selection_add'])
+  onDelete(row: any) {
+    this.showConfirm(row.title, row.uuid);
   }
 
+  onEdit(row: any) {
+    this.showModalEdit(row.num_select);
+  }
+
+  onAdd() {
+    this.addStudent();
+  }
+  
+  showModalEdit(numSelect: string): void{
+    this.isEdit = true
+    localStorage.setItem(this.keyNum, numSelect)
+    localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)
+    localStorage.setItem(this.keyYear, this.form.get(this.keyYear.substring(CODE.length))?.value)
+    this.router.navigate(['/user/selection_add'])
+  }
+  download(){
+
+  }
+  /*
   download(): void {
     const url: string = `${BASE_URL}/liste/list_selection/?college_year=`+this.form.get('collegeYear')?.value+`&uuid_mention=`+this.form.get('mention')?.value
     this.downloads
@@ -191,25 +203,25 @@ export class SelectionComponent implements OnInit {
         URL.revokeObjectURL(objectUrl);
       })
   }
-
+*/
   handleCancel(): void{
     this.isvisible = false
   }
 
   getAllStudents(): void{
-    if(this.form.get('collegeYear')?.value && this.form.get('mention')?.value){
-    this.http.get<any>(`${BASE_URL}/student/new/all?college_year=`+this.form.get('collegeYear')?.value+`&uuid_mention=`+this.form.get('mention')?.value, this.options).subscribe(
-      data => this.allStudents = data,
-      error => console.error("error as ", error)
-    );
+    if(this.form.get(this.keyYear.substring(CODE.length))?.value && 
+    this.form.get(this.keyMention.substring(CODE.length))?.value && this.isLoading){
+      localStorage.setItem(this.keyYear, this.form.get(this.keyYear.substring(CODE.length))?.value)
+      localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)
+      this.datatable.fetchData()
     }
   }
 
   addStudent():void{
-    localStorage.setItem("uuid_mention", this.form.get("mention")?.value)
-    localStorage.setItem("college_years", this.form.get("collegeYear")?.value)
+    localStorage.setItem(this.keyYear, this.form.get(this.keyYear.substring(CODE.length))?.value)
+    localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)
+    localStorage.setItem(this.keyNum, '')
     this.router.navigate(['/user/selection_add'])
-    localStorage.setItem('numSelect', '')
   }
 
   handleOk(): void{

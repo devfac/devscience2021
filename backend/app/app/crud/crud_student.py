@@ -33,8 +33,8 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
             college_year: str,
             skip: int,
             limit: int,
-            order: int,
-            order_by: int
+            order: str = "ASC",
+            order_by: str = "last_name"
     ) -> List[Student]:
         if semester.upper() == 'S1':
             return (
@@ -126,8 +126,8 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
             uuid_mention: str,
             semester: str,
             college_year: str,
-            limit: int,
-            skip: int,
+            limit: int = 1000,
+            skip: int = 0,
             order: str = "asc",
             order_by: str = "last_name",
     ) -> List[Student]:

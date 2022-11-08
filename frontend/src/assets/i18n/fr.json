@@ -1,4 +1,8 @@
 {
+  "print": "Imprimer",
+  "add": "Créer",
+  "save":"Enregistrer",
+  "back":"Retour",
   "server_error": "Errors occur on server",
   "welcomeMessage": "Merci d'avoir rejoint {{ firstName }} !",
   "welcomeContent": "C'est super de vous avoir!",
@@ -211,6 +215,12 @@
       "selection":{
         "title":"Selection de dossier",
         "is_selected":"Selecioné"
+      },
+      "dashboard":{
+        "title":"Tableau de bord"
+      },
+      "upload":{
+        "title":"Upload"
       }
     },
     "toolpit":{

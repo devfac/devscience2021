@@ -9,58 +9,83 @@
   height: 100vh;
 }
 
+p {
+  color: #fff;
+  font-weight: bold;
+}
+
 .top-nav {
-  height: 70px;
+  height: 90px;
   line-height: 70px;
+  background-color: chartreuse;
 
-  .right-menu {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    justify-content: flex-end;
-    align-items: center;
-  }
+}
 
-  .drawer-menu-trigger {
-    height: 64px;
-    padding: 20px 24px;
-    font-size: 20px;
-    cursor: pointer;
-    transition: all .3s, padding 0s;
-    color: #fff;
+.app-title {
+  font-weight: bold;
+  margin-left: 20px;
+  padding-left: 15px;
+}
 
-    &.trigger:hover {
-      color: #1890ff;
-    }
-  }
+.right-menu {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+  align-items: center;
+}
 
-  .logo {
-    position: relative;
-    height: 64px;
-    padding-left: 24px;
-    overflow: hidden;
-    line-height: 64px;
-    background: #001529;
-    transition: all .3s;
-    float: left;
+.user-info {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin-right: 12px;
+  text-align: right;
+}
 
-    img {
-      display: inline-block;
-      width: 100px;
-      vertical-align: middle;
-    }
+.drawer-menu-trigger {
+  height: 64px;
+  padding: 10px 10px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s, padding 0s;
+  color: #fff;
 
-    h1 {
-      display: inline-block;
-      margin: 0 0 0 20px;
-      color: #fff;
-      font-weight: 600;
-      font-size: 14px;
-      font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
-      vertical-align: middle;
-    }
+  &.trigger:hover {
+    color: #1890ff;
   }
 }
+
+.app-menu-content {
+  margin-left: 50px;
+}
+
+.logo {
+  position: relative;
+  height: 100%;
+  padding-left: 10px;
+  overflow: hidden;
+  line-height: 64px;
+  background: #001529;
+  transition: all 0.3s;
+  float: left;
+
+  img {
+    display: inline-block;
+    width: 100px;
+    vertical-align: middle;
+  }
+
+  h1 {
+    display: inline-block;
+    margin: 0 0 0 20px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+    vertical-align: middle;
+  }
+}
+
 
 .outer-content {
   display: flex;
@@ -70,7 +95,6 @@
   margin-bottom: 0;
   padding-top: 12px;
   padding-bottom: 12px;
-
 }
 
 nz-content {
@@ -89,4 +113,9 @@ nz-footer {
 
 .ant-select-selection {
   background-color: black;
+}
+
+.breadcrumb-container {
+  display: flex;
+  justify-content: space-between;
 }

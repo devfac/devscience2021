@@ -1,17 +1,15 @@
-import { HttpHeaders, HttpClient } from '@angular/common/http';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CollegeYear } from '@app/models/collegeYear';
 import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
 import { otherQueryParams, QueryParams } from '@app/models/query';
-import { AncienStudent, ColumnItem, StudentColumn } from '@app/models/student';
+import { AncienStudent } from '@app/models/student';
 import { TableHeader } from '@app/models/table';
 import { AuthService } from '@app/services/auth/auth.service';
 import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
 import { parseQueryParams } from '@app/shared/utils';
-import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { CollegeYearService } from '../../home/college-year/college-year.service';
 import { JourneyService } from '../../home/journey/journey.service';
@@ -25,7 +23,7 @@ const CODE = "inscription"
   templateUrl: './inscription.component.html',
   styleUrls: ['./inscription.component.less']
 })
-export class InscriptionComponent implements OnInit {
+export class InscriptionComponent implements OnInit, AfterContentInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
   headers: TableHeader[] = [];
 
@@ -48,6 +46,8 @@ export class InscriptionComponent implements OnInit {
   listOfData: any[] = []
   keyMention = CODE+"mention"
   keyYear = CODE+"collegeYear"
+  keyNum = CODE+"numSelect"
+  isLoading: boolean = false
 
   actions = {
     add: true,
@@ -73,10 +73,9 @@ export class InscriptionComponent implements OnInit {
       firstName: [null, [Validators.required]],
       lastName: [null, [Validators.required]],
       isAdmin: [false],
-      mention: [null],
       collegeYear: [null],
-      uuidRole: [null, [Validators.required]],
-      uuidMention: [[], [Validators.required]],
+      role: [null, [Validators.required]],
+      mention: [[], [Validators.required]],
       filter: [null],
     });
   }
@@ -91,6 +90,7 @@ export class InscriptionComponent implements OnInit {
     },{
       title: 'Nom',
       selector: 'last_name',
+      width:"250px",
       isSortable: true,
     },{
       title: 'Prenom',
@@ -109,15 +109,12 @@ export class InscriptionComponent implements OnInit {
   }
 
  async ngOnInit() {
-  this.fetchData = this.fetchData.bind(this)
-
     const user = this.authUser.userValue
     for(let i=0; i<user?.uuid_mention.length;i++){
       let mention = await this.serviceMention.getData(user?.uuid_mention[i]).toPromise()
       this.allMention.push(mention)
           
     }
-
 
     for(let i=0; i<this.listOfSemester.length; i++){
       this.semesterTitles.push(
@@ -128,19 +125,28 @@ export class InscriptionComponent implements OnInit {
     }
     
     this.allYears = await this.serviceYears.getDataPromise().toPromise()
-    this.testStorage('collegeYear', this.allYears[0].title)
-  
-    this.allJourney = await this.serviceJourney.getDataByMention(localStorage.getItem(this.keyMention)).toPromise()
+    
+    if(this.testStorage(this.keyMention, this.allMention[0].uuid) && 
+    this.testStorage(this.keyYear, this.allYears[0].title)){
+      let uuidMention = localStorage.getItem(this.keyMention)
+      if(uuidMention !== null){
+        this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()}
+        this.fetchData = this.fetchData.bind(this)
+        this.isLoading = true
+    }
+
   }
 
   
-  testStorage(key: string, value: string){
+  testStorage(key: string, value: string): boolean{
     if(localStorage.getItem(key)){
-      this.form.get(key)?.setValue(localStorage.getItem(key))
+      this.form.get(key.substring(CODE.length))?.setValue(localStorage.getItem(key))
     }else{
       localStorage.setItem(key, value)
-      this.form.get(key)?.setValue(localStorage.getItem(key))
+      this.form.get(key.substring(CODE.length))?.setValue(localStorage.getItem(key))
     }
+    console.log(key.substring(CODE.length), value)
+    return true
   }
 
   fetchData(params?: QueryParams){
@@ -150,6 +156,7 @@ export class InscriptionComponent implements OnInit {
     }
     return this.service.getDataObservable(parseQueryParams(params,otherParams))
   }
+
   showConfirm(name: string, numSelect: string): void{
     this.confirmModal = this.modal.confirm({
       nzTitle: "Voulez-vous supprimer "+name+"?",
@@ -165,7 +172,7 @@ export class InscriptionComponent implements OnInit {
   }
 
   onEdit(row: any) {
-    this.showModalEdit(row.uuid);
+    this.showModalEdit(row.num_select);
   }
 
   onAdd() {
@@ -173,10 +180,11 @@ export class InscriptionComponent implements OnInit {
   }
   
   showModalEdit(numSelect: string): void{
+    console.log(numSelect)
     this.isEdit = true
-    localStorage.setItem('numSelect', numSelect)
-    localStorage.setItem("uuid_mention", this.form.get("mention")?.value)
-    localStorage.setItem("college_years", this.form.get("collegeYear")?.value)
+    localStorage.setItem(this.keyNum, numSelect)
+    localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)
+    localStorage.setItem(this.keyYear, this.form.get(this.keyYear.substring(CODE.length))?.value)
     this.router.navigate(['/user/inscription_add'])
   }
 
@@ -186,15 +194,17 @@ export class InscriptionComponent implements OnInit {
   }
 
   getAllStudents(): void{
-    if(this.form.get(this.keyYear)?.value && this.form.get(this.keyMention)?.value){this.datatable.fetchData()
+    if(this.form.get(this.keyYear.substring(CODE.length))?.value && 
+    this.form.get(this.keyMention.substring(CODE.length))?.value && this.isLoading){
+      localStorage.setItem(this.keyYear, this.form.get(this.keyYear.substring(CODE.length))?.value)
+      localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)
+      this.datatable.fetchData()
     }
   }
 
   addStudent():void{
-    localStorage.setItem("mention", this.form.get("mention")?.value)
-    localStorage.setItem("collegeYear", this.form.get("collegeYear")?.value)
+    localStorage.setItem(this.keyNum, '')
     this.router.navigate(['/user/inscription_add'])
-    localStorage.setItem('numSelect', '')
   }
 
   handleOk(): void{

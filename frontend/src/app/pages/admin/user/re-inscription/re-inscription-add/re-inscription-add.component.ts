@@ -13,18 +13,20 @@ import { UserService } from '../../user.service';
 import { Router } from '@angular/router';
 import { AncienStudent } from '@app/models/student';
 import { HomeService } from '../../../home/home.service';
+import { ReInscriptionService } from '../re-inscription.service';
+import { JourneyService } from '@app/pages/admin/home/journey/journey.service';
+import { MentionService } from '@app/pages/admin/home/mention/mention.service';
+
+const CODE = "reinscription"
 const BASE_URL = environment.authApiURL;
+
+
 @Component({
   selector: 'app-re-inscription-add',
   templateUrl: './re-inscription-add.component.html',
   styleUrls: ['./re-inscription-add.component.less']
 })
 export class ReInscriptionAddComponent implements OnInit {
-  private headers =  new HttpHeaders({
-    'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
-  })
-
 
   licence = [{label:"S1", value:"S1", checked:false, disabled:false}, {label:"S2", value:"S2",checked:false, disabled:false}, 
                  {label:"S3", value:"S3",checked:false, disabled:false},{label:"S4", value:"S4",checked:false, disabled:false}, 
@@ -51,9 +53,12 @@ export class ReInscriptionAddComponent implements OnInit {
   typeSex = typeSex
   typeEtudiant = typeEtudiant
   typeNation = typeNation
-  options = {
-    headers: this.headers
-  }
+  isReady: boolean = false
+
+  keyMention = CODE+"mention"
+  keyYear = CODE+"collegeYear"
+  keyNum = CODE+"numCarte"
+
   defaultValue = {
       licence: this.licence,
       master1: this.master_1, 
@@ -83,7 +88,9 @@ export class ReInscriptionAddComponent implements OnInit {
     private modal: NzModalService, 
     private fb: FormBuilder, 
     private service: UserService,
-    private homeService: HomeService, 
+    private reinscriptionService: ReInscriptionService,
+    private serviceJourney: JourneyService,
+    private serviceMention: MentionService, 
     public router: Router ) {
 
     this.form = this.fb.group({
@@ -142,78 +149,58 @@ export class ReInscriptionAddComponent implements OnInit {
    }
 
   async ngOnInit(){
-    let options = {
-      headers: this.headers
-    }
-    const numCarte = localStorage.getItem('numCarte')
+    const numCarte = localStorage.getItem(this.keyNum)
     if(numCarte && numCarte.length>0){
       this.isEdit = true
-      this.http.get<AncienStudent>(`${BASE_URL}/student/num_carte?num_carte=`+localStorage.getItem("numCarte"), options).subscribe(
-        data =>{ 
-          this.form.get('numCarte')?.setValue(data.num_carte)
-          this.form.get('mention')?.setValue(data.mention)
-          this.form.get('journey')?.setValue(data.journey.uuid)
-          this.form.get('firstName')?.setValue(data.first_name)
-          this.form.get('lastName')?.setValue(data.last_name)
-          this.form.get('address')?.setValue(data.address)
-          this.form.get('infSemester')?.setValue(data.inf_semester)
-          this.form.get('supSemester')?.setValue(data.sup_semester)
-          this.form.get('dateBirth')?.setValue(data.date_birth)
-          this.form.get('placeBirth')?.setValue(data.place_birth)
-          this.form.get('sex')?.setValue(data.sex)
-          this.form.get('dateCin')?.setValue(data.date_cin)
-          this.form.get('placeCin')?.setValue(data.place_cin)
-          this.form.get('numCin')?.setValue(data.num_cin)
-          this.form.get('sex')?.setValue(data.sex)
-          this.form.get('dateCin')?.setValue(data.date_cin)
-          this.form.get('placeCin')?.setValue(data.place_cin)
-          this.form.get('mean')?.setValue(data.mean)
-          this.form.get('baccYear')?.setValue(data.baccalaureate_years)
-          this.form.get('type')?.setValue(data.type)
-          this.form.get('nation')?.setValue(data.nation)
-          this.form.get('phone')?.setValue(data.telephone)
-          this.form.get('receipt')?.setValue(data.receipt.num)
-          this.formDialog.get('numReceipt')?.setValue(data.receipt.num)
-          this.formDialog.get('dateReceipt')?.setValue(data.receipt.date)
-          this.formDialog.get('priceRigth')?.setValue(data.receipt.price)
-          if (data.photo){
-            this.url = `${BASE_URL}/student/photo?name_file=`+data.photo
-          }
-          console.error(data.receipt)
-        },
-        error => console.error("error as ", error)
-      );
+      let  data = await this.reinscriptionService.getStudentByNumCarte(numCarte).toPromise()
+      this.form.get('numCarte')?.setValue(data.num_carte)
+      this.form.get('mention')?.setValue(data.mention)
+      this.form.get('journey')?.setValue(data.journey.uuid)
+      this.form.get('firstName')?.setValue(data.first_name)
+      this.form.get('lastName')?.setValue(data.last_name)
+      this.form.get('address')?.setValue(data.address)
+      this.form.get('infSemester')?.setValue(data.inf_semester)
+      this.form.get('supSemester')?.setValue(data.sup_semester)
+      this.form.get('dateBirth')?.setValue(data.date_birth)
+      this.form.get('placeBirth')?.setValue(data.place_birth)
+      this.form.get('sex')?.setValue(data.sex)
+      this.form.get('dateCin')?.setValue(data.date_cin)
+      this.form.get('placeCin')?.setValue(data.place_cin)
+      this.form.get('numCin')?.setValue(data.num_cin)
+      this.form.get('sex')?.setValue(data.sex)
+      this.form.get('dateCin')?.setValue(data.date_cin)
+      this.form.get('placeCin')?.setValue(data.place_cin)
+      this.form.get('mean')?.setValue(data.mean)
+      this.form.get('baccYear')?.setValue(data.baccalaureate_years)
+      this.form.get('type')?.setValue(data.type)
+      this.form.get('nation')?.setValue(data.nation)
+      this.form.get('phone')?.setValue(data.telephone)
+      this.form.get('receipt')?.setValue(data.receipt.num)
+      this.formDialog.get('numReceipt')?.setValue(data.receipt.num)
+      this.formDialog.get('dateReceipt')?.setValue(data.receipt.date)
+      this.formDialog.get('priceRigth')?.setValue(data.receipt.price)
+      if (data.photo){
+        this.url = `${BASE_URL}/student/photo?name_file=`+data.photo
+      }
+    }
+    else{
+      this.isEdit=false
+    }
+    let uuidMention = localStorage.getItem(this.keyMention.substring(CODE.length))
+    if (uuidMention !== null){
+      this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()
+      this.allMention.push(await this.serviceMention.getData(uuidMention).toPromise())
+      console.log(this.allMention)
+      this.isReady = true
     }
 
-    this.http.get<Mention>(`${BASE_URL}/mentions/`+localStorage.getItem("uuid_mention"), options).subscribe(
-      data =>{ 
-        this.allMention.push(data),
-        this.form.get("mention")?.setValue(data.uuid)
-      },
-      error => console.error("error as ", error)
-    );
-
-    this.allJourney = await this.homeService.getAllJourney(localStorage.getItem('mention')).toPromise()
-
     this.http.get<Droit[]>(`${BASE_URL}/droit/by_mention?uuid_mention=`+
-      localStorage.getItem("uuid_mention")+'&year='+localStorage.getItem("college_years"), options).subscribe(
+      localStorage.getItem("mention")+'&year='+localStorage.getItem("collegeYear")).subscribe(
       data =>{ 
         this.allPrice=data
       },
       error => console.error("error as ", error)
     );
-  }
-
-  showConfirm(name?: string, uuid?: string): void{
-    this.confirmModal = this.modal.confirm({
-      nzTitle: "Voulez-vous supprimer "+name+"?",
-      nzOnOk: () => {
-        this.http.delete<any>(`${BASE_URL}/mentions/?uuid=`+uuid, this.options).subscribe(
-          data => this.allYear = data,
-          error => console.error("error as ", error)
-        );
-      }
-    })
   }
 
   validReceipt(): void{
@@ -235,7 +222,7 @@ export class ReInscriptionAddComponent implements OnInit {
     }
   }
   
-  submitForm(): void {
+  async submitForm() {
     if (this.form.valid) {
       const title = this.form.value.title
       const mean = this.form.value.mean
@@ -246,15 +233,10 @@ export class ReInscriptionAddComponent implements OnInit {
       formData.append("uploaded_file", this.uploadedImage)
       console.log(this.url)
       if(this.url !== "assets/images/profil.png"){
-        this.http.post<any>(`${BASE_URL}/student/upload_photo/?num_carte=`+this.form.value.numCarte,formData, this.options).subscribe(
-          data =>{ 
-            console.error(data)
-            if(data.filename){
-              photo = data.filename
-            }
-          },
-          error => console.error("error as ", error)
-        );
+        let data = await this.service.uploadPhoto(this.form, formData).toPromise()
+       if (data.filename){
+        photo = data.filename
+       }
       }
       const body = 
         {
@@ -287,13 +269,9 @@ export class ReInscriptionAddComponent implements OnInit {
           inf_semester: this.form.value.infSemester,
           sup_semester: this.form.value.supSemester
         }
-        console.error(body)
-          this.http.post<any>(`${BASE_URL}/student/ancien`,body, this.options).subscribe(
-            data => {
-              this.router.navigate(['/user/reinscription'])},
-            error => console.error("error as ", error)
-          )
-      
+        await this.reinscriptionService.addData( body).toPromise()
+        this.router.navigate(['/user/inscription'])
+      this.isConfirmLoading = false
       this.isvisible = false,
       this.isConfirmLoading = false
     } else {
@@ -314,21 +292,6 @@ export class ReInscriptionAddComponent implements OnInit {
       this.formDialog.reset()
     }
   }
-
-  showModalEdit(uuid: string): void{
-    this.isEdit = true
-    this.uuid = uuid
-    this.http.get<any>(`${BASE_URL}/college_year/`+uuid, this.options).subscribe(
-      data => {
-        console.error(data)
-        this.form.get('title')?.setValue(data.title),
-        this.form.get('mean')?.setValue(data.mean)
-    },
-      error => console.error("error as ", error)
-    );
-    this.isvisible = true
-  }
-
 
   handleCancel(): void{
     this.isvisible = false
@@ -454,48 +417,39 @@ export class ReInscriptionAddComponent implements OnInit {
       return text
     }
 
-    getByNumCarte(): void{
-      if(this.form.get('numCarte')?.value){
-        this.isEdit = true
-        this.http.get<AncienStudent>(`${BASE_URL}/student/num_carte?num_carte=`+this.form.get('numCarte')?.value, this.options).subscribe(
-          data =>{ 
-            this.form.get('numCarte')?.setValue(data.num_carte)
-            this.form.get('mention')?.setValue(data.mention)
-            this.form.get('journey')?.setValue(data.journey.uuid)
-            this.form.get('firstName')?.setValue(data.first_name)
-            this.form.get('lastName')?.setValue(data.last_name)
-            this.form.get('address')?.setValue(data.address)
-            this.form.get('infSemester')?.setValue(data.inf_semester)
-            this.form.get('supSemester')?.setValue(data.sup_semester)
-            this.form.get('dateBirth')?.setValue(data.date_birth)
-            this.form.get('placeBirth')?.setValue(data.place_birth)
-            this.form.get('sex')?.setValue(data.sex)
-            this.form.get('dateCin')?.setValue(data.date_cin)
-            this.form.get('placeCin')?.setValue(data.place_cin)
-            this.form.get('numCin')?.setValue(data.num_cin)
-            this.form.get('sex')?.setValue(data.sex)
-            this.form.get('dateCin')?.setValue(data.date_cin)
-            this.form.get('placeCin')?.setValue(data.place_cin)
-            this.form.get('mean')?.setValue(data.mean)
-            this.form.get('baccYear')?.setValue(data.baccalaureate_years)
-            this.form.get('type')?.setValue(data.type)
-            this.form.get('nation')?.setValue(data.nation)
-            this.form.get('phone')?.setValue(data.telephone)
-            this.form.get('receipt')?.setValue(data.receipt.num)
-            this.formDialog.get('numReceipt')?.setValue(data.receipt.num)
-            this.formDialog.get('dateReceipt')?.setValue(data.receipt.date)
-            this.formDialog.get('priceRigth')?.setValue(data.receipt.price)
-            if (data.photo){
-              this.url = `${BASE_URL}/student/photo?name_file=`+data.photo
-            }
-            console.error(data.receipt)
-          },
-          error => console.error("error as ", error)
-        );
-      }
-  
+    async getByNumCarte(){
+      const numCarte = this.form.get('numCarte')?.value
+      if(numCarte && numCarte.length>0){
+        let  data = await this.reinscriptionService.getStudentByNumCarte(numCarte).toPromise()
+        this.form.get('numCarte')?.setValue(data.num_carte)
+        this.form.get('mention')?.setValue(data.mention)
+        this.form.get('journey')?.setValue(data.journey.uuid)
+        this.form.get('firstName')?.setValue(data.first_name)
+        this.form.get('lastName')?.setValue(data.last_name)
+        this.form.get('address')?.setValue(data.address)
+        this.form.get('infSemester')?.setValue(data.inf_semester)
+        this.form.get('supSemester')?.setValue(data.sup_semester)
+        this.form.get('dateBirth')?.setValue(data.date_birth)
+        this.form.get('placeBirth')?.setValue(data.place_birth)
+        this.form.get('sex')?.setValue(data.sex)
+        this.form.get('dateCin')?.setValue(data.date_cin)
+        this.form.get('placeCin')?.setValue(data.place_cin)
+        this.form.get('numCin')?.setValue(data.num_cin)
+        this.form.get('sex')?.setValue(data.sex)
+        this.form.get('dateCin')?.setValue(data.date_cin)
+        this.form.get('placeCin')?.setValue(data.place_cin)
+        this.form.get('mean')?.setValue(data.mean)
+        this.form.get('baccYear')?.setValue(data.baccalaureate_years)
+        this.form.get('type')?.setValue(data.type)
+        this.form.get('nation')?.setValue(data.nation)
+        this.form.get('phone')?.setValue(data.telephone)
+        this.form.get('receipt')?.setValue(data.receipt.num)
+        this.formDialog.get('numReceipt')?.setValue(data.receipt.num)
+        this.formDialog.get('dateReceipt')?.setValue(data.receipt.date)
+        this.formDialog.get('priceRigth')?.setValue(data.receipt.price)
+        if (data.photo){
+          this.url = `${BASE_URL}/student/photo?name_file=`+data.photo
+        }
     }
-    
-
   }
-
+}

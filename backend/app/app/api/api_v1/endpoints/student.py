@@ -16,7 +16,7 @@ from app.utils import create_num_carte, find_in_list
 router = APIRouter()
 
 
-@router.get("/ancien", response_model=List[schemas.AncienStudent])
+@router.get("/ancien/", response_model=List[schemas.AncienStudent])
 def read_ancien_student(
         *,
         db: Session = Depends(deps.get_db),
@@ -49,7 +49,7 @@ def read_ancien_student(
     return all_student
 
 
-@router.get("/new/all", response_model=List[schemas.SelectStudentBase])
+@router.get("/new/all/", response_model=List[schemas.SelectStudentBase])
 def read_new_student(
         *,
         db: Session = Depends(deps.get_db),
@@ -71,7 +71,7 @@ def read_new_student(
             all_student.append(on_student)
     return all_student
 
-@router.get("/new_inscrit", response_model=List[schemas.NewStudent])
+@router.get("/new_inscrit/", response_model=List[schemas.NewStudent])
 def read_new_student(
         *,
         db: Session = Depends(deps.get_db),
@@ -104,7 +104,7 @@ def read_new_student(
                 all_student.append(on_student)
     return all_student
 
-@router.post("/ancien", response_model=List[schemas.AncienStudent])
+@router.post("/ancien/", response_model=schemas.AncienStudent)
 def create_ancien_student(
         *,
         db: Session = Depends(deps.get_db),
@@ -147,7 +147,7 @@ def create_ancien_student(
     return student
 
 
-@router.post("/new", response_model=List[schemas.SelectStudentBase])
+@router.post("/new/", response_model=schemas.SelectStudentBase)
 def create_new_student(
         *,
         db: Session = Depends(deps.get_db),
@@ -175,7 +175,7 @@ def create_new_student(
     return student
 
 
-@router.put("/new", response_model=List[schemas.NewStudent])
+@router.put("/new/",  response_model=schemas.NewStudent)
 def update_student_selected(
         *,
         db: Session = Depends(deps.get_db),
@@ -240,7 +240,7 @@ def update_student_selected(
     return student
 
 
-@router.get("/num_carte", response_model=schemas.AncienStudent)
+@router.get("/num_carte/", response_model=schemas.AncienStudent)
 def read_student_by_num_carte(
         *,
         db: Session = Depends(deps.get_db),
@@ -265,7 +265,7 @@ def read_student_by_num_carte(
             return stud
 
 
-@router.get("/new_selected", response_model=schemas.NewStudent)
+@router.get("/new_selected/", response_model=schemas.NewStudent)
 def read_student_by_num_select(
         *,
         db: Session = Depends(deps.get_db),
@@ -295,7 +295,7 @@ def read_student_by_num_select(
             return stud
     return student
 
-@router.get("/new_num_carte", response_model=schemas.NewStudent)
+@router.get("/new_num_carte/", response_model=schemas.NewStudent)
 def read_student_by_num_carte(
         *,
         db: Session = Depends(deps.get_db),
@@ -320,7 +320,7 @@ def read_student_by_num_carte(
                 student.receipt = receipt
     return student
 
-@router.get("/new", response_model=schemas.NewStudent)
+@router.get("/new/", response_model=schemas.NewStudent)
 def read_student_by_num_select(
         *,
         db: Session = Depends(deps.get_db),
@@ -336,7 +336,7 @@ def read_student_by_num_select(
     return student
 
 
-@router.get("/ancien/by_journey", response_model=List[schemas.AncienStudent])
+@router.get("/ancien/by_journey/", response_model=List[schemas.AncienStudent])
 def read_student_by_journey(
         *,
         db: Session = Depends(deps.get_db),
@@ -354,7 +354,7 @@ def read_student_by_journey(
     return student
 
 
-@router.get("/new/by_journey", response_model=List[schemas.NewStudent])
+@router.get("/new/by_journey/", response_model=List[schemas.NewStudent])
 def read_student_by_journey(
         *,
         db: Session = Depends(deps.get_db),
@@ -372,7 +372,7 @@ def read_student_by_journey(
     return student
 
 
-@router.get("/ancien/by_sup_semester_and_mention", response_model=List[schemas.AncienStudent])
+@router.get("/ancien/by_sup_semester_and_mention/", response_model=List[schemas.AncienStudent])
 def read_student_by_sup_semester_and_mention(
         *,
         db: Session = Depends(deps.get_db),
@@ -398,7 +398,7 @@ def read_student_by_sup_semester_and_mention(
     return all_student
 
 
-@router.delete("/ancien", response_model=List[schemas.AncienStudent])
+@router.delete("/ancien/", response_model=List[schemas.AncienStudent])
 def delete_student(
         *,
         db: Session = Depends(deps.get_db),
@@ -420,7 +420,7 @@ def delete_student(
     return student
 
 
-@router.delete("/new", response_model=List[schemas.NewStudent])
+@router.delete("/new/", response_model=List[schemas.NewStudent])
 def delete_student(
         *,
         db: Session = Depends(deps.get_db),
@@ -442,9 +442,11 @@ def delete_student(
     return student
 
 
-@router.get("/photo")
+@router.get("/photo/")
 def get_file(name_file: str):
-    return FileResponse(path=getcwd() + "/files/photos/" + name_file)
+    path = getcwd() + "/files/photos/" + name_file
+    if os.path.exists(path):
+        return FileResponse(path=path)
 
 
 @router.post("/upload_photo/")

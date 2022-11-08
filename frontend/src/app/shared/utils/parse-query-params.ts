@@ -18,7 +18,6 @@ export function parseQueryParams(params?: QueryParams, othserParams?: otherQuery
 
     if (othserParams) {
       for (const [key, value] of Object.entries(othserParams)){
-        console.log(key, value)
         _params = _params.append(key, value);
       }
   }

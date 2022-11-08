@@ -28,26 +28,30 @@ export class JourneyService {
   }
 
   getDataPromise(){
-    return this.http.get<Journey[]>(`${BASE_URL}/journey/`,this.options);
+    return this.http.get<Journey[]>(`${BASE_URL}/journey/`,{headers: this.headers});
   }
 
-  getDataByMention(uuid: string | null){
-    return this.http.get<Journey[]>(`${BASE_URL}/journey/by_uuid_mention/?uuid_mention=`+uuid,this.options);
+  getDataByMention(uuid: string){
+    let otherParams = new HttpParams().append('uuid_mention', uuid)
+    return this.http.get<Journey[]>(`${BASE_URL}/journey/by_uuid_mention/`,{headers: this.headers, params: otherParams});
   }
 
   deletData(uuid: string):Promise<Journey[]> {
-    return this.http.delete<Journey[]>(`${BASE_URL}/roles/?uuid=`+uuid, this.options).toPromise()
+    let otherParams = new HttpParams().append('uuid', uuid)
+    return this.http.delete<Journey[]>(`${BASE_URL}/journey/`, {headers: this.headers, params: otherParams}).toPromise()
   }
 
   getData(uuid: string){
-    return this.http.get<Journey>(`${BASE_URL}/journey/by_uuid/`+uuid, this.options)
+    let otherParams = new HttpParams().append('uuid', uuid)
+    return this.http.get<Journey>(`${BASE_URL}/journey/by_uuid/`, {headers: this.headers, params: otherParams})
   }
 
   updateData(uuid: string, body: any){
-    return this.http.put<Journey[]>(`${BASE_URL}/journey/?uuid=`+uuid, body, this.options)
+    let otherParams = new HttpParams().append('uuid', uuid)
+    return this.http.put<Journey[]>(`${BASE_URL}/journey/`, body, {headers: this.headers, params: otherParams})
   }
 
   addData(body: any){
-    return this.http.post<Journey[]>(`${BASE_URL}/journey/`,body, this.options)
+    return this.http.post<Journey[]>(`${BASE_URL}/journey/`,body, {headers: this.headers})
   }
 }

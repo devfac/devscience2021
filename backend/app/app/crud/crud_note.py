@@ -85,35 +85,35 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.close()
         return out
 
-    def read_note_by_moyenne_and_credit_equals(self, schema: str, semester: str, journey: str, session: str,
-                                               moyenne: float, credit: int):
+    def read_note_by_mean_and_credit_equals(self, schema: str, semester: str, journey: str, session: str,
+                                               mean: float, credit: int):
         metadata = MetaData(schema=schema, bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
         result = conn.execute(
-            f"SELECT num_carte,moyenne,credit FROM {table} WHERE moyenne >= {moyenne} and credit = {credit}")
+            f"SELECT num_carte,mean,credit FROM {table} WHERE mean >= {mean} and credit = {credit}")
         out = result.fetchall()
         conn.close()
         return out
 
-    def read_note_by_moyenne_and_credit_sup(self, schema: str, semester: str, journey: str, session: str,
-                                            moyenne: float, credit: int):
+    def read_note_by_mean_and_credit_sup(self, schema: str, semester: str, journey: str, session: str,
+                                            mean: float, credit: int):
         metadata = MetaData(schema=schema, bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
         result = conn.execute(
-            f"SELECT num_carte,moyenne,credit FROM {table} WHERE moyenne >= {moyenne} and credit >= {credit}")
+            f"SELECT num_carte,mean,credit FROM {table} WHERE mean >= {mean} and credit >= {credit}")
         out = result.fetchall()
         conn.close()
         return out
 
-    def read_note_by_moyenne_and_credit_inf(self, schema: str, semester: str, journey: str, session: str,
-                                            moyenne: float, credit: int):
+    def read_note_by_mean_and_credit_inf(self, schema: str, semester: str, journey: str, session: str,
+                                            mean: float, credit: int):
         metadata = MetaData(schema=schema, bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
         result = conn.execute(
-            f"SELECT num_carte,moyenne,credit FROM {table} WHERE moyenne >= {moyenne} and credit <= {credit}")
+            f"SELECT num_carte,mean,credit FROM {table} WHERE mean >= {mean} and credit <= {credit}")
         out = result.fetchall()
         conn.close()
         return out
@@ -136,11 +136,11 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.close()
         return out
 
-    def read_note_by_moyenne(self, schema: str, semester: str, journey: str, session: str, moyenne: float):
+    def read_note_by_mean(self, schema: str, semester: str, journey: str, session: str, mean: float):
         metadata = MetaData(schema=schema, bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
-        result = conn.execute(f"SELECT num_carte,mean FROM {table} WHERE mean >= {moyenne}")
+        result = conn.execute(f"SELECT num_carte,mean FROM {table} WHERE mean >= {mean}")
         out = result.fetchall()
         conn.close()
         return out
@@ -201,7 +201,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.execute(dele)
         conn.close()
 
-    def read_ue_moyenne(self, schema: str, semester: str, journey: str, session: str, num_carte: str,
+    def read_ue_mean(self, schema: str, semester: str, journey: str, session: str, num_carte: str,
                         obj_in: str) -> Any:
         metadata = MetaData(schema=schema, bind=engine)
         conn = engine.connect()

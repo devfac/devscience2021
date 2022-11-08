@@ -84,6 +84,7 @@ export class MentionComponent implements OnInit {
   fetchData(params?: QueryParams){
     return this.service.getDataObservable(parseQueryParams(params))
   }
+  
   showConfirm(name: string, uuid: string): void{
     this.confirmModal = this.modal.confirm({
       nzTitle: "Voulez-vous supprimer "+name+"?",

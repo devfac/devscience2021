@@ -1,6 +1,7 @@
 import { NzTableSortOrder, NzTableSortFn, NzTableFilterList, NzTableFilterFn } from "ng-zorro-antd/table"
 import { Journey } from "./journey"
 import { Receipt } from "./receipt"
+import { TableHeader } from "./table"
 
 export interface AncienStudent{
     uuid: string,
@@ -17,7 +18,6 @@ export interface AncienStudent{
     mention: string,
     actual_years: string,
     num_carte: string,
-    num_baccalaureat: string,
     baccalaureate_years: string,
     mean: number,
     inf_semester: string,

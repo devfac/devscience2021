@@ -116,7 +116,7 @@ def get_by_uuid(
     return ue
 
 
-@router.get("/get_by_class"
+@router.get("/get_by_class/"
             "", response_model=List[schemas.MatierUE])
 def get_by_class(
         *,
@@ -144,7 +144,7 @@ def get_by_class(
     return list_ue
 
 
-@router.get("/get_by_class_with_ec"
+@router.get("/get_by_class_with_ec/"
             "", response_model=List[schemas.MatierUEEC])
 def get_by_class(
         *,

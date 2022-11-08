@@ -105,20 +105,10 @@ export class EcComponent implements OnInit, AfterContentInit {
   async ngOnInit(){
     this.fetchData = this.fetchData.bind(this)
 
-    let journey: Journey[] = await this.serviceJourney.getDataPromise().toPromise()
-    this.testStorage('journey', journey[0].uuid)
-    
-    for(let i=0; i<journey.length; i++){
-      this.titles.push(
-        {
-          text: journey[i].abbreviation, value: journey[i].abbreviation
-        }
-      )
-    }
-    localStorage.setItem('filter', JSON.stringify(this.titles))
-
     this.allMention = await this.serviceMention.getDataPromise().toPromise()
     this.testStorage('mention', this.allMention[0].uuid)
+
+    this.allJourney = await this.serviceJourney.getDataByMention(localStorage.getItem('mention')!).toPromise()
     
     for(let i=0; i<this.listOfSemester.length; i++){
       this.semesterTitles.push(

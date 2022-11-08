@@ -54,7 +54,6 @@ class CRUDTeachingUnit(CRUDBase[TeachingUnit, MatierUECreate, MatierUEUpdate]):
             uuid_journey: str,
             semester: str,
     ) -> List[TeachingUnit]:
-        if semester.upper() == 'S1':
             return (
                 db.query(TeachingUnit)
                 .filter(and_(

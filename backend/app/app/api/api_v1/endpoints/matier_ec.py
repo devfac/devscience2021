@@ -35,7 +35,7 @@ def read_ec(
         list_ec.append(ec)
     return list_ec
 
-@router.get("/get_by_class"
+@router.get("/get_by_class/"
             "", response_model=List[schemas.MatierEC])
 def get_by_class(
         *,
@@ -64,7 +64,7 @@ def get_by_class(
 
 
 
-@router.get("/value_ue/{value_ue}", response_model=List[schemas.MatierEC])
+@router.get("/value_ue/", response_model=List[schemas.MatierEC])
 def read_by_value_ue(
         *,
         db: Session = Depends(deps.get_db),
@@ -89,7 +89,7 @@ def read_by_value_ue(
     return list_ec
 
 
-@router.get("/{value}", response_model=schemas.MatierEC)
+@router.get("/by_value/", response_model=schemas.MatierEC)
 def read_by_value(
         *,
         db: Session = Depends(deps.get_db),
@@ -106,7 +106,7 @@ def read_by_value(
     return constituent_element
 
 
-@router.get("/by_uuid/", response_model=schemas.MatierEC)
+@router.get("/by_uuid", response_model=schemas.MatierEC)
 def read_by_uuid(
         *,
         db: Session = Depends(deps.get_db),

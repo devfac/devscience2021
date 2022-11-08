@@ -75,7 +75,7 @@ def update_college_year(
     return crud.college_year.get_multi(db=db)
 
 
-@router.get("/{uuid}", response_model=schemas.CollegeYear)
+@router.get("/by_uuid", response_model=schemas.CollegeYear)
 def read_college_year(
         *,
         db: Session = Depends(deps.get_db),

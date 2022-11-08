@@ -88,7 +88,7 @@ def update_journey(
     return list_journey
 
 
-@router.get("/by_uuid/{uuid}", response_model=schemas.Journey)
+@router.get("/by_uuid/", response_model=schemas.Journey)
 def read_journey_by_uuid(
         *,
         db: Session = Depends(deps.get_db),
@@ -131,7 +131,7 @@ def read_journey_by_mention(
     return list_journey
 
 
-@router.delete("/{uuid}", response_model=List[schemas.Journey])
+@router.delete("/", response_model=List[schemas.Journey])
 def delete_journey(
         *,
         db: Session = Depends(deps.get_db),

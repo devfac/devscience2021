@@ -43,124 +43,72 @@
               </nz-input-group>
             </nz-form-control>
           </nz-form-item>
-
       </div>
-  <div class="header">
-
-    <nz-select
-    [ngModel]="data"
-    formControlName="filter"
-    [nzPlaceHolder]="'admin.home.note.filter' | translate"
-    (ngModelChange)="changeFilter()"
-    [nzAllowClear]="true"
-    style="width:60% ;"
-    >
-    <nz-option *ngFor="let item of allJourney"
-        [nzLabel]="item.abbreviation"
-        [nzValue]="item.uuid"
-    >
-    </nz-option>
-  </nz-select>
-    <div class="header-text">
-        <h3>
-            {{'admin.home.note.title' | translate }}</h3>
-    </div>
-    <div class="button-text">
-        <button nz-button nzType="primary" (click)="addStudent()">
-            <span nz-icon nzType="plus" nzTheme="outline"></span>
-            {{'admin.user.create' | translate | uppercase}}
-        </button>
-        <nz-divider nzType="vertical"></nz-divider>
-        <button nz-button nzType="primary" (click)="showModal()">
-          <span nz-icon nzType="printer" nzTheme="outline"></span>
-      </button>
-    </div>
-  </div>
-
 </form>
-  <nz-table #studentList [nzData]="listOfData" nzSize="small" [nzPageSize]="10" nzBordered 
-  [nzScroll]="{ x: 200 + 'px' }"> 
-      <thead>
-          <tr>
-            <tr>
-              <th *ngFor="let column of listOfColumns"
-              [nzSortOrder]="column.sortOrder"
-              [nzSortFn]="column.sortFn"
-              [nzSortDirections]="column.sortDirections"
-              [nzFilterMultiple]="column.filterMultiple"
-              [nzFilters]="column.listOfFilter"
-              [nzFilterFn]="column.filterFn"
-              > 
-            {{ column.name}}
-          </th>
-          </tr>
-      </thead>
-      <tbody>
-          <tr *ngFor="let data of studentList.data">
-              <td> {{data.num_carte}}</td>
-              <td> {{data.last_name}}</td>
-              <td> {{data.first_name}}</td>
-              <td> {{data.inf_semester}}</td>
-              <td> {{data.sup_semester}}</td>
-              <td> {{data.journey.abbreviation}}</td>
-              <td>
-                  <a nz-icon nzType="edit" nzTheme="fill" style="font-size: 20px; color: green;"  (click)="showModalEdit(data.num_carte)"></a>
-                  <nz-divider nzType="vertical"></nz-divider>
-                  <a nz-icon nzType="delete" nzTheme="fill" style="font-size: 20px; color: red;" (click)="showConfirm(data.first_name, data.num_carte)"></a>
-              </td>
-              
-          </tr>
-      </tbody>
-  </nz-table>
-  <nz-modal [(nzVisible)]="isvisible" 
-              nzTitle="{{'admin.home.journey.add_journey' | translate}}" 
-              (nzOnCancel)="handleCancel()" 
-              nzMask="true"
-              nzMaskClosable="false" >
+  
+<app-datatable-crud
+*ngIf="isLoading"
+[title]="'admin.product.product_list.title' | translate"
+[headers]="headers"
+[fetchDataFn]="fetchData"
+[width]="500"
+[actions]="actions"
+(delete)="onDelete($event)"
+(edit)="onEdit($event)"
+(add)="onAdd()"
+(download)="download()"
+[showPagination]="true"
+classNames="product-list-table"
+></app-datatable-crud>
+  <nz-modal   
+    [(nzVisible)]="isvisible" 
+    nzTitle="{{'admin.home.journey.add_journey' | translate}}" 
+    (nzOnCancel)="handleCancel()" 
+    nzMask="true"
+    nzMaskClosable="false" >
     <div *nzModalContent>
-        <form nz-form [formGroup]="formList" class="form" (ngSubmit)="download()" nzLayout="vertical">
-              <nz-form-item>
-                <nz-form-label nzRequired>
-                  {{ 'admin.home.journey.title' | translate }}
-                </nz-form-label>
-                <nz-form-control [nzErrorTip]="'admin.home.journey.journey_error' | translate">
-                  <nz-input-group>
+        <form nz-form [formGroup]="formList" class="form" (ngSubmit)="startDownload()" nzLayout="vertical">
+          <nz-form-item>
+            <nz-form-label nzRequired>
+              {{ 'admin.home.journey.title' | translate }}
+            </nz-form-label>
+            <nz-form-control [nzErrorTip]="'admin.home.journey.journey_error' | translate">
+              <nz-input-group>
+                <nz-select  style="width: 100%;"
+                    [ngModel]="data"
+                    formControlName="journey"
+                    (ngModelChange)="changeJourney()"
+                    [nzPlaceHolder]="'admin.home.journey.title' | translate"
+                    >
+                    <nz-option *ngFor="let item of allJourney"
+                        [nzLabel]="item.title"
+                        [nzValue]="item.uuid"
+                    >
+                    </nz-option>
+                </nz-select>
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label nzRequired>
+              {{ 'admin.home.journey.semester' | translate }}
+            </nz-form-label>
+            <nz-form-control [nzErrorTip]="'admin.home.journey.semester_error' | translate">
+                <nz-input-group>
                     <nz-select  style="width: 100%;"
+                        formControlName="semester"
                         [ngModel]="data"
-                        formControlName="journey"
-                        (ngModelChange)="changeJourney()"
-                        [nzPlaceHolder]="'admin.home.journey.title' | translate"
+                        [nzPlaceHolder]="'admin.home.journey.semester' | translate"
                         >
-                        <nz-option *ngFor="let item of allJourney"
-                            [nzLabel]="item.title"
-                            [nzValue]="item.uuid"
+                        <nz-option *ngFor="let item of listOfSemester"
+                            [nzLabel]="item"
+                            [nzValue]="item"
                         >
                         </nz-option>
                     </nz-select>
-                  </nz-input-group>
-                </nz-form-control>
-              </nz-form-item>
-
-              <nz-form-item>
-                <nz-form-label nzRequired>
-                  {{ 'admin.home.journey.semester' | translate }}
-                </nz-form-label>
-                <nz-form-control [nzErrorTip]="'admin.home.journey.semester_error' | translate">
-                    <nz-input-group>
-                        <nz-select  style="width: 100%;"
-                            formControlName="semester"
-                            [ngModel]="data"
-                            [nzPlaceHolder]="'admin.home.journey.semester' | translate"
-                            >
-                            <nz-option *ngFor="let item of listOfSemester"
-                                [nzLabel]="item"
-                                [nzValue]="item"
-                            >
-                            </nz-option>
-                        </nz-select>
-                    </nz-input-group>
-                </nz-form-control>
-              </nz-form-item>
+                </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
             <nz-spin [nzSpinning]="isConfirmLoading">
                 <button nz-button class="form-button form-margin" [nzType]="'primary'">
                   {{'general_data.save' | translate | uppercase}}

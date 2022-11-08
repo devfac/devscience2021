@@ -4,6 +4,8 @@ import { NgStyleInterface } from 'ng-zorro-antd/core/types';
 export enum TableHeaderType {
   NORMAL,
   ACTION,
+  RIGHT,
+  LEFT,
 }
 
 export interface TableHeader {
@@ -28,5 +30,6 @@ export interface TableActions {
   edit?: boolean;
   delete?: boolean;
   detail?: boolean;
-  restore?: boolean
+  restore?: boolean;
+  print?: boolean;
 }

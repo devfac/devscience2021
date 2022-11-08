@@ -78,7 +78,7 @@ def list_examen(
 
     students = crud.ancien_student.get_by_class_limit(db=db, uuid_journey=uuid_journey,uuid_mention=uuid_mention,
                                                       semester=semester,college_year=college_year,
-                                                      offset=skip, limit=limit)
+                                                      skip=skip, limit=limit)
     all_students = []
     if len(students) == 0:
         raise HTTPException(
@@ -128,7 +128,7 @@ def list_inscrit(
         raise HTTPException(status_code=400, detail=f" Mention not found.", )
 
     students = crud.ancien_student.get_by_class(db=db, uuid_journey=uuid_journey, uuid_mention=journey.uuid_mention,
-                                                semester=semester, college_year=college_year)
+                                                semester=semester, college_year=college_year, )
 
     all_student = []
     if students:

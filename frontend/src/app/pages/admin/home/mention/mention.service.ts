@@ -21,40 +21,40 @@ export class MentionService {
     'Accept': 'application/json',
     "Authorization": "Bearer "+localStorage.getItem("token")
   })
-
-  options = {
-    headers: this.headers
-  }
   
   getDataObservable(params_?: HttpParams): Observable<any> {
     return this.http.get<Mention[]>(`${BASE_URL}/mentions/`, {headers: this.headers, params: params_});
   }
 
   getDataPromise(){
-    return this.http.get<Mention[]>(`${BASE_URL}/mentions/`,this.options);
+    return this.http.get<Mention[]>(`${BASE_URL}/mentions/`,{headers: this.headers});
   }
 
   deletData(uuid: string):Promise<Mention[]> {
-    return this.http.delete<Mention[]>(`${BASE_URL}/mentions/`+uuid, this.options).toPromise()
+    let otherParams = new HttpParams().append('uuid', uuid)
+    return this.http.delete<Mention[]>(`${BASE_URL}/mentions/`, {headers: this.headers, params: otherParams}).toPromise()
   }
 
   getData(uuid: string){
-    return this.http.get<Mention>(`${BASE_URL}/mentions/`+uuid, this.options)
+    let otherParams = new HttpParams().append('uuid', uuid)
+    return this.http.get<Mention>(`${BASE_URL}/mentions/by_uuid/`, {headers: this.headers, params: otherParams})
   }
 
   updateData(uuid: string, body: any){
-    return this.http.put<Mention[]>(`${BASE_URL}/mentions/?uuid=`+uuid, body, this.options)
+    let otherParams = new HttpParams().append('uuid', uuid)
+    return this.http.put<Mention[]>(`${BASE_URL}/mentions/`, body, {headers: this.headers, params: otherParams})
   }
 
   addData(body: any){
-    return this.http.post<Mention[]>(`${BASE_URL}/mentions/`,body, this.options)
+    return this.http.post<Mention[]>(`${BASE_URL}/mentions/`,body, {headers: this.headers})
   }
    
   async getMentionUser(){
     let allMention: Mention[] = []
     const user = this.authService.userValue
     for(let i=0; i<user?.uuid_mention.length;i++){
-     allMention.push( await this.http.get<Mention>(`${BASE_URL}/mentions/`+user?.uuid_mention[i], this.options).toPromise())
+      let otherParams = new HttpParams().append('uuid_mention', user?.uuid_mention[i])
+     allMention.push( await this.http.get<Mention>(`${BASE_URL}/mentions/`, {headers: this.headers, params: otherParams}).toPromise())
     }
     return allMention
   }

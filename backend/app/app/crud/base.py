@@ -77,3 +77,44 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.delete(obj)
         db.commit()
         return obj
+
+    def dynamic_filter(self,db: Session, *,
+                       limit: int = 100, skip: int = 0,
+                       order_by: str = "title",
+                       order: str = "ASC",
+                       filter_condition: List
+                       ) -> ModelType:
+        """
+        eq for ==
+        lt for <
+        ge for >
+        in for _in
+        like for like
+        """
+        __query = db.query(self.model)
+        for raw in filter_condition:
+            try:
+                key, op, value = raw
+            except ValueError:
+                raise Exception(f'invalid filter {raw}')
+            column = getattr(self.model, key, None)
+            if not column:
+                raise Exception(f'invalid filter column {key}')
+            if op == 'in':
+                if isinstance(value, list):
+                    filt = column.in_(value)
+                else:
+                    filt = column.in_(value.split(','))
+            else:
+                try:
+                    attr = list(filter(lambda e: hasattr(column, e % op), ['%s', '%s_', '__%s__']))[0] % op
+                except IndexError:
+                    raise Exception(f'invalid filter operator {op}')
+                if value == 'null':
+                    value = None
+                filt = getattr(column, attr)(value)
+            __query = __query.filter(filt)
+        return( __query.order_by(text(f"{order_by} {order}"))
+                        .offset(skip)
+                        .limit(limit)
+                        .all())

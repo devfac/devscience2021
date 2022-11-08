@@ -14,8 +14,12 @@ import { Observable } from 'rxjs';
 import { first } from 'rxjs/operators';
 import * as _ from 'lodash';
 import { Location } from '@angular/common';
-import { QueryParams } from '@app/models/query';
+import { otherQueryParams, QueryParams } from '@app/models/query';
 import { TableHeader, TableActions, TableHeaderType } from '@app/models/table';
+import { Ue } from '@app/models/ue';
+import { Ec } from '@app/models/ec';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-datatable-crud',
@@ -27,12 +31,15 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   @Input() headers: TableHeader[] = [];
   @Input() headerSpan: TableHeader[] = [];
   @Input() headerData: TableHeader[] = [];
-  @Input() childrenDataHeader: TableHeader[] = [];
-  @Input() childrenDataSpan: TableHeader[] = [];
-  @Input()
-  width!: number;
+  @Input() matierUe: Ue[] = [];
+  @Input() matierEc: Ec[] = [];
+  @Input() width!: number;
   @Input() title: string = '';
+  @Input() session: string = '';
+  @Input() portList: any[] = [];
   @Input() isSelectable: boolean = false;
+  @Input() permission: boolean = true;
+  @Input() isNote: boolean = false
   @Input() selectedId: number | null = null;
   @Input() searchTemplate?: TemplateRef<any>;
   @Input() showPagination: boolean = true;
@@ -45,19 +52,33 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     delete: false,
     detail: false,
     restore: false,
+    print: false,
   };
   @Input() isDeletedRow: Function = () => false;
-  @Input()
-  fetchDataFn!: (params?: QueryParams) => Observable<any>;
+  @Input() fetchDataFn!: (params?: QueryParams, otherParams?: otherQueryParams) => Observable<any>;
   @Input() anotherAction: string = '';
   @Output() add = new EventEmitter<void>();
+  @Output() download = new EventEmitter<void>();
   @Output() edit = new EventEmitter<any>();
   @Output() delete = new EventEmitter<any>();
   @Output() detail = new EventEmitter<any>();
-  @Output() restore = new EventEmitter<any>();
+  @Output() compareUesup = new EventEmitter<{ue: string, value_ue: string}>();
+  @Output() startSearch = new EventEmitter<any>();
   @Output() selectionChange = new EventEmitter<number | null>();
-  @ViewChild('actionsTemplate', { static: true })
-  actionsTemplate!: TemplateRef<any>;
+  @ViewChild('actionsTemplate', { static: true }) actionsTemplate!: TemplateRef<any>;
+
+
+  @Output() refresh = new EventEmitter<any>();
+  @Output() listExam = new EventEmitter<any>();
+  @Output() downloadResult = new EventEmitter<any>();
+  @Output() deleteTable = new EventEmitter<any>();
+  @Output() createTable = new EventEmitter<any>();
+  @Output() insert = new EventEmitter<any>();
+
+
+
+
+
   data: any[] = [];
   new_data: any[] = [];
   loading: boolean = false;
@@ -68,8 +89,27 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   sortOrder: string | null = null;
   where: any | null = null;
   searchOption: string | null = null;
+  idExpand: number = 0;
+  isVisible: boolean = true
+  isResult: boolean = false
+  isRattrape: boolean = false
+  result: string = ""
 
-  constructor(private nzMessage: NzMessageService, private location: Location) {}
+  form!: FormGroup;
+  listOfFilter = ["Moyenne" ,"Credit"]
+  message: string = "FacSciences"
+  constructor(
+    private nzMessage: NzMessageService,
+    private location: Location, 
+    private translate: TranslateService,
+    private fb: FormBuilder, ) { 
+    this.form = this.fb.group({
+    matierUe: [null],
+    matierEc: [null],
+    meanCredit: [null],
+    filter: [null],
+    })
+  }
 
   ngOnInit(): void {
     this.fetchData();
@@ -95,51 +135,29 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     }, 0);
   }
 
-  editCache: { [key: string]: { edit: boolean; data: any } } = {};
+  editCache: { [key: string]: { edit: boolean; data: any;} } = {};
   listOfData: any[] = [];
 
   startEdit(id: any): void {
+    console.log(id)
     this.editCache[id].edit = true;
   }
 
   cancelEdit(id: any, listOfData: any[]): void {
-    const index = this.listOfData.findIndex((item) => item.id === id);
+    console.log(id)
+    const index = this.listOfData.findIndex((item) => item.num_carte === id);
     Object.assign(listOfData[index], this.listOfData[index]);
     this.editCache[id] = {
       data: { ...this.listOfData[index] },
       edit: false,
     };
   }
-
-  cancelStockEdit(id: any, listOfData: any[], data: any[]): void {
-    console.log(this.listOfData);
-    console.log(id.id_stock);
-    const index_data = this.data.findIndex((item) => item.id === id.id_product);
-    let stocks: any[] = this.data[index_data].stocks;
-    const index_stocks = stocks.findIndex((item) => item.id === id.id_stock);
-    const index = this.listOfData.findIndex((item) => item[0].id === id.id_stock);
-
-    Object.assign(data[index_data].stocks[index_stocks], this.listOfData[index]);
-    this.editCache[id.id_stock] = {
-      data: { ...this.listOfData[index] },
-      edit: false,
-    };
-  }
-
-  saveEdit(row: any, listOfData: any[]): void {
-    console.log(row);
-    const index = this.listOfData.findIndex((item) => item.id === row.id_product);
+  saveEdit(row: any): void {
+    this.idExpand = row.productId;
+    const index = this.listOfData.findIndex((item) => item.num_carte === row.num_carte);
     this.edit.emit(row);
     //Object.assign(this.listOfData[index], listOfData[index]);
-    this.editCache[row.id_product].edit = false;
-  }
-
-  saveStockEdit(row: any, listOfData: any[]): void {
-    console.log(row);
-    const index = this.listOfData.findIndex((item) => item.id === row.id);
-    this.edit.emit(row);
-    // Object.assign(this.listOfData[index], listOfData[index]);
-    this.editCache[row.id].edit = false;
+    this.editCache[row.num_carte].edit = false;
   }
 
   updateEditCache(): void {
@@ -152,7 +170,8 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   }
 
   public fetchData(
-    params?: QueryParams,
+    params?: QueryParams | null,
+    additional?: otherQueryParams,
     debounceTime = 0
   ) {
     let _params: QueryParams;
@@ -169,42 +188,30 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
           _params = { ...params };
         }
 
+        if (additional) {
+          _params = { ..._params };
+        }
+        console.log("lqstpqrqms", _params)
         this.loading = true;
-        console.log('paramse', _params)
-        this.fetchDataFn(_params)
+        this.fetchDataFn(_params, additional)
           ?.pipe(first())
           .subscribe({
             next: (result) => {
-              console.log('result',result)
               this.loading = false;
               this.new_data = [];
               this.listOfData = [];
-              /*
-              if (this.childrenDataHeader.length > 0) {
-                for (let i = 0; i < result; i++) {
-                  this.new_data.push({ ...result.data[i], expand: false });
-                  this.listOfData.push({ ...result.data[i].stocks });
-
-                  for (let j = 0; j < result.data[i].stocks.length; j++) {
-                    this.editCache[result.data[i].stocks[j].id] = {
-                      edit: false,
-                      data: { ...result.data[i].stocks },
-                    };
-                  }
-                }
-              } else {
-                for (let i = 0; i < result.data.length; i++) {
-                  this.new_data.push({ ...result.data[i], expand: false });
-                  this.listOfData.push({ ...result.data[i] });
-                  this.editCache[result.data[i].id] = {
+              //this.data = result
+                for (let i = 0; i < result.length; i++) {
+                  this.new_data.push({ ...result[i]});
+                  this.listOfData.push({ ...result[i] });
+                  this.editCache[result[i].num_carte] = {
                     edit: false,
-                    data: { ...result.data[i] },
+                    data: { ...result[i] },
                   };
                 }
-              }
-              */
-              this.total = result?.meta?.itemCount || 0;
-              this.data = result;
+              this.total = result.length || 0;
+              this.data = [...this.new_data];
+              console.log("result ", result)
             },
             error: (err) => {
               console.error(err);
@@ -245,12 +252,12 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     this.add.emit();
   }
 
-  onRestore(row: any) {
-    this.restore.emit(row);
-  }
-
   onEdit(row: any) {
     this.edit.emit(row);
+  }
+
+  onSearch(row: any) {
+    this.startSearch.emit(row);
   }
 
   saveEditData(row: any) {
@@ -267,5 +274,139 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
 
   back(): void {
     this.location.back();
+  }
+
+  onDownload(){
+    this.download.emit();
+  }
+
+  compareNoteSupUe(): void{
+    if (this.form.value.matierUe){
+      this.data = this.new_data.filter((item: any) => item["ue_"+this.form.value.matierUe] >= 10);
+      const name = this.matierUe.find((item:Ue) => item.value === this.form.value.matierUe)
+      this.message = this.data.length+" "+
+      this.translate.instant('admin.home.note.message_ue_admis')+" "+name?.title
+    }else{
+      this.data = this.new_data;
+      this.message = ""
+    }
+  }
+  insertStudent(){
+    this.insert.emit()
+  }
+  setVisible(){
+    this.isVisible = !this.isVisible
+  }
+  onRefresh(){
+    this.refresh.emit()
+  }
+  onExamList(){
+    this.listExam.emit()
+  }
+  onDeleteTable(){
+    this.deleteTable.emit()
+  }
+
+  onCreateTable(){
+    this.createTable.emit()
+  }
+  filterSup(){
+    if (this.form.value.filter){
+      let value = this.form.value.meanCredit
+      localStorage.setItem('lastBtn', 'sup')
+        if (localStorage.getItem('filter') === 'Moyenne' ){
+          this.data = this.new_data.filter((item: any) => item['mean']  >= Number(value) )
+        }else{
+          this.data = this.new_data.filter((item: any) => item['credit']  >= Number(value) )
+        }
+    }else{
+      this.data = this.new_data
+    }
+  }
+  filterInf(){
+    if (this.form.value.filter){
+      let value = this.form.value.meanCredit
+      localStorage.setItem('lastBtn', 'sup')
+        if (localStorage.getItem('filter') === 'Moyenne' ){
+          this.data = this.new_data.filter((item: any) => item['mean']  < Number(value) )
+        }else{
+          this.data = this.new_data.filter((item: any) => item['credit']  < Number(value) )
+        }
+    }else{
+      this.data = this.new_data
+    }
+  }
+  resetTableUe(){
+    if (this.form.value.matierUe){
+      this.result = this.form.value.matierUe
+      this.isResult = true
+    }else{
+      this.data = this.new_data;
+      this.isResult = false
+    }
+  }
+  compareNoteInfUe(){
+    if (this.form.value.matierUe){
+      this.data = this.new_data.filter((item: any) => item["ue_"+this.form.value.matierUe] < 10);
+      const name = this.matierUe.find((item:Ue) => item.value === this.form.value.matierUe)
+      this.message = this.data.length+" "+
+      this.translate.instant('admin.home.note.message_ue_echec')+" "+name?.title
+    }else{
+      this.data = this.new_data;
+      this.message = ""
+    }
+  }
+  resultat(){
+    this.downloadResult.emit(this.form.value.matierUe)
+  }
+  resetTableEc(){
+    if (this.form.value.matierEc){
+      this.result = this.form.value.matierEc
+      this.isRattrape = true
+    }else{
+      this.data = this.new_data;
+      this.isRattrape = false
+    }
+  }
+  compareNoteSupEc(){
+    if (this.form.value.matierEc){
+      this.data = this.new_data.filter((item: any) => item["ec_"+this.form.value.matierEc] >= 10);
+      const name = this.matierEc.find((item:Ec) => item.value === this.form.value.matierEc)
+      this.message = this.data.length+" "+
+      this.translate.instant('admin.home.note.message_ec_admis')+" "+name?.title
+    }else{
+      this.data = this.new_data;
+      this.message = ""
+    }
+  }
+  compareNoteInfEc(){
+    if (this.form.value.matierEc){
+      this.data = this.new_data.filter((item: any) => item["ec_"+this.form.value.matierEc] < 10);
+      const name = this.matierEc.find((item:Ec) => item.value === this.form.value.matierEc)
+      this.message = this.data.length+" "+
+      this.translate.instant('admin.home.note.message_ec_echec')+" "+name?.title
+    }else{
+      this.data = this.new_data;
+      this.message = ""
+    }
+
+  }
+  rattrapageList(){
+    if (this.form.value.matierEc && this.session === 'Normal'){
+      const name = this.matierEc.find((item:Ec) => item.value === this.form.value.matierEc)
+      this.data = this.new_data.filter((item: any) => item["ec_"+this.form.value.matierEc] < 10 && item["ue_"+name?.value_ue] < 10 )
+      this.message = this.data.length+" "+
+        this.translate.instant('admin.home.note.message_ec_refaire')+" "+name?.title
+  }else{
+    this.data = this.new_data;
+    this.message = ""
+  }
+  }
+  changeFilter(){
+    if (this.form.value.filter){
+      localStorage.setItem('filter', this.form.value.filter)
+    }else{
+      localStorage.setItem('filter', '')
+    }
   }
 }

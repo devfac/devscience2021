@@ -5,10 +5,12 @@ import { CollegeYear } from '@app/models/collegeYear';
 import { Ec } from '@app/models/ec';
 import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
+import { Menu } from '@app/models/menu';
 import { AncienStudent } from '@app/models/student';
 import { Ue, UeEc } from '@app/models/ue';
 import { AuthService } from '@app/services/auth/auth.service';
 import { environment } from '@environments/environment';
+import { Subject } from 'rxjs';
 const BASE_URL = environment.authApiURL;
 @Injectable({
   providedIn: 'root'
@@ -60,10 +62,6 @@ export class HomeService {
 
   getMentionByUuid(uuid: string | null){
     return  this.http.get<Mention>(`${BASE_URL}/mentions/`+uuid, this.options)
-  }
-
-  getAllJourney(uuidMention: string | null ){
-    return this.http.get<Journey[]>(`${BASE_URL}/journey/by_uuid_mention/`+uuidMention, this.options)
   }
 
   deleteJourney(uuid?: string){
@@ -118,5 +116,66 @@ export class HomeService {
   }else{
     form.get(key)?.setValue(value)
   }
+  }
+  public menu: Menu[] = [
+    {
+      id: 1,
+      title: 'admin.home.users.title',
+      route: 'users',
+      selected: '/home/users',
+      icon: 'unordered-list',
+    },{
+      id: 2,
+      title: 'admin.home.mention.title',
+      route: 'mention',
+      selected: '/home/mention',
+      icon: 'unordered-list',
+    },{
+      id: 3,
+      title: 'admin.home.journey.title',
+      route: 'journey',
+      selected: '/home/journey',
+      icon: 'unordered-list',
+    },{
+      id: 4,
+      title: 'admin.home.college_year.title',
+      route: 'college-year',
+      selected: '/home/college-year',
+      icon: 'unordered-list',
+    },{
+      id: 5,
+      title: 'admin.home.role.title',
+      route: 'role',
+      selected: '/home/role',
+      icon: 'unordered-list',
+    },{
+      id: 6,
+      title: 'admin.home.ue.title',
+      route: 'ue',
+      selected: '/home/ue',
+      icon: 'unordered-list',
+    },
+    {
+      id: 7,
+      title: 'admin.home.ec.title',
+      route: 'ec',
+      selected: '/home/ec',
+      icon: 'unordered-list',
+    },
+    {
+      id: 8,
+      title: 'admin.home.note.title',
+      route: 'note',
+      selected: '/home/note',
+      icon: 'unordered-list',
+    },
+  ]
+  public menu$ = new Subject<any>();
+  public showSider = true;
+  public showSider$ = new Subject<boolean>();
+
+  setShowSider(show: boolean) {
+    this.showSider = show;
+    this.showSider$.next(show);
   }
 }

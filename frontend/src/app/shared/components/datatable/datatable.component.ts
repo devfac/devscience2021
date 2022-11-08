@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { QueryParams } from '@app/models/query';
 import { TableHeader, TableHeaderType } from '@app/models/table';
 import { Observable } from 'rxjs';
@@ -16,7 +16,8 @@ export class DatatableComponent {
   @Input() childrenDataHeader: TableHeader[] = [];
   @Input() childrenDataSpan: TableHeader[] = [];
   @Input() data: any[] = [];
-  @Input() editCache: { [key: string]: { edit: boolean; data: any } } = {};
+  @Input() portList: any[] = [];
+  @Input() editCache: { [key: string]: { edit: boolean; data: any} } = {};
   @Input() dataStocks: any[] = [];
   @Input() width: number = 800;
   @Input() idSelector: string = 'id';
@@ -25,32 +26,23 @@ export class DatatableComponent {
   @Input() pageSize = 10;
   @Input() pageIndex = 1;
   @Input() classNames?: string;
+  @Input() message: string = ""
   @Input() classExpand?: string;
-  @Input()
-  fetchDataFn!: (params?: QueryParams) => Observable<any>;
+  @Input() fetchDataFn!: (params?: QueryParams) => Observable<any>;
   @Input() isSelectable: boolean = false;
   @Input() showPagination: boolean = true;
   @Input() selectedId: number | null = null;
   @Output() startEdit = new EventEmitter<void>();
+  @Output() addStock = new EventEmitter<void>();
   @Output() canceltEdit = new EventEmitter<void>();
-  @Output() cancelStocktEdit = new EventEmitter<{ id_stock: number; id_product: number }>();
-  @Output() saveEdit = new EventEmitter<{
-    id_product: number;
-    id: number;
-    halfPalletQty: number;
-    standardPalletQty: number;
-    sellingPricePerUnit: number;
-  }>();
-  @Output() saveStockEdit = new EventEmitter<{
-    id: number;
-    productionTime: number;
-    departurePortId: number;
-    isMainStock: boolean;
-    stock: number;
-  }>();
+  @Output() search = new EventEmitter<void>();
+  @Output() viewNote = new EventEmitter<void>();
+  @Output() saveEdit = new EventEmitter<any>();
   @Output() selectionChange = new EventEmitter<number | null>();
   @Output() queryParamsChange = new EventEmitter<any>();
   TableHeaderType = TableHeaderType;
+
+  isAdded: boolean = true;
 
   constructor() {
   }
@@ -77,32 +69,22 @@ export class DatatableComponent {
     this.startEdit.emit(id);
   }
 
+  onStock(id: any): void {
+    console.log('kjaf kaugsfakg agsf', id);
+    this.addStock.emit(id);
+    this.isAdded = false;
+  }
+
   cancEdit(id: any): void {
     this.canceltEdit.emit(id);
   }
 
-  cancelStocEdit(id_stock: number, id_product: any): void {
-    this.cancelStocktEdit.emit({ id_stock, id_product });
-  }
-
   savedEdit(row: any): void {
-    this.saveEdit.emit({
-      id_product: row.id,
-      id: row.productPricingId,
-      halfPalletQty: row.halfPalletQty,
-      standardPalletQty: row.standardPalletQty,
-      sellingPricePerUnit: row.sellingPricePerUnit,
-    });
+    this.saveEdit.emit(row);
   }
 
-  savedStockEdit(row: any): void {
-    console.log(row);
-    this.saveStockEdit.emit({
-      id: row.id,
-      isMainStock: row.isMainStock,
-      departurePortId: row.departurePortId,
-      stock: row.stock,
-      productionTime: row.productionTime,
-    });
+  onView(num_carte: any){
+    this.viewNote.emit(num_carte)
   }
+
 }

@@ -11,7 +11,6 @@ import { CustomAutoFocusDirective } from '../directives/custom-auto-focus/custom
 import { CustomBackgroundDirective } from '../directives/custom-background/custom-background.directive';
 import { DatatableComponent } from '../components/datatable/datatable.component';
 import { DatatableCrudComponent } from '../components/datatable-crud/datatable-crud.component';
-//import { CurrencyPricePipe } from '../pipes/currency-price/currency-price.pipe';
 
 @NgModule({
   imports: [
@@ -36,7 +35,7 @@ import { DatatableCrudComponent } from '../components/datatable-crud/datatable-c
     CustomAutoFocusDirective,
     ScrollingModule,
     DatatableComponent,
-    DatatableCrudComponent
+    DatatableCrudComponent,
    // CurrencyPricePipe,
   ],
   declarations: [

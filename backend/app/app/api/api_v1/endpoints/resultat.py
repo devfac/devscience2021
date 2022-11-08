@@ -150,7 +150,7 @@ def get_by_matier(
 
 @router.get("/get_by_matier_pdf", response_model=List[Any])
 def get_by_matier_pdf(
-        schema: str,
+        college_year: str,
         semester: str,
         uuid_journey: str,
         session: str,
@@ -213,7 +213,7 @@ def get_by_matier_pdf(
                     info_etudiants['prenom'] = un_etudiant.first_name
                     etudiant_admis_compense.append(info_etudiants)
         notes.append(etudiants)
-    data = {'mention': mention.title, 'journey': journey.title, 'anne': schema, 'session': session}
+    data = {'mention': mention.title, 'journey': journey.title, 'anne': college_year, 'session': session}
     file = result_by_ue.PDF.create_result_by_ue(semester, journey, data, list(titre_note), notes, etudiant_admis,
                                                 etudiant_admis_compense)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)

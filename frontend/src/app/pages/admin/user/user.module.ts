@@ -8,6 +8,7 @@ import { ReInscriptionAddComponent } from './re-inscription/re-inscription-add/r
 import { SelectionComponent } from './selection/selection.component';
 import { SelectionAddComponent } from './selection/selection-add/selection-add.component';
 import { InscriptionAddComponent } from './inscription/inscription-add/inscription-add.component';
+import { UploadComponent } from './upload/upload.component';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { InscriptionAddComponent } from './inscription/inscription-add/inscripti
     ReInscriptionAddComponent,
     SelectionComponent,
     SelectionAddComponent,
-    InscriptionAddComponent
+    InscriptionAddComponent,
+    UploadComponent
   ],
   imports: [
     SharedModule,

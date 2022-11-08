@@ -45,34 +45,9 @@
           </nz-form-item>
 
       </div>
-  <div class="header">
-    <nz-select
-      [ngModel]="data"
-      formControlName="filter"
-      [nzPlaceHolder]="'admin.home.note.filter' | translate"
-      (ngModelChange)="changeFilter()"
-      [nzAllowClear]="true"
-      style="width:60% ;"
-    >
-    <nz-option *ngFor="let item of allJourney"
-        [nzLabel]="item.abbreviation"
-        [nzValue]="item.uuid"
-    >
-    </nz-option>
-  </nz-select>
-    <div class="header-text">
-        <h3>
-            {{'admin.home.note.title' | translate }}</h3>
-    </div>
-    <div class="button-text">
-        <button nz-button nzType="primary" (click)="addStudent()">
-            <span nz-icon nzType="plus" nzTheme="outline"></span>
-            {{'admin.user.create' | translate | uppercase}}
-        </button>
-    </div>
-  </div>
 </form>
 <app-datatable-crud
+*ngIf="isLoading"
 [title]="'admin.product.product_list.title' | translate"
 [headers]="headers"
 [fetchDataFn]="fetchData"
@@ -81,5 +56,6 @@
 (delete)="onDelete($event)"
 (edit)="onEdit($event)"
 (add)="onAdd()"
+[showPagination]="true"
 classNames="product-list-table"
 ></app-datatable-crud>

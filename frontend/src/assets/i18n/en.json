@@ -1,4 +1,8 @@
 {
+  "print": "print",
+  "add": "Create",
+  "save":"Save",
+  "back":"back",
   "server_error": "Errors occur on server",
   "welcomeMessage": "Thanks for joining, {{ firstName }}!",
   "welcomeContent": "It's great to have you!",
@@ -209,6 +213,12 @@
       "selection":{
         "title":"Selection",
         "is_selected":"Selected"
+      },
+      "dashboard":{
+        "title":"Dashboard"
+      },
+      "upload":{
+        "title":"Upload"
       }
     },
     "toolpit":{

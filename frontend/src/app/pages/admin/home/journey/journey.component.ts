@@ -74,7 +74,7 @@ export class JourneyComponent implements OnInit, AfterContentInit {
     },
     {
       title: 'Mention',
-      selector: 'mention',
+      selector: 'mention.abbreviation',
       isSortable: true,
     },
   ];

@@ -29,19 +29,22 @@ export class UsersService {
   }
 
   deletData(uuid: string):Promise<User[]> {
-    return this.http.delete<User[]>(`${BASE_URL}/users/?uuid=`+uuid, this.options).toPromise()
+    let otherParams = new HttpParams().append('uuid', uuid)
+    return this.http.delete<User[]>(`${BASE_URL}/users/`, {headers: this.headers, params: otherParams}).toPromise()
   }
 
   getData(uuid: string){
-    return this.http.get<User>(`${BASE_URL}/users/by_uuid/`+uuid, this.options)
+    let otherParams = new HttpParams().append('uuid', uuid)
+    return this.http.get<User>(`${BASE_URL}/users/by_uuid/`, {headers: this.headers, params: otherParams})
   }
 
   updateData(uuid: string, body: any){
-    return this.http.put<User>(`${BASE_URL}/users/?uuid=`+uuid, body, this.options)
+    let otherParams = new HttpParams().append('uuid', uuid)
+    return this.http.put<User>(`${BASE_URL}/users/`, body, {headers: this.headers, params: otherParams})
   }
 
   addData(body: any){
     console.log(body)
-    return this.http.post<User>(`${BASE_URL}/users/`,body, this.options)
+    return this.http.post<User>(`${BASE_URL}/users/`,body, {headers: this.headers})
   }
 }

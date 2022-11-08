@@ -1,5 +1,5 @@
 <h2>{{ 'admin.student.title' | translate | uppercase }}</h2>
-<form [formGroup]="form" (ngSubmit)="submitForm()">
+<form [formGroup]="form" (ngSubmit)="submitForm()" *ngIf="isReady">
   <div nz-row>
     <div class="container" >
       <img [src]="url" alt="" *ngIf="url">
@@ -455,7 +455,7 @@
         {{ 'back' | translate }}
       </button>
       <button nz-button type="submit" nzType="primary" [disabled]="!form.valid">
-        {{ 'create' | translate }}
+        {{ 'save' | translate }}
       </button>
     </nz-form-control>
   </nz-form-item>
