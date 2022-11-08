@@ -1,4 +1,5 @@
-<form nz-form [formGroup]="form" class="form" (ngSubmit)="submitForm()" nzLayout="vertical">
+
+      <form nz-form [formGroup]="form" class="form" nzLayout="vertical">
         <div class="header-title" nz-row>
             <nz-form-item>
                 <nz-form-label>
@@ -11,7 +12,7 @@
                         formControlName="collegeYear"
                         [nzPlaceHolder]="'admin.home.college_year.title' | translate"
                         >
-                        <nz-option *ngFor="let item of all_years"
+                        <nz-option *ngFor="let item of allYears"
                             [nzLabel]="item.title"
                             [nzValue]="item.title"
                         >
@@ -27,12 +28,13 @@
                 </nz-form-label>
                 <nz-form-control >
                   <nz-input-group>
-                    <nz-select style="margin-left: 30px;"
+                    <nz-select style="margin-left: 30px; width: 95%;"
                         [ngModel]="data"
                         formControlName="mention"
                         [nzPlaceHolder]="'admin.home.mention.title' | translate"
+                        (ngModelChange)="getJourney()"
                         >
-                        <nz-option *ngFor="let item of all_mention"
+                        <nz-option *ngFor="let item of allMention"
                             [nzLabel]="item.title"
                             [nzValue]="item.uuid"
                         >
@@ -48,12 +50,13 @@
                 </nz-form-label>
                 <nz-form-control >
                   <nz-input-group>
-                    <nz-select style="margin-left: 30px;"
+                    <nz-select style="margin-left: 30px; width: 85%;"
                         [ngModel]="data"
                         formControlName="journey"
+                        (ngModelChange)="changeJourney()"
                         [nzPlaceHolder]="'admin.home.journey.title' | translate"
                         >
-                        <nz-option *ngFor="let item of all_journey"
+                        <nz-option *ngFor="let item of allJourney"
                             [nzLabel]="item.abbreviation"
                             [nzValue]="item.uuid"
                         >
@@ -69,11 +72,11 @@
                 </nz-form-label>
                 <nz-form-control >
                   <nz-input-group>
-                    <nz-select style="margin-left: 30px;"
+                    <nz-select style="margin-left: 30px; width: 85%;"
                         [ngModel]="data"
                         formControlName="semester"
                         [nzPlaceHolder]="'admin.home.journey.semester' | translate"
-                        (ngModelChange)="getAllColumnsSession()"
+                        (ngModelChange)="getAllColumnsSemester()"
                         >
                         <nz-option *ngFor="let item of listOfSemester"
                             [nzLabel]="item"
@@ -85,17 +88,17 @@
                 </nz-form-control>
               </nz-form-item>
 
-              <nz-form-item>
+              <nz-form-item >
                 <nz-form-label style="margin-left: 30px;">
                   {{ 'admin.home.note.session' | translate }}
                 </nz-form-label>
                 <nz-form-control >
                   <nz-input-group>
-                    <nz-select style="margin-left: 30px;"
+                    <nz-select style="margin-left: 30px; width: 80%;"
                         [ngModel]="data"
                         formControlName="session"
                         [nzPlaceHolder]="'admin.home.note.session' | translate"
-                        (ngModelChange)="getAllColumnsSemester()"
+                        (ngModelChange)="getAllColumnsSession()"
                         >
                         <nz-option *ngFor="let item of listOfSession"
                             [nzLabel]="item"
@@ -106,44 +109,163 @@
                   </nz-input-group>
                 </nz-form-control>
               </nz-form-item>
-    </div>
+      </div>
   </form>
+  <div *ngIf="!showTable && !authService.getPermission()">
+    <nz-divider nzType="horizontal"></nz-divider>
+    <nz-steps [nzCurrent]="current">
+      <nz-step nzTitle="Choisir les matier"></nz-step>
+      <nz-step nzTitle="Créer la table"></nz-step>
+      <nz-step nzTitle="Términé"></nz-step>
+    </nz-steps>
 
-  <div class="header">
-    <div class="header-text">
-        <h3>
-            {{'admin.home.note.title' | translate }}</h3>
+    <div class="steps-content">
+      <nz-table
+      #rowSelectionTable
+      [nzData]="matier"
+      (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
+      [nzScroll]="{ x: '100px', y:'300px'}"
+      [nzShowPagination]="false"
+      *ngIf="current === 0"
+    >
+      <thead>
+        <tr>
+          <th></th>
+          <th
+            [(nzChecked)]="checked"
+            [nzIndeterminate]="indeterminate"
+            (nzCheckedChange)="onAllChecked($event)"
+          ></th>
+          <th>Name</th>
+          <th>Credit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let data of rowSelectionTable.data">
+            <tr >
+              <td [nzExpand]="expandSet.has(data.uuid)" (nzExpandChange)="onExpandChange(data.uuid, $event)"></td>
+              <td [nzChecked]="setOfCheckedId.has(data.value)" (nzCheckedChange)="onItemChecked(data.value, $event)"></td>
+              <td>{{ data.title }}</td>
+              <td>{{ data.credit }}</td>
+            </tr>
+            <tr [nzExpand]="expandSet.has(data.uuid)">
+              <ng-container *ngFor="let ec of data.ec">
+                  <nz-input-group [nzAddOnBefore]="ec.title" >
+                      <input nz-input type="text" readonly  
+                      [placeholder]="ec.weight "/>
+                  </nz-input-group>
+              </ng-container>
+              </tr>
+        </ng-container>
+      </tbody>
+    </nz-table>
+      <nz-descriptions  *ngIf="current === 1" [nzTitle]="'admin.home.note.table_name' | translate :{name: tableName}"
+        nzLayout="vertical">
+        <nz-descriptions-item [nzTitle]="'admin.home.note.nbr_ue' | translate">{{totalUe}}
+        </nz-descriptions-item>
+        <nz-descriptions-item [nzTitle]="'admin.home.note.nbr_ec' | translate">{{totalEc}}
+        </nz-descriptions-item>
+        <nz-descriptions-item [nzTitle]="'admin.home.note.year' | translate">{{year}}
+        </nz-descriptions-item>
+      </nz-descriptions>
     </div>
-    <div class="button-text">
-        <button nz-button nzType="primary" (click)="submitForm()">
-            <span nz-icon nzType="plus" nzTheme="outline"></span>
-            {{'admin.home.create' | translate | uppercase}}
-        </button>
-        <label> | </label>
-        <button nz-button nzType="primary" (click)="submitForm()">
-            <span nz-icon nzType="delete" nzTheme="outline"></span>
-            {{'admin.home.delete' | translate | uppercase}}
-        </button>
+    <div class="steps-action">
+      <button nz-button nzType="default" (click)="pre()" *ngIf="current > 0"[disabled]="form.valid">
+        <span>Previous</span>
+      </button>
+      <button nz-button nzType="default" (click)="next()" *ngIf="current < 2"[disabled]="form.valid">
+        <span>Next</span>
+      </button>
+      <button nz-button nzType="primary" (click)="done()" *ngIf="current === 2" [disabled]="form.valid">
+        <span>Done</span>
+      </button>
     </div>
   </div>
-<nz-table #usersList [nzData]="all_columns" nzSize="small" [nzPageSize]="10" nzBordered > 
-    <thead>
-        <tr>
-            <th  *ngFor="let data of usersList.data">
-                <div style="width: auto;">
-                    {{data}}
-                </div>
-            </th>
-            <th nzRight> Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let data of usersList.data">
-            <td  *ngFor="let data of all_columns"> data</td>
-            <td nzRight>
-                <a nz-icon nzType="edit" nzTheme="fill" style="font-size: 20px; color: green;" ></a>
-                <nz-divider nzType="vertical"></nz-divider>
-                <a nz-icon nzType="delete" nzTheme="fill" style="font-size: 20px; color: red;" (click)="showConfirm(data.title, data.uuid)"></a>
-            </td>
-    </tbody>
-</nz-table>
+     
+
+<nz-spin [nzSpinning]="isSpinning">
+  
+<app-datatable-crud
+*ngIf="showTable"
+[headers]="headers"
+[headerData]="headerData"
+[headerSpan]="headerSpan"
+[fetchDataFn]="fetchData"
+[width]="560+(matierEc.length)*280"
+[actions]="actions"
+(delete)="onDelete($event)"
+(edit)="onEdit($event)"
+(add)="onAdd()"
+(detail)="viewNoteDetails($event)"
+[permission]="authService.getPermission()"
+(listExam)="showModal()"
+(deleteTable)="deleteTable()"
+(createTable)="createTable()"
+(downloadResult)="resultat($event)"
+(refresh)="refresh()"
+(insert)="insertStudent()"
+[matierEc]="matierEc"
+[matierUe]="matierUe"
+[session]="session"
+[showPagination]="true"
+[isNote]="true"
+classNames="note"
+></app-datatable-crud>
+
+  <nz-modal [(nzVisible)]="visibleDialog" 
+      nzTitle="{{'admin.home.note.list' | translate}}" 
+      (nzOnCancel)="handleCancel()" 
+      nzMask="true"
+      nzMaskClosable="false" >
+      <div *nzModalContent>
+      <form nz-form [formGroup]="form" class="form" (ngSubmit)="listExam()" nzLayout="vertical">
+      <nz-form-item>
+        <nz-form-label nzRequired>
+          {{ 'admin.home.note.salle' | translate }}
+        </nz-form-label>
+        <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+          <nz-input-group>
+            <input type="text" nz-input formControlName="salle" appCustomAutoFocus
+              [placeholder]="'admin.home.note.salle' | translate" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired>
+          {{ 'admin.home.note.from' | translate }}
+        </nz-form-label>
+        <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+          <nz-input-group>
+            <input type="number" nz-input formControlName="from" 
+              [min]="1" 
+              appCustomAutoFocus
+              [placeholder]="'admin.home.note.from' | translate" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      
+      <nz-form-item>
+        <nz-form-label nzRequired>
+          {{ 'admin.home.note.to' | translate }}
+        </nz-form-label>
+        <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+          <nz-input-group>
+            <input type="number" nz-input formControlName="to" [min]="1" appCustomAutoFocus
+              [placeholder]="'admin.home.note.to' | translate" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-spin [nzSpinning]="isConfirmLoading">
+          <button nz-button class="form-button form-margin" [nzType]="'primary'">
+            {{'general_data.save' | translate | uppercase}}
+          </button>
+      </nz-spin>
+      </form>
+      </div>
+      <div *nzModalFooter>
+      </div>
+      </nz-modal>
+  </nz-spin>
+    

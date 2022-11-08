@@ -1,13 +1,17 @@
-from typing import Any, List
+from typing import Any, List, Optional
 from pydantic import BaseModel
 
 
 class NoteEC(BaseModel):
     name: str
-    note: str
+    note: Optional[float]
+
+
+class NoteUE(BaseModel):
+    name: str
+    ec: List[NoteEC]
 
 
 class Note(BaseModel):
     num_carte: str
-    name: str
-    ec: List[NoteEC]
+    ue: List[NoteUE]

@@ -1,72 +1,16 @@
 
-<form nz-form [formGroup]="form" class="form" (ngSubmit)="submitForm()" nzLayout="vertical">
-    <div class="years">
-        <nz-form-item>
-            <nz-form-label>
-              {{ 'admin.home.college_year.title' | translate }}
-            </nz-form-label>
-            <nz-form-control >
-              <nz-input-group>
-                <nz-select  style="width: 20%;"
-                    [ngModel]="data"
-                    formControlName="collegeYear"
-                    [nzPlaceHolder]="'admin.home.college_year.title' | translate"
-                    >
-                    <nz-option *ngFor="let item of all_years"
-                        [nzLabel]="item.title"
-                        [nzValue]="item.title"
-                    >
-                    </nz-option>
-                </nz-select>
-              </nz-input-group>
-            </nz-form-control>
-          </nz-form-item>
-        </div>
-  </form>
-    <div class="container" ><div class="header">
-       
-        <div class="header-text">
-            <h3>Ue list</h3>
-        </div>
-        <div class="button-text">
-            <button nz-button nzType="primary" (click)="showModal()">
-                <span nz-icon nzType="plus" nzTheme="outline"></span>
-                Ajouter
-            </button>
-        </div>
-    </div>
-        <nz-table #ecList [nzData]="all_ec" nzSize="small" [nzPageSize]="10" nzBordered 
-        [nzScroll]="{ x: 200 + 'px' }"> 
-            <thead>
-                <tr>
-                    <th *ngFor="let column of listOfColumns"
-                    [nzSortOrder]="column.sortOrder"
-                    [nzSortFn]="column.sortFn"
-                    [nzSortDirections]="column.sortDirections"
-                    [nzFilterMultiple]="column.filterMultiple"
-                    [nzFilters]="column.listOfFilter"
-                    [nzFilterFn]="column.filterFn"
-                    > 
-                  {{ column.name}}
-                </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let data of ecList.data">
-                    <td> {{data.title}}</td>
-                    <td> {{data.journey.abbreviation}}</td>
-                    <td> {{data.semester}}</td>
-                    <td> {{data.weight}}</td>
-                    <td> {{data.value_ue}}</td>
-                    <td>
-                        <a nz-icon nzType="edit" nzTheme="fill" style="font-size: 20px; color: green;"  (click)="showModalEdit(data.uuid)"></a>
-                        <nz-divider nzType="vertical"></nz-divider>
-                        <a nz-icon nzType="delete" nzTheme="fill" style="font-size: 20px; color: red;" (click)="showConfirm(data.title, data.uuid)"></a>
-                    </td>
-                    
-                </tr>
-            </tbody>
-        </nz-table>
+  <app-datatable-crud
+  [title]="'admin.product.product_list.title' | translate"
+  [headers]="headers"
+  [fetchDataFn]="fetchData"
+  [width]="500"
+  [actions]="actions"
+  (delete)="onDelete($event)"
+  (edit)="onEdit($event)"
+  (add)="onAdd()"
+  classNames="product-list-table"
+  ></app-datatable-crud>
+  
         <nz-modal [(nzVisible)]="isvisible" 
               nzTitle="{{'admin.home.journey.add_journey' | translate}}" 
               (nzOnCancel)="handleCancel()" 
@@ -108,13 +52,12 @@
               <nz-form-control [nzErrorTip]="'admin.home.mention.title_error' | translate">
                 <nz-input-group>
                   <nz-select  style="width: 100%;"
-                      [ngModel]="data"
-                      formControlName="mention"
+                      formControlName="uuidMention"
                       [nzPlaceHolder]="'admin.home.mention.title' | translate"
                       (ngModelChange)="getAllJourney()"
                       [nzDisabled]="isEdit"
                       >
-                      <nz-option *ngFor="let item of all_mention"
+                      <nz-option *ngFor="let item of allMention"
                           [nzLabel]="item.title"
                           [nzValue]="item.uuid"
                       >
@@ -131,13 +74,12 @@
               <nz-form-control [nzErrorTip]="'admin.home.journey.title_error' | translate">
                 <nz-input-group>
                   <nz-select  style="width: 100%;"
-                      [ngModel]="data"
                       formControlName="journey"
                       [nzPlaceHolder]="'admin.home.journey.title' | translate"
                       (ngModelChange)="getAllUe()"
                       [nzDisabled]="isEdit"
                       >
-                      <nz-option *ngFor="let item of all_journey"
+                      <nz-option *ngFor="let item of allJourney"
                           [nzLabel]="item.title"
                           [nzValue]="item.uuid"
                       >
@@ -176,12 +118,11 @@
                 <nz-form-control [nzErrorTip]="'admin.home.ue.title_error' | translate">
                   <nz-input-group>
                     <nz-select  style="width: 100%;"
-                        [ngModel]="data"
                         formControlName="valueUe"
                         [nzPlaceHolder]="'admin.home.ue.title' | translate"
                         [nzDisabled]="isEdit"
                         >
-                        <nz-option *ngFor="let item of all_ue"
+                        <nz-option *ngFor="let item of allUe"
                             [nzLabel]="item.title"
                             [nzValue]="item.value"
                         >
@@ -197,7 +138,7 @@
                 </nz-form-label>
                 <nz-form-control >
                   <nz-input-group>
-                    <input type="number" nz-input formControlName="user" appCustomAutoFocus
+                    <input type="text" nz-input formControlName="user" appCustomAutoFocus
                       [placeholder]="'admin.home.ec.user' | translate" />
                   </nz-input-group>
                 </nz-form-control>
@@ -231,4 +172,3 @@
     <div *nzModalFooter>
         </div>
     </nz-modal>
-        </div>

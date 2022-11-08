@@ -1,5 +1,5 @@
 from typing import Any
-
+import json
 from fastapi import APIRouter, Depends, HTTPException
 
 from app import models, schemas
@@ -7,8 +7,9 @@ from app.api import deps
 from fastapi.responses import FileResponse
 from app.liste import liste_exams, liste_inscrit, liste_bourse, liste_select
 from app import crud
-from app.utils import decode_schemas, get_niveau, create_anne
+from app.utils import decode_schemas, get_niveau, create_anne, create_model
 from sqlalchemy.orm import Session
+from fastapi.encoders import jsonable_encoder
 
 router = APIRouter()
 
@@ -37,36 +38,47 @@ def list_examen(
     journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
     if not journey:
         raise HTTPException(status_code=400, detail=f" Journey not found.", )
-    college_years = crud.college_year.get_by_title(db, college_year)
-    if not college_years:
-        raise HTTPException(status_code=400, detail=f"{college_year} not found.",
-                            )
+
+    interaction = crud.interaction.get_by_journey_and_year(
+        db=db, uuid_journey=uuid_journey, college_year=college_year)
+    interaction_value = jsonable_encoder(interaction)
+    list_value = []
+    for value in interaction_value[semester.lower()]:
+        value = value.replace("'", '"')
+        value = json.loads(value)
+        list_value.append(value)
+    interaction = jsonable_encoder(interaction)
+    interaction[semester.lower()] = list_value
+    columns = interaction[semester.lower()]
+    print(create_model(columns))
+
     data = {}
     matiers = {}
-    ues = crud.matier_ue.get_by_class(create_anne(college_years), uuid_journey, semester)
-    if len(ues) == 0:
+
+    if len(columns) == 0:
         raise HTTPException(
             status_code=400,
-            detail="Matiers not fount.",
+            detail="Matiers not found.",
         )
     all_ue = []
-    for ue in ues:
-        ues_ = {'name': ue['title']}
+    for ue in create_model(columns):
+        ues_ = {'name': crud.teaching_unit.get_by_value(db=db, value=ue['name'],uuid_journey=uuid_journey,
+                                                        semester=semester).title}
         nbr = 0
-        ecs = crud.matier_ec.get_by_value_ue(create_anne(college_year), ue['value'], semester, uuid_journey)
         all_ec = []
-        for ec in ecs:
-            ecs_ = {}
+        for ec in ue['ec']:
+            ecs_ = {'name': crud.constituent_element.get_by_value(db=db, value=ec['name'],uuid_journey=uuid_journey,
+                                                        semester=semester).title}
             nbr += 1
-            ecs_['name'] = ec['title']
             all_ec.append(ecs_)
         ues_['nbr_ec'] = nbr
         ues_['ec'] = all_ec
         all_ue.append(ues_)
     matiers['ue'] = all_ue
 
-    students = crud.ancien_etudiant.get_by_class_limit(create_anne(college_year), uuid_journey, semester, skip, limit)
-
+    students = crud.ancien_student.get_by_class_limit(db=db, uuid_journey=uuid_journey,uuid_mention=uuid_mention,
+                                                      semester=semester,college_year=college_year,
+                                                      skip=skip, limit=limit)
     all_students = []
     if len(students) == 0:
         raise HTTPException(
@@ -74,12 +86,11 @@ def list_examen(
             detail="Etudiants not fount.",
         )
     for on_student in students:
-        un_et = crud.note.read_by_num_carte(create_anne(college_year),
-                                            semester, journey.abbreviation, session, on_student.num_carte)
+        un_et = crud.note.read_by_num_carte(semester, journey.abbreviation, session, on_student.num_carte)
         if un_et:
-            student = {"last_name": on_student["last_name"],
-                       "first_name": on_student["first_name"],
-                       "num_carte": on_student['num_carte']}
+            student = {"last_name": on_student.last_name,
+                       "first_name": on_student.first_name,
+                       "num_carte": on_student.num_carte}
             all_students.append(student)
 
     data['mention'] = mention.title
@@ -89,7 +100,7 @@ def list_examen(
     data['salle'] = salle
     data['skip'] = skip
     data['limit'] = limit
-    file = liste_exams.PDF.create_list_examen(semester, journey, data, matiers, all_students)
+    file = liste_exams.PDF.create_list_examen(semester, journey.abbreviation, data, matiers, all_students)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
 
@@ -112,12 +123,12 @@ def list_inscrit(
     if not journey:
         raise HTTPException(status_code=400, detail=f" Journey not found.", )
 
-    students = crud.ancien_student.get_by_class(db=db, uuid_journey=uuid_journey,
-                                                semester=semester, college_year=college_year)
-
     mention = crud.mention.get_by_uuid(db=db, uuid=journey.uuid_mention)
     if not mention:
         raise HTTPException(status_code=400, detail=f" Mention not found.", )
+
+    students = crud.ancien_student.get_by_class(db=db, uuid_journey=uuid_journey, uuid_mention=journey.uuid_mention,
+                                                semester=semester, college_year=college_year, )
 
     all_student = []
     if students:

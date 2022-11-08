@@ -96,4 +96,12 @@ export class AuthService {
       })
     );
   }
+  getPermission(): boolean{
+    const user = this.userSubject.value;
+    if(!user?.is_superuser){
+      return true
+    }else{
+      return false
+    }
+  }
 }

@@ -8,6 +8,7 @@ import { ProfilDropdownComponent } from '@app/components/profil-dropdown/profil-
 import { LanguageSelectComponent } from '@app/components/select/language-select/language-select.component';
 import { UploadComponent } from './upload/upload.component';
 import { UserComponent } from './user/user.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { UserComponent } from './user/user.component';
     AdminComponent,
     UploadComponent,
     UserComponent,
+    DashboardComponent,
   ],
   imports: [
     SharedModule,

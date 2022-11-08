@@ -22,6 +22,8 @@ def create_workbook(name: str, sheet_name: list, type: str):
 def write_data_title(name: str, sheet_name: str, columns: list, type: str):
     wb = load_workbook(f'files/excel/{type}/{name}.xlsx')
     sheet = wb.get_sheet_by_name(sheet_name)
+    print(sheet)
+    sheet.freeze_panes = "C6"
     gris = "00C0C0C0"
     for index, colum in enumerate(columns):
         sheet.cell(row=1, column=index + 1).value = colum
@@ -78,7 +80,7 @@ def validation_file(name: str, sheet_name: str, schemas: str) -> str:
     print(columns)
     for col in range(sheet.max_column):
         if str(sheet.cell(row=1, column=col + 1).value) != columns[col]:
-            return f"invalid columns {columns[col]} and {sheet.cell(row=1, column=col + 1).value} is differents"
+            return f"the columns {columns[col]} and {sheet.cell(row=1, column=col + 1).value} is different"
     return "valid"
 
 

@@ -32,14 +32,6 @@ class CRUDDroit(CRUDBase[Droit, DroitCreate, DroitUpdate]):
         db.refresh(db_obj)
         return db_obj
 
-    def get_multi(
-        self, db: Session
-    ) -> List[Droit]:
-        return (
-            db.query(self.model)
-            .all()
-        )
-
 
 droit = CRUDDroit(Droit)
 

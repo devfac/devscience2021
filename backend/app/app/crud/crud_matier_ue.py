@@ -68,12 +68,12 @@ class CRUDMatierUE(CRUDBase[MatierUE, MatierUECreate, MatierUEUpdate]):
         conn.close()
         return out
 
-    def get_by_uuid(self, schema: str, uuid: str) -> Optional[MatierUE]:
+    def get_by_uuid(self, schema: str, uuid_ue: str) -> Optional[MatierUE]:
         metadata = MetaData(schema=schema, bind=engine)
         table = Table("unite_enseing", metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
-        sel = sel.where(table.columns.uuid == uuid)
+        sel = sel.where(table.columns.uuid == uuid_ue)
         result = conn.execute(sel)
         out = result.fetchone()
         conn.close()

@@ -10,9 +10,10 @@ import { RoleComponent } from './role/role.component';
 import { UeComponent } from './ue/ue.component';
 import { EcComponent } from './ec/ec.component';
 import { NoteComponent } from './note/note.component';
+import { DetailsNoteComponent } from './details-note/details-note.component';
 
 @NgModule({
-  declarations: [HomeComponent, UsersComponent, MentionComponent, JourneyComponent, CollegeYearComponent, RoleComponent, UeComponent, EcComponent, NoteComponent],
+  declarations: [HomeComponent, UsersComponent, MentionComponent, JourneyComponent, CollegeYearComponent, RoleComponent, UeComponent, EcComponent, NoteComponent, DetailsNoteComponent],
   imports: [SharedModule, HomeRoutingModule],
 })
 export class HomeModule { }

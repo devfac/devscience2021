@@ -1,76 +1,53 @@
-<div class="container" ><div class="header">
-    <div class="header-text">
-        <h3>College year list</h3>
-    </div>
-    <div class="button-text">
-        <button nz-button nzType="primary" (click)="showModal()">
-            <span nz-icon nzType="plus" nzTheme="outline"></span>
-            Ajouter
-        </button>
-    </div>
-        
-</div>
-    <nz-table #collegeYearsList [nzData]="all_year" nzSize="small" [nzPageSize]="10" nzBordered [nzScroll]="{ x: 200 + 'px' }"> 
-        <thead>
-            <tr>
-                <th> Title</th>
-                <th> Mean</th>
-                <th> Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let data of collegeYearsList.data">
-                <td> {{data.title}}</td>
-                <td> {{data.mean}}</td>
-                <td>
-                    <a nz-icon nzType="edit" nzTheme="fill" style="font-size: 20px; color: green;" (click)="showModalEdit(data.uuid)"></a>
-                    <nz-divider nzType="vertical"></nz-divider>
-                    <a nz-icon nzType="delete" nzTheme="fill" style="font-size: 20px; color: red;" (click)="showConfirm(data.title, data.uuid)"></a>
-                </td>               
-            </tr>
-        </tbody>
-    </nz-table>
-    <nz-modal 
-            [(nzVisible)]="isvisible" 
-            nzTitle="{{'admin.home.college_year.college_year' | translate}}"
-            (nzOnCancel)="handleCancel()" 
-            nzMask="true"
-            nzMaskClosable="false">
-        <div *nzModalContent>
-            <form nz-form [formGroup]="form" class="form" (ngSubmit)="submitForm()" nzLayout="vertical">
-                <nz-form-item>
-                  <nz-form-label nzRequired>
-                    {{ 'admin.home.college_year.title' | translate }}
-                  </nz-form-label>
-                  <nz-form-control [nzErrorTip]="'admin.home.college_year.college_year_error' | translate">
+
+<app-datatable-crud
+[title]="'admin.product.product_list.title' | translate"
+[headers]="headers"
+[fetchDataFn]="fetchData"
+[width]="500"
+[actions]="actions"
+(delete)="onDelete($event)"
+(edit)="onEdit($event)"
+(add)="onAdd()"
+classNames="product-list-table"
+></app-datatable-crud>
+
+<nz-modal 
+        [(nzVisible)]="isvisible" 
+        nzTitle="{{'admin.home.college_year.college_year' | translate}}"
+        (nzOnCancel)="handleCancel()" 
+        nzMask="true"
+        nzMaskClosable="false">
+    <div *nzModalContent>
+        <form nz-form [formGroup]="form" class="form" (ngSubmit)="submitForm()" nzLayout="vertical">
+            <nz-form-item>
+                <nz-form-label nzRequired>
+                {{ 'admin.home.college_year.title' | translate }}
+                </nz-form-label>
+                <nz-form-control [nzErrorTip]="'admin.home.college_year.college_year_error' | translate">
+                <nz-input-group>
+                    <input type="text" nz-input formControlName="title" appCustomAutoFocus
+                    [placeholder]="'admin.home.college_year.title' | translate" />
+                </nz-input-group>
+                </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+                <nz-form-label nzRequired>
+                    {{ 'admin.home.college_year.mean' | translate }}
+                </nz-form-label>
+                <nz-form-control [nzErrorTip]="'admin.home.college_year.mean_error' | translate">
                     <nz-input-group>
-                      <input type="text" nz-input formControlName="title" appCustomAutoFocus
-                        [placeholder]="'admin.home.college_year.title' | translate" />
+                        <input type="number" nz-input formControlName="mean" appCustomAutoFocus 
+                            [placeholder]="'admin.home.college_year.mean' | translate" />
                     </nz-input-group>
-                  </nz-form-control>
+                </nz-form-control>
                 </nz-form-item>
-                <nz-form-item>
-                    <nz-form-label nzRequired>
-                      {{ 'admin.home.college_year.mean' | translate }}
-                    </nz-form-label>
-                    <nz-form-control [nzErrorTip]="'admin.home.college_year.mean_error' | translate">
-                      <nz-input-group>
-                            <input type="number" nz-input formControlName="mean" appCustomAutoFocus 
-                                [placeholder]="'admin.home.college_year.mean' | translate" />
-                      </nz-input-group>
-                    </nz-form-control>
-                  </nz-form-item>
-                <nz-spin [nzSpinning]="isConfirmLoading">
-                    <button nz-button class="form-button form-margin" [nzType]="'primary'">
-                      {{'general_data.save' | translate | uppercase}}
-                    </button>
-                </nz-spin>
-            </form>
+            <nz-spin [nzSpinning]="isConfirmLoading">
+                <button nz-button class="form-button form-margin" [nzType]="'primary'">
+                    {{'general_data.save' | translate | uppercase}}
+                </button>
+            </nz-spin>
+        </form>
+    </div>
+    <div *nzModalFooter>
         </div>
-        <div *nzModalFooter>
-            </div>
-
-
-    </nz-modal>
-</div>
-
+</nz-modal>

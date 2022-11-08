@@ -1,9 +1,15 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CollegeYear } from '@app/models/collegeYear';
+import { QueryParams } from '@app/models/query';
+import { TableHeader } from '@app/models/table';
+import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
+import { parseQueryParams } from '@app/shared/utils';
 import { environment } from '@environments/environment';
+import { truncate } from 'lodash';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
+import { CollegeYearService } from './college-year.service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -13,15 +19,9 @@ const BASE_URL = environment.authApiURL;
   templateUrl: './college-year.component.html',
   styleUrls: ['./college-year.component.less']
 })
-export class CollegeYearComponent implements OnInit {
-  private headers =  new HttpHeaders({
-    'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
-  })
-
-
-  
-  all_year: CollegeYear[] = []
+export class CollegeYearComponent implements OnInit, AfterContentInit {
+  @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
+  headers: TableHeader[] = [];
   confirmModal?: NzModalRef;
   form!: FormGroup;
   isvisible = false;
@@ -30,59 +30,91 @@ export class CollegeYearComponent implements OnInit {
   title = '';
   uuid= "";
   isDisabled: boolean = false
+  actions = {
+    add: true,
+    edit: true,
+    delete: true,
+    detail: false,
+  };
 
-  options = {
-    headers: this.headers
-  }
-
-  constructor(private http: HttpClient, private modal: NzModalService, private fb: FormBuilder) { }
-
-  ngOnInit(): void {
-    let options = {
-      headers: this.headers
-    }
-    this.http.get<any>(`${BASE_URL}/college_year/`, options).subscribe(
-      data => this.all_year = data,
-      error => console.error("error as ", error)
-    );
+  constructor(
+    public service: CollegeYearService, 
+    private modal: NzModalService, 
+    private fb: FormBuilder) { 
 
     this.form = this.fb.group({
       title: [null, [Validators.required]],
       mean: [null, [Validators.required]],
     });
-  }
+    }
+    ngOnInit(): void {
+      this.fetchData = this.fetchData.bind(this)
+    }
+  
+    fetchData(params?: QueryParams){
+      return this.service.getDataObservable(parseQueryParams(params))
+    }
 
-  showConfirm(name?: string, uuid?: string): void{
+    ngAfterContentInit(): void {
+      this.headers = [
+        {
+          title: 'Titre',
+          selector: 'title',
+          isSortable: true,
+        },
+        {
+          title: 'Code',
+          selector: 'code',
+          isSortable: true,
+        },
+        {
+          title: 'Moyenne',
+          selector: 'mean',
+          isSortable: true,
+        },
+      ];
+    }
+
+  showConfirm(name: string, uuid: string): void{
     this.confirmModal = this.modal.confirm({
       nzTitle: "Voulez-vous supprimer "+name+"?",
       nzOnOk: () => {
-        this.http.delete<any>(`${BASE_URL}/mentions/?uuid=`+uuid, this.options).subscribe(
-          data => this.all_year = data,
-          error => console.error("error as ", error)
-        );
+        this.service.deletData(uuid)
+        this.datatable.fetchData()
       }
     })
   }
 
+  onDelete(row: any) {
+    this.showConfirm(row.title, row.uuid);
+  }
+
+  onEdit(row: any) {
+    this.showModalEdit(row.uuid);
+  }
+
+  onAdd() {
+    this.showModal();
+  }
   
-  submitForm(): void {
+  async submitForm(){
     if (this.form.valid) {
-      const title = this.form.value.title
       const mean = this.form.value.mean
       this.isConfirmLoading = true
-      const body = {
-        mean: mean
-      }
+      
       if (this.isEdit){
-        this.http.put<any>(`${BASE_URL}/college_year/?uuid=`+this.uuid, body, this.options).subscribe(
-          data => this.all_year = data,
-          error => console.error("error as ", error)
-        )
+        const body = {
+        mean: mean
+        }
+        await this.service.updateData(this.uuid, body).toPromise()
+        this.datatable.fetchData()
       }else{
-        this.http.post<any>(`${BASE_URL}/college_year/`,body, this.options).subscribe(
-          data => this.all_year = data,
-          error => console.error("error as ", error)
-        )
+        const body = {
+          title: this.form.value.title, 
+          mean: mean
+        }
+        await this.service.addData(body).toPromise()
+        this.datatable.fetchData()
       }
       
       this.isvisible = false,
@@ -104,18 +136,14 @@ export class CollegeYearComponent implements OnInit {
     this.form.get('mean')?.setValue('');
   }
 
-  showModalEdit(uuid: string): void{
+  async showModalEdit(uuid: string){
     this.isEdit = true
     this.uuid = uuid
-    this.http.get<any>(`${BASE_URL}/college_year/`+uuid, this.options).subscribe(
-      data => {
-        console.error(data)
-        this.form.get('title')?.setValue(data.title),
-        this.form.get('mean')?.setValue(data.mean)
-    },
-      error => console.error("error as ", error)
-    );
+    let data: any = await this.service.getData(uuid).toPromise()
+    this.form.get('title')?.setValue(data.title),
+    this.form.get('mean')?.setValue(data.mean)
     this.isvisible = true
+    
   }
 
 

@@ -30,13 +30,4 @@ class CRUDJourney(CRUDBase[Journey, JourneyCreate, JourneyUpdate]):
         db.refresh(db_obj)
         return db_obj
 
-    def get_multi(
-        self, db: Session
-    ) -> List[Journey]:
-        return (
-            db.query(self.model)
-            .all()
-        )
-
-
 journey = CRUDJourney(Journey)

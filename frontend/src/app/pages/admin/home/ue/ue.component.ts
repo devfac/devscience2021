@@ -1,30 +1,34 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CollegeYear } from '@app/models/collegeYear';
 import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
-import { ColumnItem, Ue, UeColumn } from '@app/models/ue';
-import { environment } from '@environments/environment';
+import { QueryParams } from '@app/models/query';
+import { TableHeader } from '@app/models/table';
+import { Ue } from '@app/models/ue';
+import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
+import { parseQueryParams } from '@app/shared/utils';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
+import { CollegeYearService } from '../college-year/college-year.service';
+import { JourneyService } from '../journey/journey.service';
+import { MentionService } from '../mention/mention.service';
+import { UeService } from './ue.service';
 
-const BASE_URL = environment.authApiURL;
 
 @Component({
   selector: 'app-ue',
   templateUrl: './ue.component.html',
   styleUrls: ['./ue.component.less']
 })
-export class UeComponent implements OnInit {
-  private headers =  new HttpHeaders({
-    'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
-  })
+export class UeComponent implements OnInit, AfterContentInit {
+  @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
+  headers: TableHeader[] = [];
+
   user = localStorage.getItem('user')
-  all_years: CollegeYear[] = []
-  all_journey: Journey[] = []
-  all_mention: Mention[] = []
-  all_ue: Ue[] = []
+  allYears: CollegeYear[] = []
+  allJourney: Journey[] = []
+  allMention: Mention[] = []
+  allUe: Ue[] = []
   listOfSemester = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
   semesterTitles: any[] = []
   confirmModal?: NzModalRef;
@@ -35,88 +39,64 @@ export class UeComponent implements OnInit {
   isEdit = false;
   title = '';
   uuid= "";
-  data = ""
-  actualYear: string = ""
+  actualYear: string | null = ""
+  titles: any[] = []
+  actions = {
+    add: true,
+    edit: true,
+    delete: true,
+    detail: false,
+  };
+  
+  isInit: boolean = false
+  constructor(
+    private modal: NzModalService, 
+    private fb: FormBuilder,
+    private serviceJourney: JourneyService,
+    private serviceMention: MentionService,
+    private serviceYears: CollegeYearService,
+    private service: UeService
+    ) { 
+      this.form = this.fb.group({
+        title: [null, [Validators.required]],
+        semester: [null, [Validators.required]],
+        journey: [null, [Validators.required]],
+        credit: [null, [Validators.required]],
+        mention: [null, [Validators.required]],
+        collegeYear: [null],
+      });}
 
-  options = {
-    headers: this.headers
+  async ngAfterContentInit() {
+    this.headers = [
+    {
+      title: 'Title',
+      selector: 'title',
+      isSortable: true,
+    },{
+      title: 'Parcours',
+      selector: 'abbreviation_journey',
+      isSortable: false,
+    },{
+      title: 'Semestre',
+      selector: 'semester',
+      isSortable: true,
+    },{
+      title: 'Credit',
+      selector: 'credit',
+      isSortable: true,
+    },
+  ];
+
   }
 
-  listOfColumns: ColumnItem[] = [
-    {
-      name:"Title",
-      sortOrder: null,
-      sortFn: (a: UeColumn, b:UeColumn) => a.title.localeCompare(b.title),
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn: null
-    },
-    {
-      name:"Journey",
-      sortOrder: null,
-      sortFn: (a: UeColumn, b:UeColumn) => a.abbreviation_journey.localeCompare(b.abbreviation_journey),
-      sortDirections: ['ascend','descend', null],
-      filterMultiple: false,
-      listOfFilter: [],
-      filterFn:(list: string[], item: UeColumn) => list.some(journey => item.abbreviation_journey.indexOf(journey) !== -1)
-    },
-    {
-      name:"Semester",
-      sortOrder: null,
-      sortFn: (a: UeColumn, b:UeColumn) => a.semester.localeCompare(b.semester),
-      sortDirections: ['ascend','descend', null],
-      filterMultiple: false,
-      listOfFilter: this.semesterTitles,
-      filterFn:(semester: string, item: UeColumn) => item.semester.indexOf(semester) !== -1
-    },
-    {
-      name:"Poids",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn: null
-    },
-    {
-      name:"Action",
-      sortOrder: null,
-      sortFn: null,
-      sortDirections: ['ascend', 'descend', null],
-      filterMultiple: true,
-      listOfFilter: [],
-      filterFn:null
-    },
-  ]
-  constructor(private http: HttpClient,  private modal: NzModalService, private fb: FormBuilder) { }
+  async ngOnInit(){
+    this.fetchData = this.fetchData.bind(this)
 
-  ngOnInit(): void {
-    let options = {
-      headers: this.headers
-    }
+    this.allMention = await this.serviceMention.getDataPromise().toPromise()
+    this.testStorage('mention', this.allMention[0].uuid)
 
-    this.http.get<any>(`${BASE_URL}/mentions/`, options).subscribe(
-      data => {
-        this.all_mention = data,
-        this.form.get('mention')?.setValue(data[0].uuid)
-      },
-      error => console.error("error as ", error)
-    );
-
-    this.http.get<any>(`${BASE_URL}/college_year/`, options).subscribe(
-      data => {
-        this.all_years = data,
-        this.actualYear = data[0].title
-        this.form.get('collegeYear')?.setValue(this.actualYear)
-        this.http.get<any>(`${BASE_URL}/matier_ue/?schema=`+data[0].title, options).subscribe(
-          data => this.all_ue = data,
-          error => console.error("error as ", error)
-        );
-      },
-      error => console.error("error as ", error)
-    );
-
+    this.allJourney = await this.serviceJourney.getDataByMention(this.form.get('mention')?.value).toPromise()
+    
     for(let i=0; i<this.listOfSemester.length; i++){
       this.semesterTitles.push(
         {
@@ -125,27 +105,45 @@ export class UeComponent implements OnInit {
       )
     }
 
-    this.form = this.fb.group({
-      title: [null, [Validators.required]],
-      semester: [null, [Validators.required]],
-      journey: [null, [Validators.required]],
-      credit: [null, [Validators.required]],
-      mention: [null, [Validators.required]],
-      collegeYear: [null],
-    });
+    this.allYears = await this.serviceYears.getDataPromise().toPromise()
+    this.testStorage('collegeYear', this.allYears[0].title)
+    this.actualYear = localStorage.getItem('collegeYear')
   }
-  showConfirm(name?: string, uuid?: string): void{
+  fetchData(params?: QueryParams){
+    return this.service.getDataObservable(parseQueryParams(params))
+  }
+  testStorage(key: string, value: string){
+    if(localStorage.getItem(key)){
+      this.form.get(key)?.setValue(localStorage.getItem(key))
+    }else{
+      localStorage.setItem(key, value)
+      this.form.get(key)?.setValue(localStorage.getItem(key))
+    }
+  }
+
+  showConfirm(name: string, uuid: string): void{
     this.confirmModal = this.modal.confirm({
       nzTitle: "Voulez-vous supprimer "+name+"?",
-      nzOnOk: () => {
-        this.http.delete<any>(`${BASE_URL}/matier_ue/`+uuid+`?schema=`+this.form.get('collegeYear')?.value, this.options).subscribe(
-          data => this.all_ue = data,
-          error => console.error("error as ", error)
-        );
+      nzOnOk: async () => {
+        await this.service.deletData(uuid)
+        this.datatable.fetchData()
       }
     })
   }
-  submitForm(): void {
+
+  onDelete(row: any) {
+    this.showConfirm(row.title, row.uuid);
+  }
+
+  onEdit(row: any) {
+    this.showModalEdit(row.uuid);
+  }
+
+  onAdd() {
+    this.showModal();
+  }
+
+  async submitForm(){
     if (this.form.valid) {
       const data = {credit: this.form.value.credit}
 
@@ -153,21 +151,19 @@ export class UeComponent implements OnInit {
       console.error(data)
       if (this.isEdit){
         this.form.get('title')?.disabled
-        this.http.put<any>(`${BASE_URL}/matier_ue/`+this.uuid+`?schema=`+this.form.get('collegeYear')?.value, data, this.options).subscribe(
-          data => this.all_ue = data,
-          error => console.error("error as ", error)
-        )
+        await this.service.updateData(this.uuid, data).toPromise()
+        this.datatable.fetchData()
       }else{
         const data = {
           title: this.form.value.title,
           credit: this.form.value.credit,
+          value: "",
+          key_unique: "",
           uuid_journey: this.form.value.journey,
           semester: this.form.value.semester
         }
-        this.http.post<any>(`${BASE_URL}/matier_ue/?schema=`+this.form.get('collegeYear')?.value,data, this.options).subscribe(
-          data => this.all_ue = data,
-          error => console.error("error as ", error)
-        )
+        await this.service.addData(data).toPromise()
+        this.datatable.fetchData()
       }
       
       this.isvisible = false,
@@ -191,45 +187,27 @@ export class UeComponent implements OnInit {
     this.form.get('semester')?.setValue('');
   }
 
-  showModalEdit(uuid: string): void{
+  async showModalEdit(uuid: string){
     this.isEdit = true
     this.uuid = uuid
-    this.http.get<any>(`${BASE_URL}/matier_ue/`+uuid+`?schema=`+this.form.get('collegeYear')?.value, this.options).subscribe(
-      data => {
-        this.form.get('title')?.setValue(data.title),
-        this.form.get('credit')?.setValue(data.credit),
-        this.form.get('journey')?.setValue(data.journey.uuid),
-        this.form.get('mention')?.setValue(data.journey.uuid_mention),
-        this.form.get('semester')?.setValue(data.semester)
-        this.http.get<any>(`${BASE_URL}/journey/`+this.form.get('mention')?.value, this.options).subscribe(
-          data_journey => {
-              console.error("error as ", data_journey)
-              this.all_journey = data_journey
-              this.form.get('journey')?.setValue(data.uuid_journey)
-          },
-          error => {
-            this.all_journey = []
-            console.error("error as ", error)
-          }
-        )
-      },
-      error => console.error("error as ", error)
-    );
+    
+    let data: any = await this.service.getData(uuid).toPromise()
+    this.form.get('title')?.setValue(data.title),
+    this.form.get('credit')?.setValue(data.credit),
+    this.form.get('journey')?.setValue(data.journey.uuid),
+    this.form.get('mention')?.setValue(data.journey.uuid_mention),
+    this.form.get('semester')?.setValue(data.semester)
+    if(this.form.get('mention')?.value){
+      this.allJourney = await this.serviceJourney.getDataByMention(this.form.get('mention')?.value).toPromise()
+    }
+
     this.isvisible = true
   }
 
-  getAllJourney(): void{
-    this.http.get<any>(`${BASE_URL}/journey/`+this.form.get('mention')?.value, this.options).subscribe(
-      data => {
-          console.error("error as ", data)
-          this.all_journey = data
-          this.form.get('journey')?.setValue('')
-      },
-      error => {
-        this.all_journey = []
-        console.error("error as ", error)
-      }
-    )
+  async getAllJourney(){
+    if(this.form.get('mention')?.value){
+      this.allJourney = await this.serviceJourney.getDataByMention(this.form.get('mention')?.value).toPromise()
+    }
   }
 
   handleCancel(): void{

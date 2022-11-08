@@ -1,5 +1,6 @@
 from typing import Any
 from fpdf import FPDF
+from .header import header
 
 
 def set_orientation(nbr: int) -> str:
@@ -53,7 +54,7 @@ class PDF(FPDF):
         image_univ = "images/logo_univ.jpg"
         image_fac = "images/logo_science.jpg"
 
-        pdf.add_font("alger", "", "Algerian.ttf", uni=True)
+        header(pdf)
 
         #pdf.image(image_univ, x=30, y=6, w=30, h=30)
         #pdf.image(image_fac, x=155, y=6, w=30, h=30)
@@ -64,9 +65,9 @@ class PDF(FPDF):
 
         mention = "MENTION:"
         mention_etudiant = f"{data['mention']}"
-        journey = "journey:"
+        journey = "Parcours:"
         journey_etudiant = f"{data['journey']}"
-        semester = "semester:"
+        semester = "Semestre:"
         semester_etudiant = f"{sems.upper()}"
         anne = "ANNÉE UNIVERSITAIRE:"
         anne_univ = f"{data['anne']}"
@@ -92,13 +93,13 @@ class PDF(FPDF):
         pdf.cell(0, 8, txt=mention_etudiant, ln=1)
 
         pdf.set_font("arial", "BI", 13)
-        pdf.cell(29, 8, txt=journey, align="L")
+        pdf.cell(24, 8, txt=journey, align="L")
 
         pdf.set_font("arial", "I", 12)
         pdf.cell(0, 8, txt=journey_etudiant, ln=1)
 
         pdf.set_font("arial", "BI", 13)
-        pdf.cell(28, 8, txt=semester, align="L")
+        pdf.cell(24, 8, txt=semester, align="L")
 
         pdf.set_font("arial", "I", 12)
         pdf.cell(0, 8, txt=semester_etudiant, ln=1)
@@ -124,7 +125,7 @@ class PDF(FPDF):
         pdf.set_font("arial", "I", 12)
         pdf.cell(0, 8, txt=num, ln=1)
 
-    def create_list_examen(sems: str, parcour: str, data: Any, matiers: Any, etudiants: Any):
+    def create_list_examen(sems: str, journey: str, data: Any, matiers: Any, etudiants: Any):
         pdf = PDF("P", "mm", "a4")
         pdf.add_page()
 
@@ -170,7 +171,7 @@ class PDF(FPDF):
 
             for i, etudiant in enumerate(etudiants):
                 num_carte_ = f"{etudiant['num_carte']}"
-                name = f"{etudiant['nom']} {etudiant['prenom']}"
+                name = f"{etudiant['last_name']} {etudiant['first_name']}"
                 pdf.cell(1, 7, txt="", ln=1)
                 pdf.set_font("arial", "I", 10)
                 pdf.cell(1, 5, txt="")
@@ -201,7 +202,7 @@ class PDF(FPDF):
         num_ = int(data['skip'])
         for i, etudiant in enumerate(etudiants):
             num_carte_ = etudiant["num_carte"]
-            name = f"{etudiant['nom']} {etudiant['prenom']}"
+            name = f"{etudiant['last_name']} {etudiant['first_name']}"
             pdf.cell(1, 7, txt="", ln=1)
             pdf.set_font("arial", "I", 10)
             pdf.cell(1, 5, txt="")
@@ -213,5 +214,5 @@ class PDF(FPDF):
             pdf.cell(160, 5, txt=name, border=1, align="L")
             num_ += 1
 
-        pdf.output(f"files/list_exam_{sems}_{parcour.abreviation}_{data['skip']}_à_{data['limit']}.pdf", "F")
-        return f"files/list_exam_{sems}_{parcour.abreviation}_{data['skip']}_à_{data['limit']}.pdf"
+        pdf.output(f"files/list_exam_{sems}_{journey}_{data['skip']}_à_{data['limit']}.pdf", "F")
+        return f"files/list_exam_{sems}_{journey}_{data['skip']}_à_{data['limit']}.pdf"

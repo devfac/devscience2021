@@ -1,0 +1,145 @@
+<form nz-form [formGroup]="form" class="form"  nzLayout="vertical">
+    <div class="header-title" nz-row>
+        <nz-form-item>
+            <nz-form-label>
+              {{ 'admin.home.college_year.title' | translate }}
+            </nz-form-label>
+            <nz-form-control >
+              <nz-input-group>
+                <nz-select
+                    formControlName="collegeYear"
+                    [nzPlaceHolder]="'admin.home.college_year.title' | translate"
+                    (ngModelChange)="getAllStudents()"
+                    >
+                    <nz-option *ngFor="let item of allYears"
+                        [nzLabel]="item.title"
+                        [nzValue]="item.title"
+                    >
+                    </nz-option>
+                </nz-select>
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+            <nz-form-label style="margin-left: 30px;">
+              {{ 'admin.home.mention.title' | translate }}
+            </nz-form-label>
+            <nz-form-control >
+              <nz-input-group>
+                <nz-select style="margin-left: 30px;"
+                    formControlName="mention"
+                    [nzPlaceHolder]="'admin.home.mention.title' | translate"
+                    (ngModelChange)="getAllStudents()"
+                    >
+                    <nz-option *ngFor="let item of allMention"
+                        [nzLabel]="item.title"
+                        [nzValue]="item.uuid"
+                    >
+                    </nz-option>
+                </nz-select>
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+
+      </div>
+  </form>
+  <app-datatable-crud
+  *ngIf="isLoading"
+  [title]="'admin.product.product_list.title' | translate"
+  [headers]="headers"
+  [fetchDataFn]="fetchData"
+  [width]="(headers.length)*180"
+  [showPagination]="true"
+  classNames="product-list-table"
+  ></app-datatable-crud>
+
+  <ng-template #sexTemplate let-value="value" let-row="row" >
+    <nz-select
+    nzAllowClear
+    [ngModel]="value"
+    [nzPlaceHolder]="'admin.student.sex' | translate"
+    style="width: 100%;"
+    >
+    <nz-option *ngFor="let item of typeSex"
+        [nzLabel]="item.label"
+        [nzValue]="item.value"
+    >
+    </nz-option>
+  </nz-select>
+  </ng-template>
+
+  <ng-template #nationTemplate let-value="value" let-row="row" >
+    <nz-select
+    nzAllowClear
+    [ngModel]="value"
+    [nzPlaceHolder]="'admin.student.nation' | translate"
+    style="width: 100%;"
+    >
+    <nz-option *ngFor="let item of typeNation"
+        [nzLabel]="item.label"
+        [nzValue]="item.value"
+    >
+    </nz-option>
+  </nz-select>
+  </ng-template>
+  
+  <ng-template #baccTemplate let-value="value" let-row="row" >
+    <nz-select
+    nzAllowClear
+    [ngModel]="value"
+    [nzPlaceHolder]="'admin.student.bacc_serie' | translate"
+    style="width: 100%;"
+    >
+    <nz-option *ngFor="let item of typeSerie"
+        [nzLabel]="item.label"
+        [nzValue]="item.value"
+    >
+    </nz-option>
+  </nz-select>
+  </ng-template>
+
+  <ng-template #semesterTemplate let-value="value" let-row="row" >
+    <nz-select
+    nzAllowClear
+    [ngModel]="value"
+    [nzPlaceHolder]="'admin.home.journey.semester' | translate"
+    style="width: 100%;"
+    >
+    <nz-option *ngFor="let item of listOfSemester"
+        [nzLabel]="item"
+        [nzValue]="item"
+    >
+    </nz-option>
+  </nz-select>
+  </ng-template>
+
+  <ng-template #typeTemplate let-value="value" let-row="row" >
+    <nz-select
+    nzAllowClear
+    [ngModel]="value"
+    [nzPlaceHolder]="'admin.student.type' | translate"
+    style="width: 100%;"
+    >
+    <nz-option *ngFor="let item of typeEtudiant"
+        [nzLabel]="item.label"
+        [nzValue]="item.value"
+    >
+    </nz-option>
+  </nz-select>
+  </ng-template>
+
+  <ng-template #situationTemplate let-value="value" let-row="row" >
+    <nz-select
+    nzAllowClear
+    [ngModel]="value"
+    [nzPlaceHolder]="'admin.student.situation' | translate"
+    style="width: 100%;"
+    >
+    <nz-option *ngFor="let item of typeSituation"
+        [nzLabel]="item.label"
+        [nzValue]="item.value"
+    >
+    </nz-option>
+  </nz-select>
+  </ng-template>

@@ -14,12 +14,17 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.Mention])
 def read_mentions(
     db: Session = Depends(deps.get_db),
+    *,
+    limit: int = 100,
+    offset: int = 0,
+    order: str = "asc",
+    order_by: str = "title",
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve mentions.
     """
-    mentions = crud.mention.get_multi(db=db)
+    mentions = crud.mention.get_multi(db=db, limit=limit, skip=offset, order=order, order_by=order_by)
     return mentions
 
 
@@ -73,11 +78,11 @@ def update_mention(
     return crud.mention.get_multi(db=db)
 
 
-@router.get("/{uuid}", response_model=schemas.Mention)
+@router.get("/by_uuid/", response_model=schemas.Mention)
 def read_mention(
     *,
     db: Session = Depends(deps.get_db),
-    uuid: UUID,
+    uuid: str,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """

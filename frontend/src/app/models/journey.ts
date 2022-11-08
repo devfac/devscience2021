@@ -3,7 +3,7 @@ import { NzTableSortOrder, NzTableSortFn, NzTableFilterList, NzTableFilterFn } f
 export interface Journey{
     uuid: string,
     title: string,
-    semester: string,
+    semester: string[],
     abbreviation: string,
     mention: any
     mention_title: string

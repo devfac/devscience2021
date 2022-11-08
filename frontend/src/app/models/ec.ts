@@ -7,6 +7,7 @@ export interface Ec{
     semester: string
     journey: Journey,
     value_ue: string,
+    value: string,
     weight: number,
     user: string,
     is_optional: boolean

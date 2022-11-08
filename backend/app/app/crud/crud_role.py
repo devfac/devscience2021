@@ -27,13 +27,5 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         db.refresh(db_obj)
         return db_obj
 
-    def get_multi(
-        self, db: Session
-    ) -> List[Role]:
-        return (
-            db.query(self.model)
-            .all()
-        )
-
 
 role = CRUDRole(Role)

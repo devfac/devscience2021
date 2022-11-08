@@ -1,4 +1,8 @@
 {
+  "print": "Imprimer",
+  "add": "Créer",
+  "save":"Enregistrer",
+  "back":"Retour",
   "server_error": "Errors occur on server",
   "welcomeMessage": "Merci d'avoir rejoint {{ firstName }} !",
   "welcomeContent": "C'est super de vous avoir!",
@@ -135,7 +139,29 @@
         "optional":"Optionnel"
       },
       "note":{
-        "title":"Notes"
+        "title":"Notes",
+        "session":"Session",
+        "matier":"Matier",
+        "or":"ou",
+        "list":"Créer la liste au examen",
+        "message_ue_admis":" étudiant(s) ayant validé(s) l'ue: ",
+        "message_ec_admis":" étudiant(s) ayant validé(s) l'ec: ",
+        "message_ue_echec":" étudiant(s) qui n' est (ont) pas validé(s)  l'ue: ",
+        "message_ec_echec":" étudiant(s) qui n' est (ont) pas validé(s) l'ec: ",
+        "message_ec_refaire":" étudiant(s) ayant refaire l'ec: ",
+        "salle":"Salle",
+        "from":"Depuis",
+        "to":"à" ,
+        "filter": "Filtrer par",
+        "table_name":"Table note : {{name}}",
+        "nbr_ue": "Nombre d'UE",
+        "nbr_ec": "Nombre d'Ec",
+        "year": "Année"
+      },
+      "details":{
+        "title":"note details",
+        "info":"Information étudiants",
+        "title_note":"Note de l'etudiant semestre: {{semester}}"
       }
     },
     "student":{
@@ -159,6 +185,7 @@
       "bacc_year":"Baccalaureat Année",
       "bacc_num":"Baccalaureat Numéro",
       "bacc_serie":"Baccalaureat Serie",
+      "bacc_center":"Baccalaureat Centre",
       "work":"Profession",
       "father_name":"Nom du père",
       "father_work":"Profession du père",
@@ -188,7 +215,28 @@
       "selection":{
         "title":"Selection de dossier",
         "is_selected":"Selecioné"
+      },
+      "dashboard":{
+        "title":"Tableau de bord"
+      },
+      "upload":{
+        "title":"Upload"
       }
+    },
+    "toolpit":{
+      "detlete":"Supprimer",
+      "view":"Voir details",
+      "edit":"Editer",
+      "create":"Créer",
+      "refresh":"Actualiser",
+      "result":"Voir resultat",
+      "save":"Sauvegarder",
+      "cancel":"Annuler",
+      "list_examen":"List au examen",
+      "inf":"Inferieur à la moyene",
+      "sup":"Supérieur ou égal à la moyenne",
+      "rattrapage":"Liste rattrapé",
+      "download":"télecharger le resultat {{result}} "
     }
   },
   "auth": {

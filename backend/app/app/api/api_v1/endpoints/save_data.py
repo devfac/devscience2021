@@ -19,25 +19,17 @@ router = APIRouter()
 def get_models(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
+        model_name: str = "student",
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     """
-    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schema)} not found.", )
-    all_table = check_table_info(schema)
-    save_data.create_workbook(decode_schemas(schema), all_table, "models")
-    for table in all_table:
-        colums = check_columns_exist(schema, table)
-        save_data.write_data_title(decode_schemas(schema), table, colums, "models")
-
     all_table = check_table_info("public")
-    save_data.create_workbook("public", all_table, "models")
     for table in all_table:
-        colums = check_columns_exist("public", table)
-        save_data.write_data_title("public", table, colums, "models")
+        if table == model_name:
+            save_data.create_workbook(model_name, [model_name], "models")
+            columns = check_columns_exist("public", table)
+            save_data.write_data_title(table, table, columns, "models")
 
     return {"msg": "succes"}
 
@@ -81,30 +73,29 @@ def get_models_notes(
 @router.post("/insert_data/", response_model=List[Any])
 def insert_from_xlsx(*,
                      file: UploadFile = File(...),
-                     schema: str,
                      current_user: models.User = Depends(deps.get_current_active_user),
                      ) -> Any:
     """
     """
-    name = decode_schemas(schema)
-    all_data = save_data.get_data_xlsx(file.filename, "ancien_etudiant")
+    all_data = save_data.get_data_xlsx(file.filename, "student")
     return all_data
 
 
 @router.post("/uploadfile/")
 async def create_upload_file(*,
                              uploaded_file: UploadFile = File(...),
-                             schema: str,
+                             model_name: str = "student",
                              current_user: models.User = Depends(deps.get_current_active_user)
                              ):
     file_location = f"files/excel/uploaded/{uploaded_file.filename}"
     with open(file_location, "wb+") as file_object:
         file_object.write(uploaded_file.file.read())
 
-    all_data_ = {}
+    all_data = []
     cle = ""
-    all_table = check_table_info(schema)
+    all_table = check_table_info("public")
     all_sheet = save_data.get_all_sheet(file_location)
+    """
     if len(all_table) != len(all_sheet):
         raise HTTPException(
             status_code=400,
@@ -117,36 +108,31 @@ async def create_upload_file(*,
                 status_code=400,
                 detail=f"invalide file {all_sheet[i]} not found",
             )
-
+    """
     for table in all_table:
-        if table == "unite_enseing":
-            cle = "key_unique"
-        elif table == "element_const":
-            cle = "key_unique"
-        elif table == "ancien_etudiant":
+        if table == model_name:
             cle = "num_carte"
-        elif table == "nouveau_etudiant":
-            cle = "num_carte"
-        valid = save_data.validation_file(file_location, table, schema)
-        if valid != "valid":
-            raise HTTPException(
-                status_code=400,
-                detail=valid
-            )
-        all_data = save_data.get_data_xlsx(file_location, table)
-        for data in all_data:
-            if table == "nouveau_etudiant":
-                data["select"] = bool(data["select"])
-            elif table == "ancien_etudiant":
-                if data["moyenne"] == "None":
-                    data["moyenne"] = 0.0
-            exist_data = crud.save.exist_data(schema, table, cle, data[cle])
-            if not exist_data and data[cle] != "None":
-                one_data = crud.save.insert_data(schema, table, data)
-        all_data_[table] = all_data
-
+            valid = save_data.validation_file(file_location, table, "public")
+            if valid != "valid":
+                raise HTTPException(
+                    status_code=400,
+                    detail=valid
+                )
+            all_data = save_data.get_data_xlsx(file_location, table)
+            print(all_data)
+            """
+            for data in all_data:
+                if table == "student":
+                    if data["mean"] == "None":
+                        data["mean"] = 0.0
+                exist_data = crud.save.exist_data("public", table, cle, data[cle])
+                if not exist_data and data[cle] != "None":
+                    one_data = crud.save.insert_data("public", table, data)
+            cle = "uuid"
+            all_data_[table] = all_data
+            """
     os.remove(file_location)
-    return all_data_
+    return all_data
 
 
 @router.post("/upload_note_file/")

@@ -3,6 +3,7 @@ from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 from app.db.base_class import Base
 
@@ -27,9 +28,15 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db.query(self.model).filter(self.model.uuid == uuid).first()
 
     def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100
+            self, db: Session, limit: int = 100, skip: int = 0, order_by: str = "title", order: str = "ASC"
     ) -> List[ModelType]:
-        return db.query(self.model).offset(skip).limit(limit).all()
+        return (
+            db.query(self.model)
+            .order_by(text(f"{order_by} {order}"))
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
     def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in)
@@ -52,7 +59,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         else:
             update_data = obj_in.dict(exclude_unset=True)
         for field in obj_data:
-            if field in update_data:
+            if field in update_data and field is not  None:
                 setattr(db_obj, field, update_data[field])
         db.add(db_obj)
         db.commit()
@@ -70,3 +77,44 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.delete(obj)
         db.commit()
         return obj
+
+    def dynamic_filter(self,db: Session, *,
+                       limit: int = 100, skip: int = 0,
+                       order_by: str = "title",
+                       order: str = "ASC",
+                       filter_condition: List
+                       ) -> ModelType:
+        """
+        eq for ==
+        lt for <
+        ge for >
+        in for _in
+        like for like
+        """
+        __query = db.query(self.model)
+        for raw in filter_condition:
+            try:
+                key, op, value = raw
+            except ValueError:
+                raise Exception(f'invalid filter {raw}')
+            column = getattr(self.model, key, None)
+            if not column:
+                raise Exception(f'invalid filter column {key}')
+            if op == 'in':
+                if isinstance(value, list):
+                    filt = column.in_(value)
+                else:
+                    filt = column.in_(value.split(','))
+            else:
+                try:
+                    attr = list(filter(lambda e: hasattr(column, e % op), ['%s', '%s_', '__%s__']))[0] % op
+                except IndexError:
+                    raise Exception(f'invalid filter operator {op}')
+                if value == 'null':
+                    value = None
+                filt = getattr(column, attr)(value)
+            __query = __query.filter(filt)
+        return( __query.order_by(text(f"{order_by} {order}"))
+                        .offset(skip)
+                        .limit(limit)
+                        .all())

@@ -5,30 +5,34 @@ from typing import Any, List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
-from app import crud, models, schemas
+from app import crud, models, schemas, utils
 from app.api import deps
-from app.schemas.student import Receipt
 from app.utils import create_num_carte, find_in_list
-from fastapi.encoders import jsonable_encoder
 
 router = APIRouter()
 
 
-@router.get("/ancien", response_model=List[schemas.AncienStudent])
+@router.get("/ancien/", response_model=List[schemas.AncienStudent])
 def read_ancien_student(
         *,
         db: Session = Depends(deps.get_db),
         college_year: str,
         uuid_mention: str,
+        limit: int = 100,
+        offset: int = 0,
+        order: str = "asc",
+        order_by: str = "last_name",
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve ancien student.
     """
-    students = crud.ancien_student.get_by_mention(db=db, college_year=college_year, uuid_mention=uuid_mention)
+    students = crud.ancien_student.get_by_mention(db=db, college_year=college_year, order_by=order_by, order=order,
+                                                  uuid_mention=uuid_mention, limit=limit, skip=offset)
     all_student = []
     for on_student in students:
         if on_student.uuid_journey:
@@ -45,18 +49,21 @@ def read_ancien_student(
     return all_student
 
 
-@router.get("/new/all", response_model=List[schemas.SelectStudentBase])
+@router.get("/new/all/", response_model=List[schemas.SelectStudentBase])
 def read_new_student(
         *,
         db: Session = Depends(deps.get_db),
         college_year: str,
         uuid_mention: str,
+        limit: int = 100,
+        offset: int = 0,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve new student.
     """
-    students = crud.new_student.get_by_mention(db=db,uuid_mention=uuid_mention, college_year=college_year)
+    students = crud.new_student.get_by_mention(db=db,uuid_mention=uuid_mention,
+                                               college_year=college_year, limit=limit, skip=offset)
     all_student = []
     for on_student in students:
         on_student.mention = crud.mention.get_by_uuid(db=db, uuid=on_student.uuid_mention)
@@ -64,18 +71,23 @@ def read_new_student(
             all_student.append(on_student)
     return all_student
 
-@router.get("/new_inscrit", response_model=List[schemas.NewStudent])
+@router.get("/new_inscrit/", response_model=List[schemas.NewStudent])
 def read_new_student(
         *,
         db: Session = Depends(deps.get_db),
         college_year: str,
         uuid_mention: str,
-        current_user: models.User = Depends(deps.get_current_active_user),
+        limit: int = 100,
+        offset: int = 0,
+        order: str = "asc",
+        order_by: str = "last_name",
+        current_user: models.User = Depends(deps.get_current_active_user)
 ) -> Any:
     """
     Retrieve new student.
     """
-    students = crud.new_student.get_by_mention(db=db,uuid_mention=uuid_mention, college_year=college_year)
+    students = crud.new_student.get_by_mention(db=db,uuid_mention=uuid_mention,order_by=order_by, order=order,
+                                               college_year=college_year, limit=limit, skip=offset)
     all_student = []
     for on_student in students:
         if on_student.uuid_journey:
@@ -92,7 +104,7 @@ def read_new_student(
                 all_student.append(on_student)
     return all_student
 
-@router.post("/ancien", response_model=List[schemas.AncienStudent])
+@router.post("/ancien/", response_model=schemas.AncienStudent)
 def create_ancien_student(
         *,
         db: Session = Depends(deps.get_db),
@@ -113,7 +125,7 @@ def create_ancien_student(
         list_receipt = [str(dict(student_in.receipt))]
         student_in.receipt_list = list_receipt
         student_in.receipt = ""
-        crud.ancien_student.create(db=db, obj_in=student_in)
+        student = crud.ancien_student.create(db=db, obj_in=student_in)
     else:
         k: int = 0
         list_receipt = []
@@ -131,25 +143,11 @@ def create_ancien_student(
             list_receipt_2.append(str(dict(student_in.receipt)))
         student_in.receipt_list = list_receipt_2
         student_in.receipt = ""
-        crud.ancien_student.update(db=db, db_obj=student, obj_in=student_in)
-    students = crud.ancien_student.get_all(db=db, college_year=student_in.actual_years)
-    all_student = []
-    for on_student in students:
-        if on_student.uuid_journey:
-            stud = schemas.AncienStudent(**jsonable_encoder(on_student))
-            stud.journey = crud.journey.get_by_uuid(db=db, uuid=on_student.uuid_journey)
-            for receipt in on_student.receipt_list:
-                receipt = receipt.replace("'",'"')
-                receipt = json.loads(receipt)
-                if receipt['year'] == stud.actual_years:
-                    stud.receipt = receipt
-                    break
-            if find_in_list(current_user.uuid_mention, str(stud.uuid_mention)) != -1:
-                all_student.append(stud)
-    return all_student
+        student = crud.ancien_student.update(db=db, db_obj=student, obj_in=student_in)
+    return student
 
 
-@router.post("/new", response_model=List[schemas.SelectStudentBase])
+@router.post("/new/", response_model=schemas.SelectStudentBase)
 def create_new_student(
         *,
         db: Session = Depends(deps.get_db),
@@ -169,22 +167,15 @@ def create_new_student(
         student_in.num_select = f"S{mention.abbreviation.upper()}{student_in.num_select}-{student_in.enter_years[2:4]}"
         student = crud.new_student.get_by_num_select(db=db, num_select=student_in.num_select)
         if not student:
-            crud.new_student.create(db=db, obj_in=student_in)
+            student = crud.new_student.create(db=db, obj_in=student_in)
         else:
             raise HTTPException(status_code=404, detail="Number already exist")
     else:
-        crud.new_student.update(db=db, db_obj=student, obj_in=student_in)
-    students = crud.new_student.get_all(db=db, college_year=student_in.actual_years)
-    all_student = []
-    for on_student in students:
-        on_student.mention = crud.mention.get_by_uuid(db=db, uuid=on_student.uuid_mention)
-        if find_in_list(current_user.uuid_mention, str(on_student.uuid_mention)) != -1:
-            all_student.append(on_student)
-
-    return all_student
+        student = crud.new_student.update(db=db, db_obj=student, obj_in=student_in)
+    return student
 
 
-@router.put("/new", response_model=List[schemas.NewStudent])
+@router.put("/new/",  response_model=schemas.NewStudent)
 def update_student_selected(
         *,
         db: Session = Depends(deps.get_db),
@@ -237,24 +228,19 @@ def update_student_selected(
     if not student or not student.is_selected:
         raise HTTPException(status_code=404, detail="Student not selected or not found")
 
+    student_in.receipt = ""
     if student.num_carte:
         student_in.num_carte = student.num_carte
     else:
         student_in.num_carte = create_num_carte(mention.plugged, str(num))
 
-    crud.new_student.update(db=db, db_obj=student, obj_in=student_in)
-    students = crud.new_student.get_all(db=db, college_year=student_in.actual_years)
-    all_student = []
-    for on_student in students:
-        if on_student.uuid_journey:
-            stud = schemas.NewStudent(**jsonable_encoder(on_student))
-            stud.journey = crud.journey.get_by_uuid(db=db, uuid=on_student.uuid_journey)
-            if find_in_list(current_user.uuid_mention, str(stud.uuid_mention)) != -1:
-                all_student.append(stud)
-    return all_student
+    student_in.inf_semester = utils.get_sems_min(student.level)
+    student_in.sup_semester = utils.get_sems_max(student.level)
+    student = crud.new_student.update(db=db, db_obj=student, obj_in=student_in)
+    return student
 
 
-@router.get("/num_carte", response_model=schemas.AncienStudent)
+@router.get("/num_carte/", response_model=schemas.AncienStudent)
 def read_student_by_num_carte(
         *,
         db: Session = Depends(deps.get_db),
@@ -274,13 +260,67 @@ def read_student_by_num_carte(
             receipt = receipt.replace("'", '"')
             receipt = json.loads(receipt)
             if receipt['year'] == student.actual_years:
-                print(receipt)
                 stud.receipt = receipt
         if find_in_list(current_user.uuid_mention, str(stud.uuid_mention)) != -1:
             return stud
 
 
-@router.get("/new", response_model=schemas.NewStudent)
+@router.get("/new_selected/", response_model=schemas.NewStudent)
+def read_student_by_num_select(
+        *,
+        db: Session = Depends(deps.get_db),
+        num_select: str,
+        current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Get student by num select.
+    """
+    student = crud.new_student.get_by_num_select(db=db, num_select=num_select)
+    if not student or not find_in_list(current_user.uuid_mention, str(student.uuid_mention)) != -1:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    if not student.is_selected:
+        raise HTTPException(status_code=404, detail="Student not selected")
+
+    if student.uuid_journey:
+        stud = schemas.NewStudent(**jsonable_encoder(student))
+        stud.journey = crud.journey.get_by_uuid(db=db, uuid=student.uuid_journey)
+        for receipt in student.receipt_list:
+            receipt = receipt.replace("'", '"')
+            receipt = json.loads(receipt)
+            if receipt['year'] == student.actual_years:
+                print(receipt)
+                stud.receipt = receipt
+        if find_in_list(current_user.uuid_mention, str(stud.uuid_mention)) != -1:
+            return stud
+    return student
+
+@router.get("/new_num_carte/", response_model=schemas.NewStudent)
+def read_student_by_num_carte(
+        *,
+        db: Session = Depends(deps.get_db),
+        num_carte: str,
+        current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Get student by num select.
+    """
+    student = crud.new_student.get_by_num_carte(db=db, num_carte=num_carte)
+    if not student or not find_in_list(current_user.uuid_mention, str(student.uuid_mention)) != -1:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    if not student.is_selected:
+        raise HTTPException(status_code=404, detail="Student not selected")
+
+    if student.receipt_list:
+        for receipt in student.receipt_list:
+            receipt = receipt.replace("'", '"')
+            receipt = json.loads(receipt)
+            if receipt['year'] == student.actual_years:
+                student.receipt = receipt
+    return student
+
+@router.get("/new/", response_model=schemas.NewStudent)
 def read_student_by_num_select(
         *,
         db: Session = Depends(deps.get_db),
@@ -296,50 +336,59 @@ def read_student_by_num_select(
     return student
 
 
-@router.get("/ancien/by_journey", response_model=List[schemas.AncienStudent])
+@router.get("/ancien/by_journey/", response_model=List[schemas.AncienStudent])
 def read_student_by_journey(
         *,
         db: Session = Depends(deps.get_db),
         college_year: str,
         uuid_journey: str,
+        limit: int,
+        offset: int,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get student by journey.
     """
-    student = crud.ancien_student.get_by_jouney(db=db, uuid_journey=uuid_journey, college_year=college_year)
+    student = crud.ancien_student.get_by_jouney(db=db, uuid_journey=uuid_journey,
+                                                college_year=college_year, limit=limit, skip=offset)
     return student
 
 
-@router.get("/new/by_journey", response_model=List[schemas.NewStudent])
+@router.get("/new/by_journey/", response_model=List[schemas.NewStudent])
 def read_student_by_journey(
         *,
         db: Session = Depends(deps.get_db),
         college_year: str,
         uuid_journey: str,
+        limit: int,
+        offset: int,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get student by journey.
     """
-    student = crud.new_student.get_by_jouney(db=db, uuid_journey=uuid_journey, college_year=college_year)
+    student = crud.new_student.get_by_jouney(db=db, uuid_journey=uuid_journey,
+                                             college_year=college_year, limit=limit, skip=offset)
     return student
 
 
-@router.get("/ancien/by_sup_semester_and_mention", response_model=List[schemas.AncienStudent])
+@router.get("/ancien/by_sup_semester_and_mention/", response_model=List[schemas.AncienStudent])
 def read_student_by_sup_semester_and_mention(
         *,
         db: Session = Depends(deps.get_db),
         college_year: str,
         uuid_mention: UUID,
         sup_semester: str,
+        limit: int,
+        offset: int,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get student by semester and mention.
     """
     students = crud.ancien_student.get_by_sup_semester_and_mention(
-        db=db, uuid_mention=uuid_mention, sup_semester=sup_semester, college_year=college_year)
+        db=db, uuid_mention=uuid_mention, sup_semester=sup_semester,
+        college_year=college_year, limit=limit, skip=offset)
     all_student = []
     for on_student in students:
         if on_student.uuid_journey:
@@ -349,13 +398,11 @@ def read_student_by_sup_semester_and_mention(
     return all_student
 
 
-@router.delete("/ancien", response_model=List[schemas.AncienStudent])
+@router.delete("/ancien/", response_model=List[schemas.AncienStudent])
 def delete_student(
         *,
         db: Session = Depends(deps.get_db),
         num_carte: str,
-        college_year: str,
-        uuid_mention: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -370,30 +417,14 @@ def delete_student(
         print(os.path.exists(getcwd() + "/files/photos/" + student.photo))
         if os.path.exists(getcwd() + "/files/photos/" + student.photo):
             os.remove(getcwd() + "/files/photos/" + student.photo)
-    students = crud.ancien_student.get_by_mention(db=db, college_year=college_year, uuid_mention=uuid_mention)
-    all_student = []
-    for on_student in students:
-        if on_student.uuid_journey:
-            for receipt in on_student.receipt_list:
-                receipt = receipt.replace("'", '"')
-                receipt = json.loads(receipt)
-                if receipt['year'] == on_student.actual_years:
-                    on_student.receipt = receipt
-                    break
-            stud = schemas.AncienStudent(**jsonable_encoder(on_student))
-            stud.journey = crud.journey.get_by_uuid(db=db, uuid=on_student.uuid_journey)
-            if find_in_list(current_user.uuid_mention, str(stud.uuid_mention)) != -1:
-                all_student.append(stud)
-    return all_student
+    return student
 
 
-@router.delete("/new", response_model=List[schemas.NewStudent])
+@router.delete("/new/", response_model=List[schemas.NewStudent])
 def delete_student(
         *,
         db: Session = Depends(deps.get_db),
         num_select: str,
-        college_year: str,
-        uuid_mention: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -407,17 +438,15 @@ def delete_student(
     if student and student.photo:
         if os.path.exists(getcwd() + "/files/photos/" + student.photo):
             os.remove(getcwd() + "/files/photos/" + student.photo)
-    students = crud.new_student.get_by_mention(db=db, uuid_mention=uuid_mention, college_year=college_year)
-    all_student = []
-    for on_student in students:
-        if find_in_list(current_user.uuid_mention, str(on_student.uuid_mention)) != -1:
-            all_student.append(on_student)
-    return all_student
+
+    return student
 
 
-@router.get("/photo")
+@router.get("/photo/")
 def get_file(name_file: str):
-    return FileResponse(path=getcwd() + "/files/photos/" + name_file)
+    path = getcwd() + "/files/photos/" + name_file
+    if os.path.exists(path):
+        return FileResponse(path=path)
 
 
 @router.post("/upload_photo/")

@@ -1,4 +1,8 @@
 {
+  "print": "print",
+  "add": "Create",
+  "save":"Save",
+  "back":"back",
   "server_error": "Errors occur on server",
   "welcomeMessage": "Thanks for joining, {{ firstName }}!",
   "welcomeContent": "It's great to have you!",
@@ -136,7 +140,27 @@
         "optional":"Optional"
       },
       "note":{
-        "title":"Notes"
+        "title":"Notes",
+        "session":"Session",
+        "matier":"Matier",
+        "or":"or",
+        "message_ue_admis":" étudiant(s) ayant validé(s) l'ue: ",
+        "message_ec_admis":" étudiant(s) ayant validé(s) l'ec: ",
+        "message_ue_echec":" étudiant(s) qui n' est (ont) pas validé(s)  l'ue: ",
+        "message_ec_echec":" étudiant(s) qui n' est (ont) pas validé(s) l'ec: ",
+        "message_ec_refaire":" étudiant(s) ayant refaire l'ec: ",
+        "salle":"Salle",
+        "from":"Depuis",
+        "to":"à" ,
+        "filter": "Filter by",
+        "nbr_ue": "Nombre d'UE",
+        "nbr_ec": "Nombre d'Ec",
+        "year": "Année"
+      },
+      "details":{
+        "title":"note details",
+        "info":"Students Information",
+        "title_note":"Note de l'etudiant semestre: {{semester}}"
       }
     },
     "student":{
@@ -160,6 +184,7 @@
       "bacc_year":"Baccalaureat years",
       "bacc_num":"Baccalaureat number",
       "bacc_serie":"Baccalaureat Serie",
+      "bacc_center":"Baccalaureat Centre",
       "work":"Job",
       "father_name":"father name",
       "father_work":"father work",
@@ -188,7 +213,28 @@
       "selection":{
         "title":"Selection",
         "is_selected":"Selected"
+      },
+      "dashboard":{
+        "title":"Dashboard"
+      },
+      "upload":{
+        "title":"Upload"
       }
+    },
+    "toolpit":{
+      "detlete":"Delete",
+      "view":"View details",
+      "edit":"Update",
+      "create":"Create",
+      "refresh":"Refresh",
+      "result":"Voir resultat",
+      "save":"Save",
+      "cancel":"Cancel",
+      "list_examen":"Examen list",
+      "inf":"Inferieur à la moyene",
+      "sup":"Supérieur ou égal à la moyenne",
+      "rattrapage":"List Rattrapé",
+      "download":"dounloade the result of  {{result}} "
     }
   },
   "auth": {

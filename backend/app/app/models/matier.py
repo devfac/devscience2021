@@ -1,39 +1,36 @@
-from typing import TYPE_CHECKING
+import uuid
 
 from sqlalchemy import Boolean, Column, Integer, String, Float
 from sqlalchemy.dialects.postgresql.base import UUID
-from sqlalchemy.ext.declarative import declarative_base
-import uuid
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey, MetaData, Table
+
+from app.db.base_class import Base
 from app.db.session import engine
 
 
-def create(schemas):
-    base = MetaData()
-    unite_enseing = Table("unite_enseing", base,
-                          Column("uuid", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
-                          Column("title", String),
-                          Column("value", String),
-                          Column("credit", Integer),
-                          Column("semester", String),
-                          Column("key_unique", String),
-                          Column("uuid_journey", UUID(as_uuid=True)),
-                          Column("uuid_mention", UUID(as_uuid=True)),
-                          schema=schemas
-                          )
-    element_const = Table("element_const", base,
-                          Column("uuid", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
-                          Column("title", String),
-                          Column("value", String),
-                          Column("weight", Float),
-                          Column("value_ue", String),
-                          Column("users", String),
-                          Column("semester", String),
-                          Column("is_optional", Boolean),
-                          Column("key_unique", String),
-                          Column("uuid_journey", UUID(as_uuid=True)),
-                          Column("uuid_mention", UUID(as_uuid=True)),
-                          schema=schemas
-                          )
-    unite_enseing.create(engine)
-    element_const.create(engine)
+class TeachingUnit(Base):
+    __tablename__ = "teaching_unit"
+    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    title = Column(String)
+    value = Column(String)
+    credit = Column(Integer)
+    semester = Column(String)
+    key_unique = Column(String)
+    uuid_journey = Column(UUID(as_uuid=True), ForeignKey("journey.uuid"))
+    journey = relationship("Journey", foreign_keys=[uuid_journey])
+
+class ConstituentElement(Base):
+    __tablename__ = "constituent_element"
+    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    title = Column(String)
+    value = Column(String)
+    weight = Column(Float)
+    value_ue = Column(String, ForeignKey("teaching_unit.value"))
+    semester = Column(String)
+    key_unique = Column(String)
+    teacher = Column(String)
+    is_optional = Column(Boolean)
+    uuid_journey = Column(UUID(as_uuid=True), ForeignKey("journey.uuid"))
+    journey = relationship("Journey",  foreign_keys=[uuid_journey])
+    ue = relationship("TeachingUnit",  foreign_keys=[value_ue])

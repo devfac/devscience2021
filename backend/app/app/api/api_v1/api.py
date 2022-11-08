@@ -1,10 +1,12 @@
 from fastapi import APIRouter
 
 from app.api.api_v1.endpoints import login, users, utils, mentions, roles, journey, \
-    semesters, college_year, semester_valide, ancien_etudiants, nouveau_etudiants, matier_ue, matier_ec, \
-    scolarites, notes, notes_etudiants, liste, save_data, resultat, statistic, diplome, droit, carte, drive_action, student
+    semesters, college_year, validation, matier_ue, matier_ec, \
+    scolarites, notes, notes_etudiants, liste, save_data, resultat, statistic, diploma, droit, carte, drive_action,\
+    student, interaction
 
 api_router = APIRouter()
+api_router.include_router(interaction.router, prefix="/interaction", tags=["interaction"])
 api_router.include_router(liste.router, prefix="/liste", tags=["liste"])
 api_router.include_router(statistic.router, prefix="/statistic", tags=["statistic"])
 api_router.include_router(save_data.router, prefix="/save_data", tags=["save_data"])
@@ -21,12 +23,10 @@ api_router.include_router(journey.router, prefix="/journey", tags=["Journeys"])
 api_router.include_router(semesters.router, prefix="/semesters", tags=["semester"])
 api_router.include_router(matier_ue.router, prefix="/matier_ue", tags=["unité d'enseignements"])
 api_router.include_router(matier_ec.router, prefix="/matier_ec", tags=["éléments constitutif"])
-#api_router.include_router(ancien_etudiants.router, prefix="/ancien_etudiants", tags=["ancien etudiants"])
 api_router.include_router(student.router, prefix="/student", tags=["students"])
-api_router.include_router(nouveau_etudiants.router, prefix="/nouveau_etudiants", tags=["nouveaux etudiants"])
-api_router.include_router(semester_valide.router, prefix="/semester_valide", tags=["semester valide"])
+api_router.include_router(validation.router, prefix="/validation", tags=["validation"])
 api_router.include_router(scolarites.router, prefix="/scolarites", tags=["scolarites"])
-api_router.include_router(diplome.router, prefix="/diplome", tags=["diplome"])
+api_router.include_router(diploma.router, prefix="/diplome", tags=["diplome"])
 api_router.include_router(droit.router, prefix="/droit", tags=["droits"])
 api_router.include_router(carte.router, prefix="/carte", tags=["cartes"])
 api_router.include_router(drive_action.router, prefix="/write_to_spreadsheet", tags=["spreadsheet"])

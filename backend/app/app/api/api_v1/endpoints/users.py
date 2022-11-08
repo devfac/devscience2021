@@ -15,12 +15,16 @@ router = APIRouter()
 @router.get("/get_all/", response_model=List[schemas.User])
 def read_users(
     db: Session = Depends(deps.get_db),
+    limit: int = 100,
+    offset: int = 0,
+    order: str = "ASC",
+    order_by: str = "last_name",
     current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
     """
     Retrieve users.
     """
-    users = crud.user.get_multi(db=db)
+    users = crud.user.get_multi(db=db, limit=limit, skip=offset, order_by=order_by, order=order)
     all_users = []
     for on_user in users:
         user = schemas.User(**jsonable_encoder(on_user))
@@ -83,7 +87,7 @@ def create_user(
     return all_users
 
 
-@router.put("/me", response_model=schemas.User)
+@router.put("/me/", response_model=schemas.User)
 def update_user_me(
     *,
     db: Session = Depends(deps.get_db),
@@ -122,7 +126,7 @@ def update_user_me(
     return user
 
 
-@router.get("/me", response_model=schemas.User)
+@router.get("/me/", response_model=schemas.User)
 def read_user_me(
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -160,7 +164,7 @@ def read_user_me(
 #     return user
 
 
-@router.get("/by_uuid/{uuid}", response_model=schemas.User)
+@router.get("/by_uuid/", response_model=schemas.User)
 def read_user_by_id(
     uuid: UUID,
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -195,6 +199,7 @@ def update_user(
     *,
     db: Session = Depends(deps.get_db),
     uuid: str,
+    order_by: str = "last_name",
     user_in: schemas.UserUpdate,
     current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
@@ -208,7 +213,7 @@ def update_user(
             detail="The user with this username does not exist in the system",
         )
     crud.user.update(db, db_obj=user, obj_in=user_in)
-    users = crud.user.get_multi(db=db)
+    users = crud.user.get_multi(db=db, order_by=order_by)
     all_users = []
     for on_user in users:
         user = schemas.User(**jsonable_encoder(on_user))

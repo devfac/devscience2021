@@ -9,14 +9,15 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.post("/insert_etudiants/", response_model=List[Any])
-def inserts_etudiant(
+@router.post("/insert_students/", response_model=List[Any])
+def inserts_student(
         *,
         db: Session = Depends(deps.get_db),
         schema: str,
         semester: str,
         session: str,
         uuid_journey: str,
+        uuid_mention: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -45,24 +46,25 @@ def inserts_etudiant(
                                 detail=f"note_{journey.abbreviation.lower()}_{semester.lower()}_normal not found.",
                                 )
         credit = 30
-        all_etudiant = crud.note.read_by_credit(create_anne(schema), semester, journey.abbreviation, "normal", credit)
-        for etudiant in all_etudiant:
-            et_un = crud.note.read_by_num_carte(create_anne(schema), semester, journey.abbreviation, session, etudiant.num_carte)
+        all_student = crud.note.read_by_credit(create_anne(schema), semester, journey.abbreviation, "normal", credit)
+        for student in all_student:
+            et_un = crud.note.read_by_num_carte(create_anne(schema), semester, journey.abbreviation, session, student.num_carte)
             if not et_un:
-                crud.note.insert_note(create_anne(schema), semester, journey.abbreviation, session, etudiant.num_carte)
-                crud.note.update_auto(create_anne(schema), semester, journey.abbreviation, session, etudiant.num_carte)
+                crud.note.insert_note(create_anne(schema), semester, journey.abbreviation, session, student.num_carte)
+                crud.note.update_auto(create_anne(schema), semester, journey.abbreviation, session, student.num_carte)
         all_note = crud.note.read_all_note(create_anne(schema), semester, journey.abbreviation, session)
         return all_note
 
     else:
-        list = crud.ancien_etudiant.get_by_class(create_anne(schema), uuid_journey, semester)
+        list = crud.ancien_student.get_by_class(college_year=create_anne(schema), uuid_journey=uuid_journey,
+                                                uuid_mention=uuid_mention, semester=semester)
         if list is not None:
-            for etudiant in list:
+            for student in list:
                 et_un = crud.note.read_by_num_carte(create_anne(schema), semester, journey.abbreviation, session,
-                                                    etudiant.num_carte)
+                                                    student.num_carte)
                 if not et_un:
-                    crud.note.insert_note(create_anne(schema), semester, journey.abbreviation, session, etudiant.num_carte)
-                    crud.note.insert_note(create_anne(schema), semester, journey.abbreviation, "final", etudiant.num_carte)
+                    crud.note.insert_note(create_anne(schema), semester, journey.abbreviation, session, student.num_carte)
+                    crud.note.insert_note(create_anne(schema), semester, journey.abbreviation, "final", student.num_carte)
         all_note = crud.note.read_all_note(create_anne(schema), semester, journey.abbreviation, session)
         return all_note
 

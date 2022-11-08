@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 from app.crud.base import CRUDBase
 from app.models.mention import Mention
@@ -27,10 +28,13 @@ class CRUDMention(CRUDBase[Mention, MentionCreate, MentionUpdate]):
         return db_obj
 
     def get_multi(
-        self, db: Session
+        self, db: Session, limit: int = 100, skip: int = 0, order_by: str = "title", order: str = "ASC"
     ) -> List[Mention]:
         return (
-            db.query(self.model)
+            db.query(Mention)
+            .order_by(text(f"{order_by} {order}"))
+            .offset(skip)
+            .limit(limit)
             .all()
         )
 

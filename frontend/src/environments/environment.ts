@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  authApiURL: 'http://0.0.0.0/api/v1',
+  authApiURL: 'http://localhost/api/v1',
   notificationApiURL: 'http://localhost:3000',
   socketApiURL: "",
   currencyApiURL: 'http://localhost:5001',

@@ -14,12 +14,17 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.Journey])
 def read_journey(
         db: Session = Depends(deps.get_db),
+        *,
+        limit: int= 100,
+        offset: int = 0,
+        order: str = "asc",
+        order_by: str = "title",
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve paarcours.
     """
-    journeys = crud.journey.get_multi(db=db)
+    journeys = crud.journey.get_multi(db=db, limit=limit, skip=offset, order_by=order_by, order=order)
     list_journey = []
     for on_journey in journeys:
         journey = schemas.Journey(**jsonable_encoder(on_journey))
@@ -83,7 +88,7 @@ def update_journey(
     return list_journey
 
 
-@router.get("/by_uuid/{uuid}", response_model=schemas.Journey)
+@router.get("/by_uuid/", response_model=schemas.Journey)
 def read_journey_by_uuid(
         *,
         db: Session = Depends(deps.get_db),
@@ -103,7 +108,7 @@ def read_journey_by_uuid(
     return journey
 
 
-@router.get("/{uuid_mention}", response_model=List[schemas.Journey])
+@router.get("/by_uuid_mention/", response_model=List[schemas.Journey])
 def read_journey_by_mention(
         *,
         db: Session = Depends(deps.get_db),
@@ -126,7 +131,7 @@ def read_journey_by_mention(
     return list_journey
 
 
-@router.delete("/{uuid}", response_model=List[schemas.Journey])
+@router.delete("/", response_model=List[schemas.Journey])
 def delete_journey(
         *,
         db: Session = Depends(deps.get_db),

@@ -16,12 +16,17 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.CollegeYear])
 def read_college_year(
         db: Session = Depends(deps.get_db),
+        limit: int = 100,
+        offset: int = 0,
+        order: str = "desc",
+        order_by: str = "title",
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve anne universitaire.
     """
-    college_year = crud.college_year.get_multi(db)
+    college_year = crud.college_year.get_multi(db=db, order=order, order_by=order_by, limit=limit, skip=offset)
+    print(college_year)
     return college_year
 
 
@@ -39,13 +44,7 @@ def create_college_year(
     if crud.user.is_superuser(current_user):
         college_year = crud.college_year.get_by_title(db, title=college_year_in.title)
         if not college_year:
-            college_year = crud.college_year.create(db=db, obj_in=college_year_in)
-            try:
-                schem_et = create_anne(college_year.title)
-                engine.execute(CreateSchema(schem_et))
-                models.etudiant.create(schem_et)
-            except sqlalchemy.exc.ProgrammingError as e:
-                print(e)
+            crud.college_year.create(db=db, obj_in=college_year_in)
         else:
             raise HTTPException(
                 status_code=400,
@@ -76,7 +75,7 @@ def update_college_year(
     return crud.college_year.get_multi(db=db)
 
 
-@router.get("/{uuid}", response_model=schemas.CollegeYear)
+@router.get("/by_uuid", response_model=schemas.CollegeYear)
 def read_college_year(
         *,
         db: Session = Depends(deps.get_db),

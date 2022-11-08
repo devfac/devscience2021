@@ -28,12 +28,8 @@ def get_nbr_etudiant(db: Session, schemas: str, niveau: str, etat: str, sexe: st
 
     all_student = []
     if etat != "M" and etat != "F" and etat != "Total":
-        all_student = crud.ancien_student.get_for_stat(db=db,
-                                                       college_year=schemas,
-                                                       uuid_journey=uuid_journey,
-                                                       semester=niveau,
-                                                       sex=sexe,
-                                                       type=etat.upper())
+        all_student = crud.ancien_student.get_for_stat(db=db, uuid_journey=uuid_journey, semester=niveau, sex=sexe,
+                                                       type=etat.upper(), college_year=schemas)
     elif etat == "M":
         all_student = crud.ancien_student.get_by_sex_for_stat(db=db,
                                                                college_year=schemas,

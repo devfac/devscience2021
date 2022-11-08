@@ -15,16 +15,16 @@ router = APIRouter()
 def read_ec(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
+        limit: int = 100,
+        offset: int = 0,
+        order: str = "asc",
+        order_by: str = "title",
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve élément constitutif.
     """
-    anne_univ = crud.college_year.get_by_title(db, schema)
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-    ecs = crud.matier_ec.get_all(schema=create_anne(schema))
+    ecs = crud.constituent_element.get_multi(db=db, limit=limit, skip=offset, order_by=order_by, order=order)
     list_ec = []
     for on_ec in ecs:
         ec = schemas.MatierEC(**jsonable_encoder(on_ec))
@@ -35,12 +35,39 @@ def read_ec(
         list_ec.append(ec)
     return list_ec
 
+@router.get("/get_by_class/"
+            "", response_model=List[schemas.MatierEC])
+def get_by_class(
+        *,
+        db: Session = Depends(deps.get_db),
+        semester: str,
+        uuid_journey: str,
+        current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    get unité d'enseingement.
+    """
+    journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
+    if not journey:
+        raise HTTPException(status_code=404, detail="Journey not found")
 
-@router.get("/{value_ue}", response_model=List[schemas.MatierEC])
+    ecs = crud.constituent_element.get_by_class(db=db, uuid_journey=uuid_journey, semester=semester)
+    if not ecs:
+        raise HTTPException(status_code=404, detail="E.C not found")
+    list_ec = []
+    for on_ec in ecs:
+        ec = schemas.MatierEC(**jsonable_encoder(on_ec))
+        ec.journey = journey
+        ec.abbreviation_journey = journey.abbreviation
+        list_ec.append(ec)
+    return list_ec
+
+
+
+@router.get("/value_ue/", response_model=List[schemas.MatierEC])
 def read_by_value_ue(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         value_ue: str,
         semester: str,
         uuid_journey: str,
@@ -49,11 +76,8 @@ def read_by_value_ue(
     """
     Retrieve élément constitutif by value_ue.
     """
-    anne_univ = crud.college_year.get_by_title(db, schema)
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-    ecs = crud.matier_ec.get_by_value_ue(schema=create_anne(schema),
-                                               value_ue=value_ue, semester=semester, uuid_journey=uuid_journey)
+    ecs = crud.constituent_element.get_by_value_ue(db=db,value_ue=value_ue,
+                                                   semester=semester, uuid_journey=uuid_journey)
     list_ec = []
     for on_ec in ecs:
         ec = schemas.MatierEC(**jsonable_encoder(on_ec))
@@ -65,11 +89,10 @@ def read_by_value_ue(
     return list_ec
 
 
-@router.get("/{value}", response_model=schemas.MatierEC)
+@router.get("/by_value/", response_model=schemas.MatierEC)
 def read_by_value(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         value: str,
         semester: str,
         uuid_journey: str,
@@ -78,29 +101,22 @@ def read_by_value(
     """
     Retrieve élément constitutif by value_ue.
     """
-    anne_univ = crud.college_year.get_by_title(db, schema=schema)
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-    matier_ec = crud.matier_ec.get_by_value(schema=create_anne(schema),
+    constituent_element = crud.constituent_element.get_by_value(db=db,
                                                value=value, semester=semester, uuid_journey=uuid_journey)
-    return matier_ec
+    return constituent_element
 
 
-@router.get("/{uuid}/", response_model=schemas.MatierEC)
+@router.get("/by_uuid", response_model=schemas.MatierEC)
 def read_by_uuid(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         uuid: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve élément constitutif by uuid.
     """
-    anne_univ = crud.college_year.get_by_title(db, schema)
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-    ec = crud.matier_ec.get_by_uuid(schema=create_anne(schema), uuid=uuid)
+    ec = crud.constituent_element.get_by_uuid(db=db, uuid=uuid)
     if not ec:
         raise HTTPException(status_code=404, detail="E.C not found")
     ec = schemas.MatierEC(**jsonable_encoder(ec))
@@ -117,25 +133,22 @@ def create_ec(
         *,
         db: Session = Depends(deps.get_db),
         ec_in: schemas.MatierECCreate,
-        schema: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create élément constitutif.
     """
-    anne_univ = crud.college_year.get_by_title(db, schema)
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
     journey = crud.journey.get_by_uuid(db=db, uuid=ec_in.uuid_journey)
     if not journey:
         raise HTTPException(status_code=400, detail=f"Journey not found.", )
 
-    value = decode_text(ec_in.title).lower()
-    key_unique = decode_text(f"{value}_{ec_in.semester}_{journey.abbreviation}").lower()
-    matier_ec = crud.matier_ec.get_by_schema(schema=create_anne(schema), obj_in=ec_in, value=value)
-    if matier_ec:
+    ec_in.value= decode_text(ec_in.title).lower()
+    ec_in.key_unique = decode_text(f"{ec_in.value}_{ec_in.semester}_{journey.abbreviation}").lower()
+    constituent_element = crud.constituent_element.get_by_key_unique(db=db, key_unique=ec_in.key_unique)
+    if constituent_element:
         raise HTTPException(status_code=404, detail="E.C already exists")
-    ecs = crud.matier_ec.create_ec(schema=create_anne(schema), obj_in=ec_in, value=value, key_unique=key_unique)
+    ecs = crud.constituent_element.create(db=db, obj_in=ec_in)
+    ecs = crud.constituent_element.get_all(db=db)
     list_ec = []
     for on_ec in ecs:
         ec = schemas.MatierEC(**jsonable_encoder(on_ec))
@@ -151,7 +164,6 @@ def create_ec(
 def update_ec(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         ec_in: schemas.MatierECUpdate,
         uuid: str,
         current_user: models.User = Depends(deps.get_current_active_user),
@@ -159,13 +171,11 @@ def update_ec(
     """
     Update élément constitutif.
     """
-    college_year = crud.college_year.get_by_title(db, title=schema)
-    if not college_year:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-    ec = crud.matier_ec.get_by_uuid(schema=create_anne(schema), uuid=uuid)
+    ec = crud.constituent_element.get_by_uuid(db=db, uuid=uuid)
     if not ec:
         raise HTTPException(status_code=404, detail="E.C not found")
-    ecs = crud.matier_ec.update_ec(schema=create_anne(schema), obj_in=ec_in, uuid=uuid)
+    ecs = crud.constituent_element.update(db=db, obj_in=ec_in, db_obj=ec)
+    ecs = crud.constituent_element.get_all(db=db)
     list_ec = []
     for on_ec in ecs:
         ec = schemas.MatierEC(**jsonable_encoder(on_ec))
@@ -181,21 +191,18 @@ def update_ec(
 def delete_ec(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         uuid: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Delete élément constitutifs.
     """
-    college_year = crud.college_year.get_by_title(db, schema)
-    if not college_year:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.", )
-    ec = crud.matier_ec.get_by_uuid(schema=create_anne(schema), uuid=uuid)
+    ec = crud.constituent_element.get_by_uuid(db=db, uuid=uuid)
     if not ec:
         raise HTTPException(status_code=404, detail="E.C not found")
 
-    ecs = crud.matier_ec.delete_ec(schema=create_anne(schema), uuid=uuid)
+    ecs = crud.constituent_element.remove(db=db, id=uuid)
+    ecs = crud.constituent_element.get_all(db=db)
     list_ec = []
     for on_ec in ecs:
         ec = schemas.MatierEC(**jsonable_encoder(on_ec))

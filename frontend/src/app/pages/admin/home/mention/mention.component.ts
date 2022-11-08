@@ -1,9 +1,15 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Mention } from '@app/models/mention';
+import { QueryParams } from '@app/models/query';
+import { TableHeader } from '@app/models/table';
+import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
+import { parseQueryParams } from '@app/shared/utils';
 import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
+import { HomeService } from '../home.service';
+import { MentionService } from './mention.service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -14,12 +20,11 @@ const BASE_URL = environment.authApiURL;
   styleUrls: ['./mention.component.less']
 })
 export class MentionComponent implements OnInit {
-  private headers =  new HttpHeaders({
-    'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
-  })
+  @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
+  headers: TableHeader[] = [];
 
-  all_mention: Mention[] = []
+  
+  allMention: Mention[] = []
   confirmModal?: NzModalRef;
   form!: FormGroup;
   isvisible = false;
@@ -27,37 +32,82 @@ export class MentionComponent implements OnInit {
   isEdit = false;
   title = '';
   uuid= "";
+  actions = {
+    add: true,
+    edit: true,
+    delete: true,
+    detail: false,
+  };
 
-  options = {
-    headers: this.headers
+
+  constructor(
+    private http: HttpClient, 
+    private modal: NzModalService, 
+    private fb: FormBuilder,
+    private service: MentionService,
+    ) {
+      this.form = this.fb.group({
+        title: [null, [Validators.required]],
+        abbreviation: [null, [Validators.required]],
+        plugged: [null, [Validators.required]],
+        last_num_carte: [null, [Validators.required]],
+      });
+     }
+    ngAfterContentInit(): void {
+      this.headers = [
+          {
+            title: 'Title',
+            selector: 'title',
+            isSortable: true,
+          },
+          {
+            title: 'Abbreviation',
+            selector: 'abbreviation',
+            isSortable: true,
+          },
+          {
+            title: 'Branche',
+            selector: 'plugged',
+            isSortable: true,
+          },{
+            title: 'LastCe',
+            selector: 'last_num_carte',
+            isSortable: true,
+          },
+        ];
+    }
+  
+  async ngOnInit(){
+    this.fetchData = this.fetchData.bind(this)
   }
-  constructor(private http: HttpClient, private modal: NzModalService, private fb: FormBuilder,) { }
 
-  ngOnInit(): void {
-    this.http.get<any>(`${BASE_URL}/mentions/`, this.options).subscribe(
-      data => this.all_mention = data,
-      error => console.error("error as ", error)
-    );
-
-    this.form = this.fb.group({
-      title: [null, [Validators.required]],
-      abbreviation: [null, [Validators.required]],
-      plugged: [null, [Validators.required]],
-      last_num_carte: [null, [Validators.required]],
-    });
+  fetchData(params?: QueryParams){
+    return this.service.getDataObservable(parseQueryParams(params))
   }
-  showConfirm(name?: string, uuid?: string): void{
+  
+  showConfirm(name: string, uuid: string): void{
     this.confirmModal = this.modal.confirm({
       nzTitle: "Voulez-vous supprimer "+name+"?",
-      nzOnOk: () => {
-        this.http.delete<any>(`${BASE_URL}/mentions/?uuid=`+uuid, this.options).subscribe(
-          data => this.all_mention = data,
-          error => console.error("error as ", error)
-        );
+      nzOnOk: async () => {
+        this.service.deletData(uuid)
+        this.datatable.fetchData()
       }
     })
   }
-  submitForm(): void {
+
+  onDelete(row: any) {
+    this.showConfirm(row.title, row.uuid);
+  }
+
+  onEdit(row: any) {
+    this.showModalEdit(row.uuid);
+  }
+
+  onAdd() {
+    this.showModal();
+  }
+  
+  async submitForm(){
     if (this.form.valid) {
       const title = this.form.value.title
       const abbreviation = this.form.value.abbreviation
@@ -71,15 +121,12 @@ export class MentionComponent implements OnInit {
         last_num_carte: last_num_carte,
       }
       if (this.isEdit){
-        this.http.put<any>(`${BASE_URL}/mentions/?uuid=`+this.uuid, body, this.options).subscribe(
-          data => this.all_mention = data,
-          error => console.error("error as ", error)
-        )
+        await this.service.updateData(this.uuid, body).toPromise()
+        this.datatable.fetchData()
+        
       }else{
-        this.http.post<any>(`${BASE_URL}/mentions/`,body, this.options).subscribe(
-          data => this.all_mention = data,
-          error => console.error("error as ", error)
-        )
+        await this.service.addData(body).toPromise()
+        this.datatable.fetchData()
       }
       
       this.isvisible = false,
@@ -103,17 +150,14 @@ export class MentionComponent implements OnInit {
     this.form.get('last_num_carte')?.setValue('');
   }
 
-  showModalEdit(uuid: string): void{
+  async showModalEdit(uuid: string){
     this.isEdit = true
     this.uuid = uuid
-    this.http.get<any>(`${BASE_URL}/mentions/`+uuid, this.options).subscribe(
-      data => {
-        this.form.get('title')?.setValue(data.title),
-        this.form.get('abbreviation')?.setValue(data.abbreviation),
-        this.form.get('plugged')?.setValue(data.plugged),
-        this.form.get('last_num_carte')?.setValue(data.last_num_carte)},
-      error => console.error("error as ", error)
-    );
+    let data: any = await this.service.getData(uuid).toPromise()
+    this.form.get('title')?.setValue(data.title);
+    this.form.get('abbreviation')?.setValue(data.abbreviation);
+    this.form.get('plugged')?.setValue(data.plugged);
+    this.form.get('last_num_carte')?.setValue(data.last_num_carte);
     this.isvisible = true
   }
 
