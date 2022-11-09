@@ -417,6 +417,8 @@ def convert_date(date: str) -> str:
     mois = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet",
             "Aout", "Séptembre", "Octobre", "Novembre","Décembre", ""]
     # 1995-10-20
+    if not date:
+        return ""
     jours = date[8:10]
     annee = date[0:4]
     mois_ = int(date[5:7])

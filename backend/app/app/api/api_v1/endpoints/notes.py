@@ -129,6 +129,11 @@ def get_all_columns(
         db=db, uuid_journey=uuid_journey, college_year=college_year)
     interaction_value = jsonable_encoder(interaction)
     list_value = []
+    if not interaction:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Marier_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()} not found.",
+        )
     for value in interaction_value[semester.lower()]:
         value = value.replace("'", '"')
         value = json.loads(value)
@@ -216,7 +221,7 @@ def inserts_student(
                                 )
         credit = 30
         all_student = crud.note.read_by_credit(semester=semester, journey=journey.abbreviation,
-                                               session="normal", credit=credit)
+                                               session="normal", credit=credit, year=college_year)
         for student in all_student:
             et_un = crud.note.read_by_num_carte(semester=semester, journey=journey.abbreviation,
                                                 session=session, num_carte=student.num_carte)
@@ -225,7 +230,7 @@ def inserts_student(
                                       session=session, num_carte=student.num_carte, year=college_year)
                 crud.note.update_auto(semester=semester, journey=journey.abbreviation,
                                       session=session, num_carte=student.num_carte)
-        all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation, session=session)
+        all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation, session=session, year=college_year)
         all_note_ = []
         for note in all_note:
             note = jsonable_encoder(note)

@@ -1,8 +1,242 @@
-<div class="container">
-    <div class="item item-1">1</div>
-    <div class="item item-2">2</div>
-    <div class="item item-3">3</div>
-    <div class="item item-4">4</div>
-    <div class="item item-5">5</div>
-    <div class="item item-6">6</div>
-</div>
+<nz-layout class="inner-layout">
+    <nz-content class="inner-content">
+      <section class="home-section">
+        <div class="home-content">
+          <div class="overview-boxes">
+            <div class="box yelow">
+              <div class="right-side">
+                <div class="box-topic">Total products published</div>
+                <div class="number">{{ totalProductPublished | number }}</div>
+                <div class="indicator">
+                  <i class="bx bx-up-arrow-alt"></i>
+                  <div class="button">
+                    <a href="product/product-list">See All</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <div class="box gris-black">
+              <div class="right-side">
+                <div class="box-topic">Total products in draft</div>
+                <div class="number">{{ totalProductDraft | number }}</div>
+                <div class="indicator">
+                  <i class="bx bx-up-arrow-alt"></i>
+                  <div class="button">
+                    <a href="product/product-list">See All</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <div class="box cyan">
+              <div class="right-side">
+                <div class="box-topic">Total active suppliers</div>
+                <div class="number">{{ totalActiveSuppliers | number }}</div>
+                <div class="indicator">
+                  <i class="bx bx-up-arrow-alt"></i>
+                  <div class="button">
+                    <a href="supplier">See All</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <div class="box orange">
+              <div class="right-side">
+                <div class="box-topic">Total pending product revisions</div>
+                <div class="number">{{ totalProductPending | number }}</div>
+                <div class="indicator">
+                  <i class="bx bx-down-arrow-alt down"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+  
+          <div class="sales-boxes">
+            <div class="recent-sales box">
+              <div class="box orders">
+                <div class="right-side">
+                  <div class="box-topic">Total Orders</div>
+                  <div class="number">{{ totalOrders | number }}</div>
+                  <div class="indicator">
+                    <i class="bx bx-up-arrow-alt"></i>
+                    <a href="#">See All</a>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-wrapper">
+                <div class="single-chart">
+                  <svg viewBox="0 0 36 36" class="circular-chart orange">
+                    <path
+                      class="circle-bg"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      class="circle"
+                      id="orders-1-days"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <text x="18" y="20.35" class="percentage">{{ percentOrders1days }}%</text>
+                  </svg>
+                  <div class="title bas">in the last 24 hours</div>
+                </div>
+  
+                <div class="single-chart">
+                  <svg viewBox="0 0 36 36" class="circular-chart green">
+                    <path
+                      class="circle-bg"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      class="circle"
+                      id="orders-7-days"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <text x="18" y="20.35" class="percentage">{{ percentOrders7days }}%</text>
+                  </svg>
+                  <div class="title bas">in the last 7 days</div>
+                </div>
+  
+                <div class="single-chart">
+                  <svg viewBox="0 0 36 36" class="circular-chart blue">
+                    <path
+                      class="circle-bg"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      class="circle"
+                      id="orders-30-days"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <text x="18" y="20.35" class="percentage">{{ percentOrders30days }}%</text>
+                  </svg>
+                  <div class="title bas">in the last 30 days</div>
+                </div>
+              </div>
+  
+              <div class="button">
+                <a href="#">See All</a>
+              </div>
+            </div>
+  
+            <div class="recent-sales box">
+              <div class="box suppliers">
+                <div class="right-side">
+                  <div class="box-topic">Total invited suppliers</div>
+                  <div class="number">{{ totalInvitationsSuppliers }}</div>
+                  <div class="indicator">
+                    <i class="bx bx-up-arrow-alt"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-wrapper">
+                <div class="single-chart">
+                  <svg viewBox="0 0 36 36" class="circular-chart orange">
+                    <path
+                      class="circle-bg"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      class="circle"
+                      id="supplies-1-days"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <text x="18" y="20.35" class="percentage">
+                      {{ percentInvitationAccepted1days }}%
+                    </text>
+                  </svg>
+                  <div class="title bas">accepted</div>
+                  <div class="title bas">in the last 24 hours</div>
+                </div>
+  
+                <div class="single-chart">
+                  <svg viewBox="0 0 36 36" class="circular-chart green">
+                    <path
+                      class="circle-bg"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      class="circle"
+                      id="supplies-7-days"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <text x="18" y="20.35" class="percentage">
+                      {{ percentInvitationAccepted7days }}%
+                    </text>
+                  </svg>
+                  <div class="title bas">accepted</div>
+                  <div class="title bas">in the last 7 days</div>
+                </div>
+  
+                <div class="single-chart">
+                  <svg viewBox="0 0 36 36" class="circular-chart blue">
+                    <path
+                      class="circle-bg"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <path
+                      class="circle"
+                      id="supplies-30-days"
+                      d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <text x="18" y="20.35" class="percentage">
+                      {{ percentInvitationAccepted30days }}%
+                    </text>
+                  </svg>
+                  <div class="title bas">accepted</div>
+                  <div class="title bas">in the last 30 days</div>
+                </div>
+              </div>
+  
+              <div class="button">
+                <a href="#">See All</a>
+              </div>
+            </div>
+  
+            <div class="top-sales box">
+              <div class="title">pending product revisions</div>
+              <div>
+                <cdk-virtual-scroll-viewport itemSize="80" class="demo-infinite-container">
+                  <nz-list [nzBordered]="false">
+                    <nz-list-item *cdkVirtualFor="let item of ds">
+                      <nz-list-item-meta *ngIf="item" [nzDescription]="item.reference">
+                        <nz-list-item-meta-title>
+                          <a href="https://ng.ant.design">{{ item.id }}</a>
+                        </nz-list-item-meta-title>
+                      </nz-list-item-meta>
+                    </nz-list-item>
+                  </nz-list>
+                </cdk-virtual-scroll-viewport>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </nz-content>
+  </nz-layout>
+  
