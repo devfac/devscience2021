@@ -184,7 +184,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
           selector: "ue_"+this.allColumns[index].name,
           isSortable: false,
           colspan: this.allColumns[index].nbr_ec + 1,
-          width: "250px"
           }
       }else{
         column =  {
@@ -192,7 +191,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
           selector: "ue_"+this.allColumns[index].name,
           isSortable: false,
           colspan: this.allColumns[index].nbr_ec + 1,
-          width:"180px"
           }
       }
       this.headers.push(column)
@@ -329,11 +327,9 @@ export class NoteComponent implements OnInit, AfterContentInit {
                     ).toPromise()
                     
                     this.createHeaders()
-                    console.log(this.headerData)
-                    console.log(this.headerSpan)
-                    console.log(this.headers)
                     this.showTable = true
                     this.isLoading = true
+                    this.initialise = true
                     this.fetchData = this.fetchData.bind(this)
                     this.form.get('filter')?.setValue('Credit')
                   }else{
@@ -384,6 +380,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
                     console.log(this.headers)
                     this.showTable = true
                     this.isLoading = true
+                    this.initialise = true
                     this.fetchData = this.fetchData.bind(this)
                     this.form.get('filter')?.setValue('Credit')
                   }else{
@@ -541,114 +538,9 @@ export class NoteComponent implements OnInit, AfterContentInit {
     this.isSpinning = false
   }
 
-  compareNoteSupUe(): void{
-    if (this.form.value.matierUe){
-      this.listOfDisplayData = this.allStudents.filter((item: any) => item["ue_"+this.form.value.matierUe] >= 10);
-      const name = this.matierUe.find((item:Ue) => item.value === this.form.value.matierUe)
-      this.message = this.listOfDisplayData.length+" "+
-      this.translate.instant('admin.home.note.message_ue_admis')+" "+name?.title
-    }else{
-      this.listOfDisplayData = this.allStudents;
-      this.message = ""
-    }
-  }
-
-  compareNoteSupEc(): void{
-    if (this.form.value.matierEc){
-      this.listOfDisplayData = this.allStudents.filter((item: any) => item["ec_"+this.form.value.matierEc] >= 10);
-      const name = this.matierEc.find((item:Ec) => item.value === this.form.value.matierEc)
-      this.message = this.listOfDisplayData.length+" "+
-      this.translate.instant('admin.home.note.message_ec_admis')+" "+name?.title
-    }else{
-      this.listOfDisplayData = this.allStudents;
-      this.message = ""
-    }
-  }
-
-  resetTableUe(): void{
-    if (this.form.value.matierUe){
-      this.result = this.form.value.matierUe
-      this.isResult = true
-    }else{
-      this.listOfDisplayData = this.allStudents;
-      this.isResult = false
-    }
-  }
-
-  resetTableEc(): void{
-    if (this.form.value.matierEc){
-      this.result = this.form.value.matierEc
-      this.isRattrape = true
-    }else{
-      this.listOfDisplayData = this.allStudents;
-      this.isRattrape = false
-    }
-  }
   getTitle(data: any[], key: string, value: string): any{
     const name = data.find((item: any) => item[key] === value)
     return name
-  }
-
-  rattrapageList(): void{
-    if (this.form.value.matierEc && this.form.value.session === 'Normal'){
-        const name = this.matierEc.find((item:Ec) => item.value === this.form.value.matierEc)
-        this.listOfDisplayData = this.allStudents.filter((item: any) => item["ec_"+this.form.value.matierEc] < 10 && item["ue_"+name?.value_ue] < 10 )
-        this.message = this.listOfDisplayData.length+" "+
-        this.translate.instant('admin.home.note.message_ec_refaire')+" "+name?.title
-    }else{
-      this.listOfDisplayData = this.allStudents;
-      this.message = ""
-    }
-  }
-
-  changeFilter(){
-    if (this.form.value.filter){
-      localStorage.setItem('filter', this.form.value.filter)
-    }else{
-      localStorage.setItem('filter', '')
-    }
-  }
-
-  filterSup(): void{
-    this.message = ""
-    if (this.form.value.filter){
-      let value = this.form.value.meanCredit
-      localStorage.setItem('lastBtn', 'sup')
-        if (localStorage.getItem('filter') === 'Moyenne' ){
-          this.listOfDisplayData = this.allStudents.filter((item: any) => item['mean']  >= Number(value) )
-        }else{
-          this.listOfDisplayData = this.allStudents.filter((item: any) => item['credit']  >= Number(value) )
-        }
-    }else{
-      this.listOfDisplayData = this.allStudents
-    }
-  }
-
-  filterInf(): void{
-    this.message = ""
-    if (localStorage.getItem('filter')){
-      let value = this.form.value.meanCredit
-      localStorage.setItem('lastBtn', 'inf')
-        if (localStorage.getItem('filter') === 'Moyenne' ){
-          this.listOfDisplayData = this.allStudents.filter((item: any) => item['mean']  < Number(value) )
-        }else{
-          this.listOfDisplayData = this.allStudents.filter((item: any) => item['credit']  < Number(value) )
-        }
-    }else{
-      this.listOfDisplayData = this.allStudents
-    }
-  }
-
-  compareNoteInfUe(): void{
-    if (this.form.value.matierUe){
-      this.listOfDisplayData = this.allStudents.filter((item: any) => item["ue_"+this.form.value.matierUe] < 10);
-      const name = this.matierUe.find((item:Ue) => item.value === this.form.value.matierUe)
-      this.message = this.listOfDisplayData.length+" "+
-      this.translate.instant('admin.home.note.message_ue_echec')+" "+name?.title
-    }else{
-      this.listOfDisplayData = this.allStudents;
-      this.message = ""
-    }
   }
   test(event: any){
     console.error(event)
@@ -755,10 +647,9 @@ export class NoteComponent implements OnInit, AfterContentInit {
   }
 
   async insertStudent(){
-    if (this.form.valid) {
-       await this.noteService.insertStudent(
-        this.form.value.collegeYear, this.form.value.semester
-        ,this.form.value.session, this.form.value.journey).toPromise()
+    if(this.form.get('journey')?.value && this.form.get('mention')?.value && this.form.get('session')?.value && this.form.get('semester')?.value && this.initialise) {
+       await this.noteService.insertStudent( this.form.value.semester, this.form.value.journey, 
+        this.form.value.session, this.form.value.collegeYear, this.form.value.mention).toPromise()
         this.datatable.fetchData()
       }
   }
@@ -796,13 +687,16 @@ export class NoteComponent implements OnInit, AfterContentInit {
     }
   }
   async getAllColumnsSession(){
-    if(this.form.get('journey')?.value && this.form.get('mention')?.value && this.form.get('semester')?.value){
+    console.log(this.initialise)
+    if(this.form.get('journey')?.value && this.form.get('mention')?.value && this.form.get('semester')?.value && this.initialise){
       let testNote: boolean = await this.noteService.testNote( 
         this.form.value.semester, this.form.value.journey, this.form.value.session).toPromise()
+    localStorage.setItem(this.keySession, this.form.get('session')?.value)
         if(testNote){
           this.matier = await this.service.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
           this.getNoteMatier()
           this.showTable = true
+          this.createHeaders()
           this.datatable.fetchData()
         }else{
           this.matier = []
@@ -838,12 +732,13 @@ export class NoteComponent implements OnInit, AfterContentInit {
      
   }
   async refresh(){
-    if(this.form.get('journey')?.value && this.form.get('mention')?.value && this.form.get('session')?.value && this.form.get('semester')?.value){
+    if(this.form.get('journey')?.value && this.form.get('mention')?.value && this.form.get('session')?.value && this.form.get('semester')?.value && this.initialise){
       let testNote: boolean = await this.noteService.testNote(this.form.value.semester, this.form.value.journey, this.form.value.session).toPromise()
       if(testNote){
         this.matier = await this.service.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
         this.getNoteMatier()
         this.showTable = true
+        this.createHeaders()
         this.datatable.fetchData()
       }else{
         this.matier = []
@@ -854,12 +749,14 @@ export class NoteComponent implements OnInit, AfterContentInit {
   }
 
   async getAllColumnsSemester(){
-    if(this.form.get('journey')?.value && this.form.get('mention')?.value && this.form.get('session')?.value){
+    if(this.form.get('journey')?.value && this.form.get('mention')?.value && this.form.get('session')?.value && this.initialise){
       let testNote: boolean = await this.noteService.testNote(this.form.value.semester, this.form.value.journey, this.form.value.session).toPromise()
+      localStorage.setItem(this.keySemester, this.form.get('semester')?.value)
       if(testNote){
         this.matier = await this.service.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
         this.getNoteMatier()
         this.showTable = true
+        this.createHeaders()
         this.datatable.fetchData()
       }else{
         this.matier = []

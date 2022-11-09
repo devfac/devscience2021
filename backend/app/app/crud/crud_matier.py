@@ -120,16 +120,15 @@ class CRUDConstituentElement(CRUDBase[ConstituentElement, MatierECCreate, Matier
             uuid_journey: str,
             semester: str,
     ) -> List[ConstituentElement]:
-        if semester.upper() == 'S1':
-            return (
-                db.query(ConstituentElement)
-                .filter(and_(
-                    ConstituentElement.uuid_journey == uuid_journey,
-                    ConstituentElement.semester == semester,
-                ))
-                .order_by(ConstituentElement.title.asc())
-                .all()
-            )
+        return (
+            db.query(ConstituentElement)
+            .filter(and_(
+                ConstituentElement.uuid_journey == uuid_journey,
+                ConstituentElement.semester == semester,
+            ))
+            .order_by(ConstituentElement.title.asc())
+            .all()
+        )
 
 
 constituent_element = CRUDConstituentElement(ConstituentElement)

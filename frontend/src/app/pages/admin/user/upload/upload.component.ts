@@ -13,6 +13,7 @@ import { JourneyService } from '../../home/journey/journey.service';
 import { MentionService } from '../../home/mention/mention.service';
 import { SelectionService } from '../selection/selection.service';
 import { typeEtudiant,typeSerie, typeSex, typeNation, typeSituation } from '@app/data/data';
+import { UploadService } from './upload.service';
 
 const CODE = "upload"
 @Component({
@@ -46,10 +47,16 @@ export class UploadComponent implements OnInit ,AfterContentInit{
   typeSerie=typeSerie
   typeEtudiant=typeEtudiant
   typeSituation=typeSituation
+  isConfirmLoading=false
+  isvisible=false
+  initialise= false
+  msg!: string ;
+  url: string | ArrayBuffer | null = "";
+  uploadedFile: any;
 
   constructor(
     private fb: FormBuilder, 
-    private service: SelectionService,
+    private service: UploadService,
     private authUser: AuthService,
     private serviceJourney: JourneyService,
     private serviceMention: MentionService,
@@ -155,10 +162,12 @@ export class UploadComponent implements OnInit ,AfterContentInit{
     this.testStorage(this.keyYear, this.allYears[0].title)){
       let uuidMention = localStorage.getItem(this.keyMention)
       if(uuidMention !== null){
-        this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()}
         this.fetchData = this.fetchData.bind(this)
+        this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()}
         this.isLoading = true
     }
+
+    this.initialise = true
   }
 
   getAllStudents(): void{
@@ -171,13 +180,15 @@ export class UploadComponent implements OnInit ,AfterContentInit{
   }
 
   fetchData(params?: QueryParams){
-    let otherParams: otherQueryParams = {
-      college_year: localStorage.getItem(this.keyYear),
-      uuid_mention: localStorage.getItem(this.keyMention),
-    }
-    return this.service.getDataObservable(parseQueryParams(params,otherParams))
+    const formData = new FormData();
+    formData.append("uploaded_file", this.uploadedFile)
+    console.log(this.initialise)
+    if (this.url !== "" && this.initialise){
+      return this.service.uploadFile(formData, "student")
+    }else{
+      return this.service.fakeData()}
   }
-
+  
 
   testStorage(key: string, value: string): boolean{
     if(localStorage.getItem(key)){
@@ -188,5 +199,39 @@ export class UploadComponent implements OnInit ,AfterContentInit{
     }
     console.log(key.substring(CODE.length), value)
     return true
+  }
+
+  selectFile(event: any){
+    if(!event.target.files[0] || event.target.files[0].length == 0){
+      this.msg = "select image"
+    }
+    var mineType = event.target.files[0].type;
+    if(mineType.match(/document\/*/) == null){
+      this.msg = "select image"
+    }
+    var reader = new FileReader();
+    reader.readAsDataURL(event.target.files[0])
+
+    reader.onload = (_event) =>{
+      this.msg = ""
+      this.url = reader.result
+    } 
+    this.uploadedFile = event.target.files[0]
+   }
+
+   handleCancel(){
+    this.isvisible = false
+   }
+
+   showModal(){
+    this.isvisible = true
+   }
+
+   async submitForm(){
+    const formData = new FormData();
+    if (this.url !== "" && this.initialise){
+      this.datatable.fetchData()
+      this.isvisible = false
+   }
   }
 }

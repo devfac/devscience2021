@@ -63,12 +63,13 @@ export class NoteService {
     return this.http.get<any>(`${BASE_URL}/notes/`, {headers: this.headers, params: otherParams})
   }
 
-  insertStudent(semester: string, journey: string, session: string, collegeYear: string){
+  insertStudent(semester: string, journey: string, session: string, collegeYear: string, mention: string){
     let otherParams = new HttpParams()
       .append('semester', semester)
       .append('session', session)
       .append('college_year', collegeYear)
       .append('uuid_journey', journey)
+      .append('uuid_mention', mention)
     return this.http.post<any>(`${BASE_URL}/notes/insert_students`,null,{headers: this.headers, params: otherParams})
   }
 

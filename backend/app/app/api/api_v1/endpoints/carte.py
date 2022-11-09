@@ -24,7 +24,8 @@ def create_carte(
     """
     create liste au examen
     """
-    students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention, college_year=college_year)
+    students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention,
+                                                  college_year=college_year, skip=0, limit=1000)
 
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
     if not mention:
@@ -74,7 +75,8 @@ def create_after_carte(
     if not year:
         raise HTTPException(status_code=400, detail=f"College year not found.",
                             )
-    students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention, college_year=college_year)
+    students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention,
+                                                  college_year=college_year, skip=0, limit=1000)
 
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
     if not mention:

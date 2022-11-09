@@ -92,26 +92,9 @@ async def create_upload_file(*,
         file_object.write(uploaded_file.file.read())
 
     all_data = []
-    cle = ""
     all_table = check_table_info("public")
-    all_sheet = save_data.get_all_sheet(file_location)
-    """
-    if len(all_table) != len(all_sheet):
-        raise HTTPException(
-            status_code=400,
-            detail=f"invalide file",
-        )
-    test = False
-    for i in all_table:
-        if i not in all_sheet:
-            raise HTTPException(
-                status_code=400,
-                detail=f"invalide file {all_sheet[i]} not found",
-            )
-    """
     for table in all_table:
         if table == model_name:
-            cle = "num_carte"
             valid = save_data.validation_file(file_location, table, "public")
             if valid != "valid":
                 raise HTTPException(
@@ -119,18 +102,6 @@ async def create_upload_file(*,
                     detail=valid
                 )
             all_data = save_data.get_data_xlsx(file_location, table)
-            print(all_data)
-            """
-            for data in all_data:
-                if table == "student":
-                    if data["mean"] == "None":
-                        data["mean"] = 0.0
-                exist_data = crud.save.exist_data("public", table, cle, data[cle])
-                if not exist_data and data[cle] != "None":
-                    one_data = crud.save.insert_data("public", table, data)
-            cle = "uuid"
-            all_data_[table] = all_data
-            """
     os.remove(file_location)
     return all_data
 
