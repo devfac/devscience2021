@@ -52,6 +52,8 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
   title = '';
   data = ""
   uuid= "";
+  url_face:any ="assets/images/face.png";
+  url_pile:any ="assets/images/pile.png";
   isLoading: boolean = false
 
   actions = {

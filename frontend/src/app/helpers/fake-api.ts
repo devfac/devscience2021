@@ -5,7 +5,7 @@ import { delay, materialize, dematerialize } from 'rxjs/operators';
 import { User } from '../models';
 
 // array in local storage for registered users
-const usersKey = 'admin-ui-user-key';
+const usersKey = 'fac-science-user-key';
 let users = JSON.parse(localStorage.getItem(usersKey) || 'null') || [];
 
 @Injectable()

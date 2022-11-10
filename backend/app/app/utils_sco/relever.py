@@ -63,7 +63,7 @@ def relever_note(num_carte: str, date: str, data: Any, note: Any) -> str:
     moyenne = "moyenne générale"
 
     pdf.add_font("alger", "", "Algerian.ttf", uni=True)
-    pdf.add_font("aparaj", "", "aparaji.ttf", uni=True)
+    pdf.add_font("aparaj", "", "aparaj.ttf", uni=True)
 
     pdf.set_font("arial", "B", 12)
     pdf.cell(10, 6, txt="", ln=0, align="L")
