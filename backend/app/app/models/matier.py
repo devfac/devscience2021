@@ -20,17 +20,17 @@ class TeachingUnit(Base):
     uuid_journey = Column(UUID(as_uuid=True), ForeignKey("journey.uuid"))
     journey = relationship("Journey", foreign_keys=[uuid_journey])
 
+
 class ConstituentElement(Base):
     __tablename__ = "constituent_element"
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String)
     value = Column(String)
     weight = Column(Float)
-    value_ue = Column(String, ForeignKey("teaching_unit.value"))
+    value_ue = Column(String)
     semester = Column(String)
     key_unique = Column(String)
     teacher = Column(String)
     is_optional = Column(Boolean)
     uuid_journey = Column(UUID(as_uuid=True), ForeignKey("journey.uuid"))
     journey = relationship("Journey",  foreign_keys=[uuid_journey])
-    ue = relationship("TeachingUnit",  foreign_keys=[value_ue])

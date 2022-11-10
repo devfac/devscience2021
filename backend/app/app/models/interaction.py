@@ -25,6 +25,7 @@ class Validation(Base):
     num_carte = Column(String, ForeignKey("student.num_carte"))
     student = relationship("Student", foreign_keys=[num_carte])
 
+
 class Interaction(Base):
     __tablename__ = "interaction"
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -43,13 +44,12 @@ class Interaction(Base):
 
     journey = relationship("Journey", foreign_keys=[uuid_journey])
 
+
 class Diploma(Base):
     __tablename__ = "diploma"
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     num_carte = Column(String, ForeignKey("student.num_carte"))
-    licence_title = Column(String, ForeignKey("college_year.title"))
-    master_title = Column(String,ForeignKey("college_year.title"))
+    licence_title = Column(String)
+    master_title = Column(String)
 
     student = relationship("Student", foreign_keys='Diploma.num_carte')
-    licence = relationship("CollegeYear", foreign_keys='Diploma.licence_title')
-    master = relationship("CollegeYear", foreign_keys='Diploma.master_title')
