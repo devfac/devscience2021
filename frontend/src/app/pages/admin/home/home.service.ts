@@ -169,6 +169,13 @@ export class HomeService {
       selected: '/home/note',
       icon: 'file-done',
     },
+    {
+      id: 9,
+      title: 'admin.home.permission',
+      route: 'permission',
+      selected: '/home/permission',
+      icon: 'setting',
+    },
   ]
   public menu$ = new Subject<any>();
   public showSider = true;

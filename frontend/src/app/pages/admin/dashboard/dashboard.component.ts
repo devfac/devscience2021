@@ -8,6 +8,11 @@ import { first, takeUntil } from 'rxjs/operators';
 import { HomeService } from '../home/home.service';
 import { CollectionViewer, DataSource } from '@angular/cdk/collections';
 import { environment } from '@environments/environment';
+import { TotalDash } from '@app/models/dashbord';
+import { MentionService } from '../home/mention/mention.service';
+import { DashboardService } from './dashboard.service';
+import { AuthService } from '@app/services/auth/auth.service';
+import { CollegeYearService } from '../home/college-year/college-year.service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -46,107 +51,45 @@ export class DashboardComponent implements OnInit {
     'Man charged over missing wedding girl.',
     'Los Angeles battles huge wildfires.',
   ];
+  totalDas : any = {L1:0, L2:0, L3:0, M:0, PL:0, RL:0, TL:0, PM:0, RM:0, TM:0}
   ds = new MyDataSource(this.http);
-  // product and product revision
-  totalProductPublished: any = 0;
-  totalProductDraft: any = 0;
-  totalProductPending: any = 0;
+  
+  percentLicencePassant: any = 0;
+  percentLicenceRedoublant: any = 0;
+  percentLicenceTriplant: any = 0;
 
-  // suppliers
-  totalActiveSuppliers: any = 0;
-  totalInvitationsSuppliers: any = 0;
-  totalInvitationAccepted1days: any = 0;
-  totalInvitationAccepted7days: any = 0;
-  totalInvitationAccepted30days: any = 0;
+  percentMasterPassant: any = 0;
+  percentMasterRedoublant: any = 0;
+  percentMasterTriplant: any = 0;
 
-  percentInvitationAccepted1days: any = 0;
-  percentInvitationAccepted7days: any = 0;
-  percentInvitationAccepted30days: any = 0;
-
-  //orders
-  totalOrders: any = 0;
-  totalOrders1days: any = 0;
-  totalOrders7days: any = 0;
-  totalOrders30days: any = 0;
-
-  percentOrders1days: any = 0;
-  percentOrders7days: any = 0;
-  percentOrders30days: any = 0;
 
   private destroy$ = new Subject();
   constructor(
     private http: HttpClient,
     private nzMessage: NzMessageService,
-    private homeService: HomeService
+    private mentionService: MentionService,
+    private service: DashboardService,
+    private authService: AuthService,
+    private serviceCollegeYear: CollegeYearService
   ) {}
   async ngAfterViewInit() {
-    // product
-    this.totalProductPublished = await this.homeService.getMentionAdmin().toPromise();
-    this.totalProductDraft = await this.homeService.getMentionAdmin().toPromise();
-
-    // product revision
-    this.totalProductPending = await this.homeService.getMentionAdmin().toPromise();
-
-    //suppliers
-
-
-    if (this.totalInvitationsSuppliers > 0) {
-      this.percentInvitationAccepted1days =
-        (this.totalInvitationAccepted1days * 100) / this.totalInvitationsSuppliers;
-      this.percentInvitationAccepted7days =
-        (this.totalInvitationAccepted7days * 100) / this.totalInvitationsSuppliers;
-      this.percentInvitationAccepted30days =
-        (this.totalInvitationAccepted30days * 100) / this.totalInvitationsSuppliers;
-    }
-
-    document.getElementById(
-      'supplies-1-days'
-    )!.style.strokeDasharray = `${this.percentInvitationAccepted1days} , 100`;
-    document.getElementById(
-      'supplies-7-days'
-    )!.style.strokeDasharray = `${this.percentInvitationAccepted7days} , 100`;
-    document.getElementById(
-      'supplies-30-days'
-    )!.style.strokeDasharray = `${this.percentInvitationAccepted30days} , 100`;
-
-    //orders
-    let totalOrders: number = 50;
-    this.totalOrders = totalOrders;
-
-    let totalOrders1days: number = 10;
-    this.totalOrders1days = totalOrders1days;
-    let totalOrders7days: number = 15;
-    this.totalOrders7days = totalOrders7days;
-    let totalOrders30days: number = 25;
-    this.totalOrders30days = totalOrders30days;
-
-    if (this.totalOrders > 0) {
-      this.percentOrders1days = (this.totalOrders1days * 100) / this.totalOrders;
-      this.percentOrders7days = (this.totalOrders7days * 100) / this.totalOrders;
-      this.percentOrders30days = (this.totalOrders30days * 100) / this.totalOrders;
-      console.log(this.percentOrders1days, this.percentOrders7days, this.percentOrders30days);
-    }
-
-    document.getElementById(
-      'orders-1-days'
-    )!.style.strokeDasharray = `${this.percentOrders1days} , 100`;
-    document.getElementById(
-      'orders-7-days'
-    )!.style.strokeDasharray = `${this.percentOrders7days} , 100`;
-    document.getElementById(
-      'orders-30-days'
-    )!.style.strokeDasharray = `${this.percentOrders30days} , 100`;
+    
   }
 
   async ngOnInit() {
-    this.ds
-      .completed()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.nzMessage.warning('Infinite List loaded all');
-      });
+    let year = localStorage.getItem('collegeYear')
+    if(year){
+      this.totalDas = await this.service.totaldashboard(year).toPromise()
+    }else{
+      let allYears = await this.serviceCollegeYear.getDataPromise().toPromise()
+      year = allYears[0].title
+      this.totalDas = await this.service.totaldashboard(year).toPromise()
+    }
+    console.log(this.totalDas)
+    let totalLicence = this.totalDas.L1 + this.totalDas.L2 + this.totalDas.L3
+    console.log(totalLicence, this.totalDas.PL)
+    this.percentLicencePassant = (this.totalDas.PL * 100)/ totalLicence
   }
-
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();

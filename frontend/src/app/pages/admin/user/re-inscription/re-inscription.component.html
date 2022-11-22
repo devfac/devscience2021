@@ -58,7 +58,7 @@
 (add)="onAdd()"
 (download)="download()"
 [showPagination]="true"
-classNames="product-list-table"
+classNames="table"
 ></app-datatable-crud>
   <nz-modal   
     [(nzVisible)]="isvisible" 
@@ -123,7 +123,7 @@ classNames="product-list-table"
           <div nz-row>
             <div nz-col [nzSpan]="11" class="card">
               <img [src]="url_face" alt="" *ngIf="url_face">
-                <button nz-button nzType="primary"  class="button">
+                <button nz-button nzType="primary"  class="button" (click)="startDownloadFace()">
                   <span nz-icon nzType="download"></span>
                   En face
                 </button>
@@ -131,7 +131,7 @@ classNames="product-list-table"
             <div nz-col [nzSpan]="1"></div>
             <div nz-col [nzSpan]="11" class="card">
               <img [src]="url_pile" alt="" *ngIf="url_pile">
-                <button nz-button nzType="primary"  class="button">
+                <button nz-button nzType="primary"  class="button" (click)="startDownloadPile()">
                   <span nz-icon nzType="download"></span>
                   Arrière
                 </button>

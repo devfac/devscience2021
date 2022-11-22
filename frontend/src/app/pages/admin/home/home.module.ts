@@ -11,9 +11,10 @@ import { UeComponent } from './ue/ue.component';
 import { EcComponent } from './ec/ec.component';
 import { NoteComponent } from './note/note.component';
 import { DetailsNoteComponent } from './details-note/details-note.component';
+import { PermissionComponent } from './permission/permission.component';
 
 @NgModule({
-  declarations: [HomeComponent, UsersComponent, MentionComponent, JourneyComponent, CollegeYearComponent, RoleComponent, UeComponent, EcComponent, NoteComponent, DetailsNoteComponent],
+  declarations: [HomeComponent, UsersComponent, MentionComponent, JourneyComponent, CollegeYearComponent, RoleComponent, UeComponent, EcComponent, NoteComponent, DetailsNoteComponent, PermissionComponent],
   imports: [SharedModule, HomeRoutingModule],
 })
 export class HomeModule { }

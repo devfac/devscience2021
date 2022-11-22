@@ -1,24 +1,26 @@
+import json
 import logging
+import secrets
+import smtplib
+import ssl
+import string
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-
-from sqlalchemy.sql.expression import true
-from sqlalchemy import MetaData, Table
+from uuid import UUID
 
 import emails
+import requests
 from emails.template import JinjaTemplate
 from jose import jwt
-import secrets, random, string
-import smtplib, ssl
 from pydantic import EmailStr
-import requests
-import json
-from uuid import UUID
-from app.core.config import settings
+from sqlalchemy import MetaData, Table
 from unidecode import unidecode
-from app.db.session import engine
+
 from app import schemas
+from app.core.config import settings
+from app.db.session import engine
+
 
 def send_email(
         email_to: str,
@@ -149,6 +151,10 @@ def decode_text(text: str) -> str:
 
 
 def get_max(sems_a: str, sems_b: str) -> str:
+    if not sems_a:
+        sems_a = ""
+    if not sems_b:
+        sems_b = ""
     if len(sems_a) == 0:
         value_1 = 0
     else:
@@ -165,6 +171,10 @@ def get_max(sems_a: str, sems_b: str) -> str:
 
 
 def get_min(sems_a: str, sems_b: str) -> str:
+    if not sems_a:
+        sems_a = ""
+    if not sems_b:
+        sems_b = ""
     if len(sems_a) == 0:
         value_1 = 0
     else:

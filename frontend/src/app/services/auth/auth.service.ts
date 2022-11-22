@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '@environments/environment';
 import { User } from '@app/models';
+import { SocketService } from '@app/socket.service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -19,7 +20,7 @@ export class AuthService {
     'Accept': 'application/json'
   })
 
-  constructor(private router: Router, private http: HttpClient) {
+  constructor(private router: Router, private http: HttpClient, private socketService: SocketService) {
     this.userSubject = new BehaviorSubject<User | null>(
       JSON.parse(localStorage.getItem('user') || 'null')
     );
@@ -51,6 +52,7 @@ export class AuthService {
   logout() {
     // remove user from local storage and set current user to null
     localStorage.removeItem('user');
+    this.socketService.chatMessage = []
     this.userSubject.next(null);
     this.router.navigate(['/auth/login']);
   }
@@ -96,9 +98,18 @@ export class AuthService {
       })
     );
   }
-  getPermission(): boolean{
+  getPermissionSuperuser(): boolean{
     const user = this.userSubject.value;
     if(!user?.is_superuser){
+      return true
+    }else{
+      return false
+    }
+  }
+
+  getPermissionAdmin(): boolean{
+    const user = this.userSubject.value;
+    if(!user?.is_admin){
       return true
     }else{
       return false

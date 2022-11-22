@@ -78,6 +78,9 @@
       "delete":"Supprimer",
       "update":"Modifier",
       "menu": "Menu",
+      "permission":"Permission",
+      "time":"Expiré dans",
+      "value":"Min: {{min}}, Max: {{max}}",
       "users":{
         "add_users":"Ajouter ou modifier un utilisateur",
         "title": "Utilisateurs",
@@ -237,6 +240,11 @@
       "sup":"Supérieur ou égal à la moyenne",
       "rattrapage":"Liste rattrapé",
       "download":"télecharger le resultat {{result}} "
+    },
+    "notification":{
+      "msg_from":"Msessage depuis",
+      "not_permited":"Vous n'êtes pas autorisé pour les modifications des notes, pour demander cliquer ",
+      "link":"ici"
     }
   },
   "auth": {

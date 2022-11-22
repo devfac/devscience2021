@@ -78,6 +78,7 @@
       "delete":"Delete",
       "update":"Update",
       "menu": "Menu",
+      "permission":"Permission",
       "users":{
         "add_users":"add or update users",
         "title": "Users",
@@ -235,6 +236,9 @@
       "sup":"Supérieur ou égal à la moyenne",
       "rattrapage":"List Rattrapé",
       "download":"dounloade the result of  {{result}} "
+    },
+    "notification":{
+      "msg_from":"Msessage depuis"
     }
   },
   "auth": {

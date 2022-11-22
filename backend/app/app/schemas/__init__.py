@@ -20,3 +20,6 @@ from .droit import Droit, DroitUpdate, DroitCreate, DroitInDB
 from .student import AncienStudentCreate, AncienStudentUpdate, AncienStudent, AncienStudentInDB, CarteStudent
 from .student import NewStudent, NewStudentCreate, NewStudentUpdate, NewStudentInDB, SelectStudentBase, SelectStudentCreate
 from .interaction import InteractionInDBBase, InteractionUpdate, Interaction, InteractionInDB,  InteractionCreate, ValueUEEC
+from .socket import SocketModel
+from .permission import Permission, PermissionCreate, PermissionUpdate
+from .invitation import Invitation, InvitationCreate, InvitationUpdate

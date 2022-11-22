@@ -7,6 +7,7 @@ import { HomeComponent } from './home.component';
 import { JourneyComponent } from './journey/journey.component';
 import { MentionComponent } from './mention/mention.component';
 import { NoteComponent } from './note/note.component';
+import { PermissionComponent } from './permission/permission.component';
 import { RoleComponent } from './role/role.component';
 import { UeComponent } from './ue/ue.component';
 import { UsersComponent } from './users/users.component';
@@ -63,6 +64,11 @@ const routes: Routes = [
       path: 'note-details',
       component: DetailsNoteComponent,
       data: { breadcrumb: 'admin.home.details.title' },
+    },
+    {
+      path: 'permission',
+      component: PermissionComponent,
+      data: { breadcrumb: 'admin.home.permission' },
     },
   ]
  },

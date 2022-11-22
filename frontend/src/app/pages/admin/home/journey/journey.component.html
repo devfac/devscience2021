@@ -2,13 +2,13 @@
 [title]="'admin.home.journey.title' | translate"
 [headers]="headers"
 [fetchDataFn]="fetchData"
-[width]="500"
+[width]="180+(headers.length)*180"
 [actions]="actions"
 (delete)="onDelete($event)"
 (edit)="onEdit($event)"
 (add)="onAdd()"
 [showPagination]="true"
-classNames="table-journey-list"
+classNames="table"
 ></app-datatable-crud>
 
     <nz-modal [(nzVisible)]="isvisible" 

@@ -28,6 +28,7 @@ import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzStepsModule } from 'ng-zorro-antd/steps';
 import { NzListModule } from 'ng-zorro-antd/list';
+import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
 
 @NgModule({
   exports: [
@@ -60,6 +61,7 @@ import { NzListModule } from 'ng-zorro-antd/list';
     NzInputNumberModule,
     NzStepsModule,
     NzListModule,
+    NzPageHeaderModule,
   ],
 })
 export class NgZorroModule { }

@@ -1,4 +1,11 @@
-
+<nz-alert nzCloseable nzType="warning" [nzDescription]="actionTemplate3" *ngIf="!permissionNote && isNote && !getPermission()" >
+  <ng-template #actionTemplate3>
+    <div class="message">
+        <p> {{'admin.notification.not_permited' | translate}} <a (click)="onDemande()"> {{'admin.notification.link' | translate}}</a></p>
+    </div>
+  </ng-template>
+</nz-alert>
+    
 <form nz-form [formGroup]="form" class="form" nzLayout="vertical">
 <div class="top-content" *ngIf="actions.add || title">
   <span
@@ -196,6 +203,7 @@
   [portList]="portList"
   (startEdit)="startEdit($event)"
   (saveEdit)="saveEdit($event)"
+  [permissionNote]="permissionNote"
   (canceltEdit)="cancelEdit($event, data)"
   (search)="onSearch($event)"
   (viewNote)="onDetail($event)"

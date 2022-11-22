@@ -11,6 +11,8 @@ import { CustomAutoFocusDirective } from '../directives/custom-auto-focus/custom
 import { CustomBackgroundDirective } from '../directives/custom-background/custom-background.directive';
 import { DatatableComponent } from '../components/datatable/datatable.component';
 import { DatatableCrudComponent } from '../components/datatable-crud/datatable-crud.component';
+import { NotificationDropdownComponent } from "@app/components/notification-dropdown/notification-dropdown.component";
+import { NzListModule } from 'ng-zorro-antd/list';
 
 @NgModule({
   imports: [
@@ -36,6 +38,7 @@ import { DatatableCrudComponent } from '../components/datatable-crud/datatable-c
     ScrollingModule,
     DatatableComponent,
     DatatableCrudComponent,
+    NotificationDropdownComponent,
    // CurrencyPricePipe,
   ],
   declarations: [
@@ -45,6 +48,7 @@ import { DatatableCrudComponent } from '../components/datatable-crud/datatable-c
     CustomBackgroundDirective,
     DatatableComponent,
     DatatableCrudComponent,
+    NotificationDropdownComponent,
     // CurrencyPricePipe,
   ],
 })

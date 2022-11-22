@@ -23,18 +23,21 @@ export class AdminComponent implements OnInit {
     footerCopyright: string;
   }
 
-  constructor(public translation: TranslationService, public router: Router) {
+  constructor(public translation: TranslationService, public router: Router,) {
     this.translate = this.translation.translate;
   }
-
+ 
   ngOnInit() {
+
+    console.log("get socket")
+
     this.config = {
       appLogo: globalConfig.appLogo,
       appTitle: globalConfig.appTitle,
       appURL: globalConfig.appURL,
       footerCopyright: globalConfig.footerCopyright
     }
-    this.user = { firstName: 'Benjamina', lastName: 'Randrinasolo' };
+    this.user = { firstName: '', lastName: '' };
     
   }
 

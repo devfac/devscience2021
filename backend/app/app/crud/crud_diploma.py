@@ -16,6 +16,12 @@ class CRUDDiploma(CRUDBase[Diploma, DiplomaCreate, DiplomaUpdate]):
     def get_all(self, db: Session) -> Optional[Diploma]:
         return db.query(Diploma).all()
 
+
+    def get_by_mention(self, db: Session, uuid_mention: str, college_year: str, limit: int= 100, skip: int =0) -> Optional[Diploma]:
+        return (db.query(Diploma)
+            .filter(Diploma.college_year == college_year)
+            .all())
+
     def get_by_num_carte(self, db: Session, *,  num_carte: str) -> Optional[
         Diploma]:
         return (

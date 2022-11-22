@@ -6,12 +6,9 @@
             <div class="box yelow">
               <div class="right-side">
                 <div class="box-topic">Total étudiants en L1</div>
-                <div class="number">{{ totalProductPublished | number }}</div>
+                <div class="number">{{ totalDas.L1| number }}</div>
                 <div class="indicator">
                   <i class="bx bx-up-arrow-alt"></i>
-                  <div class="button">
-                    <a href="product/product-list">See All</a>
-                  </div>
                 </div>
               </div>
             </div>
@@ -19,12 +16,9 @@
             <div class="box gris-black">
               <div class="right-side">
                 <div class="box-topic">Total étudiants en L2</div>
-                <div class="number">{{ totalProductDraft | number }}</div>
+                <div class="number">{{ totalDas.L2| number }}</div>
                 <div class="indicator">
                   <i class="bx bx-up-arrow-alt"></i>
-                  <div class="button">
-                    <a href="product/product-list">See All</a>
-                  </div>
                 </div>
               </div>
             </div>
@@ -32,12 +26,9 @@
             <div class="box cyan">
               <div class="right-side">
                 <div class="box-topic">Total étudiants en L3</div>
-                <div class="number">{{ totalActiveSuppliers | number }}</div>
+                <div class="number">{{ totalDas.L3| number }}</div>
                 <div class="indicator">
                   <i class="bx bx-up-arrow-alt"></i>
-                  <div class="button">
-                    <a href="supplier">See All</a>
-                  </div>
                 </div>
               </div>
             </div>
@@ -45,7 +36,7 @@
             <div class="box orange">
               <div class="right-side">
                 <div class="box-topic">Total étudiants en Master</div>
-                <div class="number">{{ totalProductPending | number }}</div>
+                <div class="number">{{ totalDas.M| number }}</div>
                 <div class="indicator">
                   <i class="bx bx-down-arrow-alt down"></i>
                 </div>
@@ -58,10 +49,9 @@
               <div class="box orders">
                 <div class="right-side">
                   <div class="box-topic">Licence</div>
-                  <div class="number">{{ totalOrders | number }}</div>
+                  <div class="number">{{ totalDas.L1 + totalDas.L2 + totalDas.L3| number }}</div>
                   <div class="indicator">
                     <i class="bx bx-up-arrow-alt"></i>
-                    <a href="#">See All</a>
                   </div>
                 </div>
               </div>
@@ -81,7 +71,7 @@
                         a 15.9155 15.9155 0 0 1 0 31.831
                         a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
-                    <text x="18" y="20.35" class="percentage">{{ percentOrders1days }}%</text>
+                    <text x="18" y="20.35" class="percentage">{{ percentLicencePassant }}%</text>
                   </svg>
                   <div class="title bas">Passant</div>
                 </div>
@@ -101,7 +91,7 @@
                         a 15.9155 15.9155 0 0 1 0 31.831
                         a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
-                    <text x="18" y="20.35" class="percentage">{{ percentOrders7days }}%</text>
+                    <text x="18" y="20.35" class="percentage">{{ percentLicencePassant }}%</text>
                   </svg>
                   <div class="title bas">Redoublant</div>
                 </div>
@@ -121,7 +111,7 @@
                         a 15.9155 15.9155 0 0 1 0 31.831
                         a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
-                    <text x="18" y="20.35" class="percentage">{{ percentOrders30days }}%</text>
+                    <text x="18" y="20.35" class="percentage">{{ percentLicencePassant }}%</text>
                   </svg>
                   <div class="title bas">Triplant et plus</div>
                 </div>
@@ -133,7 +123,7 @@
               <div class="box suppliers">
                 <div class="right-side">
                   <div class="box-topic">Master</div>
-                  <div class="number">{{ totalInvitationsSuppliers }}</div>
+                  <div class="number">{{ totalDas.M }}</div>
                   <div class="indicator">
                     <i class="bx bx-up-arrow-alt"></i>
                   </div>
@@ -156,7 +146,7 @@
                         a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
                     <text x="18" y="20.35" class="percentage">
-                      {{ percentInvitationAccepted1days }}%
+                      {{ percentLicencePassant }}%
                     </text>
                   </svg>
                   <div class="title bas">Passant</div>
@@ -178,7 +168,7 @@
                         a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
                     <text x="18" y="20.35" class="percentage">
-                      {{ percentInvitationAccepted7days }}%
+                      {{ percentLicencePassant }}%
                     </text>
                   </svg>
                   <div class="title bas">Redoublant</div>
@@ -200,7 +190,7 @@
                         a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
                     <text x="18" y="20.35" class="percentage">
-                      {{ percentInvitationAccepted30days }}%
+                      {{ percentLicencePassant }}%
                     </text>
                   </svg>
                   <div class="title bas">Triplant et plus</div>

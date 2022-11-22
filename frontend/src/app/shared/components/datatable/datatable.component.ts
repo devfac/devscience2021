@@ -22,6 +22,7 @@ export class DatatableComponent {
   @Input() width: number = 800;
   @Input() idSelector: string = 'id';
   @Input() loading: boolean = false;
+  @Input() permissionNote: boolean = false;
   @Input() total = 0;
   @Input() pageSize = 10;
   @Input() pageIndex = 1;

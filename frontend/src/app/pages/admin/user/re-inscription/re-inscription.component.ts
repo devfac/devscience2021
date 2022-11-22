@@ -342,6 +342,32 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
     this.isvisible = false;
   }
 
+  startDownloadFace(){
+    let url: string = `${BASE_URL}/carte/carte_student/`;
+
+    let params = new HttpParams()
+      .append('college_year', this.form.get('collegeYear')?.value)
+      .append('uuid_mention', this.form.get('mention')?.value)
+
+    const mention = this.allMention.find((item: Mention) => item.uuid === this.form.value.mention);
+    let name: string = 'Face_carte'+mention?.abbreviation
+    this.utlisService.download(url, params, name);
+    this.isvisible = false;
+  }
+
+  startDownloadPile(){
+    let url: string = `${BASE_URL}/carte/carte_after/`;
+
+    let params = new HttpParams()
+      .append('college_year', this.form.get('collegeYear')?.value)
+      .append('uuid_mention', this.form.get('mention')?.value)
+
+    const mention = this.allMention.find((item: Mention) => item.uuid === this.form.value.mention);
+    let name: string = 'Arriere_carte'+mention?.abbreviation;
+    this.utlisService.download(url, params, name);
+    this.isvisible = false;
+  }
+
   download(){
     this.showModal()
   }

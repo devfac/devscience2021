@@ -109,6 +109,8 @@
               <ng-template #templateBtn>
                 <ng-container *ngIf="!editCache[row.num_carte].edit; else editTemplate1">
                   <button
+
+                    *ngIf="permissionNote "
                     nz-button
                     nzType="text"
                     nzShape="circle"

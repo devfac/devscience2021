@@ -68,7 +68,7 @@ def create_user(
     #        detail="email not valid.",
     #    )
     user = crud.user.create(db, obj_in=user_in)
-    users = crud.user.get_multi(db=db)
+    users = crud.user.get_multi(db=db, order_by='last_name')
     all_users = []
     for on_user in users:
         user = schemas.User(**jsonable_encoder(on_user))

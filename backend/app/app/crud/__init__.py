@@ -13,6 +13,8 @@ from .crud_diploma import diploma
 from .crud_droit import droit
 from .crud_student import new_student, ancien_student
 from .crud_interaction import interaction
+from .crud_permission import permission
+from .crud_invitation import invitation
 # For a new basic set of CRUD operations you could just do
 
 # from .base import CRUDBase

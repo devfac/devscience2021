@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Message } from '@app/models/chatMessage';
 import { CollegeYear } from '@app/models/collegeYear';
 import { Ec } from '@app/models/ec';
 import { Interaction } from '@app/models/interaction';
@@ -13,6 +14,7 @@ import { Ue, UeEc } from '@app/models/ue';
 import { AuthService } from '@app/services/auth/auth.service';
 import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
 import { parseQueryParams } from '@app/shared/utils/parse-query-params';
+import { SocketService } from '@app/socket.service';
 import { environment } from '@environments/environment';
 import { TranslateService } from '@ngx-translate/core';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
@@ -102,6 +104,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
   keySemester = CODE+"semester"
   keySession = CODE+"session"
   isLoading: boolean = false
+  permissionNote: boolean = false
 
   actions = {
     add: true,
@@ -121,6 +124,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
     private downloadServices: UtilsService,
     private service: HomeService,
     private noteService: NoteService,
+    private socketService: SocketService,
     private serviceJourney: JourneyService, ) { 
     this.form = this.fb.group({
       mention: [null, [Validators.required]],
@@ -298,7 +302,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
     // get College year
     this.allYears = await this.service.getCollegeYear().toPromise()
     // get mention by permission
-    if(this.authService.getPermission()){
+    if(this.authService.getPermissionSuperuser()){
       this.allMention = await this.noteService.getMentionUser()
       if(this.testStorage(this.keyMention, this.allMention[0].uuid) && 
         this.testStorage(this.keyYear, this.allYears[0].title)){
@@ -337,6 +341,10 @@ export class NoteComponent implements OnInit, AfterContentInit {
                   }
               }
            }
+          }
+          let permission = await this.noteService.getPermission(this.authService.userValue?.email, 'note').toPromise()
+          if (permission){
+            this.permissionNote = permission.accepted
           }
     }else{
       this.form.get('salle')?.clearValidators()
@@ -450,6 +458,11 @@ export class NoteComponent implements OnInit, AfterContentInit {
     this.indeterminate = this.listOfCurrentPageData.some(item => this.setOfCheckedId.has(item.value)) && !this.checked;
     console.log(this.setOfCheckedId.size)
     
+  }
+
+  demande(){
+    let chatMsg: Message = {message: "demande de permission note"}
+    this.socketService.sendMessage(chatMsg)
   }
 
   pre(): void {

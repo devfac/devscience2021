@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CollegeYear } from '@app/models/collegeYear';
 import { Mention } from '@app/models/mention';
+import { Permission } from '@app/models/permission';
 import { AuthService } from '@app/services/auth/auth.service';
 import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
@@ -86,6 +87,13 @@ export class NoteService {
     let otherParams = new HttpParams()
       .append('semester', semester) 
     return this.http.post<any>(`${BASE_URL}/interaction/`, body, {headers: this.headers, params: otherParams})
+  }
+
+  getPermission(email: string = '', type_: any){
+    let otherParams = new HttpParams()
+      .append('email', email) 
+      .append('type_', type_) 
+    return this.http.get<Permission>(`${BASE_URL}/permission/get_by_email_and_type/`, {headers: this.headers, params: otherParams})
   }
 
   createTable(semester: string, journey: string, collegeYear: string){

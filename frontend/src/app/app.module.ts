@@ -10,7 +10,13 @@ import { BreadcrumbModule } from 'xng-breadcrumb';
 import { TranslationProviderModule } from './providers/translation-provider.module';
 import { SharedModule } from './shared/modules/shared.module';
 import { ErrorInterceptor, JwtInterceptor } from './helpers';
+//import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 import { fakeApiProvider } from './providers/fake-api-provider.module';
+import { SocketService } from './socket.service';
+//import { environment } from '@environments/environment';
+
+
+//const config: SocketIoConfig = { url: environment.socketApiURL, options: {} };
 
 @NgModule({
   declarations: [AppComponent],
@@ -22,11 +28,13 @@ import { fakeApiProvider } from './providers/fake-api-provider.module';
     TranslationProviderModule,
     SharedModule,
     BreadcrumbModule,
+    //SocketIoModule.forRoot(config),
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     fakeApiProvider,
+    SocketService
   ],
   bootstrap: [AppComponent],
 })

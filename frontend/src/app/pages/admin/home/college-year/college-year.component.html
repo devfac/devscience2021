@@ -3,12 +3,12 @@
 [title]="'admin.home.college_year.title' | translate"
 [headers]="headers"
 [fetchDataFn]="fetchData"
-[width]="500"
+[width]="180+(headers.length)*180"
 [actions]="actions"
 (delete)="onDelete($event)"
 (edit)="onEdit($event)"
 (add)="onAdd()"
-classNames="product-list-table"
+classNames="table"
 ></app-datatable-crud>
 
 <nz-modal 

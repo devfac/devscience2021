@@ -1,29 +1,19 @@
 <nz-layout class="container">
-  <nz-header class="top-nav">
-    <div nz-row>
-      <div nz-col nzSpan="2" nzLg="0">
-        <span class="drawer-menu-trigger" (click)="openDrawer()">
-          <i class="trigger" nz-icon [nzType]="drawerVisible ? 'menu-unfold' : 'menu-fold'"></i>
-        </span>
-      </div>
-      <div nz-col nzSpan="4">
-        <div class="logo">
-          <a routerLink="/dashboard">
-            <img src="{{ config.appLogo }}" alt="{{ config.appTitle }}" />
-          </a>
-        </div>
-      </div>
-      <div nz-col nzSpan="0" nzLg="12">
-        <app-menu mode="horizontal"></app-menu>
-      </div>
-      <div nz-col nzFlex="auto">
-        <div class="right-menu">
-          <app-language-select></app-language-select>
-          <app-profil-dropdown></app-profil-dropdown>
-        </div>
-      </div>
-    </div>
-  </nz-header>
+      <nz-page-header nzBackIcon [nzGhost]="false" style="background-color: #001529;" nzTheme="dark">
+        <nz-page-header-title> <p> Université de Fianarantsoa</p></nz-page-header-title>
+        <nz-page-header-subtitle>  <p>Faculté des sciences</p></nz-page-header-subtitle>
+        <nz-page-header-extra>
+          <div nz-col nzFlex="auto">
+            <div class="right-menu">
+              <app-notification-dropdown></app-notification-dropdown>
+              <app-language-select></app-language-select>
+              <app-profil-dropdown></app-profil-dropdown>
+            </div>
+          </div>
+        </nz-page-header-extra>
+        <nz-page-header-content>
+        </nz-page-header-content>
+      </nz-page-header>
   <nz-content class="outer-content">
     <div>
       <xng-breadcrumb>
@@ -31,7 +21,6 @@
           <ng-container>{{ breadcrumb | translate | titlecase }}</ng-container>
         </ng-container>
       </xng-breadcrumb>
-  
     </div>
     <div style="padding: 16px 0px; flex: 1">
       <router-outlet></router-outlet>

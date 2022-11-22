@@ -20,6 +20,7 @@ import { Ue } from '@app/models/ue';
 import { Ec } from '@app/models/ec';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { AuthService } from '@app/services/auth/auth.service';
 
 @Component({
   selector: 'app-datatable-crud',
@@ -39,6 +40,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   @Input() portList: any[] = [];
   @Input() isSelectable: boolean = false;
   @Input() permission: boolean = true;
+  @Input() permissionNote: boolean = false;
   @Input() isNote: boolean = false
   @Input() selectedId: number | null = null;
   @Input() searchTemplate?: TemplateRef<any>;
@@ -64,6 +66,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   @Output() detail = new EventEmitter<any>();
   @Output() compareUesup = new EventEmitter<{ue: string, value_ue: string}>();
   @Output() startSearch = new EventEmitter<any>();
+  @Output() demande = new EventEmitter<any>();
   @Output() selectionChange = new EventEmitter<number | null>();
   @ViewChild('actionsTemplate', { static: true }) actionsTemplate!: TemplateRef<any>;
 
@@ -102,6 +105,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     private nzMessage: NzMessageService,
     private location: Location, 
     private translate: TranslateService,
+    private authService: AuthService,
     private fb: FormBuilder, ) { 
     this.form = this.fb.group({
     matierUe: [null],
@@ -115,6 +119,13 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     this.fetchData();
   }
 
+  getPermission(): boolean{
+    if (this.authService.getPermissionSuperuser() || this.authService.getPermissionAdmin()){
+      return false
+    }else{
+      return true
+    }
+  }
   ngAfterContentInit(): void {
     setTimeout(() => {
       if (this.getActionsNumber() > 0) {
@@ -408,5 +419,8 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     }else{
       localStorage.setItem('filter', '')
     }
+  }
+  onDemande(){
+    this.demande.emit()
   }
 }

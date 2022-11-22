@@ -1,0 +1,63 @@
+<h1>{{"admin.home.permission" | translate}}</h1>
+<form nz-form [formGroup]="form" class="form_years" (ngSubmit)="submitForm()" nzLayout="vertical">
+    <div nz-row>
+    <nz-form-item nz-col nzSpan="8">
+      <nz-form-label nzRequired>
+        {{ 'admin.home.users.email' | translate }}
+      </nz-form-label>
+      <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+        <nz-input-group>
+          <input type="text" nz-input formControlName="email" appCustomAutoFocus
+            [placeholder]="'admin.home.users.email' | translate" 
+            />
+        </nz-input-group>
+      </nz-form-control>
+    </nz-form-item>
+
+    </div>
+    <div nz-row>
+        <nz-form-item nz-col nzSpan="8">
+        <nz-form-label nzRequired>
+          {{ 'admin.home.time' | translate }}
+        </nz-form-label>
+        <nz-form-control [nzErrorTip]="'admin.home.value' | translate: {min:1, max:72}">
+          <nz-input-group nzAddOnAfter="Heure">
+            <input type="number" nz-input formControlName="time" appCustomAutoFocus [min]="1" [max]="72"
+              [placeholder]="'admin.home.time' | translate" 
+              />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+
+    <div nz-row>
+    <nz-form-item nz-col nzSpan="8">
+        <nz-form-label>
+          {{ 'type' | translate }}
+        </nz-form-label>
+        <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+          <nz-select
+            nzAllowClear
+            formControlName="type"
+            [nzPlaceHolder]="'type'"
+            >
+            <nz-option *ngFor="let item of typePermission"
+                [nzLabel]="item.label"
+                [nzValue]="item.value"
+            >
+            </nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+      </div>
+
+      <div nz-row>
+  <nz-form-item nz-col nzSpan="8">
+    <nz-form-control class="max-width flex align-items-end">
+      <button nz-button type="submit" nzType="primary" [disabled]="!form.valid">
+        {{ 'save' | translate }}
+      </button>
+    </nz-form-control>
+  </nz-form-item>
+  </div>
+</form>

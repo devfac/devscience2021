@@ -10,3 +10,5 @@ from .student import Student
 from .matier import TeachingUnit
 from .matier import  ConstituentElement
 from .interaction import Diploma, Validation, Interaction
+from .invitation import Invitation
+from .permission import Permission

@@ -17,6 +17,11 @@ export const  typeSex=[
         {label:"Masculin",value:"Masculin"},
     ]
 
+export const  typePermission=[
+        {label:"note",value:"note"},
+        {label:"validation",value:"validation"},
+    ]
+
 export const  typeSituation=[
         {label:"Célibataire",value:"Célibataire"},
         {label:"Marié(e)",value:"Marié(e)"},
