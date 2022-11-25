@@ -383,9 +383,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
                     ).toPromise()
                     
                     this.createHeaders()
-                    console.log(this.headerData)
-                    console.log(this.headerSpan)
-                    console.log(this.headers)
                     this.showTable = true
                     this.isLoading = true
                     this.initialise = true
@@ -456,7 +453,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
   refreshCheckedStatus(): void {
     this.checked = this.listOfCurrentPageData.every(item => this.setOfCheckedId.has(item.value));
     this.indeterminate = this.listOfCurrentPageData.some(item => this.setOfCheckedId.has(item.value)) && !this.checked;
-    console.log(this.setOfCheckedId.size)
     
   }
 
@@ -497,7 +493,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
             }
       }
     }else{
-      console.log(this.interactionResult)
       if(this.interactionResult.length > 0){
         this.submitForm()
       }
@@ -518,7 +513,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
 
   done(): void {
     this.showTable = true
-    console.log('done');
   }
 
   getColumsType(str: string): string{
@@ -544,7 +538,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
         ue.push(modelUe)
       }
     let model = {"num_carte":note["num_carte"], "ue":ue}
-    console.log(model)
     await this.noteService.insertNote(this.form.value.semester, this.form.value.journey, 
       this.form.value.session, this.form.value.collegeYear, model).toPromise()
       this.datatable.fetchData()
@@ -595,7 +588,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
 
   onEdit(row: any) {
     this.createModel(row)
-    console.log(row)
   }
 
   onAdd() {
@@ -620,7 +612,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
     this.listOfDisplayData = this.allStudents.filter((item: any) => item.name.indexOf(this.searchValue) !== -1);
   }
   async getStorage(){
-    console.log(this.listOfFilter.find((item: string) => item == localStorage.getItem('filter')))
     this.form.get('collegeYear')?.setValue(localStorage.getItem('collegeYear'))
     this.form.get('mention')?.setValue(localStorage.getItem('mention'))
     this.form.get('semester')?.setValue(localStorage.getItem('semester'))
@@ -695,12 +686,9 @@ export class NoteComponent implements OnInit, AfterContentInit {
     if(this.form.value.journey ){
       localStorage.setItem(this.keyJourney, this.form.value.journey)
       this.listOfSemester = this.allJourney.find((item: Journey) => item.uuid === localStorage.getItem(this.keyJourney))?.semester
-      console.log(this.allJourney.find((item: Journey) => item.uuid === localStorage.getItem(this.keyJourney))?.semester, 
-      this.form.value.journey, this.allJourney)
     }
   }
   async getAllColumnsSession(){
-    console.log(this.initialise)
     if(this.form.get('journey')?.value && this.form.get('mention')?.value && this.form.get('semester')?.value && this.initialise){
       let testNote: boolean = await this.noteService.testNote( 
         this.form.value.semester, this.form.value.journey, this.form.value.session).toPromise()

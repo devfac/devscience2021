@@ -145,7 +145,6 @@ export class InscriptionComponent implements OnInit, AfterContentInit {
       localStorage.setItem(key, value)
       this.form.get(key.substring(CODE.length))?.setValue(localStorage.getItem(key))
     }
-    console.log(key.substring(CODE.length), value)
     return true
   }
 
@@ -180,7 +179,6 @@ export class InscriptionComponent implements OnInit, AfterContentInit {
   }
   
   showModalEdit(numSelect: string): void{
-    console.log(numSelect)
     this.isEdit = true
     localStorage.setItem(this.keyNum, numSelect)
     localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)

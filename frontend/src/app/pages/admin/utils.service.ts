@@ -31,7 +31,6 @@ export class UtilsService {
     this.downloads
       .download(url, this.headers, params)
       .subscribe(blob => {
-        console.log(blob.stream)
         const a = document.createElement('a')
         const objectUrl = URL.createObjectURL(blob)
         a.href = objectUrl

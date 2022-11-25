@@ -150,7 +150,6 @@ export class InscriptionAddComponent implements OnInit {
     if(numSelect && numSelect.length>0){
       this.isEdit = true
       let  data = await this.inscriptionService.getStudentByNumSelect(numSelect).toPromise()
-          console.log(data)
           this.form.get('numSelect')?.setValue(data.num_select)
           this.form.get('mention')?.setValue(data.uuid_mention)
           this.form.get('journey')?.setValue(data.journey.uuid)
@@ -194,7 +193,6 @@ export class InscriptionAddComponent implements OnInit {
     if (uuidMention !== null){
       this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()
       this.allMention.push(await this.serviceMention.getData(uuidMention).toPromise())
-      console.log(this.allMention)
       this.isReady = true
     }
 
@@ -309,7 +307,6 @@ export class InscriptionAddComponent implements OnInit {
     const numSelect = this.form.get('numSelect')?.value
     if(numSelect && numSelect.length>0){
       let  data = await this.inscriptionService.getStudentByNumSelect(numSelect).toPromise()
-        console.log(data)
         this.form.get('mention')?.setValue(data.uuid_mention)
         this.form.get('firstName')?.setValue(data.first_name)
         this.form.get('lastName')?.setValue(data.last_name)

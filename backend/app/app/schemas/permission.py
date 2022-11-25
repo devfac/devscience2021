@@ -9,19 +9,24 @@ class PermissionBase(BaseModel):
     email_sender: Optional[str]
     email: Optional[str]
     type: Optional[str]
-    valid_time: Optional[float]
+    expiration_date: Optional[datetime]
     accepted: Optional[bool] = False
     created_at: Optional[datetime] = datetime.now()
     updated_at: Optional[datetime] = datetime.now()
 
 
 # Properties to receive via API on creation
+class PermissionCreateModel(BaseModel):
+    email: str
+    type: str
+    expiration_date: Optional[datetime]
+    accepted: bool
+
 class PermissionCreate(BaseModel):
     email: str
     type: str
-    valid_time: float
+    time: float
     accepted: bool
-
 
 # Properties to receive via API on update
 class PermissionUpdate(PermissionBase):

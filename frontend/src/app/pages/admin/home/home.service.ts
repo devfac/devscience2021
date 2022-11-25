@@ -78,7 +78,6 @@ export class HomeService {
 
 
   createValidation(data?:any, semester?: string | null){
-    console.log('uihf iqsgfq jqygsf yqgsf ', data)
     return this.http.post<any[]>(`${BASE_URL}/validation/?semester=`+semester, data, this.options)
   }
 

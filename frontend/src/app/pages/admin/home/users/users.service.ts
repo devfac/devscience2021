@@ -44,7 +44,6 @@ export class UsersService {
   }
 
   addData(body: any){
-    console.log(body)
     return this.http.post<User>(`${BASE_URL}/users/`,body, {headers: this.headers})
   }
 }

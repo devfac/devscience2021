@@ -29,9 +29,6 @@ export class NotificationDropdownComponent implements OnInit {
   })
 
   ngOnInit(): void {
-    const list = ["a", "b"]
-    console.log(list[Math.floor(Math.random()*list.length)]);
-    
     const user = this.authUser.userValue
     this.socketService.openWebsocketConnection(user?.email)
   }

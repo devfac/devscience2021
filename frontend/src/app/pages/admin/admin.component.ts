@@ -28,9 +28,6 @@ export class AdminComponent implements OnInit {
   }
  
   ngOnInit() {
-
-    console.log("get socket")
-
     this.config = {
       appLogo: globalConfig.appLogo,
       appTitle: globalConfig.appTitle,

@@ -182,7 +182,6 @@ export class UploadComponent implements OnInit ,AfterContentInit{
   fetchData(params?: QueryParams){
     const formData = new FormData();
     formData.append("uploaded_file", this.uploadedFile)
-    console.log(this.initialise)
     if (this.url !== "" && this.initialise){
       return this.service.uploadFile(formData, "student")
     }else{
@@ -197,7 +196,6 @@ export class UploadComponent implements OnInit ,AfterContentInit{
       localStorage.setItem(key, value)
       this.form.get(key.substring(CODE.length))?.setValue(localStorage.getItem(key))
     }
-    console.log(key.substring(CODE.length), value)
     return true
   }
 

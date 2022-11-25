@@ -101,7 +101,6 @@ export class NoteService {
       .append('semester', semester)
       .append('college_year', collegeYear)
       .append('uuid_journey', journey)
-    console.log(otherParams)
     return  this.http.post<any>(`${BASE_URL}/notes/`,null,{headers: this.headers, params: otherParams})
   }
   async getMentionUser(){

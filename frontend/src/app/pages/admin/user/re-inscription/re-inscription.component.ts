@@ -232,7 +232,6 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
       localStorage.setItem(key, value)
       this.form.get(key.substring(CODE.length))?.setValue(localStorage.getItem(key))
     }
-    console.log(key.substring(CODE.length), value)
     return true
   }
 
@@ -304,7 +303,6 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
 
   changeJourney(): void{
     if(this.formList.value.journey ){
-      console.log(this.formList.value.journey)
       localStorage.setItem('journey', this.formList.value.journey)
 
       const journey = this.allJourney.find((item: Journey) => item.uuid === this.formList.value.journey)

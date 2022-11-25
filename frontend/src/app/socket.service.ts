@@ -14,10 +14,8 @@ export class SocketService {
 
   openWebsocketConnection(id?: string, receive?: string){
     if (receive){
-      console.log('avec received');
       this.webSocket =new WebSocket(CHAT_URL+id+"?client_received="+receive)
     }else{
-      console.log('sans received');
       this.webSocket =new WebSocket(CHAT_URL+id)
     }
 
@@ -27,13 +25,11 @@ export class SocketService {
     }
 
     this.webSocket.onmessage = (e) => {
-      console.log(JSON.parse(e.data));
       let chatMsg = JSON.stringify(e.data);
       this.chatMessage.push(JSON.parse(e.data))
     }
 
     this.webSocket.onclose = (e) =>{
-      console.log(e)
     }
   }
 
@@ -42,7 +38,6 @@ export class SocketService {
   }
 
   closeConnection(){
-    console.log('closed');
     this.webSocket.close()
   }
 

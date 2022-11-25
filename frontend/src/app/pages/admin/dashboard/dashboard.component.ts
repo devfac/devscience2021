@@ -85,9 +85,7 @@ export class DashboardComponent implements OnInit {
       year = allYears[0].title
       this.totalDas = await this.service.totaldashboard(year).toPromise()
     }
-    console.log(this.totalDas)
     let totalLicence = this.totalDas.L1 + this.totalDas.L2 + this.totalDas.L3
-    console.log(totalLicence, this.totalDas.PL)
     this.percentLicencePassant = (this.totalDas.PL * 100)/ totalLicence
   }
   ngOnDestroy(): void {
@@ -96,7 +94,6 @@ export class DashboardComponent implements OnInit {
   }
 
   fetchData(params?: QueryParams) {
-    console.log('ascasc');
    // return this.homeService.getDataObservable(parseQueryParams(params));
   }
 }
@@ -152,12 +149,10 @@ class MyDataSource extends DataSource<ItemData> {
       sortField: null,
       sortOrder: null,
     };
-    console.log(_params);
     this.fetchData(_params)
       ?.pipe(first())
       .subscribe({
         next: (data) => {
-          console.log(data);
           this.cachedData.splice(pageIndex * this.pageSize, this.pageSize, ...data.data);
           this.dataStream.next(this.cachedData);
         },
@@ -175,7 +170,6 @@ class MyDataSource extends DataSource<ItemData> {
       */
   }
   fetchData(params?: QueryParams) {
-    console.log('ascasc');
     return this.getDataObservable(parseQueryParams(params));
   }
   getDataObservable(params: HttpParams): Observable<any> {

@@ -15,7 +15,7 @@ class CRUDInvitation(CRUDBase[Invitation, InvitationCreate, InvitationUpdate]):
         return (
             db.query(Invitation)
             .filter(Invitation.email == email)
-            .order_by(Invitation.created_at)
+            .order_by(Invitation.created_at.desc())
             .all())
 
     def get_by_uuid(self, db: Session, *, uuid: str) -> Optional[Invitation]:

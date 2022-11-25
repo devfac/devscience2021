@@ -113,7 +113,12 @@ export class JourneyComponent implements OnInit, AfterContentInit {
   
   async submitForm(){
     if (this.form.valid) {
-      const data = this.form.getRawValue()
+      const data = {
+        title: this.form.value.title,
+        semester: this.form.value.semesterList,
+        uuid_mention: this.form.value.uuidMention,
+        abbreviation: this.form.value.abbreviation
+      }
       this.isConfirmLoading = true
       console.error(data)
       if (this.isEdit){

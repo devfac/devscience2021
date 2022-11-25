@@ -145,7 +145,6 @@ export class SelectionComponent implements OnInit, AfterContentInit {
       localStorage.setItem(key, value)
       this.form.get(key.substring(CODE.length))?.setValue(localStorage.getItem(key))
     }
-    console.log(key.substring(CODE.length), value)
     return true
   }
 
@@ -188,22 +187,6 @@ export class SelectionComponent implements OnInit, AfterContentInit {
   download(){
 
   }
-  /*
-  download(): void {
-    const url: string = `${BASE_URL}/liste/list_selection/?college_year=`+this.form.get('collegeYear')?.value+`&uuid_mention=`+this.form.get('mention')?.value
-    this.downloads
-      .download(url, this.options)
-      .subscribe(blob => {
-        console.log(blob.stream)
-        const a = document.createElement('a')
-        const objectUrl = URL.createObjectURL(blob)
-        a.href = objectUrl
-        a.download = 'etudiants_séléctioné.pdf';
-        a.click();
-        URL.revokeObjectURL(objectUrl);
-      })
-  }
-*/
   handleCancel(): void{
     this.isvisible = false
   }

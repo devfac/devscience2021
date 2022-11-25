@@ -15,7 +15,7 @@ class Permission(Base):
     email = Column(String, ForeignKey("user.email"))
     type = Column(String)
     email_sender = Column(String, ForeignKey("user.email"))
-    valid_time = Column(Float)
+    expiration_date = Column(DateTime)
     accepted = Column(Boolean)
     created_at = Column(DateTime)
     updated_at = Column(DateTime)

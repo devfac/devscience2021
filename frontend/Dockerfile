@@ -1,15 +1,9 @@
 # Stage 1: Build an Angular Docker Image
-FROM node:14.15 as Build
-
-COPY package*.json /app/
-RUN npm install
+FROM node:14.20 as Build
 
 WORKDIR /app
+COPY package*.json /app/
+RUN npm install --no-package-lock
 COPY . /app
-
-RUN npm install
-RUN npm install -g @angular/cli
-RUN npm install --save-dev @angular-devkit/build-angular
-
-CMD ng serve --host 0.0.0.0
+CMD npm run start
 EXPOSE 4200/tcp

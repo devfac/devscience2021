@@ -21,6 +21,7 @@ import { Ec } from '@app/models/ec';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@app/services/auth/auth.service';
+import { NoteService } from '@app/pages/admin/home/note/note.service';
 
 @Component({
   selector: 'app-datatable-crud',
@@ -106,6 +107,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     private location: Location, 
     private translate: TranslateService,
     private authService: AuthService,
+    private noteService: NoteService,
     private fb: FormBuilder, ) { 
     this.form = this.fb.group({
     matierUe: [null],
@@ -149,13 +151,18 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   editCache: { [key: string]: { edit: boolean; data: any;} } = {};
   listOfData: any[] = [];
 
-  startEdit(id: any): void {
-    console.log(id)
-    this.editCache[id].edit = true;
+  async startEdit(id: any) {
+    let permission = await this.noteService.getPermission(this.authService.userValue?.email, 'note').toPromise()
+          if (permission){
+            this.permissionNote = permission.accepted
+          }
+          
+          if (permission.accepted){
+            this.editCache[id].edit = true;
+          }
   }
 
   cancelEdit(id: any, listOfData: any[]): void {
-    console.log(id)
     const index = this.listOfData.findIndex((item) => item.num_carte === id);
     Object.assign(listOfData[index], this.listOfData[index]);
     this.editCache[id] = {
@@ -202,7 +209,6 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
         if (additional) {
           _params = { ..._params };
         }
-        console.log("lqstpqrqms", _params)
         this.loading = true;
         this.fetchDataFn(_params, additional)
           ?.pipe(first())
@@ -222,7 +228,6 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
                 }
               this.total = result.length || 0;
               this.data = [...this.new_data];
-              console.log("result ", result)
             },
             error: (err) => {
               console.error(err);

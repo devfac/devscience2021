@@ -190,7 +190,6 @@ export class ReInscriptionAddComponent implements OnInit {
     if (uuidMention !== null){
       this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()
       this.allMention.push(await this.serviceMention.getData(uuidMention).toPromise())
-      console.log(this.allMention)
       this.isReady = true
     }
 
@@ -231,7 +230,6 @@ export class ReInscriptionAddComponent implements OnInit {
       
       const formData = new FormData();
       formData.append("uploaded_file", this.uploadedImage)
-      console.log(this.url)
       if(this.url !== "assets/images/profil.png"){
         let data = await this.service.uploadPhoto(this.form, formData).toPromise()
        if (data.filename){

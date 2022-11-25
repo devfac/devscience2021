@@ -71,7 +71,6 @@ export class DatatableComponent {
   }
 
   onStock(id: any): void {
-    console.log('kjaf kaugsfakg agsf', id);
     this.addStock.emit(id);
     this.isAdded = false;
   }

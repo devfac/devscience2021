@@ -95,14 +95,12 @@ export class SelectionAddComponent implements OnInit {
     let uuidMention = localStorage.getItem(this.keyMention.substring(CODE.length))
     if (uuidMention !== null){
       this.allMention.push(await this.serviceMention.getData(uuidMention).toPromise())
-      console.log(this.allMention)
       this.isReady = true
     }
 
     if(numSelect && numSelect.length>0){
       this.isEdit = true
       let  data = await this.selectionService.getStudentByNumSelect(numSelect).toPromise()
-      console.log(data)
       this.form.get('numSelect')?.setValue(data.num_select)
       this.form.get('mention')?.setValue(data.uuid_mention)
       this.form.get('firstName')?.setValue(data.first_name)
@@ -122,8 +120,6 @@ export class SelectionAddComponent implements OnInit {
       this.form.get('phone')?.setValue(data.telephone)
       if (data.num_carte){
         this.isInscrit = true
-        console.log(data.num_carte)
-        console.log(this.isInscrit)
       }
     }
   }
