@@ -12,9 +12,11 @@ import { EcComponent } from './ec/ec.component';
 import { NoteComponent } from './note/note.component';
 import { DetailsNoteComponent } from './details-note/details-note.component';
 import { PermissionComponent } from './permission/permission.component';
+import { DroitComponent } from './droit/droit.component';
+import { ClassroomComponent } from './classroom/classroom.component';
 
 @NgModule({
-  declarations: [HomeComponent, UsersComponent, MentionComponent, JourneyComponent, CollegeYearComponent, RoleComponent, UeComponent, EcComponent, NoteComponent, DetailsNoteComponent, PermissionComponent],
+  declarations: [HomeComponent, UsersComponent, MentionComponent, JourneyComponent, CollegeYearComponent, RoleComponent, UeComponent, EcComponent, NoteComponent, DetailsNoteComponent, PermissionComponent, DroitComponent, ClassroomComponent],
   imports: [SharedModule, HomeRoutingModule],
 })
 export class HomeModule { }

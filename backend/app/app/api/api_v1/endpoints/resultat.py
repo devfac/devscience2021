@@ -3,7 +3,7 @@ from typing import Any, List
 from app import crud, models, schemas
 from app.api import deps
 from app.resultat import result_by_ue, result_by_session
-from app.utils import decode_schemas, get_credit, get_status, test_semester, create_anne
+from app.utils import decode_schemas, get_credit, get_status, test_semester
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse

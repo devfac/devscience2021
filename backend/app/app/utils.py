@@ -123,8 +123,8 @@ def create_secret():
     return res
 
 
-def create_anne(anne: str):
-    ann = "anne_" + anne[0:4] + "_" + anne[5:9]
+def create_year(year: str):
+    ann = "year_" + year[0:4] + "_" + year[5:9]
     return ann
 
 
@@ -271,8 +271,8 @@ def get_niveau_long(niv: str) -> str:
         return "CINQUIÈME ANNÉE"
 
 
-def validation_semester(sems_i: str, credit: int, total_cred: int, anne: str):
-    response = {"anne": anne}
+def validation_semester(sems_i: str, credit: int, total_cred: int, year: str):
+    response = {"year": year}
     if sems_i:
         if credit == total_cred:
             response["status"] = f"Étudiant(e) ayant validé(e) la {total_cred} crédit définitive."
@@ -423,20 +423,16 @@ def find_in_list(list_: list, key_: str) -> int:
         return -1
 
 def convert_date(date: str) -> str:
-    print("eto zw", date)
-    mois = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet",
+    month = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet",
             "Aout", "Séptembre", "Octobre", "Novembre","Décembre", ""]
     # 1995-10-20
     if not date:
         return ""
-    jours = date[8:10]
-    annee = date[0:4]
-    mois_ = int(date[5:7])
-    print("10", mois[10])
-    print("11", mois[11])
-    print(jours, mois_ - 1, annee)
+    days = date[8:10]
+    year = date[0:4]
+    month_ = int(date[5:7])
 
-    return f"{jours} {mois[mois_ - 1]} {annee}"
+    return f"{days} {month[month_ - 1]} {year}"
 
 def create_model(interactions: List[schemas.ValueUEEC]):
     result = []

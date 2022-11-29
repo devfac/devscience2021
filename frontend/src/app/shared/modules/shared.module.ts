@@ -12,8 +12,7 @@ import { CustomBackgroundDirective } from '../directives/custom-background/custo
 import { DatatableComponent } from '../components/datatable/datatable.component';
 import { DatatableCrudComponent } from '../components/datatable-crud/datatable-crud.component';
 import { NotificationDropdownComponent } from "@app/components/notification-dropdown/notification-dropdown.component";
-import { NzListModule } from 'ng-zorro-antd/list';
-
+import { LocalizedDatePipe } from '../utils/localized-date.pipe'; 
 @NgModule({
   imports: [
     CommonModule,
@@ -39,7 +38,7 @@ import { NzListModule } from 'ng-zorro-antd/list';
     DatatableComponent,
     DatatableCrudComponent,
     NotificationDropdownComponent,
-   // CurrencyPricePipe,
+    LocalizedDatePipe,
   ],
   declarations: [
     LanguageSwitcherComponent,
@@ -49,7 +48,7 @@ import { NzListModule } from 'ng-zorro-antd/list';
     DatatableComponent,
     DatatableCrudComponent,
     NotificationDropdownComponent,
-    // CurrencyPricePipe,
+    LocalizedDatePipe,
   ],
 })
 export class SharedModule { }

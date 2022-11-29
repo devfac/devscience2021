@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
-from app.utils import compare_list, create_anne, max_value, get_credit, create_model
+from app.utils import compare_list, max_value, get_credit, create_model
 
 router = APIRouter()
 
@@ -76,7 +76,6 @@ def create_table_note(
 def delete_table_note(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
         semester: str,
         uuid_journey: str,
         session: str,
@@ -90,8 +89,8 @@ def delete_table_note(
         journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
         if not journey:
             raise HTTPException(status_code=400, detail="journey not found")
-        test_note = crud.note.check_table_exist(schema=create_anne(schema), semester=semester, journey=journey.abbreviation,
-                                                session=session)
+        test_note = crud.note.check_table_exist(semester=semester, journey=journey.abbreviation,
+                                                session=session.lower())
         if test_note:
             if models.note.drop_table_note(journey=journey.abbreviation, session=session,
                                            semester=semester):

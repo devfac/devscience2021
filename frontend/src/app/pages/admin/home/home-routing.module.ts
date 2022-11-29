@@ -1,7 +1,9 @@
 import { NgModule } from '@angular/core';
 import { Router, RouterModule, Routes } from '@angular/router';
+import { ClassroomComponent } from './classroom/classroom.component';
 import { CollegeYearComponent } from './college-year/college-year.component';
 import { DetailsNoteComponent } from './details-note/details-note.component';
+import { DroitComponent } from './droit/droit.component';
 import { EcComponent } from './ec/ec.component';
 import { HomeComponent } from './home.component';
 import { JourneyComponent } from './journey/journey.component';
@@ -69,6 +71,16 @@ const routes: Routes = [
       path: 'permission',
       component: PermissionComponent,
       data: { breadcrumb: 'admin.home.permission' },
+    }, 
+    {
+      path: 'droit',
+      component: DroitComponent,
+      data: { breadcrumb: 'admin.home.droit.title' },
+    },
+    {
+      path: 'classroom',
+      component: ClassroomComponent,
+      data: { breadcrumb: 'admin.home.classroom.title' },
     },
   ]
  },

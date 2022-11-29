@@ -51,18 +51,8 @@ class PDF(FPDF):
 
         pdf.add_font("alger", "", "Algerian.ttf", uni=True)
 
-        image_univ = "images/logo_univ.jpg"
-        image_fac = "images/logo_science.jpg"
-
         header(pdf)
-
-        #pdf.image(image_univ, x=30, y=6, w=30, h=30)
-        #pdf.image(image_fac, x=155, y=6, w=30, h=30)
-
         num = f" N° {data['skip']} à {data['limit']}"
-        titre4 = "UNIVERSITE DE FIANARANTSOA"
-        titre5 = "FACULTE DES SCIENCES"
-
         mention = "MENTION:"
         mention_etudiant = f"{data['mention']}"
         journey = "Parcours:"

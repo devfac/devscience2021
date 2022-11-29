@@ -137,7 +137,6 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
     private modal: NzModalService, 
     private fb: FormBuilder, 
     public router: Router, 
-    private downloads: DownloadService,
     private authUser: AuthService, 
     private serviceJourney: JourneyService,
     private serviceMention: MentionService,
@@ -362,6 +361,32 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
 
     const mention = this.allMention.find((item: Mention) => item.uuid === this.form.value.mention);
     let name: string = 'Arriere_carte'+mention?.abbreviation;
+    this.utlisService.download(url, params, name);
+    this.isvisible = false;
+  }
+
+  startDownloadPassant(){
+    let url: string = `${BASE_URL}/liste/list_bourse_passant/`;
+
+    let params = new HttpParams()
+      .append('college_year', this.form.get('collegeYear')?.value)
+      .append('uuid_mention', this.form.get('mention')?.value)
+
+    const mention = this.allMention.find((item: Mention) => item.uuid === this.form.value.mention);
+    let name: string = 'Bourse_Passant'+mention?.abbreviation
+    this.utlisService.download(url, params, name);
+    this.isvisible = false;
+  }
+
+  startDownloadRedoublant(){
+    let url: string = `${BASE_URL}/liste/list_bourse_redoublant/`;
+
+    let params = new HttpParams()
+      .append('college_year', this.form.get('collegeYear')?.value)
+      .append('uuid_mention', this.form.get('mention')?.value)
+
+    const mention = this.allMention.find((item: Mention) => item.uuid === this.form.value.mention);
+    let name: string = 'Bourse_Rédoublant'+mention?.abbreviation
     this.utlisService.download(url, params, name);
     this.isvisible = false;
   }

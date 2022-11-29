@@ -56,20 +56,16 @@
   ></app-datatable-crud>
   <nz-modal 
       [(nzVisible)]="isvisible" 
-      nzTitle="{{'admin.home.role.add_role' | translate}}"
+      nzTitle="{{'admin.home.upload.title' | translate}}"
       (nzOnCancel)="handleCancel()" 
       nzMask="true"
       nzMaskClosable="false">
   <div *nzModalContent>
       <form nz-form [formGroup]="form" class="form" (ngSubmit)="submitForm()" nzLayout="vertical">
-        <div nz-row>
           <div class="container" >
-            <img [src]="url" alt="" *ngIf="url">
-            <div [innerHtml]="msg" *ngIf="msg" style="color: red;"></div>
-            <input type="file" #fileDropRef id="fileDropRef"  (change)="selectFile($event)"/>
-          </div>
-      
-          <div nz-col nzSpan="1"></div>
+            <input type="file" #fileDropRef id="fileDropRef"  />
+            <img src="assets/images/ic-upload-file.svg" alt="">
+            <h3 class="title-h3">Click or drag file to this area to upload</h3>
         </div>
           <nz-spin [nzSpinning]="isConfirmLoading">
               <button nz-button class="form-button form-margin" [nzType]="'primary'">

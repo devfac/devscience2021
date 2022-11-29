@@ -1,14 +1,10 @@
 from typing import Any, List
 
-import sqlalchemy
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from sqlalchemy.sql.ddl import CreateSchema
 
 from app import crud, models, schemas
 from app.api import deps
-from app.db.session import engine
-from app.utils import create_anne
 
 router = APIRouter()
 
@@ -26,7 +22,6 @@ def read_college_year(
     Retrieve anne universitaire.
     """
     college_year = crud.college_year.get_multi(db=db, order=order, order_by=order_by, limit=limit, skip=offset)
-    print(college_year)
     return college_year
 
 

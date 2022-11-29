@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app import crud
 from app.drive_script import create_folder_with_test, get_folder_file_id_by_name, \
     check_if_folder_already_exists, move_all_file, write_data_title, write_all_data, create_worksheet
-from app.utils import create_anne, check_table_info, check_columns_exist
+from app.utils import check_table_info, check_columns_exist
 
 
 def create_forlder_and_spreadsheet(db: Session) -> str:
@@ -13,7 +13,7 @@ def create_forlder_and_spreadsheet(db: Session) -> str:
     if anne_univ:
         anne_univ = anne_univ[0]
         print(anne_univ)
-        schema = create_anne(anne_univ.title)
+        schema = anne_univ.title
         foolder_name = f"annee {anne_univ.title}"
         is_exist = check_if_folder_already_exists(foolder_name)
         if not is_exist:
@@ -41,7 +41,7 @@ def write_title(spreadsheet_id: str, schema: str, table: str) -> Any:
 def write_data_to_drive(db: Session) -> Any:
     anne_univ = crud.anne_univ.get_actual_value(db)
     if anne_univ:
-        schema = create_anne(anne_univ.title)
+        schema = anne_univ.title
         foolder_name = f"annee {anne_univ.title}"
         parent_id = get_folder_file_id_by_name(foolder_name)
         if parent_id:

@@ -92,7 +92,7 @@ export class SelectionAddComponent implements OnInit {
 
     const numSelect = localStorage.getItem(this.keyNum)
 
-    let uuidMention = localStorage.getItem(this.keyMention.substring(CODE.length))
+    let uuidMention = localStorage.getItem(this.keyMention)
     if (uuidMention !== null){
       this.allMention.push(await this.serviceMention.getData(uuidMention).toPromise())
       this.isReady = true

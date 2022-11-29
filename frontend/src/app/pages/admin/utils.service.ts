@@ -28,6 +28,8 @@ export class UtilsService {
   }
 
   download(url: string, params: HttpParams, name: string): void{
+    console.log(params);
+    
     this.downloads
       .download(url, this.headers, params)
       .subscribe(blob => {

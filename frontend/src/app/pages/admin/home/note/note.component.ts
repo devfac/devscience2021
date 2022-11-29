@@ -3,6 +3,7 @@ import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Message } from '@app/models/chatMessage';
+import { Classroom } from '@app/models/classroom';
 import { CollegeYear } from '@app/models/collegeYear';
 import { Ec } from '@app/models/ec';
 import { Interaction } from '@app/models/interaction';
@@ -19,6 +20,7 @@ import { environment } from '@environments/environment';
 import { TranslateService } from '@ngx-translate/core';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { UtilsService } from '../../utils.service';
+import { ClassroomService } from '../classroom/classroom.service';
 import { HomeService } from '../home.service';
 import { JourneyService } from '../journey/journey.service';
 import { NoteService } from './note.service';
@@ -105,6 +107,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
   keySession = CODE+"session"
   isLoading: boolean = false
   permissionNote: boolean = false
+  listRoom: Classroom[] = []
 
   actions = {
     add: true,
@@ -125,6 +128,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
     private service: HomeService,
     private noteService: NoteService,
     private socketService: SocketService,
+    private serviceRoom: ClassroomService,
     private serviceJourney: JourneyService, ) { 
     this.form = this.fb.group({
       mention: [null, [Validators.required]],
@@ -301,6 +305,9 @@ export class NoteComponent implements OnInit, AfterContentInit {
   async ngOnInit(){
     // get College year
     this.allYears = await this.service.getCollegeYear().toPromise()
+
+    // get all room
+    this.listRoom = await this.serviceRoom.getDataPromisee().toPromise()
     // get mention by permission
     if(this.authService.getPermissionSuperuser()){
       this.allMention = await this.noteService.getMentionUser()
@@ -356,9 +363,10 @@ export class NoteComponent implements OnInit, AfterContentInit {
       if(this.testStorage(this.keyMention, this.allMention[0].uuid) && 
         this.testStorage(this.keyYear, this.allYears[0].title)){
         let uuidMention = localStorage.getItem(this.keyMention)
+
         if(uuidMention !== null){
           this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()}
-         if(this.testStorage(this.keyJourney, this.allJourney[0].uuid)){
+          if (this.allJourney.length > 0){  if(this.testStorage(this.keyJourney, this.allJourney[0].uuid)){
             this.listOfSemester = this.allJourney.find((item: Journey) => item.uuid === localStorage.getItem(this.keyJourney))?.semester
             let testNote: boolean = await this.noteService.testNote(this.form.value.semester,
                this.form.value.journey,
@@ -385,7 +393,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
                     this.createHeaders()
                     this.showTable = true
                     this.isLoading = true
-                    this.initialise = true
                     this.fetchData = this.fetchData.bind(this)
                     this.form.get('filter')?.setValue('Credit')
                   }else{
@@ -395,6 +402,9 @@ export class NoteComponent implements OnInit, AfterContentInit {
          }
         }
       }
+      }
+
+      this.initialise = true
     }
 
   }   
@@ -494,7 +504,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
       }
     }else{
       if(this.interactionResult.length > 0){
-        this.submitForm()
+        this.createTable()
       }
     }
     
@@ -511,8 +521,13 @@ export class NoteComponent implements OnInit, AfterContentInit {
 
   }
 
-  done(): void {
-    this.showTable = true
+ async done() {
+    let testNote: boolean = await this.noteService.testNote( 
+      this.form.value.semester, this.form.value.journey, this.form.value.session).toPromise()
+      if(testNote){
+        this.submitForm()
+        this.showTable = true
+      }
   }
 
   getColumsType(str: string): string{
@@ -638,16 +653,14 @@ export class NoteComponent implements OnInit, AfterContentInit {
         nzTitle: "Voulez-vous supprimer la table note "+this.form.get('semester')?.value+" "+journey?.abbreviation+" "+this.form.get('session')?.value+"?",
         nzOnOk:async () => {
           await this.noteService.deleteTable(this.form.value.semester, this.form.value.journey
-          ,this.form.value.sessionr).toPromise()
+          ,this.form.value.session).toPromise()
         }
       })
     }
   }
   async createTable(){
-    if(this.form.get('journey')?.value && this.form.get('semester')?.value && this.form.get('session')?.value){
-      await this.noteService.createTable(this.form.value.semester, this.form.value.journey, this.form.value.collegeYear)
-      .toPromise()
-    }
+    this.matier = await this.service.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
+    this.showTable = false
   }
 
   async insertStudent(){
@@ -660,12 +673,14 @@ export class NoteComponent implements OnInit, AfterContentInit {
 
   async submitForm() {
     this.showStep = true
+    this.form.get('salle')?.clearValidators()
+    this.form.get('from')?.clearValidators()
+    this.form.get('to')?.clearValidators()
     if (this.form.valid) {
-      this.datatable.fetchData()
+        this.datatable.fetchData()
         this.isvisible = false,
         this.isConfirmLoading = false
       } else {
-        console.error("form not vali")
         Object.values(this.form.controls).forEach(control => {
           if (control.invalid) {
             control.markAsDirty();
@@ -689,7 +704,10 @@ export class NoteComponent implements OnInit, AfterContentInit {
     }
   }
   async getAllColumnsSession(){
+    
     if(this.form.get('journey')?.value && this.form.get('mention')?.value && this.form.get('semester')?.value && this.initialise){
+
+    console.log("mandalo test note");
       let testNote: boolean = await this.noteService.testNote( 
         this.form.value.semester, this.form.value.journey, this.form.value.session).toPromise()
     localStorage.setItem(this.keySession, this.form.get('session')?.value)

@@ -86,7 +86,19 @@ export class DashboardComponent implements OnInit {
       this.totalDas = await this.service.totaldashboard(year).toPromise()
     }
     let totalLicence = this.totalDas.L1 + this.totalDas.L2 + this.totalDas.L3
-    this.percentLicencePassant = (this.totalDas.PL * 100)/ totalLicence
+    this.percentLicencePassant = this.roundNumber((this.totalDas.PL * 100)/ totalLicence)
+    this.percentLicenceRedoublant = this.roundNumber((this.totalDas.RL * 100)/ totalLicence)
+    this.percentLicenceTriplant = this.roundNumber((this.totalDas.TL * 100)/ totalLicence)
+
+    document.getElementById(
+      'passant_licence'
+    )!.style.strokeDasharray = `${this.percentLicencePassant} , 100`;
+    document.getElementById(
+      'redoublant_licence'
+    )!.style.strokeDasharray = `${this.percentLicenceRedoublant} , 100`;
+    document.getElementById(
+      'triplant_licence'
+    )!.style.strokeDasharray = `${this.percentLicenceTriplant} , 100`;
   }
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -95,6 +107,13 @@ export class DashboardComponent implements OnInit {
 
   fetchData(params?: QueryParams) {
    // return this.homeService.getDataObservable(parseQueryParams(params));
+  }
+  roundNumber(num: number) {
+    if (num.toString().includes('.')) {
+      var scale = num.toString().split('.');
+      if (scale[1].length > 2) return num.toFixed(2);
+    }
+    return num;
   }
 }
 
@@ -175,4 +194,5 @@ class MyDataSource extends DataSource<ItemData> {
   getDataObservable(params: HttpParams): Observable<any> {
     return this.http.get<any>(`${BASE_URL}/college_year/`,{params: params});
   }
+
 }

@@ -147,7 +147,22 @@ export class HomeService {
       route: 'role',
       selected: '/home/role',
       icon: 'question-circle',
-    },{
+    },
+    {
+      id: 10,
+      title: 'admin.home.droit.title',
+      route: 'droit',
+      selected: '/home/droit',
+      icon: 'dollar',
+    },
+    {
+      id: 11,
+      title: 'admin.home.classroom.title',
+      route: 'classroom',
+      selected: '/home/classroom',
+      icon: 'home',
+    },
+    {
       id: 6,
       title: 'admin.home.ue.title',
       route: 'ue',

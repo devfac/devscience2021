@@ -7,7 +7,7 @@ from app.api import deps
 from fastapi.responses import FileResponse
 from app.liste import liste_exams, liste_inscrit, liste_bourse, liste_select
 from app import crud
-from app.utils import decode_schemas, get_niveau, create_anne, create_model
+from app.utils import decode_schemas, get_niveau, create_model
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
 
@@ -83,7 +83,7 @@ def list_examen(
     if len(students) == 0:
         raise HTTPException(
             status_code=400,
-            detail="Etudiants not fount.",
+            detail="Etudiants not found.",
         )
     for on_student in students:
         un_et = crud.note.read_by_num_carte(semester, journey.abbreviation, session, on_student.num_carte)
@@ -184,20 +184,16 @@ def list_selection(
 
 @router.get("/list_bourse_passant/")
 def list_bourse_passant(
-        schema: str,
+        college_year: str,
         uuid_mention: str,
         db: Session = Depends(deps.get_db),
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    create liste au examen
+    create liste bourse
     
     """
-    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schema)} not found.",
-                            )
-    etat = "Passant"
+    type_ = "Passant"
     all_data = {}
     all_journey = []
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
@@ -206,63 +202,56 @@ def list_bourse_passant(
             status_code=404,
             detail="The mention with this uuid does not exist in the system.",
         )
-    journey = crud.journey.get_by_mention(db=db, uuid_mention=uuid_mention)
+    journeys = crud.journey.get_by_mention(db=db, uuid_mention=uuid_mention)
     all_data['mention'] = mention.title
-    for parcour in journey:
-        journey_ = {}
-        journey_["name"] = parcour.title
+    for journey in journeys:
+        journey_ = {"name": journey.title}
         l1 = []
         l2 = []
         l3 = []
         m1 = []
         m2 = []
-        etudiants_ = crud.ancien_etudiant.get_by_journey_and_etat(schema=schema, uuid_journey=str(parcour.uuid),
-                                                                   etat=etat)
-        if etudiants_:
-            for etudiant in etudiants_:
-                etudiants = {}
-                etudiants["nom"] = etudiant["nom"]
-                etudiants["prenom"] = etudiant["prenom"]
-                etudiants["num_carte"] = etudiant["num_carte"]
-                niveau = get_niveau(etudiant['semester_petit'], etudiant['semester_grand'])
-                if niveau == "L1":
-                    l1.append(etudiants)
-                if niveau == "L2":
-                    l2.append(etudiants)
-                if niveau == "L3":
-                    l3.append(etudiants)
-                if niveau == "M1":
-                    m1.append(etudiants)
-                if niveau == "M2":
-                    m2.append(etudiants)
+        students_ = crud.ancien_student.get_by_journey_and_type(db=db, college_year=college_year, 
+                                                                 uuid_journey=journey.uuid, type_=type_)
+        if students_:
+            for student in students_:
+                students = {"last_name": student.last_name, "first_name": student.first_name, "num_carte": student.num_carte}
+                level = get_niveau(student.inf_semester, student.sup_semester)
+                if level == "L1":
+                    l1.append(students)
+                if level == "L2":
+                    l2.append(students)
+                if level == "L3":
+                    l3.append(students)
+                if level == "M1":
+                    m1.append(students)
+                if level == "M2":
+                    m2.append(students)
         journey_["l1"] = l1
         journey_["l2"] = l2
         journey_["l3"] = l3
         journey_["m1"] = m1
         journey_["m2"] = m2
         all_journey.append(journey_)
-    all_data['parcour'] = all_journey
-    all_data['anne'] = decode_schemas(schema)
+    all_data['journey'] = all_journey
+    all_data['year'] = college_year.title()
 
-    file = liste_bourse.PDF.create_list_bourse(mention.title, all_data, etat)
+    file = liste_bourse.PDF.create_list_bourse(mention.title, all_data, type_)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
 
 @router.get("/list_bourse_redoublant/")
-def list_bourse_redoublant(
-        schema: str,
+def list_bourse_passant(
+        college_year: str,
         uuid_mention: str,
         db: Session = Depends(deps.get_db),
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    create liste au examen
+    create liste bourse
+
     """
-    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.",
-                            )
-    etat = "Redoublant"
+    type_ = "Redoublant"
     all_data = {}
     all_journey = []
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
@@ -271,45 +260,49 @@ def list_bourse_redoublant(
             status_code=404,
             detail="The mention with this uuid does not exist in the system.",
         )
-    journey = crud.journey.get_by_mention(db=db, uuid_mention=uuid_mention)
+
+    college_year = crud.college_year.get_by_title(db=db, title=college_year)
+    if not college_year:
+        raise HTTPException(
+            status_code=404,
+            detail="The college year with this uuid does not exist in the system.",
+        )
+    journeys = crud.journey.get_by_mention(db=db, uuid_mention=uuid_mention)
     all_data['mention'] = mention.title
-    for parcour in journey:
-        journey_ = {}
-        journey_["name"] = parcour.title
+    for journey in journeys:
+        journey_ = {"name": journey.title}
         l1 = []
         l2 = []
         l3 = []
         m1 = []
         m2 = []
-        etudiants_ = crud.ancien_etudiant.get_by_journey_and_etat_and_moyenne(schema=schema,
-                                                                               uuid_journey=str(parcour.uuid),
-                                                                               etat=etat,
-                                                                               moyenne=float(anne_univ.moyenne))
-        if etudiants_:
-            for etudiant in etudiants_:
-                etudiants = {}
-                etudiants["nom"] = etudiant["nom"]
-                etudiants["prenom"] = etudiant["prenom"]
-                etudiants["num_carte"] = etudiant["num_carte"]
-                niveau = get_niveau(etudiant['semester_petit'], etudiant['semester_grand'])
-                if niveau == "L1":
-                    l1.append(etudiants)
-                if niveau == "L2":
-                    l2.append(etudiants)
-                if niveau == "L3":
-                    l3.append(etudiants)
-                if niveau == "M1":
-                    m1.append(etudiants)
-                if niveau == "M2":
-                    m2.append(etudiants)
+        students_ = crud.ancien_student.get_by_journey_and_type_and_mean(db=db, college_year=college_year.title,
+                                                                         uuid_journey=journey.uuid, type_=type_,
+                                                                         mean=college_year.mean)
+        if students_:
+            for student in students_:
+                students = {"last_name": student.last_name, "first_name": student.first_name,
+                            "num_carte": student.num_carte}
+                level = get_niveau(student.inf_semester, student.sup_semester)
+                if level == "L1":
+                    l1.append(students)
+                if level == "L2":
+                    l2.append(students)
+                if level == "L3":
+                    l3.append(students)
+                if level == "M1":
+                    m1.append(students)
+                if level == "M2":
+                    m2.append(students)
         journey_["l1"] = l1
         journey_["l2"] = l2
         journey_["l3"] = l3
         journey_["m1"] = m1
         journey_["m2"] = m2
         all_journey.append(journey_)
-    all_data['parcour'] = all_journey
-    all_data['anne'] = decode_schemas(schema)
+    all_data['journey'] = all_journey
+    all_data['year'] = college_year.title
 
-    file = liste_bourse.PDF.create_list_bourse(mention.title, all_data, etat)
+    file = liste_bourse.PDF.create_list_bourse(mention.title, all_data, type_)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
+

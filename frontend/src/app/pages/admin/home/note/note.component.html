@@ -221,17 +221,25 @@ classNames="note"
       nzMaskClosable="false" >
       <div *nzModalContent>
       <form nz-form [formGroup]="form" class="form" (ngSubmit)="listExam()" nzLayout="vertical">
-      <nz-form-item>
-        <nz-form-label nzRequired>
-          {{ 'admin.home.note.salle' | translate }}
-        </nz-form-label>
-        <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-          <nz-input-group>
-            <input type="text" nz-input formControlName="salle" appCustomAutoFocus
-              [placeholder]="'admin.home.note.salle' | translate" />
-          </nz-input-group>
-        </nz-form-control>
-      </nz-form-item>
+        <nz-form-item>
+          <nz-form-label nzRequired>
+            {{ 'admin.home.note.salle' | translate }}
+          </nz-form-label>
+          <nz-form-control [nzErrorTip]="'admin.home.value_error' | translate">
+            <nz-input-group>
+              <nz-select  style="width: 100%;"
+                  formControlName="salle"
+                  [nzPlaceHolder]="'admin.home.note.salle' | translate"
+                  >
+                  <nz-option *ngFor="let item of listRoom"
+                      [nzLabel]="item.name"
+                      [nzValue]="item.name"
+                  >
+                  </nz-option>
+              </nz-select>
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
 
       <nz-form-item>
         <nz-form-label nzRequired>

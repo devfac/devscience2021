@@ -29,3 +29,8 @@ def init_db(db: Session) -> None:
             is_superuser=True,
         )
         user = crud.user.create(db, obj_in=user_in)  # noqa: F841
+
+    role = crud.role.get_title(db, title="chefsco")
+    if not role:
+        role_in = schemas.RoleCreate(title="chefsco")
+        user = crud.role.create(db, obj_in=role_in)  # noqa: F841

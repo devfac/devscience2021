@@ -15,6 +15,7 @@ export class AdminComponent implements OnInit {
     "padding": 0,
   }
   translate: TranslateService;
+  currentDate = new Date();
   user!: { firstName: string; lastName: string; };
   config!: {
     appLogo: string,

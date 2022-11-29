@@ -1,4 +1,4 @@
-import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http';
 import { AfterContentInit, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -17,10 +17,11 @@ import { DownloadService } from '../../download.service';
 import { CollegeYearService } from '../../home/college-year/college-year.service';
 import { JourneyService } from '../../home/journey/journey.service';
 import { MentionService } from '../../home/mention/mention.service';
+import { UtilsService } from '../../utils.service';
 import { SelectionService } from './selection.service';
 
-const BASE_URL = environment.authApiURL;
 const CODE = "selection"
+const BASE_URL = environment.authApiURL;
 
 @Component({
   selector: 'app-selection',
@@ -58,13 +59,14 @@ export class SelectionComponent implements OnInit, AfterContentInit {
     edit: true,
     delete: true,
     detail: false,
+    print: true,
   };
   constructor(
     private http: HttpClient, 
     private modal: NzModalService, 
     private fb: FormBuilder, 
     public router: Router, 
-    private downloads: DownloadService,
+    private utlisService: UtilsService,
     private authUser: AuthService,
     private serviceJourney: JourneyService,
     private serviceMention: MentionService,
@@ -184,9 +186,6 @@ export class SelectionComponent implements OnInit, AfterContentInit {
     localStorage.setItem(this.keyYear, this.form.get(this.keyYear.substring(CODE.length))?.value)
     this.router.navigate(['/user/selection_add'])
   }
-  download(){
-
-  }
   handleCancel(): void{
     this.isvisible = false
   }
@@ -201,10 +200,14 @@ export class SelectionComponent implements OnInit, AfterContentInit {
   }
 
   addStudent():void{
+    console.log(this.form.get(this.keyMention.substring(CODE.length))?.value);
+    
     localStorage.setItem(this.keyYear, this.form.get(this.keyYear.substring(CODE.length))?.value)
     localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)
     localStorage.setItem(this.keyNum, '')
     this.router.navigate(['/user/selection_add'])
+    console.log(localStorage.getItem(this.keyMention));
+    
   }
 
   handleOk(): void{
@@ -214,6 +217,16 @@ export class SelectionComponent implements OnInit, AfterContentInit {
     }, 3000);
   }
 
+  download(){
+    let url: string = `${BASE_URL}/liste/list_selection/`;
 
+    let params = new HttpParams()
+      .append('college_year', this.form.get('collegeYear')?.value)
+      .append('uuid_mention', this.form.get('mention')?.value)
+
+    const mention = this.allMention.find((item: Mention) => item.uuid === this.form.value.mention);
+    let name: string = 'Liste_séléction'+mention?.abbreviation
+    this.utlisService.download(url, params, name);
+  }
 
 }

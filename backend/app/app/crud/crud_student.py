@@ -167,7 +167,7 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
                      sex: str,
                      type: str,
                      college_year: str,
-                     limit: int = 500,
+                     limit: int = 1000,
                      skip: int = 0,
                      order: str = "asc",
                      order_by: str = "last_name"
@@ -190,7 +190,7 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
                             semester: str,
                             sex: str,
                             college_year: str,
-                            limit: int = 500,
+                            limit: int = 1000,
                             skip: int = 0
                             ) -> Optional[List[Student]]:
         return (
@@ -208,7 +208,7 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
                             uuid_journey: UUID,
                             semester: str,
                             college_year: str,
-                            limit: int = 500,
+                            limit: int = 1000,
                             skip: int = 0
                             ) -> Optional[List[Student]]:
         return (
@@ -217,6 +217,42 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
                 and_(Student.uuid_journey == uuid_journey,
                      Student.actual_years == college_year,
                      Student.sup_semester == semester))
+            .offset(skip)
+            .limit(limit)
+            .all())
+    
+    def get_by_journey_and_type(self, db: Session, *,
+                            uuid_journey: UUID,
+                            type_: str,
+                            college_year: str,
+                            limit: int = 1000,
+                            skip: int = 0
+                            ) -> Optional[List[Student]]:
+        return (
+            db.query(Student)
+            .filter(
+                and_(Student.uuid_journey == uuid_journey,
+                     Student.actual_years == college_year,
+                     Student.type == type_))
+            .offset(skip)
+            .limit(limit)
+            .all())
+
+    def get_by_journey_and_type_and_mean(self, db: Session, *,
+                            uuid_journey: UUID,
+                            type_: str,
+                            mean: float,
+                            college_year: str,
+                            limit: int = 1000,
+                            skip: int = 0
+                            ) -> Optional[List[Student]]:
+        return (
+            db.query(Student)
+            .filter(
+                and_(Student.uuid_journey == uuid_journey,
+                     Student.actual_years == college_year,
+                     Student.type == type_,
+                     Student.mean >= mean))
             .offset(skip)
             .limit(limit)
             .all())
@@ -250,7 +286,7 @@ class CRUDNewStudent(CRUDBase[Student, NewStudentCreate, NewStudentUpdate]):
                 .all())
 
     def get_by_mention(self, db: Session, *, uuid_mention: UUID,
-                       college_year: str, limit: int, skip: int,
+                       college_year: str, limit: int=1000, skip: int=0,
                        order: str = "asc", order_by: str = "last_name",
                        ) -> Optional[List[Student]]:
         return (
@@ -264,7 +300,7 @@ class CRUDNewStudent(CRUDBase[Student, NewStudentCreate, NewStudentUpdate]):
             .all())
 
     def get_all_admis_by_mention(self, db: Session, *, uuid_mention: UUID,
-                                 college_year: str, limit: int, skip: int,
+                                 college_year: str, limit: int=1000, skip: int=0,
                                  order: str = "asc", order_by: str = "last_name"
                                  ) -> Optional[
         List[Student]]:
@@ -280,7 +316,7 @@ class CRUDNewStudent(CRUDBase[Student, NewStudentCreate, NewStudentUpdate]):
             .all())
 
     def get_by_jouney(self, db: Session, *, uuid_journey: UUID,
-                      college_year: str, limit: int, skip: int,
+                      college_year: str, limit: int=1000, skip: int=0,
                       order: str = "asc", order_by: str = "last_name",
                       ) -> Optional[List[Student]]:
         return (

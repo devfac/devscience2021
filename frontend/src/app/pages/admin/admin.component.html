@@ -15,12 +15,24 @@
         </nz-page-header-content>
       </nz-page-header>
   <nz-content class="outer-content">
-    <div>
+    <div class="breadcrumb-container">
       <xng-breadcrumb>
         <ng-container *xngBreadcrumbItem="let breadcrumb">
           <ng-container>{{ breadcrumb | translate | titlecase }}</ng-container>
         </ng-container>
       </xng-breadcrumb>
+
+      <div nz-row>
+        <div>
+          {{ currentDate | localizedDate: 'longDate' }}
+          <!-- <button nz-button nzSize="small" nzType="text" (click)="back()">
+            <span nz-icon nzType="left"></span>
+          </button>
+          <button nz-button nzSize="small" nzType="text" (click)="forward()">
+            <span nz-icon nzType="right"></span>
+          </button> -->
+        </div>
+      </div>
     </div>
     <div style="padding: 16px 0px; flex: 1">
       <router-outlet></router-outlet>

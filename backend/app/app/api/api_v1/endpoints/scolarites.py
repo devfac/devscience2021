@@ -1,6 +1,6 @@
 from app import crud
 from app.core.config import settings
-from app.utils import get_niveau, decode_schemas, creaate_registre, validation_semester, create_anne, create_model
+from app.utils import get_niveau, decode_schemas, creaate_registre, validation_semester, create_model
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import models

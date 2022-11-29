@@ -50,8 +50,6 @@ def create_carte(
     if role:
         chefsco = crud.user.get_chefsco(db=db, uuid_role=role.uuid)
         data['supperadmin'] = f"{chefsco.last_name} {chefsco.first_name}"
-
-    print("chef sco", data['supperadmin'])
     data['mention'] = mention.title
     data['key'] = year.code
     data['img_carte'] = (mention.plugged.lower())[0:1]

@@ -189,7 +189,7 @@ export class InscriptionAddComponent implements OnInit {
     }else{
       this.isEdit=false
     }
-    let uuidMention = localStorage.getItem(this.keyMention.substring(CODE.length))
+    let uuidMention = localStorage.getItem(this.keyMention)
     if (uuidMention !== null){
       this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()
       this.allMention.push(await this.serviceMention.getData(uuidMention).toPromise())
@@ -197,7 +197,7 @@ export class InscriptionAddComponent implements OnInit {
     }
 
     this.http.get<Droit[]>(`${BASE_URL}/droit/by_mention?uuid_mention=`+
-      localStorage.getItem("mention")+'&year='+localStorage.getItem("collegeYear")).subscribe(
+      localStorage.getItem(this.keyMention)+'&year='+localStorage.getItem(this.keyYear)).subscribe(
       data =>{ 
         this.allPrice=data
       },

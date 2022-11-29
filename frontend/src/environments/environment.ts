@@ -7,7 +7,6 @@ export const environment = {
   authApiURL: 'http://localhost/api/v1',
   notificationApiURL: 'http://localhost:3000',
   socketApiURL: "localhost/api/v1/utils/ws/",
-  currencyApiURL: 'http://localhost:5001',
 };
 
 /*

@@ -4,6 +4,9 @@ from pydantic import BaseModel
 
 
 # Shared properties
+from .mention import Mention
+
+
 class DroitBase(BaseModel):
     level: Optional[str]
     droit: Optional[str]
@@ -37,7 +40,7 @@ class DroitInDBBase(DroitBase):
 
 # Additional properties to return via API
 class Droit(DroitInDBBase):
-    pass
+    mention: Optional[Mention]
 
 
 # Additional properties stored in DB

@@ -79,8 +79,20 @@
       "update":"Modifier",
       "menu": "Menu",
       "permission":"Permission",
+      "droit":{
+        "add_droit": "Ajouter ou modifier un droit",
+        "title":"Droit d'inscription",
+        "level":"Niveau"
+
+      },
+      "classroom":{
+        "add_classroom": "Ajouter ou modifier une salle de classe",
+        "title":"Salle de classe",
+        "capacity":"Capacité"
+      },
       "time":"Expiré dans",
       "value":"Min: {{min}}, Max: {{max}}",
+      "value_error":"Champ obligatoire",
       "users":{
         "add_users":"Ajouter ou modifier un utilisateur",
         "title": "Utilisateurs",
