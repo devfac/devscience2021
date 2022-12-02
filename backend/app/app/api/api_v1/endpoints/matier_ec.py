@@ -6,12 +6,12 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
-from app.utils import decode_text, create_anne
+from app.utils import decode_text
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.MatierEC])
+@router.get("/", response_model=schemas.ResponseData)
 def read_ec(
         *,
         db: Session = Depends(deps.get_db),
@@ -26,6 +26,7 @@ def read_ec(
     """
     ecs = crud.constituent_element.get_multi(db=db, limit=limit, skip=offset, order_by=order_by, order=order)
     list_ec = []
+    count = len(crud.constituent_element.get_count(db=db))
     for on_ec in ecs:
         ec = schemas.MatierEC(**jsonable_encoder(on_ec))
         journey = crud.journey.get_by_uuid(db=db, uuid=ec.uuid_journey)
@@ -33,7 +34,8 @@ def read_ec(
             ec.journey = journey
             ec.abbreviation_journey = journey.abbreviation
         list_ec.append(ec)
-    return list_ec
+    response = schemas.ResponseData(**{'count':count, 'data':list_ec})
+    return response
 
 @router.get("/get_by_class/"
             "", response_model=List[schemas.MatierEC])

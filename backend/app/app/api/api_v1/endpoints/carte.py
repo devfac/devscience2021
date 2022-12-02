@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app import crud
 from app import models, schemas
 from app.api import deps
-from app.utils import decode_schemas, get_niveau
+from app.utils import decode_schemas, get_niveau, find_in_list
 from app.utils_sco import carte_avant, arrire_carte
 
 router = APIRouter()
@@ -24,8 +24,7 @@ def create_carte(
     """
     create liste au examen
     """
-    students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention,
-                                                  college_year=college_year, skip=0, limit=1000)
+    students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention,skip=0, limit=1000, order_by="num_carte")
 
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
     if not mention:
@@ -37,7 +36,7 @@ def create_carte(
 
     all_student = []
     for on_student in students:
-        if on_student.num_carte:
+        if on_student.num_carte and find_in_list(on_student.actual_years, college_year) != -1:
             stud = jsonable_encoder(on_student)
             stud['level'] = get_niveau(on_student.inf_semester, on_student.sup_semester)
             stud['journey'] = crud.journey.get_by_uuid(db=db, uuid=on_student.uuid_journey).abbreviation
@@ -73,8 +72,7 @@ def create_after_carte(
     if not year:
         raise HTTPException(status_code=400, detail=f"College year not found.",
                             )
-    students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention,
-                                                  college_year=college_year, skip=0, limit=1000)
+    students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention, skip=0, limit=1000)
 
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
     if not mention:
@@ -82,7 +80,7 @@ def create_after_carte(
 
     all_student = []
     for on_student in students:
-        if on_student.num_carte:
+        if on_student.num_carte and find_in_list(on_student.actual_years, college_year) != -1:
             stud = jsonable_encoder(on_student)
             stud['level'] = get_niveau(on_student.inf_semester, on_student.sup_semester)
             stud['journey'] = crud.journey.get_by_uuid(db=db, uuid=on_student.uuid_journey).abbreviation

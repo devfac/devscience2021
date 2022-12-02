@@ -7,7 +7,7 @@ from app.api import deps
 from fastapi.responses import FileResponse
 from app.liste import liste_exams, liste_inscrit, liste_bourse, liste_select
 from app import crud
-from app.utils import decode_schemas, get_niveau, create_model
+from app.utils import decode_schemas, get_niveau, create_model, find_in_list
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
 
@@ -77,8 +77,7 @@ def list_examen(
     matiers['ue'] = all_ue
 
     students = crud.ancien_student.get_by_class_limit(db=db, uuid_journey=uuid_journey,uuid_mention=uuid_mention,
-                                                      semester=semester,college_year=college_year,
-                                                      skip=skip, limit=limit)
+                                                      semester=semester,skip=skip, limit=limit)
     all_students = []
     if len(students) == 0:
         raise HTTPException(
@@ -87,7 +86,7 @@ def list_examen(
         )
     for on_student in students:
         un_et = crud.note.read_by_num_carte(semester, journey.abbreviation, session, on_student.num_carte)
-        if un_et:
+        if un_et and find_in_list(on_student.actual_years, college_year) != -1:
             student = {"last_name": on_student.last_name,
                        "first_name": on_student.first_name,
                        "num_carte": on_student.num_carte}
@@ -128,11 +127,11 @@ def list_inscrit(
         raise HTTPException(status_code=400, detail=f" Mention not found.", )
 
     students = crud.ancien_student.get_by_class(db=db, uuid_journey=uuid_journey, uuid_mention=journey.uuid_mention,
-                                                semester=semester, college_year=college_year, )
+                                                semester=semester, )
 
     all_student = []
-    if students:
-        for on_student in students:
+    for on_student in students:
+        if find_in_list(on_student.actual_years, college_year) != -1:
             student = {"last_name": on_student.last_name,
                        "first_name": on_student.first_name,
                        "num_carte": on_student.num_carte}
@@ -211,10 +210,10 @@ def list_bourse_passant(
         l3 = []
         m1 = []
         m2 = []
-        students_ = crud.ancien_student.get_by_journey_and_type(db=db, college_year=college_year, 
-                                                                 uuid_journey=journey.uuid, type_=type_)
-        if students_:
-            for student in students_:
+        students_ = crud.ancien_student.get_by_journey_and_type(db=db,uuid_journey=journey.uuid, type_=type_)
+
+        for student in students_:
+            if find_in_list(student.actual_years, college_year) != -1:
                 students = {"last_name": student.last_name, "first_name": student.first_name, "num_carte": student.num_carte}
                 level = get_niveau(student.inf_semester, student.sup_semester)
                 if level == "L1":
@@ -276,11 +275,10 @@ def list_bourse_passant(
         l3 = []
         m1 = []
         m2 = []
-        students_ = crud.ancien_student.get_by_journey_and_type_and_mean(db=db, college_year=college_year.title,
-                                                                         uuid_journey=journey.uuid, type_=type_,
+        students_ = crud.ancien_student.get_by_journey_and_type_and_mean(db=db,uuid_journey=journey.uuid, type_=type_,
                                                                          mean=college_year.mean)
-        if students_:
-            for student in students_:
+        for student in students_:
+            if find_in_list(student.actual_years, college_year) != -1:
                 students = {"last_name": student.last_name, "first_name": student.first_name,
                             "num_carte": student.num_carte}
                 level = get_niveau(student.inf_semester, student.sup_semester)

@@ -39,8 +39,7 @@ def create_permission(
     user = crud.user.get_by_email(db=db, email=permission_in.email)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    expiration_date = datetime.utcnow() + timedelta(minutes=permission_in.time)
-    print("epxpirer en",datetime.utcnow()< expiration_date)
+    expiration_date = datetime.utcnow() + timedelta(hours=permission_in.time)
     permission_model = schemas.PermissionCreateModel(**{'email':permission_in.email,
                                                        'expiration_date':expiration_date,
                                                        'accepted':permission_in.accepted,

@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Ec } from '@app/models/ec';
+import { ResponseModel } from '@app/models/response';
 import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
 
@@ -25,7 +26,7 @@ export class EcService {
     return this.http.get<Ec[]>(`${BASE_URL}/matier_ec/`, {headers: this.headers, params: params_});
   }
   getDataPromise(){
-    return this.http.get<Ec[]>(`${BASE_URL}/matier_ec/`,{headers: this.headers});
+    return this.http.get<ResponseModel>(`${BASE_URL}/matier_ec/`,{headers: this.headers});
   }
 
   deletData(uuid: string):Promise<Ec[]> {
@@ -45,6 +46,11 @@ export class EcService {
 
   addData(body: any){
     return this.http.post<Ec[]>(`${BASE_URL}/matier_ec/`,body, {headers: this.headers})
+  }
+  
+  getEc( semester: string, uuidJourney: string){
+    let otherParams = new HttpParams().append('semester', semester).append('uuid_journey', uuidJourney)
+    return this.http.get<Ec[]>(`${BASE_URL}/matier_ec/get_by_class`, {headers: this.headers, params: otherParams})
   }
    
 }

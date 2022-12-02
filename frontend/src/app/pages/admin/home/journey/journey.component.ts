@@ -10,6 +10,7 @@ import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { MentionService } from '../mention/mention.service';
 import { JourneyService } from './journey.service';
 import { parseQueryParams } from '@app/shared/utils';
+import { ResponseModel } from '@app/models/response';
 
 const BASE_URL = environment.authApiURL;
 
@@ -82,7 +83,8 @@ export class JourneyComponent implements OnInit, AfterContentInit {
 
   async ngOnInit(){
     this.fetchData = this.fetchData.bind(this)
-    this.allMention = await this.serviceMention.getDataPromise().toPromise()
+   let allMention: ResponseModel = await this.serviceMention.getDataPromise().toPromise()
+   this.allMention = allMention.data
   }
 
   fetchData(params?: QueryParams){

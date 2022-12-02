@@ -11,6 +11,7 @@
                         [ngModel]="data"
                         formControlName="collegeYear"
                         [nzPlaceHolder]="'admin.home.college_year.title' | translate"
+                        (ngModelChange)="changeYear()"
                         >
                         <nz-option *ngFor="let item of allYears"
                             [nzLabel]="item.title"

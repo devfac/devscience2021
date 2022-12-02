@@ -4,6 +4,7 @@ import { CollegeYear } from '@app/models/collegeYear';
 import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
 import { QueryParams } from '@app/models/query';
+import { ResponseModel } from '@app/models/response';
 import { TableHeader } from '@app/models/table';
 import { Ue } from '@app/models/ue';
 import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
@@ -25,7 +26,6 @@ export class UeComponent implements OnInit, AfterContentInit {
   headers: TableHeader[] = [];
 
   user = localStorage.getItem('user')
-  allYears: CollegeYear[] = []
   allJourney: Journey[] = []
   allMention: Mention[] = []
   allUe: Ue[] = []
@@ -92,7 +92,8 @@ export class UeComponent implements OnInit, AfterContentInit {
   async ngOnInit(){
     this.fetchData = this.fetchData.bind(this)
 
-    this.allMention = await this.serviceMention.getDataPromise().toPromise()
+    let allMention: ResponseModel = await this.serviceMention.getDataPromise().toPromise()
+    this.allMention = allMention.data
     this.testStorage('mention', this.allMention[0].uuid)
 
     this.allJourney = await this.serviceJourney.getDataByMention(this.form.get('mention')?.value).toPromise()
@@ -104,10 +105,6 @@ export class UeComponent implements OnInit, AfterContentInit {
         }
       )
     }
-
-    this.allYears = await this.serviceYears.getDataPromise().toPromise()
-    this.testStorage('collegeYear', this.allYears[0].title)
-    this.actualYear = localStorage.getItem('collegeYear')
   }
   fetchData(params?: QueryParams){
     return this.service.getDataObservable(parseQueryParams(params))

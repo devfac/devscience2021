@@ -9,7 +9,7 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Role])
+@router.get("/", response_model=schemas.ResponseData)
 def read_roles(
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -19,9 +19,11 @@ def read_roles(
     """
     if crud.user.is_superuser(current_user):
         role = crud.role.get_multi(db=db)
+        count = len(crud.role.get_count(db=db))
+        response = schemas.ResponseData(**{'count':count, 'data':role})
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    return role
+    return response
 
 
 @router.post("/", response_model=List[schemas.Role])

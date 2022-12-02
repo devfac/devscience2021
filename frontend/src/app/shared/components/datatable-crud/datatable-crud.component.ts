@@ -218,16 +218,17 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
               this.new_data = [];
               this.listOfData = [];
               //this.data = result
-                for (let i = 0; i < result.length; i++) {
-                  this.new_data.push({ ...result[i]});
-                  this.listOfData.push({ ...result[i] });
-                  this.editCache[result[i].num_carte] = {
+                for (let i = 0; i < result.data.length; i++) {
+                  this.new_data.push({ ...result.data[i]});
+                  this.listOfData.push({ ...result.data[i] });
+                  this.editCache[result.data[i].num_carte] = {
                     edit: false,
-                    data: { ...result[i] },
+                    data: { ...result.data[i] },
                   };
                 }
-              this.total = result.length || 0;
+              this.total = result?.count || 0;
               this.data = [...this.new_data];
+              
             },
             error: (err) => {
               console.error(err);

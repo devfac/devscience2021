@@ -42,7 +42,7 @@ class StudentBase(BaseModel):
     date_cin: Optional[str] = None
     place_cin: Optional[str] = None
     uuid_mention: Optional[UUID]
-    actual_years: Optional[str]
+    actual_years: Optional[List[str]]
 
 
 class SelectStudentCreate(StudentBase):
@@ -207,6 +207,7 @@ class NewStudent(NewStudentInDBBase):
     num_carte: Optional[str]
     is_selected: Optional[bool]
     journey: Optional[Journey]
+    mention: Optional[Mention]
     receipt: Optional[Receipt]
     situation: Optional[str]
     telephone: Optional[str]

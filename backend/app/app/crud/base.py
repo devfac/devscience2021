@@ -38,6 +38,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             .all()
         )
 
+    def get_count(
+            self, db: Session
+    ) -> List[ModelType]:
+        return (
+            db.query(self.model)
+            .all()
+        )
+
     def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(**obj_in_data)  # type: ignore
@@ -61,6 +69,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         for field in obj_data:
             if field in update_data and field is not  None:
                 setattr(db_obj, field, update_data[field])
+
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)

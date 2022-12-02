@@ -212,7 +212,7 @@ def dashboard(
     for uuid_mention in mention_list:
         mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
         if mention:
-            students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention, college_year=college_year, skip=0,
+            students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention, skip=0,
                                                           limit=1000, )
             for student in students:
                 semester: str = get_max(student.inf_semester, student.sup_semester)

@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Classroom } from '@app/models/classroom';
+import { ResponseModel } from '@app/models/response';
 import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
 const BASE_URL = environment.authApiURL;
@@ -27,7 +28,7 @@ export class ClassroomService {
   }
 
   getDataPromisee() {
-    return this.http.get<Classroom[]>(`${BASE_URL}/classroom/`, {headers: this.headers});
+    return this.http.get<ResponseModel>(`${BASE_URL}/classroom/`, {headers: this.headers});
   }
 
   deletData(uuid: string):Promise<Classroom[]> {

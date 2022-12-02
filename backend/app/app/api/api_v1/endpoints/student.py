@@ -16,7 +16,7 @@ from app.utils import create_num_carte, find_in_list
 router = APIRouter()
 
 
-@router.get("/ancien/", response_model=List[schemas.AncienStudent])
+@router.get("/ancien/", response_model=schemas.ResponseData)
 def read_ancien_student(
         *,
         db: Session = Depends(deps.get_db),
@@ -31,25 +31,32 @@ def read_ancien_student(
     """
     Retrieve ancien student.
     """
-    students = crud.ancien_student.get_by_mention(db=db, college_year=college_year, order_by=order_by, order=order,
+    students = crud.ancien_student.get_by_mention(db=db, order_by=order_by, order=order,
                                                   uuid_mention=uuid_mention, limit=limit, skip=offset)
     all_student = []
+    count = 0
+    for student in crud.ancien_student.count_by_mention(db=db, uuid_mention=uuid_mention):
+        if find_in_list(current_user.uuid_mention, str(student.uuid_mention)) != -1 and \
+                find_in_list(student.actual_years, college_year) != -1 and student.uuid_journey:
+            count += 1
     for on_student in students:
         if on_student.uuid_journey:
             for receipt in on_student.receipt_list:
                 receipt = receipt.replace("'",'"')
                 receipt = json.loads(receipt)
-                if receipt['year'] == on_student.actual_years:
+                if receipt['year'] == college_year:
                     on_student.receipt = receipt
                     break
             stud = schemas.AncienStudent(**jsonable_encoder(on_student))
             stud.journey = crud.journey.get_by_uuid(db=db, uuid=on_student.uuid_journey)
-            if find_in_list(current_user.uuid_mention, str(stud.uuid_mention)) != -1:
+            if find_in_list(current_user.uuid_mention, str(stud.uuid_mention)) != -1 and \
+                    find_in_list(on_student.actual_years, college_year) != -1:
                 all_student.append(stud)
-    return all_student
+    response = schemas.ResponseData(**{'count': count, 'data': all_student})
+    return response
 
 
-@router.get("/new/all/", response_model=List[schemas.SelectStudentBase])
+@router.get("/new/all/", response_model=schemas.ResponseData)
 def read_new_student(
         *,
         db: Session = Depends(deps.get_db),
@@ -65,13 +72,16 @@ def read_new_student(
     students = crud.new_student.get_by_mention(db=db,uuid_mention=uuid_mention,
                                                college_year=college_year, limit=limit, skip=offset)
     all_student = []
+    count = len(crud.new_student.count_by_mention(db=db, uuid_mention=uuid_mention,  college_year=college_year))
     for on_student in students:
         on_student.mention = crud.mention.get_by_uuid(db=db, uuid=on_student.uuid_mention)
-        if find_in_list(current_user.uuid_mention, str(on_student.uuid_mention)) != -1:
+        if find_in_list(current_user.uuid_mention, str(on_student.uuid_mention)) != -1 and\
+                find_in_list(on_student.actual_years, college_year) != -1:
             all_student.append(on_student)
-    return all_student
+    response = schemas.ResponseData(**{'count': count, 'data': all_student})
+    return response
 
-@router.get("/new_inscrit/", response_model=List[schemas.NewStudent])
+@router.get("/new_inscrit/", response_model=schemas.ResponseData)
 def read_new_student(
         *,
         db: Session = Depends(deps.get_db),
@@ -86,28 +96,36 @@ def read_new_student(
     """
     Retrieve new student.
     """
-    students = crud.new_student.get_by_mention(db=db,uuid_mention=uuid_mention,order_by=order_by, order=order,
-                                               college_year=college_year, limit=limit, skip=offset)
+    students = crud.new_student.get_by_mention(db=db,uuid_mention=uuid_mention,college_year=college_year,
+                                               order_by=order_by, order=order, limit=limit, skip=offset)
     all_student = []
+    count = 0
+    for student in crud.new_student.count_by_mention(db=db, uuid_mention=uuid_mention, college_year=college_year):
+        if find_in_list(current_user.uuid_mention, str(student.uuid_mention)) != -1 and \
+                find_in_list(student.actual_years, college_year) != -1 and student.uuid_journey:
+            count += 1
     for on_student in students:
         if on_student.uuid_journey:
             for receipt in on_student.receipt_list:
                 receipt = receipt.replace("'",'"')
                 receipt = json.loads(receipt)
-                if receipt['year'] == on_student.actual_years:
+                if receipt['year'] == college_year:
                     on_student.receipt = receipt
                     break
             stud = schemas.NewStudent(**jsonable_encoder(on_student))
             stud.journey = crud.journey.get_by_uuid(db=db, uuid=on_student.uuid_journey)
-            on_student.mention = crud.mention.get_by_uuid(db=db, uuid=on_student.uuid_mention)
-            if find_in_list(current_user.uuid_mention, str(on_student.uuid_mention)) != -1:
-                all_student.append(on_student)
-    return all_student
+            stud.mention = crud.mention.get_by_uuid(db=db, uuid=on_student.uuid_mention)
+            if find_in_list(current_user.uuid_mention, str(on_student.uuid_mention)) != -1 and \
+                    find_in_list(stud.actual_years, college_year) != -1:
+                all_student.append(stud)
+    response = schemas.ResponseData(**{'count': count, 'data': all_student})
+    return response
 
 @router.post("/ancien/", response_model=schemas.AncienStudent)
 def create_ancien_student(
         *,
         db: Session = Depends(deps.get_db),
+        college_year: str,
         student_in: schemas.AncienStudentCreate,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -125,6 +143,7 @@ def create_ancien_student(
         list_receipt = [str(dict(student_in.receipt))]
         student_in.receipt_list = list_receipt
         student_in.receipt = ""
+        student_in.actual_years = [str(college_year)]
         student = crud.ancien_student.create(db=db, obj_in=student_in)
     else:
         k: int = 0
@@ -143,6 +162,14 @@ def create_ancien_student(
             list_receipt_2.append(str(dict(student_in.receipt)))
         student_in.receipt_list = list_receipt_2
         student_in.receipt = ""
+        if find_in_list(student.actual_years, college_year) == -1:
+            actual_year:List[str] = student.actual_years if student.actual_years else []
+            new_year = [str(college_year)]
+            for year in actual_year:
+                new_year.append(str(year))
+            student_in.actual_years = new_year
+        else:
+            student_in.actual_years = student.actual_years
         student = crud.ancien_student.update(db=db, db_obj=student, obj_in=student_in)
     return student
 
@@ -151,6 +178,7 @@ def create_ancien_student(
 def create_new_student(
         *,
         db: Session = Depends(deps.get_db),
+        college_year: str,
         student_in: schemas.SelectStudentCreate,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -167,10 +195,13 @@ def create_new_student(
         student_in.num_select = f"S{mention.abbreviation.upper()}{student_in.num_select}-{student_in.enter_years[2:4]}"
         student = crud.new_student.get_by_num_select(db=db, num_select=student_in.num_select)
         if not student:
+            student_in.actual_years = [college_year]
             student = crud.new_student.create(db=db, obj_in=student_in)
         else:
             raise HTTPException(status_code=404, detail="Number already exist")
     else:
+        if find_in_list(student.actual_years, college_year) == -1:
+            student_in.actual_years = student.actual_years.append(college_year)
         student = crud.new_student.update(db=db, db_obj=student, obj_in=student_in)
     return student
 
@@ -181,6 +212,7 @@ def update_student_selected(
         db: Session = Depends(deps.get_db),
         student_in: schemas.NewStudentUpdate,
         num_select: str,
+        college_year: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -195,7 +227,7 @@ def update_student_selected(
     if not mention:
         raise HTTPException(status_code=404, detail="Mention not found")
 
-    students = crud.new_student.get_student_admis(db=db, college_year=student_in.actual_years,
+    students = crud.new_student.get_student_admis(db=db, college_year=college_year,
                                                   uuid_mention=mention.uuid)
     all_students = []
     for student in students:
@@ -245,6 +277,7 @@ def read_student_by_num_carte(
         *,
         db: Session = Depends(deps.get_db),
         num_carte: str,
+        college_year: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -259,7 +292,7 @@ def read_student_by_num_carte(
         for receipt in student.receipt_list:
             receipt = receipt.replace("'", '"')
             receipt = json.loads(receipt)
-            if receipt['year'] == student.actual_years:
+            if receipt['year'] == college_year:
                 stud.receipt = receipt
         if find_in_list(current_user.uuid_mention, str(stud.uuid_mention)) != -1:
             return stud
@@ -270,6 +303,7 @@ def read_student_by_num_select(
         *,
         db: Session = Depends(deps.get_db),
         num_select: str,
+        college_year: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -288,8 +322,7 @@ def read_student_by_num_select(
         for receipt in student.receipt_list:
             receipt = receipt.replace("'", '"')
             receipt = json.loads(receipt)
-            if receipt['year'] == student.actual_years:
-                print(receipt)
+            if receipt['year'] == college_year:
                 stud.receipt = receipt
         if find_in_list(current_user.uuid_mention, str(stud.uuid_mention)) != -1:
             return stud
@@ -300,6 +333,7 @@ def read_student_by_num_carte(
         *,
         db: Session = Depends(deps.get_db),
         num_carte: str,
+        college_year: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
@@ -316,7 +350,7 @@ def read_student_by_num_carte(
         for receipt in student.receipt_list:
             receipt = receipt.replace("'", '"')
             receipt = json.loads(receipt)
-            if receipt['year'] == student.actual_years:
+            if receipt['year'] == college_year:
                 student.receipt = receipt
     return student
 

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
-from app.utils import compare_list, max_value, get_credit, create_model
+from app.utils import compare_list, max_value, get_credit, create_model, find_in_list
 
 router = APIRouter()
 
@@ -131,7 +131,7 @@ def get_all_columns(
     if not interaction:
         raise HTTPException(
             status_code=400,
-            detail=f"Marier_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()} not found.",
+            detail=f"Matier_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()} not found.",
         )
     for value in interaction_value[semester.lower()]:
         value = value.replace("'", '"')
@@ -181,7 +181,7 @@ def get_exist_table(
                                             session=session)
 
 
-@router.post("/insert_students/", response_model=List[Any])
+@router.post("/insert_students/", response_model=schemas.ResponseData)
 def inserts_student(
         *,
         db: Session = Depends(deps.get_db),
@@ -222,15 +222,20 @@ def inserts_student(
         all_student = crud.note.read_by_credit(semester=semester, journey=journey.abbreviation,
                                                session="normal", credit=credit, year=college_year)
         for student in all_student:
-            et_un = crud.note.read_by_num_carte(semester=semester, journey=journey.abbreviation,
-                                                session=session, num_carte=student.num_carte)
-            if not et_un:
-                crud.note.insert_note(semester=semester, journey=journey.abbreviation,
-                                      session=session, num_carte=student.num_carte, year=college_year)
-                crud.note.update_auto(semester=semester, journey=journey.abbreviation,
-                                      session=session, num_carte=student.num_carte)
+                et_un = crud.note.read_by_num_carte(semester=semester, journey=journey.abbreviation,
+                                                    session=session,num_carte=student.num_carte)
+                if et_un:
+                    year = {'year': college_year}
+                    crud.note.update_note(semester=semester, journey=journey.abbreviation,
+                                      session=session, num_carte=student.num_carte, ue_in=year)
+                else:
+                    crud.note.insert_note(semester=semester, journey=journey.abbreviation,
+                                          session=session, num_carte=student.num_carte, year=college_year)
+                    crud.note.update_auto(semester=semester, journey=journey.abbreviation,
+                                          session=session, num_carte=student.num_carte)
         all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation, session=session, year=college_year)
         all_note_ = []
+        count = len(all_note)
         for note in all_note:
             note = jsonable_encoder(note)
             note['validation'] = False
@@ -240,16 +245,23 @@ def inserts_student(
                 if validation[semester.lower()]:
                     note['validation'] = True
             all_note_.append(note)
-        return all_note_
+        response = schemas.ResponseData(**{'count':count, 'data':all_note_})
+        return response
     else:
-        students = crud.ancien_student.get_by_class(db=db,college_year=college_year,uuid_mention=uuid_mention,
+        students = crud.ancien_student.get_by_class(db=db,uuid_mention=uuid_mention,
                                                     uuid_journey= uuid_journey, semester=semester)
 
-        if students is not None:
-            for student in students:
+        for student in students:
+            if find_in_list(student.actual_years, college_year) != -1:
                 et_un = crud.note.read_by_num_carte(semester=semester, journey=journey.abbreviation,
                                                     session=session,num_carte=student.num_carte)
-                if not et_un:
+                if et_un:
+                    sessions = ['normal', 'final']
+                    for session_ in sessions:
+                        year = {'year': college_year}
+                        crud.note.update_note(semester=semester, journey=journey.abbreviation,
+                                          session=session_, num_carte=student.num_carte, ue_in=year)
+                else:
                     sessions = ['normal', 'final']
                     for session_ in sessions:
                         crud.note.insert_note(semester=semester, journey=journey.abbreviation,
@@ -257,6 +269,7 @@ def inserts_student(
         all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation,
                                            session=session,  year=college_year)
         all_note_ = []
+        count = len(all_note)
         for note in all_note:
             note = jsonable_encoder(note)
             note['validation'] = False
@@ -266,10 +279,12 @@ def inserts_student(
                 if validation[semester.lower()]:
                     note['validation'] = True
             all_note_.append(note)
-        return all_note_
+    response = schemas.ResponseData(**{'count':count, 'data':all_note_})
+    return response
 
 
-@router.get("/get_all_notes/", response_model=List[Any])
+
+@router.get("/get_all_notes/", response_model=schemas.ResponseData)
 def get_all_notes(
         *,
         db: Session = Depends(deps.get_db),
@@ -287,6 +302,7 @@ def get_all_notes(
     all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation,
                                        session=session, year=college_year)
     all_note_ = []
+    count = len(all_note)
     for note in all_note:
         note = jsonable_encoder(note)
         note['validation'] = False
@@ -296,7 +312,9 @@ def get_all_notes(
             if validation[semester.lower()]:
                 note['validation'] = True
         all_note_.append(note)
-    return all_note_
+
+    response = schemas.ResponseData(**{'count':count, 'data':all_note_})
+    return response
 
 
 @router.post("/insert_note", response_model=Any)
@@ -460,7 +478,7 @@ def details_note(
 
 
 
-@router.delete("/student", response_model=List[Any])
+@router.delete("/student", response_model=schemas.ResponseData)
 def delete_note(
         *,
         db: Session = Depends(deps.get_db),
@@ -493,6 +511,7 @@ def delete_note(
         crud.note.delete_by_num_carte(semester, journey.abbreviation, session, et_un.num_carte)
     all_note = crud.note.read_all_note(semester, journey.abbreviation, session)
     all_note_ = []
+    count = len(all_note)
     for note in all_note:
         note = jsonable_encoder(note)
         note['validation'] = False
@@ -502,4 +521,6 @@ def delete_note(
             if validation[semester.lower()]:
                 note['validation'] = True
         all_note_.append(note)
-    return all_note_
+
+    response = schemas.ResponseData(**{'count':count, 'data':all_note_})
+    return response

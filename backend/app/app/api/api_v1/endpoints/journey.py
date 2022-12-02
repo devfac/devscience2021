@@ -11,7 +11,7 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Journey])
+@router.get("/", response_model=schemas.ResponseData)
 def read_journey(
         db: Session = Depends(deps.get_db),
         *,
@@ -26,13 +26,15 @@ def read_journey(
     """
     journeys = crud.journey.get_multi(db=db, limit=limit, skip=offset, order_by=order_by, order=order)
     list_journey = []
+    count = len(crud.journey.get_count(db=db))
     for on_journey in journeys:
         journey = schemas.Journey(**jsonable_encoder(on_journey))
         mention = crud.mention.get_by_uuid(db=db, uuid=on_journey.uuid_mention)
         journey.mention = mention
         journey.mention_title = mention.title
         list_journey.append(journey)
-    return list_journey
+    response = schemas.ResponseData(**{'count':count, 'data':list_journey})
+    return response
 
 
 @router.post("/", response_model=List[schemas.Journey])

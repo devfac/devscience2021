@@ -15,22 +15,26 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
     def get_by_num_carte(self, db: Session, *, num_carte: str) -> Optional[Student]:
         return db.query(Student).filter(Student.num_carte == num_carte).first()
 
-    def get_by_mention(self, db: Session, *, uuid_mention: UUID,
-                       college_year: str, limit:int, skip: int,
+    def get_by_mention(self, db: Session, *, uuid_mention: UUID, limit:int, skip: int,
                        order: str = 'asc', order_by: str = "last_name") -> Optional[List[Student]]:
         return (
             db.query(Student)
-            .filter(and_(Student.uuid_mention == uuid_mention, Student.actual_years == college_year))
+            .filter(and_(Student.uuid_mention == uuid_mention))
             .order_by(text(f"{order_by} {order}"))
             .offset(skip)
             .limit(limit)
+            .all())
+
+    def count_by_mention(self, db: Session, *, uuid_mention: UUID, ) -> Optional[List[Student]]:
+        return (
+            db.query(Student)
+            .filter(and_(Student.uuid_mention == uuid_mention))
             .all())
 
     def get_by_class_limit(self,db: Session,
             uuid_journey: str,
             uuid_mention: str,
             semester: str,
-            college_year: str,
             skip: int,
             limit: int,
             order: str = "ASC",
@@ -40,7 +44,6 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
             return (
                 db.query(Student)
                 .filter(and_(
-                    Student.actual_years == college_year,
                     Student.uuid_mention == uuid_mention,
                     or_(Student.inf_semester == semester.upper(),
                         Student.sup_semester == semester.upper())
@@ -54,7 +57,6 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
             return (
                 db.query(Student)
                 .filter(and_(
-                    Student.actual_years == college_year,
                     Student.uuid_journey == uuid_journey,
                     Student.uuid_mention == uuid_mention,
                     or_(Student.inf_semester == semester.upper(),
@@ -125,7 +127,6 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
             uuid_journey: str,
             uuid_mention: str,
             semester: str,
-            college_year: str,
             limit: int = 1000,
             skip: int = 0,
             order: str = "asc",
@@ -135,7 +136,6 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
             return (
                 db.query(Student)
                 .filter(and_(
-                    Student.actual_years == college_year,
                     Student.uuid_mention == uuid_mention,
                     or_(Student.inf_semester == semester.upper(),
                         Student.sup_semester == semester.upper())
@@ -149,7 +149,6 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
             return (
                 db.query(Student)
                 .filter(and_(
-                    Student.actual_years == college_year,
                     Student.uuid_journey == uuid_journey,
                     Student.uuid_mention == uuid_mention,
                     or_(Student.inf_semester == semester.upper(),
@@ -224,7 +223,6 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
     def get_by_journey_and_type(self, db: Session, *,
                             uuid_journey: UUID,
                             type_: str,
-                            college_year: str,
                             limit: int = 1000,
                             skip: int = 0
                             ) -> Optional[List[Student]]:
@@ -232,7 +230,6 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
             db.query(Student)
             .filter(
                 and_(Student.uuid_journey == uuid_journey,
-                     Student.actual_years == college_year,
                      Student.type == type_))
             .offset(skip)
             .limit(limit)
@@ -242,7 +239,6 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
                             uuid_journey: UUID,
                             type_: str,
                             mean: float,
-                            college_year: str,
                             limit: int = 1000,
                             skip: int = 0
                             ) -> Optional[List[Student]]:
@@ -250,7 +246,6 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
             db.query(Student)
             .filter(
                 and_(Student.uuid_journey == uuid_journey,
-                     Student.actual_years == college_year,
                      Student.type == type_,
                      Student.mean >= mean))
             .offset(skip)
@@ -297,6 +292,15 @@ class CRUDNewStudent(CRUDBase[Student, NewStudentCreate, NewStudentUpdate]):
             .order_by(text(f"{order_by} {order}"))
             .offset(skip)
             .limit(limit)
+            .all())
+
+    def count_by_mention(self, db: Session, *, uuid_mention: UUID,
+                       college_year: str, ) -> Optional[List[Student]]:
+        return (
+            db.query(Student).filter(
+                and_(Student.uuid_mention == uuid_mention,
+                     Student.enter_years == college_year
+                     ))
             .all())
 
     def get_all_admis_by_mention(self, db: Session, *, uuid_mention: UUID,

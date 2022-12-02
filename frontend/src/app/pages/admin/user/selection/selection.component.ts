@@ -6,6 +6,7 @@ import { CollegeYear } from '@app/models/collegeYear';
 import { Journey} from '@app/models/journey';
 import { Mention } from '@app/models/mention';
 import { QueryParams, otherQueryParams } from '@app/models/query';
+import { ResponseModel } from '@app/models/response';
 import { AncienStudent, StudentColumn, ColumnItem  } from '@app/models/student';
 import { TableHeader } from '@app/models/table';
 import { AuthService } from '@app/services/auth/auth.service';
@@ -127,7 +128,8 @@ export class SelectionComponent implements OnInit, AfterContentInit {
       )
     }
     
-    this.allYears = await this.serviceYears.getDataPromise().toPromise()
+    let allYears: ResponseModel = await this.serviceYears.getDataPromise().toPromise()
+    this.allYears = allYears.data
     
     if(this.testStorage(this.keyMention, this.allMention[0].uuid) && 
     this.testStorage(this.keyYear, this.allYears[0].title)){

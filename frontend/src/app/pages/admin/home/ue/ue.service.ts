@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Ue } from '@app/models/ue';
+import { Ue, UeEc } from '@app/models/ue';
 import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
 
@@ -48,5 +48,14 @@ export class UeService {
   addData(body: any){
     return this.http.post<Ue[]>(`${BASE_URL}/matier_ue/`,body, this.options)
   }
+  getMatier(collegeYear: string | null, semester: string | null, uuidJourney: string | null){
+    return this.http.get<UeEc[]>(`${BASE_URL}/matier_ue/get_by_class_with_ec?schema=`+collegeYear+
+        `&semester=`+semester+
+        `&uuid_journey=`+uuidJourney, this.options)
+  }
    
+  getUe( semester: string, uuidJourney: string){
+    return this.http.get<Ue[]>(`${BASE_URL}/matier_ue/get_by_class?semester=`+semester+
+                              `&uuid_journey=`+uuidJourney, this.options)
+  }
 }

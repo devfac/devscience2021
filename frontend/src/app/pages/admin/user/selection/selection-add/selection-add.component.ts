@@ -91,6 +91,7 @@ export class SelectionAddComponent implements OnInit {
   async ngOnInit() {
 
     const numSelect = localStorage.getItem(this.keyNum)
+    const year = localStorage.getItem(this.keyYear)
 
     let uuidMention = localStorage.getItem(this.keyMention)
     if (uuidMention !== null){
@@ -98,9 +99,9 @@ export class SelectionAddComponent implements OnInit {
       this.isReady = true
     }
 
-    if(numSelect && numSelect.length>0){
+    if(numSelect && numSelect.length>0 && year){
       this.isEdit = true
-      let  data = await this.selectionService.getStudentByNumSelect(numSelect).toPromise()
+      let  data = await this.selectionService.getStudentByNumSelect(numSelect, year).toPromise()
       this.form.get('numSelect')?.setValue(data.num_select)
       this.form.get('mention')?.setValue(data.uuid_mention)
       this.form.get('firstName')?.setValue(data.first_name)
@@ -140,15 +141,16 @@ export class SelectionAddComponent implements OnInit {
           date_cin: this.form.value.dateCin,
           place_cin: this.form.value.placeCin,
           uuid_mention: this.form.value.mention,
-          actual_years: localStorage.getItem('college_years'),
-          enter_years: localStorage.getItem('college_years'),
+          enter_years: localStorage.getItem(this.keyYear),
           num_select: this.form.value.numSelect,
           is_selected: this.form.value.isSelected,
           level: this.form.value.level,
           telephone: this.form.value.phone,
         }
-        console.error(body)
-        await this.selectionService.addData(body).toPromise()
+        let year = localStorage.getItem(this.keyYear)
+        if (year){
+          await this.selectionService.addData(body, year).toPromise()
+        }
         this.router.navigate(['/user/selection'])
       this.isvisible = false,
       this.isConfirmLoading = false

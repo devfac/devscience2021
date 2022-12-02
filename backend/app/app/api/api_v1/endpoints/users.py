@@ -12,7 +12,7 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.get("/get_all/", response_model=List[schemas.User])
+@router.get("/get_all/", response_model=schemas.ResponseData)
 def read_users(
     db: Session = Depends(deps.get_db),
     limit: int = 100,
@@ -26,6 +26,7 @@ def read_users(
     """
     users = crud.user.get_multi(db=db, limit=limit, skip=offset, order_by=order_by, order=order)
     all_users = []
+    count = len(crud.user.get_count(db=db))
     for on_user in users:
         user = schemas.User(**jsonable_encoder(on_user))
         role = crud.role.get_by_uuid(db=db, uuid=on_user.uuid_role)
@@ -40,7 +41,8 @@ def read_users(
         user.mention = all_mention
         if not user.is_superuser:
             all_users.append(user)
-    return all_users
+    response = schemas.ResponseData(**{'count':count, 'data':all_users})
+    return response
 
 
 @router.post("/", response_model=List[schemas.User])

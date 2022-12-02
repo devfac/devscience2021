@@ -10,7 +10,7 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Droit])
+@router.get("/", response_model=schemas.ResponseData)
 def read_droit(
     db: Session = Depends(deps.get_db),
         limit: int = 100,
@@ -22,11 +22,13 @@ def read_droit(
     """
     droit = crud.droit.get_multi(db=db, limit=limit, skip=offset, order_by="level")
     all_droit = []
+    count = len(crud.droit.get_count(db=db))
     for one_droit in droit:
         mention = crud.mention.get_by_uuid(db=db, uuid=one_droit.uuid_mention)
         droit_ = schemas.Droit(**jsonable_encoder(one_droit), mention=mention)
         all_droit.append(droit_)
-    return all_droit
+    response = schemas.ResponseData(**{'count':count, 'data':all_droit})
+    return response
 
 
 @router.get("/by_mention", response_model=List[schemas.Droit])

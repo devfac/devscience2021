@@ -5,6 +5,7 @@ import { Ec } from '@app/models/ec';
 import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
 import { QueryParams } from '@app/models/query';
+import { ResponseModel } from '@app/models/response';
 import { TableHeader } from '@app/models/table';
 import { Ue } from '@app/models/ue';
 import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
@@ -105,7 +106,8 @@ export class EcComponent implements OnInit, AfterContentInit {
   async ngOnInit(){
     this.fetchData = this.fetchData.bind(this)
 
-    this.allMention = await this.serviceMention.getDataPromise().toPromise()
+    let allMention: ResponseModel = await this.serviceMention.getDataPromise().toPromise()
+    this.allMention = allMention.data
     this.testStorage('mention', this.allMention[0].uuid)
 
     this.allJourney = await this.serviceJourney.getDataByMention(localStorage.getItem('mention')!).toPromise()

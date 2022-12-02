@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Journey } from '@app/models/journey';
 import { QueryParams } from '@app/models/query';
+import { ResponseModel } from '@app/models/response';
 import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
 
@@ -28,7 +29,7 @@ export class JourneyService {
   }
 
   getDataPromise(){
-    return this.http.get<Journey[]>(`${BASE_URL}/journey/`,{headers: this.headers});
+    return this.http.get<ResponseModel>(`${BASE_URL}/journey/`,{headers: this.headers});
   }
 
   getDataByMention(uuid: string){

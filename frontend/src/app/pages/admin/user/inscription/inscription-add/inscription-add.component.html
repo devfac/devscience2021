@@ -1,16 +1,6 @@
 <h2>{{ 'admin.student.title' | translate | uppercase }}</h2>
 <form [formGroup]="form" (ngSubmit)="submitForm()" *ngIf="isReady">
   <div nz-row>
-    <div class="container" >
-      <img [src]="url" alt="" *ngIf="url">
-      <div [innerHtml]="msg" *ngIf="msg" style="color: red;"></div>
-      <input type="file" #fileDropRef id="fileDropRef"  (change)="selectFile($event)"/>
-    </div>
-
-    <div nz-col nzSpan="1"></div>
-  <div nz-row>
-
-  <div nz-row>
     <nz-form-item nz-col nzSpan="22">
       <nz-form-label>
         {{ 'admin.student.num_select' | translate }}
@@ -25,8 +15,6 @@
       </ng-template>
       </nz-form-control>
     </nz-form-item>
-  </div>
-  </div>
   </div>
   <div nz-row>
     <nz-form-item nz-col nzSpan="8">

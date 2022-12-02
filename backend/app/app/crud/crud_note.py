@@ -37,7 +37,6 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
 
     def insert_note(self, semester: str, journey: str, session: str, num_carte: str, year: str):
         obj_in_data = jsonable_encoder({"num_carte":num_carte, "year":year})
-        print(obj_in_data)
         metadata = MetaData(bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()

@@ -14,6 +14,7 @@ import { MentionService } from '../../home/mention/mention.service';
 import { SelectionService } from '../selection/selection.service';
 import { typeEtudiant,typeSerie, typeSex, typeNation, typeSituation } from '@app/data/data';
 import { UploadService } from './upload.service';
+import { ResponseModel } from '@app/models/response';
 
 const CODE = "upload"
 @Component({
@@ -156,7 +157,9 @@ export class UploadComponent implements OnInit ,AfterContentInit{
           
     }
     
-    this.allYears = await this.serviceYears.getDataPromise().toPromise()
+    let allYears: ResponseModel = await this.serviceYears.getDataPromise().toPromise()
+    this.allYears = allYears.data
+
     
     if(this.testStorage(this.keyMention, this.allMention[0].uuid) && 
     this.testStorage(this.keyYear, this.allYears[0].title)){

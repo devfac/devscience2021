@@ -13,6 +13,7 @@ import { MentionService } from '../home/mention/mention.service';
 import { DashboardService } from './dashboard.service';
 import { AuthService } from '@app/services/auth/auth.service';
 import { CollegeYearService } from '../home/college-year/college-year.service';
+import { ResponseModel } from '@app/models/response';
 
 const BASE_URL = environment.authApiURL;
 
@@ -81,8 +82,8 @@ export class DashboardComponent implements OnInit {
     if(year){
       this.totalDas = await this.service.totaldashboard(year).toPromise()
     }else{
-      let allYears = await this.serviceCollegeYear.getDataPromise().toPromise()
-      year = allYears[0].title
+      let allYears: ResponseModel = await this.serviceCollegeYear.getDataPromise().toPromise()
+      let year = allYears.data[0].title
       this.totalDas = await this.service.totaldashboard(year).toPromise()
     }
     let totalLicence = this.totalDas.L1 + this.totalDas.L2 + this.totalDas.L3

@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Mention } from '@app/models/mention';
+import { ResponseModel } from '@app/models/response';
 import { AuthService } from '@app/services/auth/auth.service';
 import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
@@ -27,7 +28,7 @@ export class MentionService {
   }
 
   getDataPromise(){
-    return this.http.get<Mention[]>(`${BASE_URL}/mentions/`,{headers: this.headers});
+    return this.http.get<ResponseModel>(`${BASE_URL}/mentions/`,{headers: this.headers});
   }
 
   deletData(uuid: string):Promise<Mention[]> {

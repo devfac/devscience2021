@@ -24,3 +24,4 @@ from .socket import SocketModel
 from .permission import Permission, PermissionCreate, PermissionUpdate, PermissionCreateModel
 from .invitation import Invitation, InvitationCreate, InvitationUpdate
 from .classroom import Classroom, ClassroomCreate, ClassroomUpdate
+from .response import ResponseData

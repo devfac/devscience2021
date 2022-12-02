@@ -32,8 +32,8 @@ export class SelectionService {
     return this.http.get<AncienStudent>(`${BASE_URL}/matier_ue/get_by_class/`,{headers: this.headers, params: otherParams})
   }
 
-  getStudentByNumSelect(numSelect: string){
-    let otherParams = new HttpParams().append('num_select', numSelect)
+  getStudentByNumSelect(numSelect: string, collegeYear: string){
+    let otherParams = new HttpParams().append('num_select', numSelect).append('college_year', collegeYear)
     return  this.http.get<AncienStudent>(`${BASE_URL}/student/new/`,
     {headers: this.headers, params: otherParams})
   }
@@ -48,8 +48,9 @@ export class SelectionService {
     return this.http.put<AncienStudent>(`${BASE_URL}/student/new?num_select=`+numCarte, body, {headers: this.headers})
   }
 */
-addData(body: any){
-  return this.http.post<Ue[]>(`${BASE_URL}/student/new/`,body, {headers: this.headers})
+addData(body: any, collegeYear: string){
+  let otherParams = new HttpParams().append('college_year', collegeYear)
+  return this.http.post<Ue[]>(`${BASE_URL}/student/new/`,body, {headers: this.headers, params: otherParams})
 }
  
 }

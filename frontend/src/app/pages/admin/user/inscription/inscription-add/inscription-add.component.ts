@@ -147,9 +147,10 @@ export class InscriptionAddComponent implements OnInit {
 
   async ngOnInit(){
     const numSelect = localStorage.getItem(this.keyNum)
-    if(numSelect && numSelect.length>0){
+    const year = localStorage.getItem(this.keyYear)
+    if(numSelect && numSelect.length>0 && year){
       this.isEdit = true
-      let  data = await this.inscriptionService.getStudentByNumSelect(numSelect).toPromise()
+      let  data = await this.inscriptionService.getStudentByNumSelect(numSelect, year).toPromise()
           this.form.get('numSelect')?.setValue(data.num_select)
           this.form.get('mention')?.setValue(data.uuid_mention)
           this.form.get('journey')?.setValue(data.journey.uuid)
@@ -227,18 +228,8 @@ export class InscriptionAddComponent implements OnInit {
   
   async submitForm(){
     if (this.form.valid) {
-      const title = this.form.value.title
-      const mean = this.form.value.mean
       this.isConfirmLoading = true
       let photo = null
-      const formData = new FormData();
-      if (this.url !== "assets/images/profil.png"){
-        formData.append("uploaded_file", this.uploadedImage)
-       let data = await this.service.uploadPhoto(this.form, formData).toPromise()
-       if (data.filename){
-        photo = data.filename
-       }
-      }
       const body = 
         {
           last_name: this.form.value.lastName,
@@ -252,13 +243,12 @@ export class InscriptionAddComponent implements OnInit {
           date_cin: this.form.value.dateCin,
           place_cin: this.form.value.placeCin,
           uuid_mention: this.form.value.mention,
-          actual_years: localStorage.getItem('college_years'),
           num_select: this.form.value.numSelect,
           receipt: {
             num: this.formDialog.get('numReceipt')?.value,
             date: this.formDialog.get('dateReceipt')?.value,
             price: this.formDialog.get('priceRigth')?.value,
-            year: localStorage.getItem('college_years')
+            year: localStorage.getItem(this.keyYear)
           },
           receipt_list: [],
           mean: this.form.value.mean,
@@ -281,7 +271,10 @@ export class InscriptionAddComponent implements OnInit {
           parent_address: this.form.value.parentAddress,
 
         }
-        await this.inscriptionService.updateData(this.form.value.numSelect, body).toPromise()
+        let year = localStorage.getItem(this.keyYear)
+        if (year){
+          await this.inscriptionService.updateData(this.form.value.numSelect, body, year).toPromise()
+        }
         this.router.navigate(['/user/inscription'])
       this.isConfirmLoading = false
     } else {
@@ -296,7 +289,6 @@ export class InscriptionAddComponent implements OnInit {
 
   showModal(): void{
     this.isvisible = true;
-    console.error(this.form.get('receipt')?.value)
     if(!this.form.get('receipt')?.value){
 
       this.formDialog.reset()
@@ -305,8 +297,9 @@ export class InscriptionAddComponent implements OnInit {
 
   async getStudentByNumSelect(){
     const numSelect = this.form.get('numSelect')?.value
-    if(numSelect && numSelect.length>0){
-      let  data = await this.inscriptionService.getStudentByNumSelect(numSelect).toPromise()
+    const year = localStorage.getItem(this.keyYear)
+    if(numSelect && numSelect.length>0 && year){
+      let  data = await this.inscriptionService.getStudentByNumSelect(numSelect, year).toPromise()
         this.form.get('mention')?.setValue(data.uuid_mention)
         this.form.get('firstName')?.setValue(data.first_name)
         this.form.get('lastName')?.setValue(data.last_name)

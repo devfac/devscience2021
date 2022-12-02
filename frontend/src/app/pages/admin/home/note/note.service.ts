@@ -96,7 +96,7 @@ export class NoteService {
     return this.http.get<Permission>(`${BASE_URL}/permission/get_by_email_and_type/`, {headers: this.headers, params: otherParams})
   }
 
-  createTable(semester: string, journey: string, collegeYear: string){
+  createTableNote(semester: string, journey: string, collegeYear: string){
     let otherParams = new HttpParams()
       .append('semester', semester)
       .append('college_year', collegeYear)

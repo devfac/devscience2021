@@ -37,8 +37,8 @@ export class InscriptionService {
     {headers: this.headers, params: otherParams})
   }
 
-  getStudentByNumSelect(numSelect: string){
-    let otherParams = new HttpParams().append('num_select', numSelect)
+  getStudentByNumSelect(numSelect: string, collegeYear: string){
+    let otherParams = new HttpParams().append('num_select', numSelect).append('college_year', collegeYear)
     return  this.http.get<AncienStudent>(`${BASE_URL}/student/new_selected/`,
     {headers: this.headers, params: otherParams})
   }
@@ -55,8 +55,8 @@ export class InscriptionService {
     {headers: this.headers, params: otherParams})
   }
 
-  updateData(numSelect: string, body: any){
-    let otherParams = new HttpParams().append('num_select', numSelect)
+  updateData(numSelect: string, body: any,  collegeYear: string){
+    let otherParams = new HttpParams().append('num_select', numSelect).append('college_year', collegeYear)
 
     return this.http.put<AncienStudent>(`${BASE_URL}/student/new`, body, 
     {headers: this.headers, params: otherParams})

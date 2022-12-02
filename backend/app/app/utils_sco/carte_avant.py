@@ -13,7 +13,6 @@ class PDF(FPDF):
     def create_carte(pdf: FPDF, pos_init_y: int, long_init_y: int, deux_et: list, data: Any):
         j: int = 0
 
-        image_fac = f"images/{data['img_carte']}_avant.jpg"
         # logo_fac = "images/logo_science.jpg"
 
         titre_1 = "Université de Fanarantsoa \n"
@@ -32,7 +31,8 @@ class PDF(FPDF):
         i = 0
         while i < len(deux_et):
             num_carte = f"{deux_et[i]['num_carte']}"
-            niveau = f"Niveau: {deux_et[i]['level']}"
+            niveau = f"{deux_et[i]['level']}"
+            image_fac = f"images/{niveau.lower()}_avant.jpg"
 
             image = f"files/photos/profil.png"
             if os.path.exists(f"files/photos/{deux_et[i]['photo']}"):

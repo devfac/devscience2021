@@ -9,7 +9,7 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.CollegeYear])
+@router.get("/", response_model=schemas.ResponseData)
 def read_college_year(
         db: Session = Depends(deps.get_db),
         limit: int = 100,
@@ -22,7 +22,10 @@ def read_college_year(
     Retrieve anne universitaire.
     """
     college_year = crud.college_year.get_multi(db=db, order=order, order_by=order_by, limit=limit, skip=offset)
-    return college_year
+
+    count = len(crud.college_year.get_count(db=db))
+    response = schemas.ResponseData(**{'count':count, 'data':college_year})
+    return response
 
 
 @router.post("/", response_model=List[schemas.CollegeYear])

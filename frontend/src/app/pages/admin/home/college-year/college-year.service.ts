@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
 import { CollegeYear } from '@app/models/collegeYear';
+import { ResponseModel } from '@app/models/response';
 
 const BASE_URL = environment.authApiURL;
 
@@ -26,7 +27,7 @@ export class CollegeYearService {
     return this.http.get<CollegeYear[]>(`${BASE_URL}/college_year/`, {headers: this.headers, params: params_});
   }
   getDataPromise() {
-    return this.http.get<CollegeYear[]>(`${BASE_URL}/college_year/`,this.options);
+    return this.http.get<ResponseModel>(`${BASE_URL}/college_year/`,this.options);
   }
 
   deletData(uuid: string):Promise<CollegeYear[]> {

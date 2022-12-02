@@ -419,7 +419,6 @@ def find_in_list(list_: list, key_: str) -> int:
         index = list_.index(key_.lower())
         return index
     except Exception as e:
-        print(e)
         return -1
 
 def convert_date(date: str) -> str:

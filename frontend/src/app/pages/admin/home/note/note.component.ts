@@ -10,6 +10,7 @@ import { Interaction } from '@app/models/interaction';
 import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
 import { otherQueryParams, QueryParams } from '@app/models/query';
+import { ResponseModel } from '@app/models/response';
 import { TableHeader, TableHeaderType } from '@app/models/table';
 import { Ue, UeEc } from '@app/models/ue';
 import { AuthService } from '@app/services/auth/auth.service';
@@ -21,8 +22,12 @@ import { TranslateService } from '@ngx-translate/core';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { UtilsService } from '../../utils.service';
 import { ClassroomService } from '../classroom/classroom.service';
+import { CollegeYearService } from '../college-year/college-year.service';
+import { EcService } from '../ec/ec.service';
 import { HomeService } from '../home.service';
 import { JourneyService } from '../journey/journey.service';
+import { MentionService } from '../mention/mention.service';
+import { UeService } from '../ue/ue.service';
 import { NoteService } from './note.service';
 
 
@@ -95,6 +100,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
   tableName: string = ""
   totalUe: number = 0
   totalEc: number = 0
+  totalCredit: number = 0
   year: string = ""
   session: string = "Normal"
   interactionResult: Interaction[] = []
@@ -125,11 +131,14 @@ export class NoteComponent implements OnInit, AfterContentInit {
     private translate: TranslateService,
     private router: Router,
     private downloadServices: UtilsService,
-    private service: HomeService,
+    private serviceYear: CollegeYearService,
     private noteService: NoteService,
     private socketService: SocketService,
     private serviceRoom: ClassroomService,
-    private serviceJourney: JourneyService, ) { 
+    private serviceJourney: JourneyService,
+    private serviceMention: MentionService,
+    private serviceUe: UeService, 
+    private serviceEc: EcService,) { 
     this.form = this.fb.group({
       mention: [null, [Validators.required]],
       journey: [null, [Validators.required]],
@@ -304,10 +313,12 @@ export class NoteComponent implements OnInit, AfterContentInit {
 
   async ngOnInit(){
     // get College year
-    this.allYears = await this.service.getCollegeYear().toPromise()
+    let allYears: ResponseModel = await this.serviceYear.getDataPromise().toPromise()
+    this.allYears = allYears.data
 
     // get all room
-    this.listRoom = await this.serviceRoom.getDataPromisee().toPromise()
+    let listRoom:ResponseModel = await this.serviceRoom.getDataPromisee().toPromise()
+    this.listRoom = listRoom.data
     // get mention by permission
     if(this.authService.getPermissionSuperuser()){
       this.allMention = await this.noteService.getMentionUser()
@@ -358,7 +369,8 @@ export class NoteComponent implements OnInit, AfterContentInit {
       this.form.get('from')?.clearValidators()
       this.form.get('to')?.clearValidators()
 
-      this.allMention = await this.service.getMentionAdmin().toPromise()
+      let allMention: ResponseModel = await this.serviceMention.getDataPromise().toPromise()
+      this.allMention = allMention.data
 
       if(this.testStorage(this.keyMention, this.allMention[0].uuid) && 
         this.testStorage(this.keyYear, this.allYears[0].title)){
@@ -397,7 +409,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
                     this.form.get('filter')?.setValue('Credit')
                   }else{
                 this.showTable = false
-                this.matier = await this.service.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
+                this.matier = await this.serviceUe.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
               }
          }
         }
@@ -438,6 +450,12 @@ export class NoteComponent implements OnInit, AfterContentInit {
     }
   }
 
+  changeYear(){
+    if(this.form.value.collegeYear && this.initialise){
+    localStorage.setItem(this.keyYear, this.form.value.collegeYear)
+    this.refresh()
+  }
+}
   updateCheckedSet(id: string, checked: boolean): void {
     if (checked) {
       this.setOfCheckedId.add(id);
@@ -473,6 +491,8 @@ export class NoteComponent implements OnInit, AfterContentInit {
 
   pre(): void {
     this.current -= 1;
+    this.totalEc = 0
+    this.totalUe = 0
   }
 
   async next() {
@@ -494,17 +514,20 @@ export class NoteComponent implements OnInit, AfterContentInit {
       interaction["college_year"] = this.form.value.collegeYear
   
       let data = await this.noteService.addInteraction(this.form.value.semester, interaction).toPromise()
+      console.log("ito ilay izy", data);
+      
       for (let index = 0; index< data.length; index++){
         this.interactionResult.push(data[index])
-            if (data[index].type == "ue"){
-              this.totalUe ++
-            }else{
-              this.totalEc ++
-            }
+        if (data[index].type == "ue"){
+          this.totalUe ++
+        }else{
+          this.totalEc ++
+          
+        }
       }
     }else{
       if(this.interactionResult.length > 0){
-        this.createTable()
+        await this.noteService.createTableNote(this.form.value.semester, this.form.value.journey, this.form.value.collegeYear).toPromise()
       }
     }
     
@@ -659,7 +682,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
     }
   }
   async createTable(){
-    this.matier = await this.service.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
+    this.matier = await this.serviceUe.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
     this.showTable = false
   }
 
@@ -677,7 +700,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
     this.form.get('from')?.clearValidators()
     this.form.get('to')?.clearValidators()
     if (this.form.valid) {
-        this.datatable.fetchData()
+        //this.datatable.fetchData()
         this.isvisible = false,
         this.isConfirmLoading = false
       } else {
@@ -710,9 +733,11 @@ export class NoteComponent implements OnInit, AfterContentInit {
     console.log("mandalo test note");
       let testNote: boolean = await this.noteService.testNote( 
         this.form.value.semester, this.form.value.journey, this.form.value.session).toPromise()
+
     localStorage.setItem(this.keySession, this.form.get('session')?.value)
         if(testNote){
-          this.matier = await this.service.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
+          console.log("tafiditra ato");
+          this.matier = await this.serviceUe.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
           this.getNoteMatier()
           this.showTable = true
           this.createHeaders()
@@ -720,15 +745,15 @@ export class NoteComponent implements OnInit, AfterContentInit {
         }else{
           this.matier = []
           this.showTable = false
-          this.matier = await this.service.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
+          this.matier = await this.serviceUe.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
       }
       this.session = this.form.get('session')?.value
     }
   }
 
   async getNoteMatier(){
-    this.matierEc = await this.service.getEc(this.form.value.semester, this.form.value.journey).toPromise()
-    this.matierUe = await this.service.getUe(this.form.value.semester, this.form.value.journey).toPromise()
+    this.matierEc = await this.serviceEc.getEc(this.form.value.semester, this.form.value.journey).toPromise()
+    this.matierUe = await this.serviceUe.getUe(this.form.value.semester, this.form.value.journey).toPromise()
     let data = await this.noteService.getAllColumns(this.form.value.semester, this.form.value.journey,
        this.form.value.session, this.form.value.collegeYear).toPromise()
     this.allColumns = data
@@ -754,7 +779,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
     if(this.form.get('journey')?.value && this.form.get('mention')?.value && this.form.get('session')?.value && this.form.get('semester')?.value && this.initialise){
       let testNote: boolean = await this.noteService.testNote(this.form.value.semester, this.form.value.journey, this.form.value.session).toPromise()
       if(testNote){
-        this.matier = await this.service.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
+        this.matier = await this.serviceUe.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
         this.getNoteMatier()
         this.showTable = true
         this.createHeaders()
@@ -762,7 +787,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
       }else{
         this.matier = []
         this.showTable = false
-        this.matier = await this.service.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
+        this.matier = await this.serviceUe.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
     }
     }
   }
@@ -772,7 +797,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
       let testNote: boolean = await this.noteService.testNote(this.form.value.semester, this.form.value.journey, this.form.value.session).toPromise()
       localStorage.setItem(this.keySemester, this.form.get('semester')?.value)
       if(testNote){
-        this.matier = await this.service.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
+        this.matier = await this.serviceUe.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
         this.getNoteMatier()
         this.showTable = true
         this.createHeaders()
@@ -780,7 +805,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
       }else{
         this.matier = []
         this.showTable = false
-        this.matier = await this.service.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
+        this.matier = await this.serviceUe.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
     }
     }
   }

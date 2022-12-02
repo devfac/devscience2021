@@ -195,12 +195,12 @@ def relever(
         else:
             test_validation['status'] = f"Étudiant(e) redoublé(e)."
             test_validation['code'] = False
-            test_validation['anne'] = college_year
+            test_validation['year'] = college_year
         mention = crud.mention.get_by_uuid(db=db, uuid=student.uuid_mention).title
         data = {'last_name': student.last_name, 'first_name': student.first_name, 'date_birth': student.date_birth,
                 'place_birth':student.place_birth, 'semester': semester, 'mention': mention,
                 'journey': journey.title, 'session': session, 'validation': test_validation['status'],
-                'code': test_validation['code'], 'anne': test_validation['anne']}
+                'code': test_validation['code'], 'year': test_validation['year']}
         date_ = date.today()
         file = relever_note(num_carte=num_carte, date=date_.year, data=data, note=note)
         return FileResponse(path=file, media_type='application/octet-stream', filename=file)

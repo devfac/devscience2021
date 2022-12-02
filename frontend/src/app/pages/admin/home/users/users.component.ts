@@ -13,6 +13,7 @@ import { MentionService } from '../mention/mention.service';
 import { RoleService } from '../role/role.service';
 import { QueryParams } from '@app/models/query';
 import { parseQueryParams } from '@app/shared/utils';
+import { ResponseModel } from '@app/models/response';
 
 
 
@@ -46,7 +47,7 @@ export class UsersComponent implements OnInit, AfterContentInit {
     private modal: NzModalService, 
     private fb: FormBuilder,
     private service: UsersService,
-    private mentionService: MentionService,
+    private serviceMention: MentionService,
     private roleService: RoleService
     ) {
       this.form = this.fb.group({
@@ -88,7 +89,8 @@ export class UsersComponent implements OnInit, AfterContentInit {
 
   async ngOnInit(){
     this.fetchData = this.fetchData.bind(this)
-    this.allMention = await this.mentionService.getDataPromise().toPromise()
+    let allMention: ResponseModel = await this.serviceMention.getDataPromise().toPromise()
+    this.allMention = allMention.data
     this.allRole = await this.roleService.getDataPromise().toPromise()
   }
 

@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.api_v1.endpoints import login, users, utils, mentions, roles, journey, \
-    semesters, college_year, validation, \
+    semesters, college_year, validation,matier_ue, matier_ec, \
     scolarites, notes, liste, save_data, resultat, statistic, diploma, droit, carte, drive_action,\
     student, interaction, invitation, permission, classroom
 
@@ -18,6 +18,8 @@ api_router.include_router(login.router, tags=["login"])
 api_router.include_router(users.router, prefix="/users", tags=["users"])
 api_router.include_router(roles.router, prefix="/roles", tags=["roles"])
 api_router.include_router(notes.router, prefix="/notes", tags=["notes"])
+api_router.include_router(matier_ue.router, prefix="/matier_ue", tags=["unité d'enseignement"])
+api_router.include_router(matier_ec.router, prefix="/matier_ec", tags=["élément constitutif"])
 api_router.include_router(resultat.router, prefix="/resultat", tags=["resultat"])
 api_router.include_router(college_year.router, prefix="/college_year", tags=["College year"])
 api_router.include_router(mentions.router, prefix="/mentions", tags=["mentions"])

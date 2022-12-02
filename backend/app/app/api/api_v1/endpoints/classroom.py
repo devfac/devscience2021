@@ -10,7 +10,7 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Classroom])
+@router.get("/", response_model=schemas.ResponseData)
 def read_classroom(
     db: Session = Depends(deps.get_db),
         limit: int = 100,
@@ -20,8 +20,10 @@ def read_classroom(
     """
     Retrieve classrooms.
     """
+    count = len(crud.classroom.get_count(db=db))
     classroom = crud.classroom.get_multi(db=db, limit=limit, skip=offset, order_by="name")
-    return classroom
+    response = schemas.ResponseData(**{'count':count, 'data':classroom})
+    return response
 
 @router.get("/by_uuid", response_model=schemas.Classroom)
 def read_classroom(

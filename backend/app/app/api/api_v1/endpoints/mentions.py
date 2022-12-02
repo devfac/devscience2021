@@ -11,7 +11,7 @@ from app.utils import decode_text
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Mention])
+@router.get("/", response_model=schemas.ResponseData)
 def read_mentions(
     db: Session = Depends(deps.get_db),
     *,
@@ -25,7 +25,9 @@ def read_mentions(
     Retrieve mentions.
     """
     mentions = crud.mention.get_multi(db=db, limit=limit, skip=offset, order=order, order_by=order_by)
-    return mentions
+    count = len(crud.mention.get_count(db=db))
+    response = schemas.ResponseData(**{'count':count, 'data':mentions})
+    return response
 
 
 @router.post("/", response_model=List[schemas.Mention])

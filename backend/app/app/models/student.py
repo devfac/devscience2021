@@ -45,7 +45,7 @@ class Student(Base):
     inf_semester = Column(String)
     sup_semester = Column(String)
 
-    actual_years = Column(String)
+    actual_years = Column(ARRAY(String))
     enter_years = Column(String)
 
     uuid_journey = Column(UUID(as_uuid=True), ForeignKey("journey.uuid"))

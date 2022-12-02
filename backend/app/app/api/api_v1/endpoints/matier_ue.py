@@ -3,7 +3,7 @@ import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.utils import decode_text, create_anne
+from app.utils import decode_text
 from app import crud, models, schemas
 from fastapi.encoders import jsonable_encoder
 from app.api import deps
@@ -11,7 +11,7 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.MatierUE])
+@router.get("/", response_model=schemas.ResponseData)
 def read_ue(
         *,
         db: Session = Depends(deps.get_db),
@@ -26,6 +26,7 @@ def read_ue(
     """
     ues = crud.teaching_unit.get_multi(db=db, limit=limit, skip=offset, order_by=order_by, order=order)
     list_ue = []
+    count = len(crud.teaching_unit.get_count(db=db))
     for on_ue in ues:
         ue = schemas.MatierUE(**jsonable_encoder(on_ue))
         journey = crud.journey.get_by_uuid(db=db, uuid=ue.uuid_journey)
@@ -33,7 +34,8 @@ def read_ue(
             ue.journey = journey
             ue.abbreviation_journey = journey.abbreviation
         list_ue.append(ue)
-    return list_ue
+    response = schemas.ResponseData(**{'count':count, 'data':list_ue})
+    return response
 
 
 @router.post("/", response_model=List[schemas.MatierUE])

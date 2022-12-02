@@ -85,7 +85,6 @@ export class ReInscriptionAddComponent implements OnInit {
 
   constructor(
     private http: HttpClient, 
-    private modal: NzModalService, 
     private fb: FormBuilder, 
     private service: UserService,
     private reinscriptionService: ReInscriptionService,
@@ -150,11 +149,27 @@ export class ReInscriptionAddComponent implements OnInit {
 
   async ngOnInit(){
     const numCarte = localStorage.getItem(this.keyNum)
-    if(numCarte && numCarte.length>0){
+    let year = localStorage.getItem(this.keyYear)
+    
+    let uuidMention = localStorage.getItem(this.keyMention)
+    if (uuidMention !== null){
+      this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()
+      this.allMention.push(await this.serviceMention.getData(uuidMention).toPromise())
+      this.isReady = true
+    }
+
+    this.http.get<Droit[]>(`${BASE_URL}/droit/by_mention?uuid_mention=`+
+      localStorage.getItem(this.keyMention)+'&year='+localStorage.getItem(this.keyYear)).subscribe(
+      data =>{ 
+        this.allPrice=data
+      },
+      error => console.error("error as ", error)
+    );
+    if(numCarte && numCarte.length>0 && year){
       this.isEdit = true
-      let  data = await this.reinscriptionService.getStudentByNumCarte(numCarte).toPromise()
+      let  data = await this.reinscriptionService.getStudentByNumCarte(numCarte, year).toPromise()
       this.form.get('numCarte')?.setValue(data.num_carte)
-      this.form.get('mention')?.setValue(data.mention)
+      this.form.get('mention')?.setValue(data.uuid_mention)
       this.form.get('journey')?.setValue(data.journey.uuid)
       this.form.get('firstName')?.setValue(data.first_name)
       this.form.get('lastName')?.setValue(data.last_name)
@@ -179,27 +194,12 @@ export class ReInscriptionAddComponent implements OnInit {
       this.formDialog.get('numReceipt')?.setValue(data.receipt.num)
       this.formDialog.get('dateReceipt')?.setValue(data.receipt.date)
       this.formDialog.get('priceRigth')?.setValue(data.receipt.price)
-      if (data.photo){
-        this.url = `${BASE_URL}/student/photo?name_file=`+data.photo
-      }
+      console.log(data);
+      
     }
     else{
       this.isEdit=false
     }
-    let uuidMention = localStorage.getItem(this.keyMention)
-    if (uuidMention !== null){
-      this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()
-      this.allMention.push(await this.serviceMention.getData(uuidMention).toPromise())
-      this.isReady = true
-    }
-
-    this.http.get<Droit[]>(`${BASE_URL}/droit/by_mention?uuid_mention=`+
-      localStorage.getItem(this.keyMention)+'&year='+localStorage.getItem(this.keyYear)).subscribe(
-      data =>{ 
-        this.allPrice=data
-      },
-      error => console.error("error as ", error)
-    );
   }
 
   validReceipt(): void{
@@ -223,19 +223,8 @@ export class ReInscriptionAddComponent implements OnInit {
   
   async submitForm() {
     if (this.form.valid) {
-      const title = this.form.value.title
-      const mean = this.form.value.mean
       this.isConfirmLoading = true
       let photo = this.form.value.numCarte+".jpg"
-      
-      const formData = new FormData();
-      formData.append("uploaded_file", this.uploadedImage)
-      if(this.url !== "assets/images/profil.png"){
-        let data = await this.service.uploadPhoto(this.form, formData).toPromise()
-       if (data.filename){
-        photo = data.filename
-       }
-      }
       const body = 
         {
           last_name: this.form.value.lastName,
@@ -249,13 +238,13 @@ export class ReInscriptionAddComponent implements OnInit {
           date_cin: this.form.value.dateCin,
           place_cin: this.form.value.placeCin,
           uuid_mention: this.form.value.mention,
-          actual_years: localStorage.getItem('college_years'),
+          actual_years: [],
           num_carte: this.form.value.numCarte,
           receipt: {
             num: this.formDialog.get('numReceipt')?.value,
             date: this.formDialog.get('dateReceipt')?.value,
             price: this.formDialog.get('priceRigth')?.value,
-            year: localStorage.getItem('college_years')
+            year: localStorage.getItem(this.keyYear)
           },
           receipt_list: [],
           mean: this.form.value.mean,
@@ -267,8 +256,11 @@ export class ReInscriptionAddComponent implements OnInit {
           inf_semester: this.form.value.infSemester,
           sup_semester: this.form.value.supSemester
         }
-        await this.reinscriptionService.addData( body).toPromise()
-        this.router.navigate(['/user/inscription'])
+        let year = localStorage.getItem(this.keyYear)
+        if (year){
+          await this.reinscriptionService.addData( body, year).toPromise()
+        }
+        this.router.navigate(['/user/reinscription'])
       this.isConfirmLoading = false
       this.isvisible = false,
       this.isConfirmLoading = false
@@ -417,8 +409,9 @@ export class ReInscriptionAddComponent implements OnInit {
 
     async getByNumCarte(){
       const numCarte = this.form.get('numCarte')?.value
-      if(numCarte && numCarte.length>0){
-        let  data = await this.reinscriptionService.getStudentByNumCarte(numCarte).toPromise()
+      let year = localStorage.getItem(this.keyYear)
+      if(numCarte && numCarte.length>0 && year){
+        let  data = await this.reinscriptionService.getStudentByNumCarte(numCarte, year).toPromise()
         this.form.get('numCarte')?.setValue(data.num_carte)
         this.form.get('mention')?.setValue(data.mention)
         this.form.get('journey')?.setValue(data.journey.uuid)
