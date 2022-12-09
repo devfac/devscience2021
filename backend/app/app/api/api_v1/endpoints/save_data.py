@@ -103,7 +103,8 @@ async def create_upload_file(*,
                 )
             all_data = save_data.get_data_xlsx(file_location, table)
     os.remove(file_location)
-    return all_data
+    response = schemas.ResponseData(**{'count': len(all_data), 'data': all_data})
+    return response
 
 
 @router.post("/upload_note_file/")

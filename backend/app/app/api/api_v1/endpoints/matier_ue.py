@@ -16,6 +16,8 @@ def read_ue(
         *,
         db: Session = Depends(deps.get_db),
         limit: int = 100,
+        uuid_journey: str = "",
+        semester: str = "",
         offset: int = 0,
         order: str = "asc",
         order_by: str = "title",
@@ -24,9 +26,10 @@ def read_ue(
     """
     Retrieve unité d'enseingement.
     """
-    ues = crud.teaching_unit.get_multi(db=db, limit=limit, skip=offset, order_by=order_by, order=order)
+    ues = crud.teaching_unit.get_multi(db=db, limit=limit, skip=offset, order_by=order_by, order=order,
+                                       uuid_journey=uuid_journey, semester = semester)
     list_ue = []
-    count = len(crud.teaching_unit.get_count(db=db))
+    count = len(crud.teaching_unit.get_count(db=db, uuid_journey=uuid_journey, semester = semester))
     for on_ue in ues:
         ue = schemas.MatierUE(**jsonable_encoder(on_ue))
         journey = crud.journey.get_by_uuid(db=db, uuid=ue.uuid_journey)

@@ -22,6 +22,6 @@ export class UploadService {
       return this.http.post<any>(`${BASE_URL}/save_data/uploadfile/`,formData, {headers: this.headers, params:otherParams})
     }
     fakeData() :Observable<any>{
-        return of([])
+        return of({data:[], count: 0})
       }
 }

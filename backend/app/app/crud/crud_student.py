@@ -16,19 +16,31 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
         return db.query(Student).filter(Student.num_carte == num_carte).first()
 
     def get_by_mention(self, db: Session, *, uuid_mention: UUID, limit:int, skip: int,
+                       uuid_journey: str = "", semester: str = "",
                        order: str = 'asc', order_by: str = "last_name") -> Optional[List[Student]]:
+        filter_ = [Student.uuid_mention == uuid_mention]
+        if uuid_journey != "" and uuid_journey != "null":
+            filter_.append(Student.uuid_journey == uuid_journey)
+        if semester != "" and semester != "null":
+            filter_.append(or_(Student.inf_semester == semester, Student.sup_semester == semester))
         return (
             db.query(Student)
-            .filter(and_(Student.uuid_mention == uuid_mention))
+            .filter(and_(*filter_))
             .order_by(text(f"{order_by} {order}"))
             .offset(skip)
             .limit(limit)
             .all())
 
-    def count_by_mention(self, db: Session, *, uuid_mention: UUID, ) -> Optional[List[Student]]:
+    def count_by_mention(self, db: Session, *, uuid_mention: UUID,
+                         uuid_journey: str = "", semester: str = "", ) -> Optional[List[Student]]:
+        filter_ = [Student.uuid_mention == uuid_mention]
+        if uuid_journey != "" and uuid_journey != "null":
+            filter_.append(Student.uuid_journey == uuid_journey)
+        if semester != "" and semester != "null":
+            filter_.append(or_(Student.inf_semester == semester, Student.sup_semester == semester))
         return (
             db.query(Student)
-            .filter(and_(Student.uuid_mention == uuid_mention))
+            .filter(and_(*filter_))
             .all())
 
     def get_by_class_limit(self,db: Session,
@@ -280,26 +292,31 @@ class CRUDNewStudent(CRUDBase[Student, NewStudentCreate, NewStudentUpdate]):
                      ))
                 .all())
 
-    def get_by_mention(self, db: Session, *, uuid_mention: UUID,
+    def get_by_mention(self, db: Session, *, uuid_mention: UUID,level: str = '',
                        college_year: str, limit: int=1000, skip: int=0,
                        order: str = "asc", order_by: str = "last_name",
                        ) -> Optional[List[Student]]:
+        filter_ = [Student.uuid_mention == uuid_mention, Student.enter_years == college_year]
+        if level != "null" and level != "":
+            filter_.append(Student.level == level)
         return (
             db.query(Student).filter(
-                and_(Student.uuid_mention == uuid_mention,
-                     Student.enter_years == college_year
+                and_(*filter_
                      ))
             .order_by(text(f"{order_by} {order}"))
             .offset(skip)
             .limit(limit)
             .all())
 
-    def count_by_mention(self, db: Session, *, uuid_mention: UUID,
+    def count_by_mention(self, db: Session, *, uuid_mention: UUID,level: str = "",
                        college_year: str, ) -> Optional[List[Student]]:
+
+        filter_ = [Student.uuid_mention == uuid_mention, Student.enter_years == college_year]
+        if level != "null" and level != "":
+            filter_.append(Student.level == level)
         return (
             db.query(Student).filter(
-                and_(Student.uuid_mention == uuid_mention,
-                     Student.enter_years == college_year
+                and_(*filter_
                      ))
             .all())
 

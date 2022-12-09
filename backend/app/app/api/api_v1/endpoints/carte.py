@@ -18,13 +18,15 @@ router = APIRouter()
 def create_carte(
         college_year: str,
         uuid_mention: str,
+        uuid_journey: str = "",
         db: Session = Depends(deps.get_db),
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     create liste au examen
     """
-    students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention,skip=0, limit=1000, order_by="num_carte")
+    students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention,skip=0, limit=1000,
+                                                  order_by="num_carte", uuid_journey=uuid_journey)
 
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
     if not mention:
@@ -62,6 +64,7 @@ def create_carte(
 def create_after_carte(
         college_year: str,
         uuid_mention: str,
+        uuid_journey: str = "",
         db: Session = Depends(deps.get_db),
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -72,7 +75,8 @@ def create_after_carte(
     if not year:
         raise HTTPException(status_code=400, detail=f"College year not found.",
                             )
-    students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention, skip=0, limit=1000)
+    students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention,skip=0, limit=1000,
+                                                  order_by="num_carte", uuid_journey=uuid_journey)
 
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
     if not mention:

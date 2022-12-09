@@ -63,7 +63,7 @@
   <div *nzModalContent>
       <form nz-form [formGroup]="form" class="form" (ngSubmit)="submitForm()" nzLayout="vertical">
           <div class="container" >
-            <input type="file" #fileDropRef id="fileDropRef"  />
+            <input type="file" #fileDropRef id="fileDropRef" (change)="selectFile($event)" class="input" />
             <img src="assets/images/ic-upload-file.svg" alt="">
             <h3 class="title-h3">Click or drag file to this area to upload</h3>
         </div>

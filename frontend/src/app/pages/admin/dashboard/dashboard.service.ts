@@ -18,10 +18,7 @@ export class DashboardService {
     "Authorization": "Bearer "+localStorage.getItem("token")
   })
   constructor(
-    private http: HttpClient,
-    private serviceMention: MentionService,
-    private authUser: AuthService
-    ) { }
+    private http: HttpClient    ) { }
     
   totaldashboard( collegeYear: string){
     let otherParams = new HttpParams()

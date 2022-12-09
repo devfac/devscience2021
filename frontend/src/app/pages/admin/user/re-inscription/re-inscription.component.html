@@ -1,49 +1,87 @@
 <form nz-form [formGroup]="form" class="form"  nzLayout="vertical">
-    <div class="header-title" nz-row>
-        <nz-form-item>
-            <nz-form-label>
-              {{ 'admin.home.college_year.title' | translate }}
-            </nz-form-label>
-            <nz-form-control >
-              <nz-input-group>
-                <nz-select
-                    [ngModel]="data"
-                    formControlName="collegeYear"
-                    [nzPlaceHolder]="'admin.home.college_year.title' | translate"
-                    (ngModelChange)="getAllStudents()"
-                    >
-                    <nz-option *ngFor="let item of allYears"
-                        [nzLabel]="item.title"
-                        [nzValue]="item.title"
-                    >
-                    </nz-option>
-                </nz-select>
-              </nz-input-group>
-            </nz-form-control>
-          </nz-form-item>
-
-          <nz-form-item>
-            <nz-form-label style="margin-left: 30px;">
-              {{ 'admin.home.mention.title' | translate }}
-            </nz-form-label>
-            <nz-form-control >
-              <nz-input-group>
-                <nz-select style="margin-left: 30px;"
-                    [ngModel]="data"
-                    formControlName="mention"
-                    [nzPlaceHolder]="'admin.home.mention.title' | translate"
-                    (ngModelChange)="getAllStudents()"
-                    >
-                    <nz-option *ngFor="let item of allMention"
-                        [nzLabel]="item.title"
-                        [nzValue]="item.uuid"
-                    >
-                    </nz-option>
-                </nz-select>
-              </nz-input-group>
-            </nz-form-control>
-          </nz-form-item>
-      </div>
+  <div nz-row>
+    <nz-form-item nz-col nzSpan="3">
+      <nz-form-label>
+        {{ 'admin.home.college_year.title' | translate }}
+      </nz-form-label>
+      <nz-form-control >
+        <nz-input-group>
+          <nz-select
+              [ngModel]="data"
+              formControlName="collegeYear"
+              [nzPlaceHolder]="'admin.home.college_year.title' | translate"
+              (ngModelChange)="getAllStudents()"
+              style="width: 100%;"
+              >
+              <nz-option *ngFor="let item of allYears"
+                  [nzLabel]="item.title"
+                  [nzValue]="item.title"
+              >
+              </nz-option>
+          </nz-select>
+        </nz-input-group>
+      </nz-form-control>
+    </nz-form-item>
+    <div nz-col nzSpan="1"></div>
+    <nz-form-item nz-col nzSpan="6">
+      <nz-form-label>
+        {{ 'admin.home.mention.title' | translate }}
+      </nz-form-label>
+      <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+          <nz-select
+              nzAllowClear
+              formControlName="mention"
+              [nzPlaceHolder]="'admin.home.mention.title' | translate"
+              >
+              <nz-option *ngFor="let item of allMention"
+                  [nzLabel]="item.title"
+                  [nzValue]="item.uuid"
+              >
+              </nz-option>
+          </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+    <div nz-col nzSpan="1"></div>
+    <nz-form-item nz-col nzSpan="4">
+      <nz-form-label>
+        {{ 'admin.home.journey.title' | translate }}
+      </nz-form-label>
+      <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+          <nz-select
+              nzAllowClear
+              formControlName="journey"
+              [nzPlaceHolder]="'admin.home.journey.title' | translate"
+              (ngModelChange)="changeJourneyList()"
+              >
+              <nz-option *ngFor="let item of allJourney"
+                  [nzLabel]="item.abbreviation"
+                  [nzValue]="item.uuid"
+              >
+              </nz-option>
+          </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+    <div nz-col nzSpan="1"></div>
+    <nz-form-item nz-col nzSpan="4">
+      <nz-form-label>
+        {{ 'admin.home.journey.semester' | translate }}
+      </nz-form-label>
+      <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+          <nz-select
+              nzAllowClear
+              formControlName="semester"
+              [nzPlaceHolder]="'admin.home.journey.semester' | translate"
+              (ngModelChange)="changeSemester()"
+              >
+              <nz-option *ngFor="let item of listOfSemester"
+                  [nzLabel]="item"
+                  [nzValue]="item"
+              >
+              </nz-option>
+          </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
 </form>
   
 <app-datatable-crud

@@ -28,7 +28,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db.query(self.model).filter(self.model.uuid == uuid).first()
 
     def get_multi(
-            self, db: Session, limit: int = 100, skip: int = 0, order_by: str = "title", order: str = "ASC"
+            self, db: Session, limit: int = 100, skip: int = 0,
+            order_by: str = "title", order: str = "ASC",
     ) -> List[ModelType]:
         return (
             db.query(self.model)

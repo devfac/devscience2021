@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CollegeYear } from '@app/models/collegeYear';
 import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
-import { QueryParams } from '@app/models/query';
+import { otherQueryParams, QueryParams } from '@app/models/query';
 import { ResponseModel } from '@app/models/response';
 import { TableHeader } from '@app/models/table';
 import { Ue } from '@app/models/ue';
@@ -27,12 +27,14 @@ export class UeComponent implements OnInit, AfterContentInit {
 
   user = localStorage.getItem('user')
   allJourney: Journey[] = []
+  allJourneyList: Journey[] = []
   allMention: Mention[] = []
   allUe: Ue[] = []
   listOfSemester = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
   semesterTitles: any[] = []
   confirmModal?: NzModalRef;
   form!: FormGroup;
+  formList!: FormGroup;
   form_years!: FormGroup;
   isvisible = false;
   isConfirmLoading = false;
@@ -64,7 +66,14 @@ export class UeComponent implements OnInit, AfterContentInit {
         credit: [null, [Validators.required]],
         mention: [null, [Validators.required]],
         collegeYear: [null],
-      });}
+      });
+      this.formList = this.fb.group({
+        mention: [null],
+        semester: [null],
+        journey: [null],
+      })
+    }
+      
 
   async ngAfterContentInit() {
     this.headers = [
@@ -97,6 +106,9 @@ export class UeComponent implements OnInit, AfterContentInit {
     this.testStorage('mention', this.allMention[0].uuid)
 
     this.allJourney = await this.serviceJourney.getDataByMention(this.form.get('mention')?.value).toPromise()
+    let journey: ResponseModel = await this.serviceJourney.getDataPromise().toPromise()
+    this.allJourneyList = journey.data
+    this.testStorage('journey', this.allJourney[0].uuid)
     
     for(let i=0; i<this.listOfSemester.length; i++){
       this.semesterTitles.push(
@@ -107,7 +119,11 @@ export class UeComponent implements OnInit, AfterContentInit {
     }
   }
   fetchData(params?: QueryParams){
-    return this.service.getDataObservable(parseQueryParams(params))
+    let otherParams: otherQueryParams = {
+      uuid_journey: localStorage.getItem('journey'),
+      semester: localStorage.getItem("semester"),
+    }
+    return this.service.getDataObservable(parseQueryParams(params, otherParams))
   }
   testStorage(key: string, value: string){
     if(localStorage.getItem(key)){
@@ -207,6 +223,24 @@ export class UeComponent implements OnInit, AfterContentInit {
     }
   }
 
+  changeJourney(){
+    if(this.formList.value.journey ){
+        const journey = this.allJourneyList.find((item: Journey) => item.uuid === this.formList.value.journey)
+        if (journey){
+        this.listOfSemester = journey.semester
+        localStorage.setItem("journey", this.formList.value.journey)
+        this.datatable.fetchData()
+      }
+      }else{
+        localStorage.setItem("journey", this.formList.value.journey)
+        this.datatable.fetchData()
+      }
+    }
+
+  changeSemester(){
+    localStorage.setItem("semester", this.formList.value.semester)
+    this.datatable.fetchData()
+  }
   handleCancel(): void{
     this.isvisible = false
   }

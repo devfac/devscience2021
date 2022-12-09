@@ -13,13 +13,14 @@ import { ErrorInterceptor, JwtInterceptor } from './helpers';
 //import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 import { fakeApiProvider } from './providers/fake-api-provider.module';
 import { SocketService } from './socket.service';
+import { FilterComponent } from './shared/components/filter/filter.component';
 //import { environment } from '@environments/environment';
 
 
 //const config: SocketIoConfig = { url: environment.socketApiURL, options: {} };
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, FilterComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

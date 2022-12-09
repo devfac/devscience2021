@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
 from sqlalchemy import and_, or_
+from sqlalchemy import text
 
 from app.models import ConstituentElement
 from app.models.matier import TeachingUnit, ConstituentElement
@@ -40,12 +41,44 @@ class CRUDTeachingUnit(CRUDBase[TeachingUnit, MatierUECreate, MatierUEUpdate]):
         db.refresh(db_obj)
         return db_obj
 
+    def get_multi(
+            self, db: Session, limit: int = 100, skip: int = 0,
+            order_by: str = "title", order: str = "ASC", uuid_journey: str = "", semester: str = ""
+    ) -> List[TeachingUnit]:
+        filter_ = []
+        if uuid_journey != "" and uuid_journey != "null":
+            filter_.append(TeachingUnit.uuid_journey == uuid_journey)
+        if semester != "" and semester != "null":
+            filter_.append(TeachingUnit.semester == semester)
+        return (
+            db.query(TeachingUnit)
+            .filter(and_(*filter_))
+            .order_by(text(f"{order_by} {order}"))
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
     def get_all(
             self, db: Session,
     ) -> List[TeachingUnit]:
         return (
             db.query(TeachingUnit)
             .order_by(TeachingUnit.title.asc())
+            .all()
+        )
+
+    def get_count(
+            self, db: Session,  uuid_journey: str = "", semester: str = ""
+    ) -> List[TeachingUnit]:
+        filter_ = []
+        if uuid_journey != "" and uuid_journey != "null":
+            filter_.append(TeachingUnit.uuid_journey == uuid_journey)
+        if semester != "" and semester != "null":
+            filter_.append(TeachingUnit.semester == semester)
+        return (
+            db.query(self.model)
+            .filter(and_(*filter_))
             .all()
         )
 
@@ -112,6 +145,38 @@ class CRUDConstituentElement(CRUDBase[ConstituentElement, MatierECCreate, Matier
         return (
             db.query(ConstituentElement)
             .order_by(ConstituentElement.title.asc())
+            .all()
+        )
+
+    def get_multi(
+            self, db: Session, limit: int = 100, skip: int = 0,
+            order_by: str = "title", order: str = "ASC", uuid_journey: str = "", semester: str = ""
+    ) -> List[ConstituentElement]:
+        filter_ = []
+        if uuid_journey != "" and uuid_journey != "null":
+            filter_.append(ConstituentElement.uuid_journey == uuid_journey)
+        if semester != "" and semester != "null":
+            filter_.append(ConstituentElement.semester == semester)
+        return (
+            db.query(ConstituentElement)
+            .filter(and_(*filter_))
+            .order_by(text(f"{order_by} {order}"))
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+    def get_count(
+            self, db: Session,  uuid_journey: str = "", semester: str = ""
+    ) -> List[ConstituentElement]:
+        filter_ = []
+        if uuid_journey != "" and uuid_journey != "null":
+            filter_.append(ConstituentElement.uuid_journey == uuid_journey)
+        if semester != "" and semester != "null":
+            filter_.append(ConstituentElement.semester == semester)
+        return (
+            db.query(self.model)
+            .filter(and_(*filter_))
             .all()
         )
 

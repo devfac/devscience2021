@@ -7,7 +7,7 @@ from app.api import deps
 from fastapi.responses import FileResponse
 from app.statistic import all_statistic, stat_by_nation, stat_diplome, stat_renseignement, bachelier
 from app import crud
-from app.utils import decode_schemas, get_max
+from app.utils import decode_schemas, get_max, find_in_list
 from sqlalchemy.orm import Session
 
 router = APIRouter()
@@ -213,48 +213,49 @@ def dashboard(
         mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
         if mention:
             students = crud.ancien_student.get_by_mention(db=db, uuid_mention=uuid_mention, skip=0,
-                                                          limit=1000, )
+                                                          limit=1000)
             for student in students:
                 semester: str = get_max(student.inf_semester, student.sup_semester)
-                if semester == "S2" or semester == "S1":
-                    l1 += 1
-                    if student.type == "Passant":
-                        pl += 1
-                    elif student.type == "Redoublant":
-                        rl += 1
-                    elif student.type == "Triplant et plus":
-                        tl += 1
-                elif semester == "S3" or semester == "S4":
-                    l2 += 1
-                    if student.type == "Passant":
-                        pl += 1
-                    elif student.type == "Redoublant":
-                        rl += 1
-                    elif student.type == "Triplant et plus":
-                        tl += 1
-                elif semester == "S5" or semester == "S6":
-                    l3 += 1
-                    if student.type == "Passant":
-                        pl += 1
-                    elif student.type == "Redoublant":
-                        rl += 1
-                    elif student.type == "Triplant et plus":
-                        tl += 1
-                elif semester == "S7" or semester == "S8":
-                    m += 1
-                    if student.type == "Passant":
-                        pm += 1
-                    elif student.type == "Redoublant":
-                        rm += 1
-                    elif student.type == "Triplant et plus":
-                        tm += 1
-                elif semester == "S9" or semester == "S10":
-                    m += 1
-                    if student.type == "Passant":
-                        pm += 1
-                    elif student.type == "Redoublant":
-                        rm += 1
-                    elif student.type == "Triplant et plus":
-                        tm += 1
+                if find_in_list(student.actual_years, college_year) != -1:
+                    if semester == "S2" or semester == "S1":
+                        l1 += 1
+                        if student.type == "Passant":
+                            pl += 1
+                        elif student.type == "Redoublant":
+                            rl += 1
+                        elif student.type == "Triplant ou plus":
+                            tl += 1
+                    elif semester == "S3" or semester == "S4":
+                        l2 += 1
+                        if student.type == "Passant":
+                            pl += 1
+                        elif student.type == "Redoublant":
+                            rl += 1
+                        elif student.type == "Triplant ou plus":
+                            tl += 1
+                    elif semester == "S5" or semester == "S6":
+                        l3 += 1
+                        if student.type == "Passant":
+                            pl += 1
+                        elif student.type == "Redoublant":
+                            rl += 1
+                        elif student.type == "Triplant ou plus":
+                            tl += 1
+                    elif semester == "S7" or semester == "S8":
+                        m += 1
+                        if student.type == "Passant":
+                            pm += 1
+                        elif student.type == "Redoublant":
+                            rm += 1
+                        elif student.type == "Triplant ou plus":
+                            tm += 1
+                    elif semester == "S9" or semester == "S10":
+                        m += 1
+                        if student.type == "Passant":
+                            pm += 1
+                        elif student.type == "Redoublant":
+                            rm += 1
+                        elif student.type == "Triplant ou plus":
+                            tm += 1
     value: dict = {"L1":l1, "L2":l2, "L3":l3, "M":m, "PL":pl, "RL":rl, "TL":tl, "PM":pm, "RM":rm, "TM":tm}
     return value

@@ -1,6 +1,7 @@
 import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { typeLevel } from '@app/data/data';
 import { CollegeYear } from '@app/models/collegeYear';
 import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
@@ -34,7 +35,6 @@ export class InscriptionComponent implements OnInit, AfterContentInit {
   allStudents: AncienStudent[] = []
   allJourney: Journey[] = []
   allMention: Mention[] = []
-  listOfSemester = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
   semesterTitles: any[] = []
   confirmModal?: NzModalRef
   form!: FormGroup;
@@ -48,7 +48,9 @@ export class InscriptionComponent implements OnInit, AfterContentInit {
   keyMention = CODE+"mention"
   keyYear = CODE+"collegeYear"
   keyNum = CODE+"numSelect"
+  keyLevel = CODE+"level"
   isLoading: boolean = false
+  typelevel = typeLevel
 
   actions = {
     add: true,
@@ -70,14 +72,10 @@ export class InscriptionComponent implements OnInit, AfterContentInit {
 
 
     this.form = this.fb.group({
-      email: [null, [Validators.required]],
-      firstName: [null, [Validators.required]],
-      lastName: [null, [Validators.required]],
-      isAdmin: [false],
       collegeYear: [null],
-      role: [null, [Validators.required]],
-      mention: [[], [Validators.required]],
-      filter: [null],
+      journey: [null, [Validators.required]],
+      mention: [null, [Validators.required]],
+      level: [null],
     });
   }
 
@@ -104,7 +102,7 @@ export class InscriptionComponent implements OnInit, AfterContentInit {
     },{
       title: 'Parcours',
       selector: 'journey.abbreviation',
-      isSortable: true,
+      isSortable: false,
     },
   ];
   }
@@ -117,14 +115,6 @@ export class InscriptionComponent implements OnInit, AfterContentInit {
           
     }
 
-    for(let i=0; i<this.listOfSemester.length; i++){
-      this.semesterTitles.push(
-        {
-          text: this.listOfSemester[i], value: this.listOfSemester[i]
-        }
-      )
-    }
-    
     let allYears: ResponseModel = await this.serviceYears.getDataPromise().toPromise()
     this.allYears = allYears.data
     
@@ -154,6 +144,7 @@ export class InscriptionComponent implements OnInit, AfterContentInit {
     let otherParams: otherQueryParams = {
       college_year: localStorage.getItem(this.keyYear),
       uuid_mention: localStorage.getItem(this.keyMention),
+      level: localStorage.getItem(this.keyLevel),
     }
     return this.service.getDataObservable(parseQueryParams(params,otherParams))
   }
@@ -202,6 +193,16 @@ export class InscriptionComponent implements OnInit, AfterContentInit {
     }
   }
 
+  changeLevel(): void{
+    if(this.form.get(this.keyYear.substring(CODE.length))?.value && 
+    this.form.get(this.keyMention.substring(CODE.length))?.value && this.isLoading){
+      localStorage.setItem(this.keyYear, this.form.get(this.keyYear.substring(CODE.length))?.value)
+      localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)
+      localStorage.setItem(this.keyLevel, this.form.get(this.keyLevel.substring(CODE.length))?.value)
+      this.datatable.fetchData()
+    }
+  }
+
   addStudent():void{
     localStorage.setItem(this.keyNum, '')
     this.router.navigate(['/user/inscription_add'])
@@ -213,14 +214,4 @@ export class InscriptionComponent implements OnInit, AfterContentInit {
       this.isConfirmLoading = false
     }, 3000);
   }
-
-  changeFilter(){
-    if(this.form.value.filter){
-      this.listOfData = this.allStudents.filter((item: any) => item.journey.uuid === this.form.value.filter)
-    }else{
-      this.listOfData = this.allStudents
-    }
-  }
-
-
 }

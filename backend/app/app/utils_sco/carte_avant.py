@@ -35,8 +35,7 @@ class PDF(FPDF):
             image_fac = f"images/{niveau.lower()}_avant.jpg"
 
             image = f"files/photos/profil.png"
-            if os.path.exists(f"files/photos/{deux_et[i]['photo']}"):
-                image = f"files/photos/{deux_et[i]['photo']}"
+
             info = f"Nom: {deux_et[i]['last_name'].upper()}\n"
             info += f"Prénom: {deux_et[i]['first_name']}\n"
             info += f"Né(e) le: {convert_date(deux_et[i]['date_birth'])} à {deux_et[i]['place_birth']}\n"

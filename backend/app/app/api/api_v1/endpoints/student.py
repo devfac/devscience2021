@@ -22,6 +22,8 @@ def read_ancien_student(
         db: Session = Depends(deps.get_db),
         college_year: str,
         uuid_mention: str,
+        uuid_journey: str = "",
+        semester: str = "",
         limit: int = 100,
         offset: int = 0,
         order: str = "asc",
@@ -31,11 +33,12 @@ def read_ancien_student(
     """
     Retrieve ancien student.
     """
-    students = crud.ancien_student.get_by_mention(db=db, order_by=order_by, order=order,
-                                                  uuid_mention=uuid_mention, limit=limit, skip=offset)
+    students = crud.ancien_student.get_by_mention(db=db, order_by=order_by, order=order, uuid_journey=uuid_journey,
+                                                  semester=semester, uuid_mention=uuid_mention, limit=limit, skip=offset)
     all_student = []
     count = 0
-    for student in crud.ancien_student.count_by_mention(db=db, uuid_mention=uuid_mention):
+    for student in crud.ancien_student.count_by_mention(db=db, uuid_mention=uuid_mention, uuid_journey=uuid_journey,
+                                                        semester=semester):
         if find_in_list(current_user.uuid_mention, str(student.uuid_mention)) != -1 and \
                 find_in_list(student.actual_years, college_year) != -1 and student.uuid_journey:
             count += 1
@@ -87,6 +90,7 @@ def read_new_student(
         db: Session = Depends(deps.get_db),
         college_year: str,
         uuid_mention: str,
+        level: str = '',
         limit: int = 100,
         offset: int = 0,
         order: str = "asc",
@@ -96,11 +100,11 @@ def read_new_student(
     """
     Retrieve new student.
     """
-    students = crud.new_student.get_by_mention(db=db,uuid_mention=uuid_mention,college_year=college_year,
+    students = crud.new_student.get_by_mention(db=db,uuid_mention=uuid_mention,college_year=college_year, level=level,
                                                order_by=order_by, order=order, limit=limit, skip=offset)
     all_student = []
     count = 0
-    for student in crud.new_student.count_by_mention(db=db, uuid_mention=uuid_mention, college_year=college_year):
+    for student in crud.new_student.count_by_mention(db=db, uuid_mention=uuid_mention, college_year=college_year, level=level):
         if find_in_list(current_user.uuid_mention, str(student.uuid_mention)) != -1 and \
                 find_in_list(student.actual_years, college_year) != -1 and student.uuid_journey:
             count += 1

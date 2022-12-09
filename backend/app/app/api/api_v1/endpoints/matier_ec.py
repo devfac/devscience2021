@@ -15,6 +15,8 @@ router = APIRouter()
 def read_ec(
         *,
         db: Session = Depends(deps.get_db),
+        uuid_journey: str = "",
+        semester: str = "",
         limit: int = 100,
         offset: int = 0,
         order: str = "asc",
@@ -24,9 +26,10 @@ def read_ec(
     """
     Retrieve élément constitutif.
     """
-    ecs = crud.constituent_element.get_multi(db=db, limit=limit, skip=offset, order_by=order_by, order=order)
+    ecs = crud.constituent_element.get_multi(db=db, limit=limit, skip=offset, order_by=order_by, order=order,
+                                       uuid_journey=uuid_journey, semester = semester)
     list_ec = []
-    count = len(crud.constituent_element.get_count(db=db))
+    count = len(crud.constituent_element.get_count(db=db, uuid_journey=uuid_journey, semester=semester))
     for on_ec in ecs:
         ec = schemas.MatierEC(**jsonable_encoder(on_ec))
         journey = crud.journey.get_by_uuid(db=db, uuid=ec.uuid_journey)

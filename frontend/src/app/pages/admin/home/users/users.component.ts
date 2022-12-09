@@ -81,7 +81,7 @@ export class UsersComponent implements OnInit, AfterContentInit {
         },{
           title: 'Mention',
           selector: 'mention.title',
-          isSortable: true,
+          isSortable: false,
         },
       ];
   }

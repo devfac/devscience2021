@@ -1,4 +1,48 @@
 
+<form nz-form [formGroup]="formList" class="form"  nzLayout="vertical">
+  <div nz-row>
+    <nz-form-item nz-col nzSpan="4">
+      <nz-form-label>
+        {{ 'admin.home.journey.title' | translate }}
+      </nz-form-label>
+      <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+          <nz-select
+              nzAllowClear
+              formControlName="journey"
+              [nzPlaceHolder]="'admin.home.journey.title' | translate"
+              (ngModelChange)="changeJourney()"
+              >
+              <nz-option *ngFor="let item of allJourneyList"
+                  [nzLabel]="item.abbreviation"
+                  [nzValue]="item.uuid"
+              >
+              </nz-option>
+          </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+    <div nz-col nzSpan="1"></div>
+    <nz-form-item nz-col nzSpan="4">
+      <nz-form-label>
+        {{ 'admin.home.journey.semester' | translate }}
+      </nz-form-label>
+      <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+          <nz-select
+              nzAllowClear
+              formControlName="semester"
+              [nzPlaceHolder]="'admin.home.journey.semester' | translate"
+              (ngModelChange)="changeSemester()"
+              >
+              <nz-option *ngFor="let item of listOfSemester"
+                  [nzLabel]="item"
+                  [nzValue]="item"
+              >
+              </nz-option>
+          </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+</form>
+  
   <app-datatable-crud
   [title]="'admin.home.ue.title' | translate"
   [headers]="headers"

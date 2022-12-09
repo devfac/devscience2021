@@ -35,23 +35,7 @@ interface Name {
   styleUrls: ['./dashboard.component.less']
 })
 export class DashboardComponent implements OnInit {
-  data = [
-    'Racing car sprays burning fuel into crowd.',
-    'Japanese princess to wed commoner.',
-    'Australian walks 100km after outback crash.',
-    'Man charged over missing wedding girl.',
-    'Los Angeles battles huge wildfires.',
-    'Racing car sprays burning fuel into crowd.',
-    'Japanese princess to wed commoner.',
-    'Australian walks 100km after outback crash.',
-    'Man charged over missing wedding girl.',
-    'Los Angeles battles huge wildfires.',
-    'Racing car sprays burning fuel into crowd.',
-    'Japanese princess to wed commoner.',
-    'Australian walks 100km after outback crash.',
-    'Man charged over missing wedding girl.',
-    'Los Angeles battles huge wildfires.',
-  ];
+ 
   totalDas : any = {L1:0, L2:0, L3:0, M:0, PL:0, RL:0, TL:0, PM:0, RM:0, TM:0}
   ds = new MyDataSource(this.http);
   
@@ -67,10 +51,7 @@ export class DashboardComponent implements OnInit {
   private destroy$ = new Subject();
   constructor(
     private http: HttpClient,
-    private nzMessage: NzMessageService,
-    private mentionService: MentionService,
     private service: DashboardService,
-    private authService: AuthService,
     private serviceCollegeYear: CollegeYearService
   ) {}
   async ngAfterViewInit() {
@@ -78,7 +59,7 @@ export class DashboardComponent implements OnInit {
   }
 
   async ngOnInit() {
-    let year = localStorage.getItem('collegeYear')
+    let year = localStorage.getItem('reinscriptioncollegeYear')
     if(year){
       this.totalDas = await this.service.totaldashboard(year).toPromise()
     }else{
@@ -87,9 +68,15 @@ export class DashboardComponent implements OnInit {
       this.totalDas = await this.service.totaldashboard(year).toPromise()
     }
     let totalLicence = this.totalDas.L1 + this.totalDas.L2 + this.totalDas.L3
+    let totalMaster = this.totalDas.M
+
     this.percentLicencePassant = this.roundNumber((this.totalDas.PL * 100)/ totalLicence)
     this.percentLicenceRedoublant = this.roundNumber((this.totalDas.RL * 100)/ totalLicence)
     this.percentLicenceTriplant = this.roundNumber((this.totalDas.TL * 100)/ totalLicence)
+
+    this.percentMasterPassant = this.roundNumber((this.totalDas.PM * 100)/ totalMaster)
+    this.percentMasterRedoublant = this.roundNumber((this.totalDas.RM * 100)/ totalMaster)
+    this.percentMasterTriplant = this.roundNumber((this.totalDas.TM * 100)/ totalMaster)
 
     document.getElementById(
       'passant_licence'
@@ -100,13 +87,25 @@ export class DashboardComponent implements OnInit {
     document.getElementById(
       'triplant_licence'
     )!.style.strokeDasharray = `${this.percentLicenceTriplant} , 100`;
-  }
+
+  document.getElementById(
+    'passant_master'
+  )!.style.strokeDasharray = `${this.percentMasterPassant} , 100`;
+  document.getElementById(
+    'redoublant_master'
+  )!.style.strokeDasharray = `${this.percentMasterRedoublant} , 100`;
+  document.getElementById(
+    'triplant_master'
+  )!.style.strokeDasharray = `${this.percentMasterTriplant} , 100`;
+}
+
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  fetchData(params?: QueryParams) {
+  fetchData() {
    // return this.homeService.getDataObservable(parseQueryParams(params));
   }
   roundNumber(num: number) {

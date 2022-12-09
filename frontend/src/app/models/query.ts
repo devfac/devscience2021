@@ -15,4 +15,5 @@ export interface otherQueryParams {
   num_carte?: string | null;
   session?: string | null;
   semester?: string | null;
+  level?: string | null;
 }

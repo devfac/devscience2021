@@ -204,7 +204,7 @@ export class UploadComponent implements OnInit ,AfterContentInit{
 
   selectFile(event: any){
     if(!event.target.files[0] || event.target.files[0].length == 0){
-      this.msg = "select image"
+      this.msg = "select a file"
     }
     var mineType = event.target.files[0].type;
     if(mineType.match(/document\/*/) == null){

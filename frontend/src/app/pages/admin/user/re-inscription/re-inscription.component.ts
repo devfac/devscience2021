@@ -49,6 +49,8 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
   keyMention = CODE+"mention"
   keyYear = CODE+"collegeYear"
   keyNum = CODE+"numCarte"
+  keyJourney = CODE+"journey"
+  keySemester = CODE+"semester"
   isEdit = false;
   title = '';
   data = ""
@@ -147,13 +149,10 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
 
 
     this.form = this.fb.group({
-      email: [null, [Validators.required]],
-      firstName: [null, [Validators.required]],
-      lastName: [null, [Validators.required]],
-      isAdmin: [false],
       collegeYear: [null],
-      uuidRole: [null, [Validators.required]],
       mention: [[], [Validators.required]],
+      semester: [null],
+      journey: [null],
       filter: [null],
     });
     this.formList = this.fb.group({
@@ -193,7 +192,7 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
       title: 'Parcours',
       selector: 'journey.abbreviation',
       width: "100px",
-      isSortable: true,
+      isSortable: false,
     },
   ];
   }
@@ -241,6 +240,8 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
     let otherParams: otherQueryParams = {
       college_year: localStorage.getItem(this.keyYear),
       uuid_mention: localStorage.getItem(this.keyMention),
+      uuid_journey: localStorage.getItem(this.keyJourney),
+      semester: localStorage.getItem(this.keySemester),
     }
     return this.service.getDataObservable(parseQueryParams(params,otherParams))
   }
@@ -305,14 +306,31 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
 
   changeJourney(): void{
     if(this.formList.value.journey ){
-      localStorage.setItem('journey', this.formList.value.journey)
-
       const journey = this.allJourney.find((item: Journey) => item.uuid === this.formList.value.journey)
       if (journey){
       this.listOfSemester = journey.semester
     }
     }
   }
+
+  changeJourneyList(): void{
+    if(this.form.value.journey ){
+      const journey = this.allJourney.find((item: Journey) => item.uuid === this.form.value.journey)
+      if (journey){
+      this.listOfSemester = journey.semester
+      localStorage.setItem(this.keyJourney, this.form.get(this.keyJourney.substring(CODE.length))?.value)
+      this.datatable.fetchData()
+    }
+    }else{
+      localStorage.setItem(this.keyJourney, this.form.get(this.keyJourney.substring(CODE.length))?.value)
+      this.datatable.fetchData()
+    }
+  }
+  changeSemester(): void{
+      localStorage.setItem(this.keySemester, this.form.get(this.keySemester.substring(CODE.length))?.value)
+      this.datatable.fetchData()
+  }
+  
   changeFilter(){
     if(this.form.value.filter){
       this.listOfData = this.allStudents.filter((item: any) => item.journey.uuid === this.form.value.filter)
@@ -348,6 +366,7 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
     let params = new HttpParams()
       .append('college_year', this.form.get('collegeYear')?.value)
       .append('uuid_mention', this.form.get('mention')?.value)
+      .append('uuid_journey', this.form.get('journey')?.value)
 
     const mention = this.allMention.find((item: Mention) => item.uuid === this.form.value.mention);
     let name: string = 'Face_carte'+mention?.abbreviation
@@ -361,6 +380,7 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
     let params = new HttpParams()
       .append('college_year', this.form.get('collegeYear')?.value)
       .append('uuid_mention', this.form.get('mention')?.value)
+      .append('uuid_journey', this.form.get('journey')?.value)
 
     const mention = this.allMention.find((item: Mention) => item.uuid === this.form.value.mention);
     let name: string = 'Arriere_carte'+mention?.abbreviation;
