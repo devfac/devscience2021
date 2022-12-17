@@ -1,12 +1,14 @@
 import json
+from datetime import datetime
 from typing import Any, List
-
+import logging
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
+from app.script_logging import ScriptLogging
 from app.utils import compare_list, max_value, get_credit, create_model, find_in_list
 
 router = APIRouter()
@@ -351,7 +353,6 @@ def updates_note(
     interaction = jsonable_encoder(interaction)
     interaction[semester.lower()] = list_value
     columns = interaction[semester.lower()]
-    print(create_model(columns))
     moy_cred_in = {}
     moy_cred_in_fin = {}
     moy = 0
@@ -360,6 +361,10 @@ def updates_note(
     credit_fin = 0
     somme = 0
     #for notes in all_notes_ue:
+
+    ScriptLogging(current_user.email)
+    logger = logging.getLogger(current_user.email)
+    logger.info(f"note {all_notes_ue.ue} updated")
     for note in all_notes_ue.ue:
         for column_ in create_model(columns):
             if note.name == column_['name']:

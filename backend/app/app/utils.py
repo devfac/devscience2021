@@ -453,7 +453,11 @@ def create_model(interactions: List[schemas.ValueUEEC]):
             name = last_ue['name']
     return result
 
-
+def clear_name(name: str, nbr: int = 50) -> str :
+    if len(name) <= nbr:
+        return name
+    else:
+        return name[0:nbr]+" ..."
 
 class UUIDEncoder(json.JSONEncoder):
     def default(self, obj):

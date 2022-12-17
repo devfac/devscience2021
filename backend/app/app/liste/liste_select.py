@@ -1,6 +1,7 @@
 from typing import Any
 from fpdf import FPDF
 from .header import header
+from ..utils import clear_name
 
 
 class PDF(FPDF):
@@ -50,7 +51,7 @@ class PDF(FPDF):
                 num_ = 1
                 for i, etudiant in enumerate(etudiants[niv]):
                     num_select_ = etudiant["num_select"]
-                    name = f"{etudiant['last_name']} {etudiant['first_name']}"
+                    name = f"{clear_name(etudiant['last_name'])} {etudiant['first_name']}"
                     pdf.cell(1, 7, txt="", ln=1)
                     pdf.set_font("arial", "I", 10)
                     pdf.cell(1, 5, txt="")

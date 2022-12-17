@@ -2,7 +2,7 @@ from typing import Any
 from fpdf import FPDF
 
 from app.liste import header
-from app.utils import get_niveau_long
+from app.utils import get_niveau_long, clear_name
 
 
 class PDF(FPDF):
@@ -68,7 +68,7 @@ class PDF(FPDF):
                     num_ = 1
                     for j, student in enumerate(journey[niv]):
                         num_carte_ = student["num_carte"]
-                        name = f"{student['last_name']} {student['first_name']}"
+                        name = f"{clear_name(student['last_name'])} {student['first_name']}"
                         pdf.cell(1, 7, txt="", ln=1)
                         pdf.set_font("arial", "I", 10)
                         pdf.cell(1, 5, txt="")

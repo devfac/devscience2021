@@ -1,6 +1,7 @@
 from typing import Any
 from fpdf import FPDF
 from .header import header
+from ..utils import clear_name
 
 
 class PDF(FPDF):
@@ -85,7 +86,7 @@ class PDF(FPDF):
         for i, etudiant in enumerate(etudiants):
             line_height: int = lh_list[i]
             num_carte_ = etudiant["num_carte"]
-            name = f"{etudiant['last_name']} {etudiant['first_name']}"
+            name = f"{clear_name(etudiant['last_name'])} {etudiant['first_name']}"
             pdf.cell(1, 1, txt="", ln=1)
             pdf.set_font("arial", "I", 10)
             pdf.cell(1, 1, txt="")

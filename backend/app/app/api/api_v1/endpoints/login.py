@@ -1,6 +1,6 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from typing import Any
-
+import logging
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -11,6 +11,7 @@ from app.api import deps
 from app.core import security
 from app.core.config import settings
 from app.core.security import get_password_hash
+from app.script_logging import ScriptLogging
 from app.utils import (
     generate_password_reset_token,
     send_reset_password_email,
@@ -18,7 +19,6 @@ from app.utils import (
 )
 
 router = APIRouter()
-
 
 @router.post("/login/access-token", response_model=schemas.UserLogin)
 def login_access_token(
@@ -35,6 +35,9 @@ def login_access_token(
     elif not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+
+    logger = ScriptLogging(user.email)
+    logger.script_logging("info",user.email, f"connected at {datetime.now()}")
     if user.is_superuser:
         permission = "super_admin"
     else:

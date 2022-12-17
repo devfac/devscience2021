@@ -22,7 +22,7 @@ class CRUDMention(CRUDBase[Mention, MentionCreate, MentionUpdate]):
         self, db: Session, *, obj_in: MentionCreate, value:str
     ) -> Mention:
         obj_in_data = jsonable_encoder(obj_in)
-        db_obj = self.model(**obj_in_data, value=value, plugged=decode_text(obj_in.plugged))
+        db_obj = self.model(**obj_in_data, value=value)
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)

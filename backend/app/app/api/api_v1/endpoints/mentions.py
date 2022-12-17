@@ -41,6 +41,7 @@ def create_mention(
     Create new mention.
     """
     value = decode_text(mention_in.title).lower()
+    mention_in.plugged = decode_text(mention_in.plugged)
     mention = crud.mention.get_by_value(db=db, value=value)
     if mention:
         raise HTTPException(status_code=400, detail="Mention already exist")

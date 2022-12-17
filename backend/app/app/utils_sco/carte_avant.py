@@ -3,7 +3,7 @@ from typing import Any
 import qrcode
 import os
 
-from app.utils import convert_date
+from app.utils import convert_date, clear_name
 
 
 class PDF(FPDF):
@@ -34,9 +34,9 @@ class PDF(FPDF):
             niveau = f"{deux_et[i]['level']}"
             image_fac = f"images/{niveau.lower()}_avant.jpg"
 
-            image = f"files/photos/profil.png"
+            image = f"images/profil.png"
 
-            info = f"Nom: {deux_et[i]['last_name'].upper()}\n"
+            info = f"Nom: {clear_name(deux_et[i]['last_name'].upper())}\n"
             info += f"Prénom: {deux_et[i]['first_name']}\n"
             info += f"Né(e) le: {convert_date(deux_et[i]['date_birth'])} à {deux_et[i]['place_birth']}\n"
             if deux_et[i]['num_cin'] and deux_et[i]['num_cin'] != "None":
