@@ -91,7 +91,9 @@ export class UsersComponent implements OnInit, AfterContentInit {
     this.fetchData = this.fetchData.bind(this)
     let allMention: ResponseModel = await this.serviceMention.getDataPromise().toPromise()
     this.allMention = allMention.data
-    this.allRole = await this.roleService.getDataPromise().toPromise()
+    let allRole = await this.roleService.getDataPromise().toPromise()
+    this.allRole = allRole.data
+    
   }
 
   fetchData(params?: QueryParams){

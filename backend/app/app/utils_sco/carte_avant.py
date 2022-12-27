@@ -33,8 +33,8 @@ class PDF(FPDF):
             num_carte = f"{deux_et[i]['num_carte']}"
             niveau = f"{deux_et[i]['level']}"
             image_fac = f"images/{niveau.lower()}_avant.jpg"
-
-            image = f"images/profil.png"
+            profile = deux_et[i]['sex']
+            image = f"images/{profile.lower()}.png"
 
             info = f"Nom: {clear_name(deux_et[i]['last_name'].upper())}\n"
             info += f"Prénom: {deux_et[i]['first_name']}\n"

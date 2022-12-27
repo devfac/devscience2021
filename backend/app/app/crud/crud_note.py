@@ -66,11 +66,11 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.close()
         return out
 
-    def read_note_by_ue(self,semester: str, journey: str, session: str, list_ue: list):
+    def read_note_by_ue(self,semester: str, journey: str, session: str, list_ue: list, year: str):
         metadata = MetaData(bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
-        result = conn.execute(f"SELECT num_carte, {list_ue} FROM {table} ")
+        result = conn.execute(f"SELECT num_carte, {list_ue} FROM {table} WHERE year = '{year}'")
         out = result.fetchall()
         conn.close()
         return out

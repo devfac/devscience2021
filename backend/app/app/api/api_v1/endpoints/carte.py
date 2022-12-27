@@ -41,6 +41,7 @@ def create_carte(
         if on_student.num_carte and find_in_list(on_student.actual_years, college_year) != -1:
             stud = jsonable_encoder(on_student)
             stud['level'] = get_niveau(on_student.inf_semester, on_student.sup_semester)
+            stud['sex'] = on_student.sex
             stud['journey'] = crud.journey.get_by_uuid(db=db, uuid=on_student.uuid_journey).abbreviation
             all_student.append(stud)
 

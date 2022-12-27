@@ -27,7 +27,7 @@ export class RoleService {
   }
 
   getDataPromise(){
-    return this.http.get<Role[]>(`${BASE_URL}/roles/`,this.options);
+    return this.http.get<any>(`${BASE_URL}/roles/`,this.options);
   }
 
   deletData(uuid: string):Promise<Role[]> {

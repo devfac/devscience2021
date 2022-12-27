@@ -182,7 +182,7 @@ def get_by_matier_pdf(
     matier = ','.join(tuple(value_matier))
     notes = []
     mention = crud.mention.get_by_uuid(db=db, uuid=journey.uuid_mention)
-    all_note = crud.note.read_note_by_ue(semester, journey.abbreviation.lower(), session, matier)
+    all_note = crud.note.read_note_by_ue(semester, journey.abbreviation.lower(), session, matier, str(college_year))
     etudiant_admis = []
     etudiant_admis_compense = []
     for note in jsonable_encoder(all_note):
@@ -196,9 +196,10 @@ def get_by_matier_pdf(
             if note[f"ue_{value_ue}"] >= 10:
                 info_etudiants = {'N° Carte': note["num_carte"]}
                 un_etudiant = crud.ancien_student.get_by_num_carte(db=db, num_carte=note['num_carte'])
-                info_etudiants['nom'] = un_etudiant.last_name
-                info_etudiants['prenom'] = un_etudiant.first_name
-                etudiant_admis.append(info_etudiants)
+                if un_etudiant:
+                    info_etudiants['nom'] = un_etudiant.last_name
+                    info_etudiants['prenom'] = un_etudiant.first_name
+                    etudiant_admis.append(info_etudiants)
         else:
             etudiants['Crédit'] = get_credit(float(0), matier_ue.credit)
             etudiants['Status'] = get_status(float(0))
@@ -209,9 +210,10 @@ def get_by_matier_pdf(
                 if validation:
                     info_etudiants = {'N° Carte': note["num_carte"]}
                     un_etudiant = crud.ancien_student.get_by_num_carte(db=db, num_carte=note['num_carte'])
-                    info_etudiants['nom'] = un_etudiant.last_name
-                    info_etudiants['prenom'] = un_etudiant.first_name
-                    etudiant_admis_compense.append(info_etudiants)
+                    if un_etudiant:
+                        info_etudiants['nom'] = un_etudiant.last_name
+                        info_etudiants['prenom'] = un_etudiant.first_name
+                        etudiant_admis_compense.append(info_etudiants)
         notes.append(etudiants)
     data = {'mention': mention.title, 'journey': journey.title, 'anne': college_year, 'session': session}
     file = result_by_ue.PDF.create_result_by_ue(semester, journey, data, list(titre_note), notes, etudiant_admis,
