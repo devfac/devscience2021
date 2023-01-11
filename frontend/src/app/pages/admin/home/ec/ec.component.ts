@@ -159,7 +159,7 @@ export class EcComponent implements OnInit, AfterContentInit {
     }
 
     onDelete(row: any) {
-      this.showConfirm(row.title, row.uuid);
+      this.showConfirm(row.title+" "+row.semester+" "+row.journey.abbreviation, row.uuid);
     }
 
     onEdit(row: any) {

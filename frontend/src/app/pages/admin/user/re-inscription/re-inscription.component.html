@@ -32,6 +32,7 @@
               nzAllowClear
               formControlName="mention"
               [nzPlaceHolder]="'admin.home.mention.title' | translate"
+              (ngModelChange)="getAllJourney()"
               >
               <nz-option *ngFor="let item of allMention"
                   [nzLabel]="item.title"

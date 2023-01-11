@@ -10,7 +10,7 @@ class PDF(FPDF):
 
     def create_carte(pdf: FPDF, pos_init_y: int, long_init_y: int, deux_et: list, data: Any):
 
-        image_fac = f"images/{data['img_carte']}_arriere.jpg"
+        image_fac = f"images/arriere.jpg"
         logo_univ = "images/logo_univ.jpg"
         logo_fac = "images/logo_science.jpg"
 

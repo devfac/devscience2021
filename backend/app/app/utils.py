@@ -128,6 +128,11 @@ def create_year(year: str):
     return ann
 
 
+def get_last_year(year: str, bacc_year: str) -> bool:
+    if year[0:4] != bacc_year:
+        return False
+    return True
+
 def create_num_carte(plugged: str, num: str):
     key: str = plugged[0:1]
     nbr_zero: int = 6 - len(num)
@@ -436,17 +441,17 @@ def convert_date(date: str) -> str:
 def create_model(interactions: List[schemas.ValueUEEC]):
     result = []
     last_ue = {}
-    ue = {'name':None, 'credit':None, 'ec':[], 'type':'ue', 'value':0.0}
+    ue = {'name':None, 'title':None, 'credit':None, 'ec':[], 'type':'ue', 'value':0.0}
     ecs  = []
     name = ''
     interactions.append(ue)
     for interaction in interactions:
         if interaction['type'] == "ue":
-            last_ue = {'name':ue['name'], 'credit':ue['credit'], 'ec':ecs}
-            ue = {'name': interaction['name'], 'credit': interaction['value'], 'ec': ecs}
+            last_ue = {'name':ue['name'],'title':ue['title'], 'credit':ue['credit'], 'ec':ecs}
+            ue = {'name': interaction['name'], 'title': interaction['title'],'credit': interaction['value'], 'ec': ecs}
             ecs  = []
         else:
-            ec = {'name':interaction['name'], 'weight':interaction['value']}
+            ec = {'name':interaction['name'],'title':interaction['title'], 'weight':interaction['value']}
             ecs.append(ec)
         if last_ue['name'] and last_ue['name'] != name:
             result.append(last_ue)

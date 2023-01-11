@@ -228,6 +228,8 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
                 }
               this.total = result?.count || 0;
               this.data = [...this.new_data];
+              console.log(this.data);
+              
               
             },
             error: (err) => {

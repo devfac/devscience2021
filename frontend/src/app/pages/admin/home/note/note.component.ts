@@ -193,42 +193,22 @@ export class NoteComponent implements OnInit, AfterContentInit {
    
     this.headerSpan = []
     for (let index = 0; index<this.allColumns.length; index++){
-      let name = this.matierUe.find((item:Ue) => item.value ===  this.allColumns[index].name)
       let column: TableHeader;
-      if (name){
         column =  {
-          title: name.title,
+          title: this.allColumns[index].title,
           selector: "ue_"+this.allColumns[index].name,
           isSortable: false,
           colspan: this.allColumns[index].nbr_ec + 1,
-          }
-      }else{
-        column =  {
-          title: "Title",
-          selector: "ue_"+this.allColumns[index].name,
-          isSortable: false,
-          colspan: this.allColumns[index].nbr_ec + 1,
-          }
       }
       this.headers.push(column)
       for (let j=0; j<this.allColumns[index].nbr_ec; j++){
-            let name = this.matierEc.find((item:Ec) => item.value ===  this.allColumns[index].ec[j].name)
             let column: TableHeader;
-            if (name){
               column =  {
-                title: name.title,
+                title: this.allColumns[index].ec[j].title,
                 selector: "ec_"+this.allColumns[index].ec[j].name,
                 isSortable: false,
                 editable: true,
                 }
-            }else{
-              column =  {
-                title: "Title",
-                selector: "ec_"+this.allColumns[index].ec[j].name,
-                isSortable: false,
-                editable: true,
-                }
-            }
            this.headerData.push(column)
            this.headerSpan.push(column)
       }
@@ -347,6 +327,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
                       this.form.value.session,
                       this.form.value.collegeYear,
                     ).toPromise()
+                    console.log(this.allColumns);
                     
                     this.createHeaders()
                     this.showTable = true
@@ -536,9 +517,9 @@ export class NoteComponent implements OnInit, AfterContentInit {
   getEc(value_ue: string): void{
     const ue = this.matier.find((item:UeEc) => item.value === value_ue)
     if (ue){
-      this.interactionList.push({name:ue?.value, value:ue?.credit, type:'ue'})
+      this.interactionList.push({name:ue?.value, title:ue?.title, value:ue?.credit, type:'ue'})
       for (let index = 0; index<ue.ec.length ; index++){
-        this.interactionList.push({name:ue.ec[index].value, value:ue.ec[index].weight, type:'ec'})
+        this.interactionList.push({name:ue.ec[index].value, title:ue.ec[index].title, value:ue.ec[index].weight, type:'ec'})
       }
     }
 

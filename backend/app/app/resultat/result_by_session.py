@@ -161,10 +161,10 @@ class PDF(FPDF):
 
         pdf.set_font("arial", "BI", 10)
         pdf.cell(100, 5, txt="", align="L")
-        pdf.cell(0, 5, txt=text_3, ln=1, align="L")
+        pdf.cell(0, 5, txt=text_4, ln=1, align="L")
         pdf.cell(1, 22, txt="", ln=1)
         pdf.cell(100, 5, txt="", align="L")
-        pdf.cell(0, 5, txt=text_4, ln=1, align="L")
+        pdf.cell(0, 5, txt=text_3, ln=1, align="L")
 
         pdf.output(f"files/resultat_{sems}_{parcour}_{session}.pdf", "F")
         return f"files/resultat_{sems}_{parcour}_{session}.pdf"

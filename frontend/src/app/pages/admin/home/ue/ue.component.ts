@@ -108,7 +108,9 @@ export class UeComponent implements OnInit, AfterContentInit {
     this.allJourney = await this.serviceJourney.getDataByMention(this.form.get('mention')?.value).toPromise()
     let journey: ResponseModel = await this.serviceJourney.getDataPromise().toPromise()
     this.allJourneyList = journey.data
-    this.testStorage('journey', this.allJourney[0].uuid)
+    console.log(this.allJourney[0]);
+    if (this.allJourney.length >0){
+      this.testStorage('journey', this.allJourney[0].uuid)}
     
     for(let i=0; i<this.listOfSemester.length; i++){
       this.semesterTitles.push(
@@ -145,7 +147,7 @@ export class UeComponent implements OnInit, AfterContentInit {
   }
 
   onDelete(row: any) {
-    this.showConfirm(row.title, row.uuid);
+    this.showConfirm(row.title+" "+row.semester+" "+row.journey.abbreviation, row.uuid);
   }
 
   onEdit(row: any) {

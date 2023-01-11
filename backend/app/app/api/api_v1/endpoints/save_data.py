@@ -11,6 +11,7 @@ from app.utils import check_table_info, check_columns_exist, decode_schemas, che
 from fastapi import APIRouter, Depends, File, UploadFile, HTTPException
 from sqlalchemy.orm import Session
 from starlette.responses import FileResponse
+from fastapi.encoders import jsonable_encoder
 
 router = APIRouter()
 
@@ -85,6 +86,10 @@ def insert_from_xlsx(*,
 async def create_upload_file(*,
                              uploaded_file: UploadFile = File(...),
                              model_name: str = "student",
+                             college_year: str,
+                             uuid_mention: str,
+                             uuid_journey: str = "",
+                             db: Session = Depends(deps.get_db),
                              current_user: models.User = Depends(deps.get_current_active_user)
                              ):
     file_location = f"files/excel/uploaded/{uploaded_file.filename}"
@@ -102,6 +107,19 @@ async def create_upload_file(*,
                     detail=valid
                 )
             all_data = save_data.get_data_xlsx(file_location, table)
+    for data in all_data:
+        data_ = jsonable_encoder(data)
+        data_["uuid_mention"] = uuid_mention
+        data_["uuid_journey"] = uuid_journey
+        data_["actual_years"] = [college_year]
+        data_["receipt"] = ""
+        data_["mean"] = 10
+        data_["receipt_list"] = []
+        student = crud.ancien_student.get_by_num_carte(db=db, num_carte=data["num_carte"])
+        new_student = schemas.NewStudentCreate(**data_)
+        print(jsonable_encoder(new_student))
+        if not student:
+            crud.new_student.create(db=db, obj_in=new_student)
     os.remove(file_location)
     response = schemas.ResponseData(**{'count': len(all_data), 'data': all_data})
     return response

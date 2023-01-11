@@ -142,16 +142,13 @@ def get_all_columns(
     interaction = jsonable_encoder(interaction)
     interaction[semester.lower()] = list_value
     columns = interaction[semester.lower()]
-    print(create_model(columns))
     all_ue = []
     for ue in create_model(columns):
-        ues_ = {'name': crud.teaching_unit.get_by_value(db=db, value=ue['name'], uuid_journey=uuid_journey,
-                                                        semester=semester).value}
+        ues_ = {'name': ue['name'], 'title': ue['title']}
         nbr = 0
         all_ec = []
         for ec in ue['ec']:
-            ecs_ = {'name': crud.constituent_element.get_by_value(db=db, value=ec['name'], uuid_journey=uuid_journey,
-                                                                  semester=semester).value}
+            ecs_ = {'name': ec['name'], 'title': ec['title']}
             nbr += 1
             all_ec.append(ecs_)
         ues_['nbr_ec'] = nbr

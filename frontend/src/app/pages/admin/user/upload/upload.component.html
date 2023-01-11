@@ -68,7 +68,7 @@
             <h3 class="title-h3">Click or drag file to this area to upload</h3>
         </div>
           <nz-spin [nzSpinning]="isConfirmLoading">
-              <button nz-button class="form-button form-margin" [nzType]="'primary'">
+              <button nz-button class="form-button form-margin" [nzType]="'primary'" [disabled]="disabled">
                 {{'general_data.save' | translate | uppercase}}
               </button>
           </nz-spin>

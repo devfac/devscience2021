@@ -7,7 +7,7 @@ from app.api import deps
 from fastapi.responses import FileResponse
 from app.liste import liste_exams, liste_inscrit, liste_bourse, liste_select
 from app import crud
-from app.utils import decode_schemas, get_niveau, create_model, find_in_list
+from app.utils import decode_schemas, get_niveau, create_model, find_in_list, get_last_year
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
 
@@ -217,7 +217,8 @@ def list_bourse_passant(
                 students = {"last_name": student.last_name, "first_name": student.first_name, "num_carte": student.num_carte}
                 level = get_niveau(student.inf_semester, student.sup_semester)
                 if level == "L1":
-                    l1.append(students)
+                    if get_last_year(student.baccalaureate_years, college_year):
+                        l1.append(students)
                 if level == "L2":
                     l2.append(students)
                 if level == "L3":

@@ -35,7 +35,7 @@ export class RoleService {
   }
 
   getData(uuid: string){
-    return this.http.get<Role>(`${BASE_URL}/roles/`+uuid, this.options)
+    return this.http.get<Role>(`${BASE_URL}/roles/by_uuid/?uuid=`+uuid, this.options)
   }
 
   updateData(uuid: string, body: any){

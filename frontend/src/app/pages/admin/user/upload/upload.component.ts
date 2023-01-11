@@ -50,6 +50,7 @@ export class UploadComponent implements OnInit ,AfterContentInit{
   typeSituation=typeSituation
   isConfirmLoading=false
   isvisible=false
+  disabled = true
   initialise= false
   msg!: string ;
   url: string | ArrayBuffer | null = "";
@@ -205,6 +206,9 @@ export class UploadComponent implements OnInit ,AfterContentInit{
   selectFile(event: any){
     if(!event.target.files[0] || event.target.files[0].length == 0){
       this.msg = "select a file"
+      this.disabled = true
+    }else{
+    this.disabled = false
     }
     var mineType = event.target.files[0].type;
     if(mineType.match(/document\/*/) == null){
@@ -218,6 +222,7 @@ export class UploadComponent implements OnInit ,AfterContentInit{
       this.url = reader.result
     } 
     this.uploadedFile = event.target.files[0]
+    this.disabled = false
    }
 
    handleCancel(){

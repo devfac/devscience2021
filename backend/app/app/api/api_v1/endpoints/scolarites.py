@@ -170,16 +170,14 @@ def relever(
 
         all_ue = []
         for ue in create_model(columns):
-            ues_ = {'name': crud.teaching_unit.get_by_value(db=db, value=ue['name'], uuid_journey=journey.uuid,
-                                                            semester=semester).title,
+            ues_ = {'name': ue['title'],
                     'note':et_un_final[f"ue_{ue['name']}"],
                     'credit': ue['credit']
                     }
             all_ec = []
             for ec in ue['ec']:
                 ecs_ = {
-                    'name': crud.constituent_element.get_by_value(db=db, value=ec['name'], uuid_journey=journey.uuid,
-                                                                  semester=semester).title,
+                    'name': ec['title'],
                     'note':et_un_final[f"ec_{ec['name']}"],
                     'weight': ec['weight']
                 }

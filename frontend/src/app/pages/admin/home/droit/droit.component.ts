@@ -132,7 +132,8 @@ export class DroitComponent implements OnInit {
   }
 
   onDelete(row: any) {
-    this.showConfirm(row.title, row.uuid);
+    console.log(row);
+    this.showConfirm(row.mention.abbreviation+" "+row.level+" "+row.year, row.uuid);
   }
 
   onEdit(row: any) {

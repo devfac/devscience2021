@@ -226,6 +226,16 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
         this.isLoading = true
     }
   }
+  async getAllJourney(){
+    localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)
+    let uuidMention = localStorage.getItem(this.keyMention)
+      if(uuidMention !== null){
+        this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()}
+        this.fetchData = this.fetchData.bind(this)
+        this.isLoading = true
+    
+  }
+
   testStorage(key: string, value: string): boolean{
     if(localStorage.getItem(key)){
       this.form.get(key.substring(CODE.length))?.setValue(localStorage.getItem(key))
