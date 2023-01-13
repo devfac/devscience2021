@@ -44,16 +44,79 @@
 
       </div>
   </form>
-  <app-datatable-crud
-  *ngIf="isLoading"
-  [title]="'admin.user.upload.title' | translate"
-  [headers]="headers"
-  [fetchDataFn]="fetchData"
-  [width]="(headers.length)*180"
-  (add)="showModal()"
-  [showPagination]="true"
-  classNames="table"
-  ></app-datatable-crud>
+ 
+<div class="top-content">
+    <div class="send-request">
+      <button
+        nz-button
+        nzType="primary"
+        [disabled]="setOfCheckedId.size === 0"
+        [nzLoading]="loading"
+        (click)="sendRequest()"
+      >
+        Send Request
+      </button>
+      <span>Selected {{ setOfCheckedId.size }} items</span>
+    </div>
+    <div class="actions">
+      <button
+      nz-button
+      nzType="primary"
+      (click)="showModal()"
+      style="padding: 0px 16px"
+    >
+      <i nz-icon nzType="plus"></i>
+      {{ 'add' | translate | titlecase }}
+    </button>
+    </div>
+    </div>
+    <nz-table
+      #rowSelectionTable
+      nzShowPagination
+      [nzScroll]="{ x: '500px'}"
+      nzShowSizeChanger
+      [nzData]="listOfData"
+      (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
+    >
+      <thead>
+        <tr>
+          <th nzWidth="100px" [nzChecked]="checked" [nzIndeterminate]="indeterminate" (nzCheckedChange)="onAllChecked($event)"></th>
+          <th
+          *ngFor="let header of headers; trackBy: trackByIdSelector"
+          [nzWidth]="header.width ? header.width : null"
+          [nzColumnKey]="header.selector"
+          [colSpan]="header.colspan ? header.colspan : 1"
+          [rowSpan]="header.rowspan ? header.rowspan : 1"
+          [nzSortFn]="header.isSortable || null"
+          [nzShowSort]="header.isSortable"
+        >
+          {{ header.title | translate }}
+        </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of rowSelectionTable.data">
+          <td
+          [nzChecked]="setOfCheckedId.has(data.id)"
+          (nzCheckedChange)="onItemChecked(data.id, $event)"
+        ></td>
+          <ng-container *ngIf="headers.length > 0">
+            <td
+              *ngFor="let header of headers" 
+              [style]="header.style"
+            >
+              <ng-container *ngIf="header.template">
+                <ng-container
+                  *ngTemplateOutlet="
+                    header.template;
+                    context: { value: data[header.selector], row: data }
+                  "
+                ></ng-container>
+              </ng-container>
+            </ng-container>
+         
+      </tbody>
+    </nz-table>
   <nz-modal 
       [(nzVisible)]="isvisible" 
       nzTitle="{{'admin.home.upload.title' | translate}}"

@@ -16,6 +16,12 @@ import { typeEtudiant,typeSerie, typeSex, typeNation, typeSituation } from '@app
 import { UploadService } from './upload.service';
 import { ResponseModel } from '@app/models/response';
 
+export interface Data {
+  id: number;
+  name: string;
+  age: number;
+  address: string;
+}
 const CODE = "upload"
 @Component({
   selector: 'app-upload',
@@ -56,6 +62,13 @@ export class UploadComponent implements OnInit ,AfterContentInit{
   url: string | ArrayBuffer | null = "";
   uploadedFile: any;
 
+  checked = false;
+  loading = false;
+  indeterminate = false;
+  listOfData: readonly any[] = [];
+  listOfCurrentPageData: readonly Data[] = [];
+  setOfCheckedId = new Set<number>();
+
   constructor(
     private fb: FormBuilder, 
     private service: UploadService,
@@ -74,7 +87,7 @@ export class UploadComponent implements OnInit ,AfterContentInit{
       {
         title: 'Num Carte',
         selector: 'num_carte',
-        width:'120px',
+        width:'150px',
         type: TableHeaderType.LEFT,
         isSortable: false,
     },
@@ -86,62 +99,73 @@ export class UploadComponent implements OnInit ,AfterContentInit{
     },
     {
         title: 'Prénom',
+        width:'150px',
         selector: 'first_name',
         isSortable: false,
     },
     {
         title: 'Date de Naissance',
+        width:'150px',
         selector: 'date_birth',
         isSortable: false,
     },
     {
         title: 'Lieu de Naissance',
+        width:'150px',
         selector: 'place_birth',
         isSortable: false,
     },
     {
         title: 'Adresse',
+        width:'150px',
         selector: 'address',
         isSortable: false,
     },
     {
         title: 'Sexe',
+        width:'150px',
         selector: 'sex',
         template: this.sex,
         isSortable: false,
     },
     {
         title: 'Nation',
+        width:'150px',
         selector: 'nation',
         template: this.nation,
         isSortable: false,
     },
     {
         title: 'Series Bacc ',
+        width:'150px',
         selector: 'baccalaureate_series',
         template: this.baccSerie,
         isSortable: false,
     },
     {
         title: 'Semestre inf',
+        width:'150px',
         selector: 'baccalaureate_series',
         template: this.semester,
         isSortable: false,
     },
     {
         title: 'Semestre sup ',
+        width:'150px',
         selector: 'baccalaureate_series',
         template: this.semester,
         isSortable: false,
     },
     {
         title: 'Etat ',
+        width:'150px',
         selector: 'type',
         template: this.type,
         isSortable: false,
     },
     {
       title: 'Situation ',
+      width:'150px',
       selector: 'situation',
       template: this.situation,
       isSortable: false,
@@ -166,12 +190,19 @@ export class UploadComponent implements OnInit ,AfterContentInit{
     this.testStorage(this.keyYear, this.allYears[0].title)){
       let uuidMention = localStorage.getItem(this.keyMention)
       if(uuidMention !== null){
-        this.fetchData = this.fetchData.bind(this)
         this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()}
         this.isLoading = true
     }
 
     this.initialise = true
+
+    this.listOfData = new Array(100).fill(0).map((_, index) => ({
+      id: index,
+      name: `Edward King ${index}`,
+      age: 32,
+      address: `London, Park Lane no. ${index}`
+    }));
+  
   }
 
   getAllStudents(): void{
@@ -183,15 +214,6 @@ export class UploadComponent implements OnInit ,AfterContentInit{
     }
   }
 
-  fetchData(params?: QueryParams){
-    const formData = new FormData();
-    formData.append("uploaded_file", this.uploadedFile)
-    if (this.url !== "" && this.initialise){
-      return this.service.uploadFile(formData, "student")
-    }else{
-      return this.service.fakeData()}
-  }
-  
 
   testStorage(key: string, value: string): boolean{
     if(localStorage.getItem(key)){
@@ -239,5 +261,49 @@ export class UploadComponent implements OnInit ,AfterContentInit{
       this.datatable.fetchData()
       this.isvisible = false
    }
+  }
+
+  updateCheckedSet(id: number, checked: boolean): void {
+    if (checked) {
+      this.setOfCheckedId.add(id);
+    } else {
+      this.setOfCheckedId.delete(id);
+    }
+  }
+
+  onCurrentPageDataChange(listOfCurrentPageData: readonly Data[]): void {
+    this.listOfCurrentPageData = listOfCurrentPageData;
+    this.refreshCheckedStatus();
+  }
+
+  refreshCheckedStatus(): void {
+    const listOfEnabledData = this.listOfCurrentPageData;
+    this.checked = listOfEnabledData.every(({ id }) => this.setOfCheckedId.has(id));
+    this.indeterminate = listOfEnabledData.some(({ id }) => this.setOfCheckedId.has(id)) && !this.checked;
+  }
+
+  onItemChecked(id: number, checked: boolean): void {
+    this.updateCheckedSet(id, checked);
+    this.refreshCheckedStatus();
+  }
+
+  onAllChecked(checked: boolean): void {
+    this.listOfCurrentPageData
+      .forEach(({ id }) => this.updateCheckedSet(id, checked));
+    this.refreshCheckedStatus();
+  }
+
+  sendRequest(): void {
+    this.loading = true;
+    const requestData = this.listOfData.filter(data => this.setOfCheckedId.has(data.id));
+    console.log(requestData);
+    setTimeout(() => {
+      this.setOfCheckedId.clear();
+      this.refreshCheckedStatus();
+      this.loading = false;
+    }, 1000);
+  }
+  trackByIdSelector(_: number, item: any): string {
+    return item["id"];
   }
 }

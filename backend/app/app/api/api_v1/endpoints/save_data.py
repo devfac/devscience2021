@@ -118,8 +118,6 @@ async def create_upload_file(*,
         student = crud.ancien_student.get_by_num_carte(db=db, num_carte=data["num_carte"])
         new_student = schemas.NewStudentCreate(**data_)
         print(jsonable_encoder(new_student))
-        if not student:
-            crud.new_student.create(db=db, obj_in=new_student)
     os.remove(file_location)
     response = schemas.ResponseData(**{'count': len(all_data), 'data': all_data})
     return response
