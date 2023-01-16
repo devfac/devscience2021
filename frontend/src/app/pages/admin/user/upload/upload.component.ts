@@ -15,13 +15,13 @@ import { SelectionService } from '../selection/selection.service';
 import { typeEtudiant,typeSerie, typeSex, typeNation, typeSituation } from '@app/data/data';
 import { UploadService } from './upload.service';
 import { ResponseModel } from '@app/models/response';
+import { environment } from '@environments/environment';
+import { HttpParams } from '@angular/common/http';
+import { UtilsService } from '../../utils.service';
 
-export interface Data {
-  id: number;
-  name: string;
-  age: number;
-  address: string;
-}
+const BASE_URL = environment.authApiURL;
+
+
 const CODE = "upload"
 @Component({
   selector: 'app-upload',
@@ -44,7 +44,7 @@ export class UploadComponent implements OnInit ,AfterContentInit{
   allJourney: Journey[] = []
   allMention: Mention[] = []
   form!: FormGroup;
-  formList!: FormGroup
+  formTemplate!: FormGroup
   keyYear = CODE+"collegeYear"
   keyMention = CODE+"mention"
   keyJourney = CODE+"journey"
@@ -58,6 +58,8 @@ export class UploadComponent implements OnInit ,AfterContentInit{
   isvisible=false
   disabled = true
   initialise= false
+  initialiseTemplate= false
+  url_excel="assets/images/face.png";
   msg!: string ;
   url: string | ArrayBuffer | null = "";
   uploadedFile: any;
@@ -66,7 +68,7 @@ export class UploadComponent implements OnInit ,AfterContentInit{
   loading = false;
   indeterminate = false;
   listOfData: readonly any[] = [];
-  listOfCurrentPageData: readonly Data[] = [];
+  listOfCurrentPageData: readonly any[] = [];
   setOfCheckedId = new Set<number>();
 
   constructor(
@@ -75,12 +77,23 @@ export class UploadComponent implements OnInit ,AfterContentInit{
     private authUser: AuthService,
     private serviceJourney: JourneyService,
     private serviceMention: MentionService,
-    private serviceYears: CollegeYearService,) { 
+    private serviceYears: CollegeYearService,
+    private utlisService: UtilsService,) { 
       this.form = this.fb.group({
         mention: [null, Validators.required],
         collegeYear: [null, Validators.required],
         journey: [null, Validators.required],
-      });}
+      });
+      this.formTemplate = this.fb.group({
+        baccalaureate_series: [null],
+        inf_semester: [null],
+        sup_semester: [null],
+        sex: [null],
+        nation: [null],
+        type: [null],
+        situation: [null],
+      });
+    }
 
   ngAfterContentInit(): void {
     this.headers = [
@@ -145,14 +158,14 @@ export class UploadComponent implements OnInit ,AfterContentInit{
     {
         title: 'Semestre inf',
         width:'150px',
-        selector: 'baccalaureate_series',
+        selector: 'inf_semester',
         template: this.semester,
         isSortable: false,
     },
     {
         title: 'Semestre sup ',
         width:'150px',
-        selector: 'baccalaureate_series',
+        selector: 'sup_semester',
         template: this.semester,
         isSortable: false,
     },
@@ -195,26 +208,30 @@ export class UploadComponent implements OnInit ,AfterContentInit{
     }
 
     this.initialise = true
-
-    this.listOfData = new Array(100).fill(0).map((_, index) => ({
-      id: index,
-      name: `Edward King ${index}`,
-      age: 32,
-      address: `London, Park Lane no. ${index}`
-    }));
-  
   }
 
-  getAllStudents(): void{
-    if(this.form.get(this.keyYear.substring(CODE.length))?.value && 
-    this.form.get(this.keyMention.substring(CODE.length))?.value && this.isLoading){
-      localStorage.setItem(this.keyYear, this.form.get(this.keyYear.substring(CODE.length))?.value)
-      localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)
-      this.datatable.fetchData()
+  async getAllStudents(){
+    if(this.form.get(this.keyMention.substring(CODE.length))?.value && this.isLoading){
+      this.allJourney = await this.serviceJourney.getDataByMention(this.form.get(this.keyMention.substring(CODE.length))?.value ).toPromise()
     }
   }
+  
+  changeTemplate(row: any, title:string){
+    if (this.initialiseTemplate){
+      const value = this.formTemplate.get(title)?.value
+      row[title] = value
+    }
+    
+  }
+  startDownloadFace(){
+    let url: string = `${BASE_URL}/save_data/get_models/`;
 
-
+    let params = new HttpParams()
+      .append('model_name', "student")
+    let name: string = 'Model_students'
+    this.utlisService.download(url, params, name, ".xlsx");                   
+    this.isvisible = false;
+  }
   testStorage(key: string, value: string): boolean{
     if(localStorage.getItem(key)){
       this.form.get(key.substring(CODE.length))?.setValue(localStorage.getItem(key))
@@ -258,44 +275,57 @@ export class UploadComponent implements OnInit ,AfterContentInit{
    async submitForm(){
     const formData = new FormData();
     if (this.url !== "" && this.initialise){
-      this.datatable.fetchData()
+      this.isConfirmLoading = true
+      formData.append("uploaded_file", this.uploadedFile)
+      let listOfData: ResponseModel  = await this.service.uploadFile(formData, "student", this.form.value.mention, this.form.value.journey, this.form.value.collegeYear).toPromise()
+      this.listOfData = listOfData.data
+      this.isConfirmLoading = false
       this.isvisible = false
+      this.initialiseTemplate = true
    }
   }
 
-  updateCheckedSet(id: number, checked: boolean): void {
+
+  getValue(data: any, selector: string) {
+    const selectors = selector.split('.');
+    return selectors.reduce((a, prop) => a[prop], data);
+  }
+
+  updateCheckedSet(num_carte: number, checked: boolean): void {
     if (checked) {
-      this.setOfCheckedId.add(id);
+      this.setOfCheckedId.add(num_carte);
     } else {
-      this.setOfCheckedId.delete(id);
+      this.setOfCheckedId.delete(num_carte);
     }
   }
 
-  onCurrentPageDataChange(listOfCurrentPageData: readonly Data[]): void {
+  onCurrentPageDataChange(listOfCurrentPageData: readonly any[]): void {
     this.listOfCurrentPageData = listOfCurrentPageData;
     this.refreshCheckedStatus();
   }
 
   refreshCheckedStatus(): void {
     const listOfEnabledData = this.listOfCurrentPageData;
-    this.checked = listOfEnabledData.every(({ id }) => this.setOfCheckedId.has(id));
-    this.indeterminate = listOfEnabledData.some(({ id }) => this.setOfCheckedId.has(id)) && !this.checked;
+    this.checked = listOfEnabledData.every(({ num_carte }) => this.setOfCheckedId.has(num_carte));
+    this.indeterminate = listOfEnabledData.some(({ num_carte }) => this.setOfCheckedId.has(num_carte)) && !this.checked;
   }
 
-  onItemChecked(id: number, checked: boolean): void {
-    this.updateCheckedSet(id, checked);
+  onItemChecked(num_carte: number, checked: boolean): void {
+    this.updateCheckedSet(num_carte, checked);
     this.refreshCheckedStatus();
   }
 
   onAllChecked(checked: boolean): void {
     this.listOfCurrentPageData
-      .forEach(({ id }) => this.updateCheckedSet(id, checked));
+      .forEach(({ num_carte }) => this.updateCheckedSet(num_carte, checked));
     this.refreshCheckedStatus();
   }
 
-  sendRequest(): void {
+ async  sendRequest() {
     this.loading = true;
-    const requestData = this.listOfData.filter(data => this.setOfCheckedId.has(data.id));
+    const requestData = this.listOfData.filter(data => this.setOfCheckedId.has(data.num_carte));
+    let listOfData: ResponseModel  = await this.service.saveData(requestData, this.form.value.mention, this.form.value.journey, this.form.value.collegeYear).toPromise()
+    this.listOfData = listOfData.data
     console.log(requestData);
     setTimeout(() => {
       this.setOfCheckedId.clear();
@@ -304,6 +334,6 @@ export class UploadComponent implements OnInit ,AfterContentInit{
     }, 1000);
   }
   trackByIdSelector(_: number, item: any): string {
-    return item["id"];
+    return item["num_carte"];
   }
 }

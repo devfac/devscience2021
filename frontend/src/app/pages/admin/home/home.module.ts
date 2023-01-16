@@ -14,9 +14,10 @@ import { DetailsNoteComponent } from './details-note/details-note.component';
 import { PermissionComponent } from './permission/permission.component';
 import { DroitComponent } from './droit/droit.component';
 import { ClassroomComponent } from './classroom/classroom.component';
+import { BaccSerieComponent } from './bacc-serie/bacc-serie.component';
 
 @NgModule({
-  declarations: [HomeComponent, UsersComponent, MentionComponent, JourneyComponent, CollegeYearComponent, RoleComponent, UeComponent, EcComponent, NoteComponent, DetailsNoteComponent, PermissionComponent, DroitComponent, ClassroomComponent],
+  declarations: [HomeComponent, UsersComponent, MentionComponent, JourneyComponent, CollegeYearComponent, RoleComponent, UeComponent, EcComponent, NoteComponent, DetailsNoteComponent, PermissionComponent, DroitComponent, ClassroomComponent, BaccSerieComponent],
   imports: [SharedModule, HomeRoutingModule],
 })
 export class HomeModule { }

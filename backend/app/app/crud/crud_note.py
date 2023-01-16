@@ -45,7 +45,21 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         conn.execute(ins)
         conn.close()
 
-    def read_all_note(self, semester: str, journey: str, session: str, year:str):
+    def read_all_note(self, semester: str, journey: str, session: str, year:str, limit: int = 1000, skip: int = 0):
+        metadata = MetaData(bind=engine)
+        table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(table.columns.year == year)
+        sel = sel.offset(skip)
+        sel = sel.limit(limit)
+        sel = sel.order_by(table.columns.num_carte.asc())
+        result = conn.execute(sel)
+        out = result.fetchall()
+        conn.close()
+        return out
+
+    def read_all_note_count(self, semester: str, journey: str, session: str, year:str, ):
         metadata = MetaData(bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()

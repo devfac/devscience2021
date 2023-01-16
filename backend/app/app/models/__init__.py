@@ -13,3 +13,4 @@ from .interaction import Diploma, Validation, Interaction
 from .invitation import Invitation
 from .permission import Permission
 from .classroom import Classroom
+from .bacc_serie import BaccSerie

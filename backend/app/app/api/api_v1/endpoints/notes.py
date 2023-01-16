@@ -249,7 +249,7 @@ def inserts_student(
     else:
         students = crud.ancien_student.get_by_class(db=db,uuid_mention=uuid_mention,
                                                     uuid_journey= uuid_journey, semester=semester)
-
+        print("eto zao", students)
         for student in students:
             if find_in_list(student.actual_years, college_year) != -1:
                 et_un = crud.note.read_by_num_carte(semester=semester, journey=journey.abbreviation,
@@ -291,6 +291,8 @@ def get_all_notes(
         semester: str,
         session: str,
         uuid_journey: str,
+        limit: int = 100,
+        offset: int = 0,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
 
@@ -298,10 +300,12 @@ def get_all_notes(
     if not journey:
         raise HTTPException(status_code=400, detail="journey not found")
 
-    all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation,
+    all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation,limit=limit, skip=offset,
+                                       session=session, year=college_year)
+
+    all_note_count = crud.note.read_all_note_count(semester=semester, journey=journey.abbreviation,
                                        session=session, year=college_year)
     all_note_ = []
-    count = len(all_note)
     for note in all_note:
         note = jsonable_encoder(note)
         note['validation'] = False
@@ -312,6 +316,7 @@ def get_all_notes(
                 note['validation'] = True
         all_note_.append(note)
 
+    count = len(all_note_count)
     response = schemas.ResponseData(**{'count':count, 'data':all_note_})
     return response
 

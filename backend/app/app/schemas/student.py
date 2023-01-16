@@ -20,7 +20,6 @@ keys = [
     "montant",
     "bacc_anne",
     "etat",
-    "photo",
     "num_quitance",
     "date_quitance",
     "uuid_mention",
@@ -36,7 +35,6 @@ class StudentBase(BaseModel):
     place_birth: Optional[str] = None
     address: Optional[str] = None
     sex: Optional[str] = None
-    photo: Optional[str] = None
     nation: Optional[str] = None
     num_cin: Optional[str] = None
     date_cin: Optional[str] = None
@@ -88,7 +86,6 @@ class AncienStudentCreate(StudentBase):
     mean: float
     baccalaureate_years: str
     type: str
-    photo: str
     uuid_journey: UUID
     inf_semester: str
     sup_semester: str
@@ -96,7 +93,7 @@ class AncienStudentCreate(StudentBase):
 class NewStudentCreate(StudentBase):
     num_select: str
     last_name: str
-    first_name: str
+    first_name: Optional[str]
     date_birth: str
     place_birth: str
     address: str
@@ -106,10 +103,10 @@ class NewStudentCreate(StudentBase):
     date_cin: Optional[str] = None
     place_cin: Optional[str] = None
     type: str
-    photo: str
     receipt: Optional[Receipt]
     receipt_list: List[Optional[Receipt]]
     mean: float
+    baccalaureate_num: str
     baccalaureate_years: str
     baccalaureate_center: str
     baccalaureate_series: str
@@ -123,6 +120,37 @@ class NewStudentCreate(StudentBase):
     uuid_mention: UUID
     uuid_journey: UUID
 
+class NewStudentUploaded(StudentBase):
+    num_carte: str
+    last_name: str
+    first_name: Optional[str]
+    date_birth: str
+    place_birth: str
+    address: str
+    sex: str
+    nation: str
+    num_cin: Optional[str] = None
+    date_cin: Optional[str] = None
+    place_cin: Optional[str] = None
+    situation: str
+    telephone: Optional[str]
+    type: str
+    mean: float
+    baccalaureate_num: str
+    baccalaureate_years: str
+    baccalaureate_center: str
+    baccalaureate_series: str
+    work: str
+    receipt_list: Optional[List[str]]
+    father_name: Optional[str]
+    father_work: Optional[str]
+    mother_name: Optional[str]
+    mother_work: Optional[str]
+    parent_address: Optional[str]
+    inf_semester: Optional[str]
+    sup_semester: Optional[str]
+    uuid_mention: UUID
+    uuid_journey: UUID
 
 # Properties to receive via API on update
 class AncienStudentUpdate(StudentBase):

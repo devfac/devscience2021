@@ -177,6 +177,10 @@
         "title":"note details",
         "info":"Information étudiants",
         "title_note":"Note de l'etudiant semestre: {{semester}}"
+      },
+      "upload":{
+        "title":"Envoyer un ficher excel",
+        "get_model":"Télecharger un model excel"
       }
     },
     "student":{

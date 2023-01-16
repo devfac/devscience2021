@@ -430,13 +430,16 @@ def convert_date(date: str) -> str:
     month = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet",
             "Aout", "Séptembre", "Octobre", "Novembre","Décembre", ""]
     # 1995-10-20
-    if not date:
+    if not date :
         return ""
-    days = date[8:10]
-    year = date[0:4]
-    month_ = int(date[5:7])
-
-    return f"{days} {month[month_ - 1]} {year}"
+    try:
+        days = date[8:10]
+        year = date[0:4]
+        month_ = int(date[5:7])
+        return f"{days} {month[month_ - 1]} {year}"
+    except Exception as e:
+        print(e , date)
+        return  ""
 
 def create_model(interactions: List[schemas.ValueUEEC]):
     result = []

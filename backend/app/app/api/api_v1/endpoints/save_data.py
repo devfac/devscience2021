@@ -32,7 +32,8 @@ def get_models(
             columns = check_columns_exist("public", table)
             save_data.write_data_title(table, table, columns, "models")
 
-    return {"msg": "succes"}
+    file = f'files/excel/models/{model_name}.xlsx'
+    return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
 
 @router.get("/get_models_notes/")
@@ -97,6 +98,7 @@ async def create_upload_file(*,
         file_object.write(uploaded_file.file.read())
 
     all_data = []
+    all_data_filter = []
     all_table = check_table_info("public")
     for table in all_table:
         if table == model_name:
@@ -108,18 +110,19 @@ async def create_upload_file(*,
                 )
             all_data = save_data.get_data_xlsx(file_location, table)
     for data in all_data:
-        data_ = jsonable_encoder(data)
-        data_["uuid_mention"] = uuid_mention
-        data_["uuid_journey"] = uuid_journey
-        data_["actual_years"] = [college_year]
-        data_["receipt"] = ""
-        data_["mean"] = 10
-        data_["receipt_list"] = []
         student = crud.ancien_student.get_by_num_carte(db=db, num_carte=data["num_carte"])
-        new_student = schemas.NewStudentCreate(**data_)
-        print(jsonable_encoder(new_student))
+        if not student:
+            data_ = jsonable_encoder(data)
+            data_["uuid_mention"] = uuid_mention
+            data_["uuid_journey"] = uuid_journey
+            data_["actual_years"] = [college_year]
+            data_["receipt"] = ""
+            data_["mean"] = 10
+            data_["receipt_list"] = []
+            new_student = schemas.NewStudentUploaded(**data_)
+            all_data_filter.append(new_student)
     os.remove(file_location)
-    response = schemas.ResponseData(**{'count': len(all_data), 'data': all_data})
+    response = schemas.ResponseData(**{'count': len(all_data_filter), 'data': all_data_filter})
     return response
 
 
