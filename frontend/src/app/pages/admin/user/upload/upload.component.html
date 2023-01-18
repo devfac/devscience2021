@@ -67,7 +67,7 @@
       </div>
  
 <div class="top-content">
-    <div class="send-request">
+    <div class="actions">
       <button
         nz-button
         nzType="primary"
@@ -78,8 +78,6 @@
         Send Request
       </button>
       <span>Selected {{ setOfCheckedId.size }} items</span>
-    </div>
-    <div class="actions">
       <button
       nz-button
       nzType="primary"
@@ -168,18 +166,17 @@
                 <img src="assets/images/ic-upload-file.svg" alt="">
                 <h3 class="title-h3">Click or drag file to this area to upload</h3>
             </div>
-              <nz-spin [nzSpinning]="isConfirmLoading">
-                  <button nz-button class="form-button form-margin" [nzType]="'primary'" [disabled]="disabled">
+                  <button nz-button class="form-button form-margin" [nzLoading]="isConfirmLoading" [nzType]="'primary'" [disabled]="disabled">
                     {{'general_data.save' | translate | uppercase}}
                   </button>
-              </nz-spin>
         </form>
       </nz-tab>
 
       <nz-tab nzTitle="{{'admin.home.upload.get_model' | translate}}">
         <div nz-col  class="card">
           <img [src]="url_excel" alt="" *ngIf="url_excel">
-            <button nz-button nzType="primary"  class="button" (click)="startDownloadFace()">
+            <button nz-button nzType="primary" 
+            [nzLoading]="isConfirmLoading"  class="button" (click)="startDownloadFace()">
               <span nz-icon nzType="download"></span>
               {{'admin.home.upload.get_model' | translate}}
             </button>
@@ -235,7 +232,7 @@
     style="width: 100%;"
     >
     <nz-option *ngFor="let item of typeSerie"
-        [nzLabel]="item.label"
+        [nzLabel]="item.title"
         [nzValue]="item.value"
     >
     </nz-option>

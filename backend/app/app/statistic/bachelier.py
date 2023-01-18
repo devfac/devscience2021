@@ -77,7 +77,7 @@ class PDF(FPDF):
 
         pdf.cell(15, 10, txt="", ln=1, align="L")
 
-    def create_stat_bachelier(data: Any, all_etudiant, schemas: str, db: Session, uuid_mention: str):
+    def create_stat_bachelier(data: Any, all_etudiant,bacc_serie):
         titre_stat = [{"name": "Nouveau Bachelier en : ",
                        "value": ["Serie A1", "Serie A2", "Serie C", "Serie D", "Technique \n Génie civile",
                                  "Technique Industrielle", "Technique Tertiaire",

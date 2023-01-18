@@ -1,5 +1,5 @@
 <app-datatable-crud
-[title]="'admin.home.role.title' | translate"
+[title]="'admin.home.bacc_serie.title' | translate"
 [headers]="headers"
 [fetchDataFn]="fetchData"
 [actions]="actions"
@@ -11,7 +11,7 @@ classNames="table"
 
 <nz-modal 
       [(nzVisible)]="isvisible" 
-      nzTitle="{{'admin.home.role.add_role' | translate}}"
+      nzTitle="{{'admin.home.bacc_serie.add_bacc_serie' | translate}}"
       (nzOnCancel)="handleCancel()" 
       nzMask="true"
       nzMaskClosable="false">
@@ -21,10 +21,10 @@ classNames="table"
             <nz-form-label nzRequired>
               {{ 'admin.home.bacc.title' | translate }}
             </nz-form-label>
-            <nz-form-control [nzErrorTip]="'admin.home.role.role_error' | translate">
+            <nz-form-control [nzErrorTip]="'admin.home.bacc_serie.bacc_serie_error' | translate">
               <nz-input-group>
                 <input type="text" nz-input formControlName="title" appCustomAutoFocus
-                  [placeholder]="'admin.home.role.title' | translate" />
+                  [placeholder]="'admin.home.bacc_serie.title' | translate" />
               </nz-input-group>
             </nz-form-control>
           </nz-form-item>

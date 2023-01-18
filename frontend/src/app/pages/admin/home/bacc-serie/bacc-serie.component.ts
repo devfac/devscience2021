@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { QueryParams } from '@app/models/query';
-import { Role } from '@app/models/role';
 import { TableHeader } from '@app/models/table';
 import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
 import { parseQueryParams } from '@app/shared/utils';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
-import { RoleService } from '../role/role.service';
+import { BaccSerieService } from './bacc-serie.service';
+import { BaccSerie } from '@app/models/bacc-serie';
 
 @Component({
   selector: 'app-bacc-serie',
@@ -17,7 +17,7 @@ export class BaccSerieComponent implements OnInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
   headers: TableHeader[] = [];
 
-  allRole: Role[] = []
+  allBaccSerie: BaccSerie[] = []
   confirmModal?: NzModalRef;
   form!: FormGroup;
   isvisible = false;
@@ -35,7 +35,7 @@ export class BaccSerieComponent implements OnInit {
   constructor(
     private modal: NzModalService, 
     private fb: FormBuilder,
-    private service: RoleService
+    private service: BaccSerieService
     ) {
       this.form = this.fb.group({
         title: [null, [Validators.required]],

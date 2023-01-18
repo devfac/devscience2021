@@ -163,6 +163,13 @@ export class HomeService {
       icon: 'home',
     },
     {
+      id: 12,
+      title: 'admin.home.bacc_serie.title',
+      route: 'bacc-serie',
+      selected: '/home/bacc-serie',
+      icon: 'home',
+    },
+    {
       id: 6,
       title: 'admin.home.ue.title',
       route: 'ue',

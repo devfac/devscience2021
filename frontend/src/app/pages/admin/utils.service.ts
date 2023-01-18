@@ -27,9 +27,7 @@ export class UtilsService {
     control?.patchValue(this.convertNumber(control.value, precision));
   }
 
-  download(url: string, params: HttpParams, name: string, extention:string = ".pdf"): void{
-    console.log(params);
-    
+  download(url: string, params: HttpParams, name: string, extention:string = ".pdf"): boolean{
     this.downloads
       .download(url, this.headers, params)
       .subscribe(blob => {
@@ -39,6 +37,8 @@ export class UtilsService {
         a.download = name+extention;
         a.click();
         URL.revokeObjectURL(objectUrl);
+        return true
       })
+      return false
   }
 }

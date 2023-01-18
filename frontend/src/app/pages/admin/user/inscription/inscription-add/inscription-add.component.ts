@@ -15,6 +15,8 @@ import { environment } from '@environments/environment';
 import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { UserService } from '../../user.service';
 import { InscriptionService } from '../inscription.service';
+import { BaccSerieService } from '@app/pages/admin/home/bacc-serie/bacc-serie.service';
+import { BaccSerie } from '@app/models/bacc-serie';
 
 const CODE = "inscription"
 const BASE_URL = environment.authApiURL;
@@ -46,7 +48,7 @@ export class InscriptionAddComponent implements OnInit {
   typeSex = typeSex
   typeSituation = typeSituation
   typeNation = typeNation
-  typeSerie = typeSerie
+  typeSerie: BaccSerie[] = []
   isReady: boolean = false
 
   keyMention = CODE+"mention"
@@ -81,6 +83,7 @@ export class InscriptionAddComponent implements OnInit {
     private inscriptionService: InscriptionService,
     private serviceJourney: JourneyService,
     private serviceMention: MentionService,
+    private serviceBacc: BaccSerieService,
     public router: Router ) {
 
     this.form = this.fb.group({
@@ -146,6 +149,8 @@ export class InscriptionAddComponent implements OnInit {
    }
 
   async ngOnInit(){
+    const baccSerie = await this.serviceBacc.getDataPromise().toPromise()
+    this.typeSerie = baccSerie.data
     const numSelect = localStorage.getItem(this.keyNum)
     const year = localStorage.getItem(this.keyYear)
     if(numSelect && numSelect.length>0 && year){

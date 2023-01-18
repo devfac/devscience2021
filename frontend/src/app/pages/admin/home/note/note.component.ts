@@ -104,6 +104,12 @@ export class NoteComponent implements OnInit, AfterContentInit {
   year: string = ""
   session: string = "Normal"
   interactionResult: Interaction[] = []
+  disabled = true
+  initialiseTemplate= false
+  url_excel="assets/images/face.png";
+  msg!: string ;
+  url: string | ArrayBuffer | null = "";
+  uploadedFile: any;
 
   keyMention = CODE+"mention"
   keyYear = CODE+"collegeYear"
@@ -557,6 +563,8 @@ export class NoteComponent implements OnInit, AfterContentInit {
         ue.push(modelUe)
       }
     let model = {"num_carte":note["num_carte"], "ue":ue}
+    console.log(model);
+    
     await this.noteService.insertNote(this.form.value.semester, this.form.value.journey, 
       this.form.value.session, this.form.value.collegeYear, model).toPromise()
       this.datatable.fetchData()
@@ -813,6 +821,27 @@ export class NoteComponent implements OnInit, AfterContentInit {
     localStorage.setItem('semester', this.form.value.semester)
     this.router.navigate(['/user/note-details'])
 }
+selectFile(event: any){
+  if(!event.target.files[0] || event.target.files[0].length == 0){
+    this.msg = "select a file"
+    this.disabled = true
+  }else{
+  this.disabled = false
+  }
+  var mineType = event.target.files[0].type;
+  if(mineType.match(/document\/*/) == null){
+    this.msg = "select image"
+  }
+  var reader = new FileReader();
+  reader.readAsDataURL(event.target.files[0])
+
+  reader.onload = (_event) =>{
+    this.msg = ""
+    this.url = reader.result
+  } 
+  this.uploadedFile = event.target.files[0]
+  this.disabled = false
+ }
 
 }
 

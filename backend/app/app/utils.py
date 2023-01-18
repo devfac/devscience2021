@@ -302,7 +302,7 @@ def check_table_info(schemas: str) -> list:
     return all_table
 
 
-def check_table_note(schemas: str) -> list:
+def check_table_note(schemas: str ="public") -> list:
     all_table = []
     metadata = MetaData(schema=schemas)
     metadata.reflect(bind=engine)

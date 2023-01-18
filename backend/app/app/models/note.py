@@ -8,7 +8,7 @@ from app.db.session import engine
 def create_table_note( journey, semester,session ,matiers) -> bool:
     try:
         base =  MetaData()
-        # table notes
+        # table note
         note = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}",base,
             Column("num_carte",String, primary_key=True),
         )
@@ -42,7 +42,7 @@ def update_table_note(journey, semester,session ,column) -> bool:
 def drop_table_note(journey,session, semester) -> bool:
     try:
         base =  MetaData(bind=engine)
-        # table notes
+        # table note
         note = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", base, autoload=True )
         note.drop(engine)
         return True

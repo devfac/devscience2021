@@ -128,7 +128,7 @@ def statistic_by_diplome(
     etudiants = []
     for num in etudiants_num:
         un_et = {}
-        un_etudiant = crud.ancien_etudiant.get_by_num_carte(schemas, num.num_carte)
+        un_etudiant = crud.new_student.get_by_num_carte(schemas, num.num_carte)
         un_et["diplome"] = num.diplome
         un_et["info"] = un_etudiant
         etudiants.append(un_et)
@@ -147,8 +147,8 @@ def renseignement(
     """
     statistic_by_years
     """
-    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schemas))
-    if not anne_univ:
+    college_year = crud.college_year.get_by_title(db, decode_schemas(schema=schemas))
+    if not college_year:
         raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.", )
 
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
@@ -170,23 +170,23 @@ def renseignement(
 
 @router.get("/bachelier/")
 def bachelier_(
-        schemas: str,
+        college_year: str,
         uuid_mention: str,
         db: Session = Depends(deps.get_db),
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    statistic_by_years
+    statistic_bachelier
     """
-    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schemas))
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schemas)} not found.", )
+    college_year = crud.college_year.get_by_title(db, college_year)
+    if not college_year:
+        raise HTTPException(status_code=400, detail=f"{college_year} not found.", )
 
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid_mention)
     if not mention:
         raise HTTPException(status_code=400, detail=f" Mention not found.", )
     niveau = ["L1"]
-    etudiants = crud.new_student.get_by_mention(schemas, str(uuid_mention))
+    etudiants = crud.new_student.get_by_mention(uuid_mention)
     info = {}
     for niv in niveau:
         all_etudiants = []
@@ -194,8 +194,11 @@ def bachelier_(
             if un_etudiant.niveau == niv:
                 all_etudiants.append(un_etudiant)
         info[niv] = all_etudiants
-    data = {"annee": decode_schemas(schemas), "mention": mention.title}
-    file = bachelier.PDF.create_stat_bachelier(data, info, schemas, db, uuid_mention)
+    data = {"annee": college_year, "mention": mention.title}
+    bacc_serie = crud.bacc_serie.get_multi(db=db, order_by="title")
+    bacc_serie.append("Autre")
+    bacc_serie.append("Ensemble")
+    file = bachelier.PDF.create_stat_bachelier(data, info, bacc_serie)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
 @router.get("/dashboard")

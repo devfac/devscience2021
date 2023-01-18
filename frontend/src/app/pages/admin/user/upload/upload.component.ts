@@ -18,6 +18,8 @@ import { ResponseModel } from '@app/models/response';
 import { environment } from '@environments/environment';
 import { HttpParams } from '@angular/common/http';
 import { UtilsService } from '../../utils.service';
+import { BaccSerieService } from '../../home/bacc-serie/bacc-serie.service';
+import { BaccSerie } from '@app/models/bacc-serie';
 
 const BASE_URL = environment.authApiURL;
 
@@ -51,7 +53,7 @@ export class UploadComponent implements OnInit ,AfterContentInit{
   isLoading: boolean = false
   typeSex = typeSex
   typeNation=typeNation
-  typeSerie=typeSerie
+  typeSerie: BaccSerie[] = []
   typeEtudiant=typeEtudiant
   typeSituation=typeSituation
   isConfirmLoading=false
@@ -78,7 +80,8 @@ export class UploadComponent implements OnInit ,AfterContentInit{
     private serviceJourney: JourneyService,
     private serviceMention: MentionService,
     private serviceYears: CollegeYearService,
-    private utlisService: UtilsService,) { 
+    private utlisService: UtilsService,
+    private serviceBacc: BaccSerieService,) { 
       this.form = this.fb.group({
         mention: [null, Validators.required],
         collegeYear: [null, Validators.required],
@@ -187,7 +190,8 @@ export class UploadComponent implements OnInit ,AfterContentInit{
   }
 
   async ngOnInit() {
-
+    const baccSerie = await this.serviceBacc.getDataPromise().toPromise()
+    this.typeSerie = baccSerie.data
     const user = this.authUser.userValue
     for(let i=0; i<user?.uuid_mention.length;i++){
       let mention = await this.serviceMention.getData(user?.uuid_mention[i]).toPromise()

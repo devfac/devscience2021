@@ -13,17 +13,16 @@ router = APIRouter()
 @router.get("/", response_model=schemas.ResponseData)
 def read_bacc_series(
     db: Session = Depends(deps.get_db),
+    limit: int = 100,
+    offset: int = 0,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve bacc_series.
     """
-    if crud.user.is_superuser(current_user):
-        bacc_serie = crud.bacc_serie.get_multi(db=db)
-        count = len(crud.bacc_serie.get_count(db=db))
-        response = schemas.ResponseData(**{'count':count, 'data':bacc_serie})
-    else:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+    bacc_serie = crud.bacc_serie.get_multi(db=db, limit=limit, skip=offset, order_by="title")
+    count = len(crud.bacc_serie.get_count(db=db))
+    response = schemas.ResponseData(**{'count':count, 'data':bacc_serie})
     return response
 
 

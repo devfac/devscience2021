@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Role } from '@app/models/role';
+import { BaccSerie } from '@app/models/bacc-serie';
 import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
 
@@ -22,26 +22,26 @@ export class BaccSerieService {
   }
   
   getDataObservable(params_?: HttpParams): Observable<any> {
-    return this.http.get<Role[]>(`${BASE_URL}/roles/`, {headers: this.headers, params: params_});
+    return this.http.get<BaccSerie[]>(`${BASE_URL}/bacc_serie/`, {headers: this.headers, params: params_});
   }
 
   getDataPromise(){
-    return this.http.get<any>(`${BASE_URL}/roles/`,this.options);
+    return this.http.get<any>(`${BASE_URL}/bacc_serie/`,this.options);
   }
 
-  deletData(uuid: string):Promise<Role[]> {
-    return this.http.delete<Role[]>(`${BASE_URL}/roles/?uuid=`+uuid, this.options).toPromise()
+  deletData(uuid: string):Promise<BaccSerie[]> {
+    return this.http.delete<BaccSerie[]>(`${BASE_URL}/bacc_serie/?uuid=`+uuid, this.options).toPromise()
   }
 
   getData(uuid: string){
-    return this.http.get<Role>(`${BASE_URL}/roles/by_uuid/?uuid=`+uuid, this.options)
+    return this.http.get<BaccSerie>(`${BASE_URL}/bacc_serie/by_uuid/?uuid=`+uuid, this.options)
   }
 
   updateData(uuid: string, body: any){
-    return this.http.put<Role[]>(`${BASE_URL}/roles/?uuid=`+uuid, body, this.options)
+    return this.http.put<BaccSerie[]>(`${BASE_URL}/bacc_serie/?uuid=`+uuid, body, this.options)
   }
 
   addData(body: any){
-    return this.http.post<Role[]>(`${BASE_URL}/roles/`,body, this.options)
+    return this.http.post<BaccSerie[]>(`${BASE_URL}/bacc_serie/`,body, this.options)
   }
 }

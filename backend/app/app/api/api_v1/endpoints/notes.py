@@ -362,11 +362,8 @@ def updates_note(
     moy_fin = 0
     credit_fin = 0
     somme = 0
-    #for notes in all_notes_ue:
+    #for note in all_notes_ue:
 
-    ScriptLogging(current_user.email)
-    logger = logging.getLogger(current_user.email)
-    logger.info(f"note {all_notes_ue.ue} updated")
     for note in all_notes_ue.ue:
         for column_ in create_model(columns):
             if note.name == column_['name']:

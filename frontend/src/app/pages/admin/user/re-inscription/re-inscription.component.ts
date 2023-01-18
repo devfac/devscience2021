@@ -371,6 +371,7 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
   }
 
   startDownloadFace(){
+    this.isConfirmLoading= true
     let url: string = `${BASE_URL}/carte/carte_student/`;
 
     let params = new HttpParams()
@@ -381,10 +382,12 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
     const mention = this.allMention.find((item: Mention) => item.uuid === this.form.value.mention);
     let name: string = 'Face_carte'+mention?.abbreviation
     this.utlisService.download(url, params, name);
+    this.isConfirmLoading= false
     this.isvisible = false;
   }
 
   startDownloadPile(){
+    this.isConfirmLoading= true
     let url: string = `${BASE_URL}/carte/carte_after/`;
 
     let params = new HttpParams()
@@ -396,9 +399,11 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
     let name: string = 'Arriere_carte'+mention?.abbreviation;
     this.utlisService.download(url, params, name);
     this.isvisible = false;
+    this.isConfirmLoading= false
   }
 
-  startDownloadPassant(){
+  async startDownloadPassant(){
+    this.isConfirmLoading= true
     let url: string = `${BASE_URL}/liste/list_bourse_passant/`;
 
     let params = new HttpParams()
@@ -407,8 +412,11 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
 
     const mention = this.allMention.find((item: Mention) => item.uuid === this.form.value.mention);
     let name: string = 'Bourse_Passant'+mention?.abbreviation
-    this.utlisService.download(url, params, name);
-    this.isvisible = false;
+    const data= this.utlisService.download(url, params, name);
+    if (data){
+      this.isvisible = false;
+      this.isConfirmLoading= false
+    }
   }
 
   startDownloadRedoublant(){

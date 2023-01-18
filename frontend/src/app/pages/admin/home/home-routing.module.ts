@@ -13,6 +13,7 @@ import { PermissionComponent } from './permission/permission.component';
 import { RoleComponent } from './role/role.component';
 import { UeComponent } from './ue/ue.component';
 import { UsersComponent } from './users/users.component';
+import { BaccSerieComponent } from './bacc-serie/bacc-serie.component';
 
 const routes: Routes = [
   { path: '',
@@ -81,6 +82,11 @@ const routes: Routes = [
       path: 'classroom',
       component: ClassroomComponent,
       data: { breadcrumb: 'admin.home.classroom.title' },
+    },
+    {
+      path: 'bacc-serie',
+      component: BaccSerieComponent,
+      data: { breadcrumb: 'admin.home.bacc_serie.title' },
     },
   ]
  },

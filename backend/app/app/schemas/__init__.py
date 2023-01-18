@@ -13,7 +13,7 @@ from .etudiant import EtudiantNouveau, EtudiantNouveauCreate, EtudiantNouveauUpd
 from .matier import MatierEC, MatierECCreate, MatierECInDB, MatierECUpdate
 from .matier import MatierUE, MatierUECreate, MatierUEInDB, MatierUEUpdate, MatierUEEC
 from .matier import MatierUni
-from .note import Note
+from .note import Note, NoteUE
 from .resultat import Resultat
 from .diploma import Diploma, DiplomaCreate, DiplomaUpdate, DiplomaInDB
 from .droit import Droit, DroitUpdate, DroitCreate, DroitInDB
