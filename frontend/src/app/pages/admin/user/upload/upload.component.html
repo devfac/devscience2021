@@ -80,6 +80,7 @@
       <span>Selected {{ setOfCheckedId.size }} items</span>
       <button
       nz-button
+      [disabled]="form.invalid"
       nzType="primary"
       (click)="showModal()"
       style="padding: 0px 16px"

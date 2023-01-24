@@ -3,10 +3,10 @@ from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from fastapi.encoders import jsonable_encoder
 
 from app import crud, models, schemas
 from app.api import deps
+from app.utils import format_date
 
 router = APIRouter()
 
@@ -39,18 +39,25 @@ def create_permission(
     user = crud.user.get_by_email(db=db, email=permission_in.email)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    expiration_date = datetime.utcnow() + timedelta(hours=permission_in.time)
+    expiration_date = datetime.now() + timedelta(hours=permission_in.time)
     permission_model = schemas.PermissionCreateModel(**{'email':permission_in.email,
-                                                       'expiration_date':expiration_date,
+                                                       'expiration_date':expiration_date.astimezone(),
                                                        'accepted':permission_in.accepted,
-                                                       'type':permission_in.type})
+                                                       'type':permission_in.type,
+                                                       'updated_at':datetime.now().astimezone()
+                                                        })
     permission = crud.permission.get_by_email_and_type(db=db, email=permission_model.email, type_=permission_in.type)
     if not permission:
         permission = crud.permission.create(db=db, obj_in=permission_model, email_sender=current_user.email)
     else:
-        permissionUpdate: schemas.PermissionUpdate(**jsonable_encoder(permission_model), email_sender=current_user.email,
-                                                   updated_at=datetime.now())
-        permission = crud.permission.update(db=db, obj_in=permission_model, db_obj=permission)
+        permissionUpdate= schemas.PermissionUpdate(**{  'email':permission_in.email,
+                                                        'expiration_date':expiration_date.astimezone(),
+                                                        'accepted':permission_in.accepted,
+                                                        'type':permission_in.type,
+                                                        'updated_at':datetime.now().astimezone(),
+                                                        'email_sender' : current_user.email
+                                                        })
+        permission = crud.permission.update(db=db, obj_in=permissionUpdate, db_obj=permission)
     return permission
 
 @router.get("/get_by_email_and_type/", response_model=schemas.Permission)
@@ -66,10 +73,11 @@ def get_by_email_and_type(
     """
     permission = crud.permission.get_by_email_and_type(db=db, email=email, type_=type_)
     if permission:
-        if datetime.utcnow() >= permission.expiration_date:
+        if format_date() >= format_date(date_=permission.expiration_date):
             permission_obj = schemas.PermissionUpdate(**{'accepted':False})
             permission = crud.permission.update(db=db, obj_in=permission_obj, db_obj=permission)
-    return permission
+        return permission
+    return schemas.Permission(**{'accepted':False})
 
 
 @router.delete("/", response_model=schemas.Permission)

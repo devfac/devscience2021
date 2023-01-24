@@ -27,6 +27,8 @@ def set_police_name(mot: str, dim: int) -> int:
         elif len(mot) <= 47:
             return 7
         elif len(mot) <= 54:
+            return 7
+        else:
             return 6
     elif dim == 108:
         if len(mot) <= 50:
@@ -163,6 +165,8 @@ class PDF(FPDF):
             for i, etudiant in enumerate(etudiants):
                 num_carte_ = f"{etudiant['num_carte']}"
                 name = f"{clear_name(etudiant['last_name'])} {etudiant['first_name']}"
+                if etudiant['num_carte'] == "33":
+                    print(dim-34, name, len(name))
                 pdf.cell(1, 7, txt="", ln=1)
                 pdf.set_font("arial", "I", 10)
                 pdf.cell(1, 5, txt="")

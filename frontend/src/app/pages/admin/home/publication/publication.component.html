@@ -1,0 +1,108 @@
+
+  <app-datatable-crud
+  [title]="'admin.home.publication.title' | translate"
+  [headers]="headers"
+  [fetchDataFn]="fetchData"
+  [width]="500"
+  [actions]="actions"
+  (delete)="onDelete($event)"
+  (edit)="onEdit($event)"
+  (add)="onAdd()"
+  classNames="table"
+  ></app-datatable-crud>
+
+    <nz-modal [(nzVisible)]="isvisible" 
+              nzTitle="{{'admin.home.classroom.add_classroom' | translate}}" 
+              (nzOnCancel)="handleCancel()" 
+              nzMask="true"
+              nzMaskClosable="false" >
+    <div *nzModalContent>
+        <form nz-form [formGroup]="form" class="form_years" (ngSubmit)="submitForm()" nzLayout="vertical">
+            <nz-form-item>
+              <nz-form-label nzRequired>
+                {{ 'admin.home.publication.title' | translate }}
+              </nz-form-label>
+              <nz-form-control [nzErrorTip]="'admin.home.value_error' | translate">
+                <nz-input-group>
+                  <input type="text" nz-input formControlName="title" appCustomAutoFocus
+                    [placeholder]="'admin.home.publication.title' | translate" />
+                </nz-input-group>
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+              <nz-form-label nzRequired>
+                {{ 'admin.home.publication.type' | translate }}
+              </nz-form-label>
+            <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+                <nz-select
+                    nzAllowClear
+                    formControlName="type"
+                    [nzPlaceHolder]="'admin.home.publication.type' | translate"
+                    (ngModelChange)="changeFile()"
+                    >
+                    <nz-option *ngFor="let item of typePublicationn"
+                        [nzLabel]="item.label"
+                        [nzValue]="item.value"
+                    >
+                    </nz-option>
+                </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+            <div class="container" *ngIf="isVisible">
+              <input type="file" #fileDropRef id="fileDropRef" (change)="selectFile($event)" class="input" />
+              <img src="assets/images/ic-upload-file.svg" alt="">
+              <h3 class="title-h3">Click or drag file to this area to upload</h3>
+          </div>
+
+            <nz-form-item>
+                <nz-form-label>
+                  {{ 'admin.home.publication.auteur' | translate }}
+                </nz-form-label>
+                <nz-form-control [nzErrorTip]="'admin.home.value_error' | translate">
+                  <nz-input-group>
+                    <input type="text" nz-input formControlName="auteur" appCustomAutoFocus
+                      [placeholder]="'admin.home.publication.auteur' | translate" />
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item>
+                <nz-form-label>
+                  {{ 'admin.home.publication.description' | translate }}
+                </nz-form-label>
+                <nz-form-control [nzErrorTip]="'admin.home.value_error' | translate">
+                  <nz-input-group>
+                    <textarea
+                    formControlName="description"
+                    nz-input
+                    placeholder="Descriptions"
+                    [nzAutosize]="{ minRows: 1, maxRows: 8 }"
+                ></textarea>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+
+            <nz-form-item >
+                <nz-form-label nzRequired>
+                  {{ 'admin.home.publication.expiration_date' | translate }}
+                </nz-form-label>
+                <nz-form-control [nzErrorTip]="'admin.home.value_error' | translate">
+                  <nz-input-group>
+                    <nz-date-picker formControlName="expiration" ></nz-date-picker>
+                  </nz-input-group>
+                </nz-form-control>
+              </nz-form-item>
+
+            <nz-spin [nzSpinning]="isConfirmLoading">
+                <button nz-button class="form-button form-margin" [nzType]="'primary'">
+                  {{'general_data.save' | translate | uppercase}}
+                </button>
+            </nz-spin>
+
+      </form>
+    </div>
+    
+    <div *nzModalFooter>
+        </div>
+    </nz-modal>

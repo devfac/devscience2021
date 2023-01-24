@@ -23,7 +23,7 @@ def list_examen(
         session: str,
         salle: str,
         skip: int = 1,
-        limit: int = 100,
+        limit: int = 1000,
         db: Session = Depends(deps.get_db),
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -62,13 +62,11 @@ def list_examen(
         )
     all_ue = []
     for ue in create_model(columns):
-        ues_ = {'name': crud.teaching_unit.get_by_value(db=db, value=ue['name'],uuid_journey=uuid_journey,
-                                                        semester=semester).title}
+        ues_ = {'name': ue['title']}
         nbr = 0
         all_ec = []
         for ec in ue['ec']:
-            ecs_ = {'name': crud.constituent_element.get_by_value(db=db, value=ec['name'],uuid_journey=uuid_journey,
-                                                        semester=semester).title}
+            ecs_ = {'name': ec['title']}
             nbr += 1
             all_ec.append(ecs_)
         ues_['nbr_ec'] = nbr
@@ -77,7 +75,9 @@ def list_examen(
     matiers['ue'] = all_ue
 
     students = crud.ancien_student.get_by_class_limit(db=db, uuid_journey=uuid_journey,uuid_mention=uuid_mention,
-                                                      semester=semester,skip=skip, limit=limit)
+                                                      semester=semester,skip=skip, limit=limit-skip)
+    print(len(students))
+
     all_students = []
     if len(students) == 0:
         raise HTTPException(
@@ -97,7 +97,7 @@ def list_examen(
     data['anne'] = college_year
     data['session'] = session
     data['salle'] = salle
-    data['skip'] = skip
+    data['skip'] = skip + 1
     data['limit'] = limit
     file = liste_exams.PDF.create_list_examen(semester, journey.abbreviation, data, matiers, all_students)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)

@@ -30,7 +30,12 @@ class PermissionCreate(BaseModel):
 
 # Properties to receive via API on update
 class PermissionUpdate(PermissionBase):
-    pass
+    email_sender: Optional[str]
+    email: Optional[str]
+    type: Optional[str]
+    expiration_date: Optional[datetime]
+    accepted: Optional[bool]
+    updated_at: Optional[datetime] = datetime.now().astimezone()
 
 
 class PermissionInDBBase(PermissionBase):

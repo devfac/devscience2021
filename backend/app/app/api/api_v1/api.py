@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from app.api.api_v1.endpoints import login, users, utils, mentions, roles, journey, \
     semesters, college_year, validation,matier_ue, matier_ec, \
     scolarites, notes, liste, save_data, resultat, statistic, diploma, droit, carte, drive_action,\
-    student, interaction, invitation, permission, classroom, bacc_serie
+    student, interaction, invitation, permission, classroom, bacc_serie, historic
 
 api_router = APIRouter()
 api_router.include_router(interaction.router, prefix="/interaction", tags=["interaction"])
@@ -12,6 +12,7 @@ api_router.include_router(classroom.router, prefix="/classroom", tags=["classroo
 api_router.include_router(invitation.router, prefix="/invitation", tags=["invitation"])
 api_router.include_router(permission.router, prefix="/permission", tags=["permission"])
 api_router.include_router(liste.router, prefix="/liste", tags=["liste"])
+api_router.include_router(historic.router, prefix="/historic", tags=["historic"])
 api_router.include_router(statistic.router, prefix="/statistic", tags=["statistic"])
 api_router.include_router(save_data.router, prefix="/save_data", tags=["save_data"])
 api_router.include_router(utils.router, prefix="/utils", tags=["utils"])

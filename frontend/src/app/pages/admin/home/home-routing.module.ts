@@ -14,6 +14,8 @@ import { RoleComponent } from './role/role.component';
 import { UeComponent } from './ue/ue.component';
 import { UsersComponent } from './users/users.component';
 import { BaccSerieComponent } from './bacc-serie/bacc-serie.component';
+import { HistoricComponent } from './historic/historic.component';
+import { PublicationComponent } from './publication/publication.component';
 
 const routes: Routes = [
   { path: '',
@@ -87,6 +89,16 @@ const routes: Routes = [
       path: 'bacc-serie',
       component: BaccSerieComponent,
       data: { breadcrumb: 'admin.home.bacc_serie.title' },
+    },
+    {
+      path: 'historic',
+      component: HistoricComponent,
+      data: { breadcrumb: 'admin.home.historic.title' },
+    },
+    {
+      path: 'publication',
+      component: PublicationComponent,
+      data: { breadcrumb: 'admin.home.publication.title' },
     },
   ]
  },

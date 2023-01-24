@@ -16,4 +16,5 @@ export interface otherQueryParams {
   session?: string | null;
   semester?: string | null;
   level?: string | null;
+  title?: string | null;
 }

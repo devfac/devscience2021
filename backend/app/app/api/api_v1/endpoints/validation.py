@@ -30,27 +30,39 @@ def create_validation(
         db: Session = Depends(deps.get_db),
         *,
         semester: str,
+        college_year: str = "",
+        num_carte: str,
         validation_in: schemas.ValidationCreate,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update an validation.
     """
-    validation = crud.validation.get_by_num_carte(
-        db=db, num_carte=validation_in.num_carte)
+    validation = crud.validation.get_by_num_carte(db=db, num_carte=num_carte)
     validation_value = jsonable_encoder(validation_in)
+    historic = schemas.HistoricCreate(email=current_user.email,
+                                      action=f"{jsonable_encoder(validation_in)}",
+                                      title=f"Update validation",
+                                      college_year=college_year)
+    hist = crud.historic.create(db=db, obj_in=historic)
     if not validation:
+        print("eto")
         for i in range(10):
             if f"s{(i + 1)}" != semester.lower():
                 validation_value[f"s{(i + 1)}"] = None
+
+        validation_value["num_carte"] = num_carte
         validation = crud.validation.create(db=db, obj_in=validation_value)
     else:
+        print("ato")
         new_value = {}
         for data in validation_value:
             if validation_value[data]:
-                new_value[data] = validation_value[data] if validation_value[data] != 'null' else None
-        print(new_value)
-        validation = crud.validation.update(db=db, db_obj=validation, obj_in=new_value)
+                new_value[data] =validation_value[data] if validation_value[data] != 'null' else None
+        value_update = schemas.ValidationUpdate(**new_value)
+        validation = crud.validation.get_by_num_carte(db=db, num_carte=num_carte)
+        print(jsonable_encoder(validation))
+        validation = crud.validation.update(db=db, db_obj=validation, obj_in=value_update)
     return validation
 
 
@@ -67,6 +79,8 @@ def read_validation(
     validation = crud.validation.get_by_num_carte(db=db, num_carte=num_carte)
     if not validation:
         raise HTTPException(status_code=404, detail="Etudiant not found")
+
+    print(jsonable_encoder(validation))
     return validation
 
 

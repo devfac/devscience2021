@@ -159,6 +159,7 @@ export class SelectionComponent implements OnInit, AfterContentInit {
     }
     return this.service.getDataObservable(parseQueryParams(params,otherParams))
   }
+
   showConfirm(name: string, numSelect: string): void{
     this.confirmModal = this.modal.confirm({
       nzTitle: "Voulez-vous supprimer "+name+"?",
@@ -170,7 +171,7 @@ export class SelectionComponent implements OnInit, AfterContentInit {
   }
   
   onDelete(row: any) {
-    this.showConfirm(row.title, row.uuid);
+    this.showConfirm(row.num_select, row.num_select);
   }
 
   onEdit(row: any) {

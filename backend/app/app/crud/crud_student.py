@@ -52,6 +52,7 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
             order: str = "ASC",
             order_by: str = "last_name"
     ) -> List[Student]:
+        print(limit, skip)
         if semester.upper() == 'S1':
             return (
                 db.query(Student)

@@ -12,7 +12,7 @@ class CRUDValidation(CRUDBase[Validation, ValidationCreate, ValidationUpdate]):
     def get_by_uuid(self, db: Session, *, uuid: str) -> Optional[Validation]:
         return db.query(Validation).filter(Validation.uuid == uuid).first()
 
-    def get_by_num_carte(self, db: Session, *, num_carte: str) -> Optional[Validation]:
+    def get_by_num_carte(self, db: Session, *, num_carte: str) -> Validation:
         return db.query(Validation).filter(Validation.num_carte == num_carte).first()
 
     def create(

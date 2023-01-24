@@ -6,7 +6,8 @@ export const environment = {
   production: false,
   authApiURL: 'http://localhost/api/v1',
   notificationApiURL: 'http://localhost:3000',
-  socketApiURL: "localhost/api/v1/utils/ws/",
+  socketApiURL: "ws://localhost/api/v1/utils/ws/",
+  onlineAPI:'http://localhost:8988/api',
 };
 
 /*

@@ -48,6 +48,7 @@ export class PermissionComponent implements OnInit {
       await this.createPermission(data).toPromise()
       let chatMsg: Message = {message: "Permission "+this.form.value.type +" accordé, expiré dans "+this.form.value.time+"h", to: this.form.value.email}
       this.socketService.sendMessage(chatMsg )
+      this.socketService.createNotification("bottomRight","Permission envoyé",this.form.value.email)
 
   }
 }

@@ -71,7 +71,6 @@ def get_models_notes(
             all_column = ["num_carte"]
             for column in columns:
                 all_column.append(f"{column['type']}_{column['name']}")
-            all_column.append("year")
             print(all_column)
             save_data.create_workbook(f"note_{journey.abbreviation.lower()}_{session.lower()}", journey.semester, "note")
             save_data.write_data_title(f"note_{journey.abbreviation.lower()}_{session.lower()}", semester, all_column,
@@ -179,7 +178,6 @@ async def create_upload_note_file(
         all_column = ["num_carte"]
         for column in columns:
             all_column.append(f"{column['type']}_{column['name']}")
-        all_column.append("year")
 
         valid = save_data.validation_file_note(file_location, semester, all_column)
         if valid != "valid":
@@ -233,8 +231,8 @@ async def create_upload_note_file(
                                     note_ue += value_ec_note * float(ec['weight'])
                                     note_ue_final += max_value(value_ec_note, value_sess) * float(ec['weight'])
 
-                                ue_in[f'ue_{note.name}'] = note_ue
-                                ue_in_final[f'ue_{note.name}'] = note_ue_final
+                                ue_in[f'ue_{note.name}'] =format(note_ue, '.3f')
+                                ue_in_final[f'ue_{note.name}'] = format(note_ue_final, '.3f')
                                 for note_ec in note.ec:
                                     value_sess = et_un_final[f'ec_{note_ec.name}']
                                     if value_sess is None:
@@ -262,10 +260,10 @@ async def create_upload_note_file(
                                 moy_fin += float(value_fin) * column_["credit"]
                                 credit_fin += get_credit(float(value_fin), column_["credit"])
 
-                                moy_cred_in["mean"] = moy / somme
+                                moy_cred_in["mean"] = format(moy / somme, '.3f')
                                 moy_cred_in["credit"] = credit
 
-                                moy_cred_in_fin["mean"] = moy_fin / somme
+                                moy_cred_in_fin["mean"] = format(moy_fin / somme, '.3f')
                                 moy_cred_in_fin["credit"] = credit_fin
 
                                 crud.note.update_note(semester, journey.abbreviation, session, note.num_carte,
@@ -278,6 +276,7 @@ async def create_upload_note_file(
 
             note_student = crud.note.read_by_num_carte(semester, journey.abbreviation, session, note_ue_[0]["num_carte"])
             all_note.append(note_student)
+        os.remove(file_location)
         return all_note
 
 

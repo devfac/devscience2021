@@ -110,6 +110,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
   msg!: string ;
   url: string | ArrayBuffer | null = "";
   uploadedFile: any;
+  disableCompense: boolean = true
 
   keyMention = CODE+"mention"
   keyYear = CODE+"collegeYear"
@@ -306,7 +307,8 @@ export class NoteComponent implements OnInit, AfterContentInit {
     let listRoom:ResponseModel = await this.serviceRoom.getDataPromisee().toPromise()
     this.listRoom = listRoom.data
     // get mention by permission
-    if(this.authService.getPermissionSuperuser()){
+    let permission: boolean = await  this.authService.getPermissionSuperuser()
+    if(permission){
       this.allMention = await this.noteService.getMentionUser()
       if(this.testStorage(this.keyMention, this.allMention[0].uuid) && 
         this.testStorage(this.keyYear, this.allYears[0].title)){
@@ -474,6 +476,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
   demande(){
     let chatMsg: Message = {message: "demande de permission note"}
     this.socketService.sendMessage(chatMsg)
+    this.socketService.createNotification("bottomRight", "Demande envoyé", "Demande")
   }
 
   pre(): void {
@@ -601,12 +604,13 @@ export class NoteComponent implements OnInit, AfterContentInit {
                 .append('session', this.form.value.session)
                 .append('uuid_mention', this.form.value.mention)
                 .append('salle', this.form.value.salle)
-                .append('skip', this.form.value.from)
+                .append('skip', this.form.value.from - 1)
                 .append('limit', this.form.value.to)
 
     const journey = this.getTitle(this.allJourney, "uuid", this.form.get('journey')?.value)
     let name ="List_examen"+this.form.get('semester')?.value+"_"+journey.abbreviation+"salle"
     this.downloadServices.download(url, params, name)
+    this.visibleDialog = false
     
   }
 
@@ -718,8 +722,12 @@ export class NoteComponent implements OnInit, AfterContentInit {
   async getAllColumnsSession(){
     
     if(this.form.get('journey')?.value && this.form.get('mention')?.value && this.form.get('semester')?.value && this.initialise){
+      if(this.form.value.session == "Normal"){
+        this.disableCompense = true
+      }else{
+        this.disableCompense = false
+      }
 
-    console.log("mandalo test note");
       let testNote: boolean = await this.noteService.testNote( 
         this.form.value.semester, this.form.value.journey, this.form.value.session).toPromise()
 
@@ -819,7 +827,61 @@ export class NoteComponent implements OnInit, AfterContentInit {
     localStorage.setItem('collegeYear', this.form.value.collegeYear)
     localStorage.setItem('journey', this.form.value.journey)
     localStorage.setItem('semester', this.form.value.semester)
-    this.router.navigate(['/user/note-details'])
+
+    if(this.authService.getPermissionSuperuser()){
+      this.router.navigate(['/user/note-details']);
+    }
+    else{
+      this.router.navigate(['/home/note-details'])
+    }
+}
+async startUpload(){
+  const formData = new FormData();
+  console.log("Start upload");
+  if (this.url !== "" && this.initialise && this.form.value.semester && this.form.value.session && this.form.value.journey && this.form.value.collegeYear){
+    this.isConfirmLoading = true
+    formData.append("uploaded_file", this.uploadedFile)
+    let listOfData: ResponseModel  = await this.noteService.uploadFile(formData,this.form.value.semester, this.form.value.session, this.form.value.journey, this.form.value.collegeYear).toPromise()
+    this.listOfData = listOfData.data
+    this.isConfirmLoading = false
+    this.datatable.fetchData()
+    this.isvisible = false
+    this.visibleDialog = false
+    this.initialiseTemplate = true
+    this.uploadedFile = null
+    this.disabled = true
+ }else{
+  console.log("Required parameters");
+  
+ }
+}
+startDownloadModel(){
+  let url: string = `${BASE_URL}/save_data/get_models_notes/`;
+
+  if (this.form.value.semester && this.form.value.session && this.form.value.journey && this.form.value.collegeYear){
+  let otherParams = new HttpParams().append('semester', this.form.value.semester)
+                                    .append('session', this.form.value.session )
+                                    .append('uuid_journey', this.form.value.journey)
+                                    .append('college_year', this.form.value.collegeYear)
+    let name: string = 'Model_note_'+this.form.value.semester+"_"+this.form.value.session 
+    this.downloadServices.download(url, otherParams, name, ".xlsx");  
+    this.visibleDialog = false
+  }
+}
+
+startDownloadResultat(typeResult: string){
+  let url: string = `${BASE_URL}/resultat/get_by_session`;
+
+  if (this.form.value.semester && this.form.value.session && this.form.value.journey && this.form.value.collegeYear){
+  let otherParams = new HttpParams().append('semester', this.form.value.semester)
+                                    .append('session', this.form.value.session )
+                                    .append('uuid_journey', this.form.value.journey)
+                                    .append('college_year', this.form.value.collegeYear)
+                                    .append('type_result', typeResult)
+    let name: string = 'Resultat'+this.form.value.semester+"_"+this.form.value.session +"_"+typeResult
+    this.downloadServices.download(url, otherParams, name);  
+    this.visibleDialog = false
+  }
 }
 selectFile(event: any){
   if(!event.target.files[0] || event.target.files[0].length == 0){

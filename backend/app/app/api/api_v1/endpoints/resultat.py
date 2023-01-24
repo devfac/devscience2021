@@ -183,51 +183,51 @@ def get_by_matier_pdf(
     notes = []
     mention = crud.mention.get_by_uuid(db=db, uuid=journey.uuid_mention)
     all_note = crud.note.read_note_by_ue(semester, journey.abbreviation.lower(), session, matier, str(college_year))
-    etudiant_admis = []
-    etudiant_admis_compense = []
+    student_admis = []
+    student_admis_compense = []
     for note in jsonable_encoder(all_note):
 
-        etudiants = {'N° Carte': note["num_carte"], matier_ue.title: note[f"ue_{value_ue}"]}
+        students = {'N° Carte': note["num_carte"], matier_ue.title: note[f"ue_{value_ue}"]}
         for ec in value_ec:
-            etudiants[ec.title] = note[f"ec_{ec.value}"]
+            students[ec.title] = note[f"ec_{ec.value}"]
         if note[f"ue_{value_ue}"]:
-            etudiants['Crédit'] = get_credit(float(note[f"ue_{value_ue}"]), matier_ue.credit)
-            etudiants['Status'] = get_status(float(note[f"ue_{value_ue}"]))
+            students['Crédit'] = get_credit(float(note[f"ue_{value_ue}"]), matier_ue.credit)
+            students['Status'] = get_status(float(note[f"ue_{value_ue}"]))
             if note[f"ue_{value_ue}"] >= 10:
-                info_etudiants = {'N° Carte': note["num_carte"]}
-                un_etudiant = crud.ancien_student.get_by_num_carte(db=db, num_carte=note['num_carte'])
-                if un_etudiant:
-                    info_etudiants['nom'] = un_etudiant.last_name
-                    info_etudiants['prenom'] = un_etudiant.first_name
-                    etudiant_admis.append(info_etudiants)
+                info_students = {'N° Carte': note["num_carte"]}
+                un_student = crud.ancien_student.get_by_num_carte(db=db, num_carte=note['num_carte'])
+                if un_student:
+                    info_students['nom'] = un_student.last_name
+                    info_students['prenom'] = un_student.first_name
+                    student_admis.append(info_students)
         else:
-            etudiants['Crédit'] = get_credit(float(0), matier_ue.credit)
-            etudiants['Status'] = get_status(float(0))
+            students['Crédit'] = get_credit(float(0), matier_ue.credit)
+            students['Status'] = get_status(float(0))
 
         if session.lower() == "rattrapage":
             if note[f"ue_{value_ue}"] is not None and note[f"ue_{value_ue}"] < 10:
                 validation = crud.validation.get_by_num_carte(db=db, num_carte=note["num_carte"])
                 if validation:
-                    info_etudiants = {'N° Carte': note["num_carte"]}
-                    un_etudiant = crud.ancien_student.get_by_num_carte(db=db, num_carte=note['num_carte'])
-                    if un_etudiant:
-                        info_etudiants['nom'] = un_etudiant.last_name
-                        info_etudiants['prenom'] = un_etudiant.first_name
-                        etudiant_admis_compense.append(info_etudiants)
-        notes.append(etudiants)
+                    info_students = {'N° Carte': note["num_carte"]}
+                    un_student = crud.ancien_student.get_by_num_carte(db=db, num_carte=note['num_carte'])
+                    if un_student:
+                        info_students['nom'] = un_student.last_name
+                        info_students['prenom'] = un_student.first_name
+                        student_admis_compense.append(info_students)
+        notes.append(students)
     data = {'mention': mention.title, 'journey': journey.title, 'anne': college_year, 'session': session}
-    file = result_by_ue.PDF.create_result_by_ue(semester, journey, data, list(titre_note), notes, etudiant_admis,
-                                                etudiant_admis_compense)
+    file = result_by_ue.PDF.create_result_by_ue(semester, journey, data, list(titre_note), notes, student_admis,
+                                                student_admis_compense)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
 
 @router.get("/get_by_session")
 def get_by_sessiondefinitive_pdf(
-        schema: str,
+        college_year: str,
         semester: str,
         uuid_journey: str,
         session: str,
-        type_result: str,
+        type_result: str = "definitive",
         db: Session = Depends(deps.get_db),
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -237,21 +237,27 @@ def get_by_sessiondefinitive_pdf(
 
     mention = crud.mention.get_by_uuid(db=db, uuid=journey.uuid_mention)
     credit = 30
-    if type_result == "definitive":
-        all_note = crud.note.read_note_by_credit(schema, semester, journey.abbreviation.lower(), session, credit)
-    else:
-        all_note = crud.note.read_note_by_credit_inf(schema, semester, journey.abbreviation.lower(), session, credit)
-    print(all_note)
-    etudiant_admis = []
+
+    all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation,
+                                       session=session, year=college_year)
+    student_admis = []
     for note in jsonable_encoder(all_note):
-        validation = crud.semetre_valide.get_by_num_carte(schema=schema, num_carte=note["num_carte"])
+        validation = jsonable_encoder(crud.validation.get_by_num_carte(db=db, num_carte=note["num_carte"]))
         if validation:
-            if test_semester(validation.semester, semester):
-                info_etudiants = {'N° Carte': note["num_carte"]}
-                un_etudiant = crud.ancien_etudiant.get_by_num_carte(schema=schema, num_carte=note['num_carte'])
-                info_etudiants['nom'] = un_etudiant["nom"]
-                info_etudiants['prenom'] = un_etudiant["prenom"]
-                etudiant_admis.append(info_etudiants)
-    data = {'mention': mention.title, 'journey': journey.title, 'anne': decode_schemas(schema), 'session': session}
-    file = result_by_session.PDF.create_result_by_session(semester, journey, data, etudiant_admis, type_result)
+            if type_result == "definitive":
+                if validation[semester.lower()] and note['credit'] == credit:
+                    info_students = {'N° Carte': note["num_carte"]}
+                    un_student = jsonable_encoder(crud.ancien_student.get_by_num_carte(db=db, num_carte=note['num_carte']))
+                    info_students['last_name'] = un_student["last_name"]
+                    info_students['first_name'] = un_student["first_name"]
+                    student_admis.append(info_students)
+            else:
+                if validation[semester.lower()]:
+                    info_students = {'N° Carte': note["num_carte"]}
+                    un_student = jsonable_encoder(crud.ancien_student.get_by_num_carte(db=db, num_carte=note['num_carte']))
+                    info_students['last_name'] = un_student["last_name"]
+                    info_students['first_name'] = un_student["first_name"]
+                    student_admis.append(info_students)
+    data = {'mention': mention.title, 'journey': journey.title, 'anne': college_year, 'session': session}
+    file = result_by_session.PDF.create_result_by_session(semester, journey, data, student_admis, type_result)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)

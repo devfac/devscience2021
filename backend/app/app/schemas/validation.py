@@ -15,18 +15,20 @@ class ValidationBase(BaseModel):
     s8: Optional[str]
     s9: Optional[str]
     s10: Optional[str]
+    num_carte: Optional[str]
 
 # Properties to receive via API on creation
 class ValidationCreate(ValidationBase):
-    num_carte: str
+    pass
 
 # Properties to receive via API on update
 class ValidationUpdate(ValidationBase):
-    num_carte: Optional[str]
+    pass
 
 # Properties to receive via API on update
 class ValidationInDBBase(ValidationBase):
     uuid: Optional[UUID]
+    num_carte: Optional[str]
 
     class Config:
         orm_mode = True

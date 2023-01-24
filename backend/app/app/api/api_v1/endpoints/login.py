@@ -63,7 +63,13 @@ def login_access_token(
     user = crud.user.get(db=db, uuid=token_data.uuid)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+
     user = schemas.UserLogin(**jsonable_encoder(user), access_token=token, role=role_value, mention=list_mention)
+    historic = schemas.HistoricCreate(email=user.email,
+                                      title=f"Login system",
+                                      action="",
+                                      college_year="")
+    crud.historic.create(db=db, obj_in=historic)
     return user
 
 

@@ -40,7 +40,7 @@ export class SelectionService {
 
   deletData(numSelect: string):Promise<Ue[]> {
     let otherParams = new HttpParams().append('num_select', numSelect)
-    return this.http.delete<Ue[]>(`${BASE_URL}/student/new/`, {headers: this.headers, params: otherParams}).toPromise()
+    return this.http.delete<any>(`${BASE_URL}/student/new/`, {headers: this.headers, params: otherParams}).toPromise()
   }
 /*
   updateData(numCarte: string, body: any){

@@ -467,8 +467,17 @@ def clear_name(name: str, nbr: int = 50) -> str :
     else:
         return name[0:nbr]+" ..."
 
+
+def format_date(date_: datetime = ""):
+    if date_ == "":
+        date_= datetime.now()
+    d2 = date_.astimezone()
+    return format(d2.strftime("%Y-%m-%d %H:%M:%S"))
+
+
 class UUIDEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, UUID):
             return obj.hex
         return json.JSONEncoder.default(self, obj)
+

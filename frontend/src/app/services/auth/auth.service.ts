@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -6,13 +6,14 @@ import { map } from 'rxjs/operators';
 import { environment } from '@environments/environment';
 import { User } from '@app/models';
 import { SocketService } from '@app/socket.service';
+import { CookieService } from 'ngx-cookie-service';
 
 const BASE_URL = environment.authApiURL;
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService {
+export class AuthService implements OnInit{
   private userSubject: BehaviorSubject<User | null>;
   public user: Observable<User | null >;
   private headersLogin =  new HttpHeaders({
@@ -20,15 +21,24 @@ export class AuthService {
     'Accept': 'application/json'
   })
 
-  constructor(private router: Router, private http: HttpClient, private socketService: SocketService) {
+  constructor(private router: Router, private http: HttpClient, private socketService: SocketService, private cookieService: CookieService) {
     this.userSubject = new BehaviorSubject<User | null>(
-      JSON.parse(localStorage.getItem('user') || 'null')
+      JSON.parse(this.cookieService.get('user') || 'null')
     );
     this.user = this.userSubject.asObservable();
+  }
+  ngOnInit(): void { 
+    this.getMe().subscribe(
+    (user) => {
+      console.log(user);
+      
+    }
+  )
   }
 
   public get userValue(): User | null {
     return this.userSubject.value;
+    //return this.cookieService.get("user")?
   }
 
   login(email: string, password: string) {
@@ -44,8 +54,12 @@ export class AuthService {
       map((user: any) => {
           console.error(user)
           localStorage.setItem('token', JSON.stringify(user.access_token));
-          localStorage.setItem('user', JSON.stringify(user));
+          let now = new Date();
+          now.setHours(now.getHours()+8)
+          this.cookieService.set("token", JSON.stringify(user.access_token),now)
+          //localStorage.setItem('user', JSON.stringify(user));
           this.userSubject.next(user)
+          this.cookieService.set("user", JSON.stringify(user))
       }))
   }
 
@@ -67,6 +81,10 @@ export class AuthService {
 
   getById(id: string) {
     return this.http.get<User>(`${BASE_URL}/users/${id}`);
+  }
+
+  getMe() {
+    return this.http.get<User>(`${BASE_URL}/users/me`, {headers: this.headersLogin});
   }
 
   update(params: any, old_password: string) {
@@ -99,16 +117,16 @@ export class AuthService {
     );
   }
   getPermissionSuperuser(): boolean{
-    const user = this.userSubject.value;
-    if(!user?.is_superuser){
+    const user = this.userValue
+    if(!user?.is_admin){
       return true
     }else{
       return false
     }
   }
 
-  getPermissionAdmin(): boolean{
-    const user = this.userSubject.value;
+  getPermissionAdmin(){
+    const user = this.userValue
     if(!user?.is_admin){
       return true
     }else{

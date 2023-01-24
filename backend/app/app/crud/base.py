@@ -70,6 +70,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         for field in obj_data:
             if field in update_data and field is not  None:
                 setattr(db_obj, field, update_data[field])
+        print(jsonable_encoder(db_obj), update_data, obj_data)
 
         db.add(db_obj)
         db.commit()

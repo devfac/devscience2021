@@ -112,4 +112,14 @@ export class NoteService {
     }
     return allMention
   }
+
+  uploadFile(formData: FormData, semester: string, session: string, uuid_journey: string, college_year: string) :Observable<any>{
+    let otherParams = new HttpParams().append('semester', semester)
+                                      .append('session', session)
+                                      .append('uuid_journey', uuid_journey)
+                                      .append('college_year', college_year)
+      return this.http.post<any>(`${BASE_URL}/save_data/upload_note_file/`,formData, {headers: this.headers, params:otherParams})
+    }
+
+  
 }

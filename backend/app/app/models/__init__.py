@@ -14,3 +14,4 @@ from .invitation import Invitation
 from .permission import Permission
 from .classroom import Classroom
 from .bacc_serie import BaccSerie
+from .historic import Historic

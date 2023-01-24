@@ -480,7 +480,7 @@ def delete_student(
     return student
 
 
-@router.delete("/new/", response_model=List[schemas.NewStudent])
+@router.delete("/new/", response_model=Any)
 def delete_student(
         *,
         db: Session = Depends(deps.get_db),

@@ -74,6 +74,9 @@
       }
     },
     "home":{
+      "service": "Service",
+      "account":"Compte",
+      "teaching":"Enseignement",
       "create":"Créer",
       "delete":"Supprimer",
       "update":"Modifier",
@@ -83,8 +86,16 @@
         "add_droit": "Ajouter ou modifier un droit",
         "title":"Droit d'inscription",
         "level":"Niveau"
-
       },
+
+      "publication":{
+        "title": "Publication",
+        "type": "Type",
+        "description": "Description",
+        "auteur": "Auteur",
+        "expiration_date": "Date d'expiration"
+      },
+
       "classroom":{
         "add_classroom": "Ajouter ou modifier une salle de classe",
         "title":"Salle de classe",
@@ -181,6 +192,12 @@
       "upload":{
         "title":"Envoyer un ficher excel",
         "get_model":"Télecharger un model excel"
+      },
+      "bacc_serie":{
+        "title":"Baccalaureat"
+      },
+      "historic":{
+        "title":"Historique"
       }
     },
     "student":{

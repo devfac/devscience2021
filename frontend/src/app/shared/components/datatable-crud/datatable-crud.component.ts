@@ -33,6 +33,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   @Input() headers: TableHeader[] = [];
   @Input() headerSpan: TableHeader[] = [];
   @Input() headerData: TableHeader[] = [];
+  @Input() childrenDataHeader: TableHeader[] = [];
   @Input() matierUe: Ue[] = [];
   @Input() matierEc: Ec[] = [];
   @Input() width!: number;
@@ -218,6 +219,16 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
               this.new_data = [];
               this.listOfData = [];
               //this.data = result
+
+              console.log(this.childrenDataHeader);
+              if (this.childrenDataHeader?.length > 0) {
+                for (let i = 0; i < result.data.length; i++) {
+                  // console.log(result.data[i].stocks);
+                  this.new_data.push({ ...result.data[i], expand: false, add: false });
+                  this.listOfData.push({ ...result.data[i] });
+                  
+                }
+              } else {
                 for (let i = 0; i < result.data.length; i++) {
                   this.new_data.push({ ...result.data[i]});
                   this.listOfData.push({ ...result.data[i] });
@@ -226,6 +237,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
                     data: { ...result.data[i] },
                   };
                 }
+              }
               this.total = result?.count || 0;
               this.data = [...this.new_data];
               console.log(this.data);
@@ -233,7 +245,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
               
             },
             error: (err) => {
-              console.error(err);
+              console.error("erroe as", err);
               this.nzMessage.error('Fetching error');
               this.loading = false;
             },

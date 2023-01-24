@@ -7,6 +7,7 @@ import { environment } from '@environments/environment';
 import { DownloadService } from '../../download.service';
 import { UtilsService } from '../../utils.service';
 import { HomeService } from '../home.service';
+import { AuthService } from '@app/services/auth/auth.service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -32,12 +33,14 @@ export class DetailsNoteComponent implements OnInit {
   isSpinning: boolean = false
   check: boolean = false
   initialise: boolean = false
+  disabled: boolean = false
   constructor(
     private http: HttpClient,
     private fb: FormBuilder, 
     public utils: UtilsService,
     private utilsService: UtilsService,
-    private service: HomeService
+    private service: HomeService,
+    public authService: AuthService, 
     ) { 
       this.form = this.fb.group({
         name: [null],
@@ -69,6 +72,7 @@ export class DetailsNoteComponent implements OnInit {
     }
   }
   async ngOnInit(){
+    this.disabled = this.authService.getPermissionSuperuser()
     this.isSpinning = true 
     if(localStorage.getItem('semester') !== null){
       this.semester = localStorage.getItem('semester')
@@ -115,8 +119,7 @@ export class DetailsNoteComponent implements OnInit {
       }
     }
     this.check = !this.check
-    validation['num_carte'] = this.infoStudent.info.num_carte
-     await this.service.createValidation(validation, this.semester).toPromise()
+     await this.service.createValidation(this.infoStudent.info.num_carte, validation, this.semester).toPromise()
   }
   }
 async relever(){

@@ -26,3 +26,4 @@ from .invitation import Invitation, InvitationCreate, InvitationUpdate
 from .classroom import Classroom, ClassroomCreate, ClassroomUpdate
 from .response import ResponseData
 from .bacc_serie import BaccSerieCreate, BaccSerieUpdate, BaccSerie
+from .historic import Historic, HistoricCreate

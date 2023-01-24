@@ -75,6 +75,13 @@ export class UserService {
       route: 'upload',
       selected: '/user/upload',
       icon: 'upload',
+    },
+    {
+      id: 6,
+      title: 'admin.home.historic.title',
+      route: 'historic',
+      selected: '/user/historic',
+      icon: 'history',
     }
   ]
   public menu$ = new Subject<any>();

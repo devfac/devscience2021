@@ -20,9 +20,9 @@
         <nz-form-label nzRequired>
           {{ 'admin.home.time' | translate }}
         </nz-form-label>
-        <nz-form-control [nzErrorTip]="'admin.home.value' | translate: {min:1, max:72}">
+        <nz-form-control [nzErrorTip]="'admin.home.value' | translate: {min:0, max:72}">
           <nz-input-group nzAddOnAfter="Heure">
-            <input type="number" nz-input formControlName="time" appCustomAutoFocus [min]="1" [max]="72"
+            <input type="number" nz-input formControlName="time" appCustomAutoFocus [min]="0" [max]="72"
               [placeholder]="'admin.home.time' | translate" 
               />
           </nz-input-group>

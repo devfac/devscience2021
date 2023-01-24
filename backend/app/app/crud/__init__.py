@@ -17,6 +17,7 @@ from .crud_permission import permission
 from .crud_invitation import invitation
 from .crud_classroom import classroom
 from .crud_bacc_serie import bacc_serie
+from .crud_historic import historic
 # For a new basic set of CRUD operations you could just do
 
 # from .base import CRUDBase

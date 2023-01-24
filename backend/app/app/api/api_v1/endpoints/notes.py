@@ -57,6 +57,12 @@ def create_table_note(
             if not test_note:
                 models.note.create_table_note(journey=journey.abbreviation, semester=semester,
                                               matiers=all_column, session=session)
+
+                historic = schemas.HistoricCreate(email=current_user.email,
+                                                  action=f"Create table note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}",
+                                                  title="Create table",
+                                                  college_year=college_year)
+                crud.historic.create(db=db, obj_in=historic)
             else:
                 all_columns = crud.note.check_columns_exist(semester=semester,
                                                             journey=journey.abbreviation, session=session)
@@ -64,6 +70,11 @@ def create_table_note(
                 if len(column_) != 0:
                     models.note.update_table_note(journey=journey.abbreviation, semester=semester,
                                                   column=all_column, session=session)
+                historic = schemas.HistoricCreate(email=current_user.email,
+                                                  action=f"Update table note_{journey.lower()}_{semester.lower()}_{session.lower()}",
+                                                  title="Update table",
+                                                  college_year=college_year)
+                crud.historic.create(db=db, obj_in=historic)
         test_note = crud.note.check_table_exist(semester=semester, journey=journey.abbreviation,
                                                 session=session.lower())
         if test_note:
@@ -80,6 +91,7 @@ def delete_table_note(
         db: Session = Depends(deps.get_db),
         semester: str,
         uuid_journey: str,
+        college_year: str = "",
         session: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -96,6 +108,11 @@ def delete_table_note(
         if test_note:
             if models.note.drop_table_note(journey=journey.abbreviation, session=session,
                                            semester=semester):
+                historic = schemas.HistoricCreate(email=current_user.email,
+                                                  action=f"Delete table note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}",
+                                                  title="Delete table",
+                                                  college_year=college_year)
+                crud.historic.create(db=db, obj_in=historic)
                 return {"msg": "Succces"}
             else:
                 raise HTTPException(
@@ -154,7 +171,6 @@ def get_all_columns(
         ues_['nbr_ec'] = nbr
         ues_['ec'] = all_ec
         all_ue.append(ues_)
-    print(all_ue)
     if test_note:
         return all_ue
     else:
@@ -212,6 +228,11 @@ def inserts_student(
         )
 
     if session.lower() == "rattrapage":
+        historic = schemas.HistoricCreate(email=current_user.email,
+                                          action=f"Insert student in note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}",
+                                          title="Insert student",
+                                          college_year=college_year)
+        crud.historic.create(db=db, obj_in=historic)
         test_note = crud.note.check_table_exist(semester=semester, journey=journey.abbreviation, session="normal")
         if not test_note:
             raise HTTPException(status_code=400,
@@ -249,7 +270,12 @@ def inserts_student(
     else:
         students = crud.ancien_student.get_by_class(db=db,uuid_mention=uuid_mention,
                                                     uuid_journey= uuid_journey, semester=semester)
-        print("eto zao", students)
+
+        historic = schemas.HistoricCreate(email=current_user.email,
+                                          action=f"Insert student in note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}",
+                                          title="Insert student",
+                                          college_year=college_year)
+        crud.historic.create(db=db, obj_in=historic)
         for student in students:
             if find_in_list(student.actual_years, college_year) != -1:
                 et_un = crud.note.read_by_num_carte(semester=semester, journey=journey.abbreviation,
@@ -315,7 +341,6 @@ def get_all_notes(
             if validation[semester.lower()]:
                 note['validation'] = True
         all_note_.append(note)
-
     count = len(all_note_count)
     response = schemas.ResponseData(**{'count':count, 'data':all_note_})
     return response
@@ -363,7 +388,7 @@ def updates_note(
     credit_fin = 0
     somme = 0
     #for note in all_notes_ue:
-
+    all_hist=[{"name":"num_carte", "note":all_notes_ue.num_carte}]
     for note in all_notes_ue.ue:
         for column_ in create_model(columns):
             if note.name == column_['name']:
@@ -380,6 +405,7 @@ def updates_note(
                         raise HTTPException(status_code=400, detail="Invalid EC for UE", )
                     for i, ec in enumerate(column_['ec']):
                         ec_note = note.ec[i].note
+                        all_hist.append(jsonable_encoder(note.ec[i]))
                         if ec_note == "" or ec_note is None:
                             note.ec[i].note = None
                             value_ec_note = 0
@@ -392,8 +418,8 @@ def updates_note(
                         note_ue += value_ec_note * float(ec['weight'])
                         note_ue_final += max_value(value_ec_note, value_sess) * float(ec['weight'])
 
-                    ue_in[f'ue_{note.name}'] = note_ue
-                    ue_in_final[f'ue_{note.name}'] = note_ue_final
+                    ue_in[f'ue_{note.name}'] = format(note_ue, '.3f')
+                    ue_in_final[f'ue_{note.name}'] = format(note_ue_final, '.3f')
                     for note_ec in note.ec:
                         value_sess = et_un_final[f'ec_{note_ec.name}']
                         if value_sess is None:
@@ -407,7 +433,6 @@ def updates_note(
                     et_un_final = crud.note.read_by_num_carte(semester, journey.abbreviation, "final",
                                                               all_notes_ue.num_carte)
                     value_sess = et_un[f'ue_{column_["name"]}']
-                    print('value_sess', value_sess)
                     if value_sess is None:
                         value_sess = 0
                     value_fin = et_un_final[f'ue_{column_["name"]}']
@@ -416,19 +441,24 @@ def updates_note(
                     somme += column_["credit"]
                     moy += float(value_sess) * column_["credit"]
                     credit += get_credit(float(value_sess), column_["credit"])
-                    print(get_credit(value_sess, column_['credit']))
 
                     moy_fin += float(value_fin) * column_["credit"]
                     credit_fin += get_credit(float(value_fin), column_["credit"])
 
-                    moy_cred_in["mean"] = moy / somme
+                    moy_cred_in["mean"] = format(moy / somme, '.3f')
                     moy_cred_in["credit"] = credit
 
-                    moy_cred_in_fin["mean"] = moy_fin / somme
+                    moy_cred_in_fin["mean"] = format(moy_fin / somme, '.3f')
                     moy_cred_in_fin["credit"] = credit_fin
 
                     crud.note.update_note(semester, journey.abbreviation, session, all_notes_ue.num_carte, moy_cred_in)
                     crud.note.update_note(semester, journey.abbreviation, "final", all_notes_ue.num_carte, moy_cred_in)
+
+    historic = schemas.HistoricCreate(email=current_user.email,
+                                      title="Update note",
+                                      action=f" {all_hist}",
+                                      college_year=college_year)
+    crud.historic.create(db=db, obj_in=historic)
     note_student = crud.note.read_by_num_carte(semester, journey.abbreviation, session, all_notes_ue.num_carte)
     return note_student
 
@@ -486,7 +516,7 @@ def details_note(
 def delete_note(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
+        college_year: str,
         semester: str,
         uuid_journey: str,
         num_carte: str,
@@ -496,11 +526,6 @@ def delete_note(
     """
     Create table note.
     """
-    college_year = crud.college_year.get_by_title(db, schema)
-    if not college_year:
-        raise HTTPException(status_code=400, detail=f"{schema} not found.",
-                            )
-
     journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
     if not journey:
         raise HTTPException(status_code=400, detail="journey not found")
