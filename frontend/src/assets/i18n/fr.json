@@ -182,6 +182,7 @@
         "table_name":"Table note : {{name}}",
         "nbr_ue": "Nombre d'UE",
         "nbr_ec": "Nombre d'Ec",
+        "credit": "Total Crédit",
         "year": "Année"
       },
       "details":{

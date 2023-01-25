@@ -513,11 +513,13 @@ export class NoteComponent implements OnInit, AfterContentInit {
         this.interactionResult.push(data[index])
         if (data[index].type == "ue"){
           this.totalUe ++
+          this.totalCredit += data[index].value
         }else{
           this.totalEc ++
           
         }
       }
+      
     }else{
       if(this.interactionResult.length > 0){
         await this.noteService.createTableNote(this.form.value.semester, this.form.value.journey, this.form.value.collegeYear).toPromise()

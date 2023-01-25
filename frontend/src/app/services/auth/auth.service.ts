@@ -13,7 +13,7 @@ const BASE_URL = environment.authApiURL;
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService implements OnInit{
+export class AuthService{
   private userSubject: BehaviorSubject<User | null>;
   public user: Observable<User | null >;
   private headersLogin =  new HttpHeaders({
@@ -26,9 +26,6 @@ export class AuthService implements OnInit{
       JSON.parse(this.cookieService.get('user') || 'null')
     );
     this.user = this.userSubject.asObservable();
-  }
-  ngOnInit(): void {
-    throw new Error('Method not implemented.');
   }
 
   public get userValue(): User | null {
