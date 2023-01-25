@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { typeTitle } from '@app/data/data';
+import { typeTitleUser, typeTitleAdmin } from '@app/data/data';
 import { CollegeYear } from '@app/models/collegeYear';
 import { Journey } from '@app/models/journey';
 import { Mention } from '@app/models/mention';
@@ -15,6 +15,7 @@ import { CollegeYearService } from '../college-year/college-year.service';
 import { DroitService } from '../droit/droit.service';
 import { MentionService } from '../mention/mention.service';
 import { HistoricService } from './historic.service';
+import { User } from '@app/models';
 
 const CODE = "historic"
 
@@ -28,7 +29,6 @@ export class HistoricComponent implements OnInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
   headers: TableHeader[] = [];
   childrenDataHeader: TableHeader[] = [];
-  user = localStorage.getItem('user')
   allYears: CollegeYear[] = []
   allTitle: Mention[] = []
   allUe: Ue[] = []
@@ -42,7 +42,7 @@ export class HistoricComponent implements OnInit {
   isEdit = false;
   title = '';
   uuid= "";
-  typeTitle = typeTitle;
+  typeTitle = [{label:'', value:''}];
   actualYear: string | null = ""
   titles: any[] = []
   actions = {
@@ -55,6 +55,7 @@ export class HistoricComponent implements OnInit {
   keyYear = CODE+"collegeYear"
   keyTitle = CODE+"title"
   isInit: boolean = false
+  user!: User
   constructor(
     private modal: NzModalService, 
     private fb: FormBuilder,
@@ -99,6 +100,12 @@ export class HistoricComponent implements OnInit {
 
     let allYears: ResponseModel = await this.serviceYears.getDataPromise().toPromise()
     this.allYears = allYears.data
+    this.user = await this.service.getMe().toPromise()
+    if(this.user.is_superuser){
+      this.typeTitle = typeTitleAdmin
+    }else{
+      this.typeTitle = typeTitleUser
+    }
     this.testStorage(this.keyYear, this.allYears[0].title)
     this.testStorage(this.keyTitle, this.typeTitle[0].value)
   }

@@ -17,6 +17,7 @@ class Historic(Base):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = Column(String, ForeignKey("user.email"))
     title = Column(String)
+    value = Column(String)
     action = Column(String)
     college_year = Column(String)
     created_at = Column(DateTime)

@@ -328,8 +328,6 @@ export class InscriptionAddComponent implements OnInit {
     this.isvisible = false
   }
 
-
-
   handleOk(): void{
     setTimeout(() => {
       this.isvisible = false

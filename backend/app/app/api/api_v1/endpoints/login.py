@@ -66,7 +66,8 @@ def login_access_token(
 
     user = schemas.UserLogin(**jsonable_encoder(user), access_token=token, role=role_value, mention=list_mention)
     historic = schemas.HistoricCreate(email=user.email,
-                                      title=f"Login system",
+                                      value=f"login_system",
+                                      title=f"Login System",
                                       action="",
                                       college_year="")
     crud.historic.create(db=db, obj_in=historic)

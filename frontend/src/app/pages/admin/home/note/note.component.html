@@ -112,7 +112,8 @@
               </nz-form-item>
       </div>
   </form>
-  <div *ngIf="!showTable && !authService.getPermissionSuperuser()">
+  <div *ngIf="!showTable && initialise">
+    <div *ngIf="user.is_superuser">
     <nz-divider nzType="horizontal"></nz-divider>
     <nz-steps [nzCurrent]="current">
       <nz-step nzTitle="Choisir les matier"></nz-step>
@@ -181,6 +182,7 @@
         <span>Done</span>
       </button>
     </div>
+    </div>
   </div>
      
 
@@ -199,7 +201,7 @@
 (add)="onAdd()"
 (detail)="viewNoteDetails($event)"
 [permissionNote]="permissionNote"
-[permission]="authService.getPermissionSuperuser()"
+[permission]="!user.is_superuser"
 (listExam)="showModal()"
 (deleteTable)="deleteTable()"
 (createTable)="createTable()"

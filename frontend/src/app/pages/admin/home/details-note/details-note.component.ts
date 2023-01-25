@@ -8,6 +8,8 @@ import { DownloadService } from '../../download.service';
 import { UtilsService } from '../../utils.service';
 import { HomeService } from '../home.service';
 import { AuthService } from '@app/services/auth/auth.service';
+import { User } from '@app/models';
+import { NoteService } from '../note/note.service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -34,12 +36,14 @@ export class DetailsNoteComponent implements OnInit {
   check: boolean = false
   initialise: boolean = false
   disabled: boolean = false
+  user!: User
   constructor(
     private http: HttpClient,
     private fb: FormBuilder, 
     public utils: UtilsService,
     private utilsService: UtilsService,
     private service: HomeService,
+    private noteService: NoteService,
     public authService: AuthService, 
     ) { 
       this.form = this.fb.group({
@@ -71,8 +75,10 @@ export class DetailsNoteComponent implements OnInit {
       return ''
     }
   }
+
   async ngOnInit(){
-    this.disabled = this.authService.getPermissionSuperuser()
+    this.user = await this.noteService.getMe().toPromise()
+    this.disabled = !this.user.is_superuser
     this.isSpinning = true 
     if(localStorage.getItem('semester') !== null){
       this.semester = localStorage.getItem('semester')

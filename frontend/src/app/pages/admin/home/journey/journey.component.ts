@@ -95,7 +95,7 @@ export class JourneyComponent implements OnInit, AfterContentInit {
     this.confirmModal = this.modal.confirm({
       nzTitle: 'Voulez-vous supprimer '+name+'?',
       nzOnOk: async () => {
-        this.service.deletData(uuid)
+        await this.service.deletData(uuid)
         this.datatable.fetchData()
       }
     })

@@ -1,4 +1,4 @@
-<nz-alert nzCloseable nzType="warning" [nzDescription]="actionTemplate3" *ngIf="!permissionNote && isNote && !getPermission()" >
+<nz-alert nzCloseable nzType="warning" [nzDescription]="actionTemplate3" *ngIf="!permissionNote && isNote && permission" >
   <ng-template #actionTemplate3>
     <div class="message">
         <p> {{'admin.notification.not_permited' | translate}} <a (click)="onDemande()"> {{'admin.notification.link' | translate}}</a></p>

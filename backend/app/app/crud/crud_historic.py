@@ -17,12 +17,12 @@ class CRUDHistoric(CRUDBase[Historic, HistoricCreate, HistoricCreate]):
     def get_by_uuid(self, db: Session, *, uuid: str) -> Optional[Historic]:
         return db.query(Historic).filter(Historic.uuid == uuid).first()
 
-    def get_by_email(self, db: Session, *, email: str,  limit: int, skip: int,college_year: str, title: str = "",
+    def get_by_email(self, db: Session, *, email: str,  limit: int, skip: int,college_year: str, value: str = "",
             order: str = "asc", order_by: str = "created_at") -> Optional[List[Historic]]:
 
         filter_ = [and_(Historic.email == email, or_(Historic.college_year == college_year, Historic.college_year == ""))]
-        if title != "" and title != "null":
-            filter_.append(Historic.title == title)
+        if value != "" and value != "null":
+            filter_.append(Historic.value == value)
         return (
             db.query(Historic)
             .filter(*filter_)
@@ -33,14 +33,14 @@ class CRUDHistoric(CRUDBase[Historic, HistoricCreate, HistoricCreate]):
         )
 
     def get_all(
-            self, db: Session,  limit: int, skip: int,college_year: str, email: str = "", title: str = "",
+            self, db: Session,  limit: int, skip: int,college_year: str, email: str = "", value: str = "",
             order: str = "asc", order_by: str = "created_at"
     ) -> List[Historic]:
         filter_ = [or_(Historic.college_year == college_year, Historic.college_year == "")]
         if email != "" and email != "null":
             filter_.append(Historic.email == email)
-        if title != "" and title != "null":
-            filter_.append(Historic.title == title)
+        if value != "" and value != "null":
+            filter_.append(Historic.value == value)
         return (
             db.query(Historic)
             .order_by(text(f"{order_by} {order}"))
@@ -50,13 +50,13 @@ class CRUDHistoric(CRUDBase[Historic, HistoricCreate, HistoricCreate]):
             .all()
         )
     def get_count(
-            self, db: Session, college_year: str, email: str = "", title: str = ""
+            self, db: Session, college_year: str, email: str = "", value: str = ""
     ) -> List[Historic]:
         filter_ = [or_(Historic.college_year == college_year, Historic.college_year == "")]
         if email != "" and email != "null":
             filter_.append(Historic.email == email)
-        if title != "" and title != "null":
-            filter_.append(Historic.title == title)
+        if value != "" and value != "null":
+            filter_.append(Historic.value == value)
         return (
             db.query(Historic)
             .filter(and_(*filter_))

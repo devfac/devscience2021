@@ -9,6 +9,7 @@ class HistoricBase(BaseModel):
     email: Optional[str]
     action: Optional[str]
     title: Optional[str]
+    value: Optional[str]
     college_year: Optional[str]
 
 
@@ -16,6 +17,7 @@ class HistoricBase(BaseModel):
 class HistoricCreate(HistoricBase):
     email: str
     title: str
+    value: str
     action: str
 
 

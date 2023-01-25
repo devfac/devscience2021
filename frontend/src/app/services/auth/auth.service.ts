@@ -27,13 +27,8 @@ export class AuthService implements OnInit{
     );
     this.user = this.userSubject.asObservable();
   }
-  ngOnInit(): void { 
-    this.getMe().subscribe(
-    (user) => {
-      console.log(user);
-      
-    }
-  )
+  ngOnInit(): void {
+    throw new Error('Method not implemented.');
   }
 
   public get userValue(): User | null {
@@ -81,10 +76,6 @@ export class AuthService implements OnInit{
 
   getById(id: string) {
     return this.http.get<User>(`${BASE_URL}/users/${id}`);
-  }
-
-  getMe() {
-    return this.http.get<User>(`${BASE_URL}/users/me`, {headers: this.headersLogin});
   }
 
   update(params: any, old_password: string) {

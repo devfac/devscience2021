@@ -22,6 +22,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@app/services/auth/auth.service';
 import { NoteService } from '@app/pages/admin/home/note/note.service';
+import { User } from '@app/models';
 
 @Component({
   selector: 'app-datatable-crud',
@@ -42,6 +43,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   @Input() portList: any[] = [];
   @Input() isSelectable: boolean = false;
   @Input() permission: boolean = true;
+  @Input() permissionUser: boolean = true;
   @Input() permissionNote: boolean = false;
   @Input() isNote: boolean = false
   @Input() selectedId: number | null = null;
@@ -80,10 +82,6 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   @Output() createTable = new EventEmitter<any>();
   @Output() insert = new EventEmitter<any>();
 
-
-
-
-
   data: any[] = [];
   new_data: any[] = [];
   loading: boolean = false;
@@ -99,7 +97,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   isResult: boolean = false
   isRattrape: boolean = false
   result: string = ""
-
+  user!: User;
   form!: FormGroup;
   listOfFilter = ["Moyenne" ,"Credit"]
   message: string = "FacSciences"
@@ -122,13 +120,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     this.fetchData();
   }
 
-  getPermission(): boolean{
-    if (this.authService.getPermissionSuperuser() || this.authService.getPermissionAdmin()){
-      return false
-    }else{
-      return true
-    }
-  }
+
   ngAfterContentInit(): void {
     setTimeout(() => {
       if (this.getActionsNumber() > 0) {

@@ -62,8 +62,8 @@ export class BaccSerieComponent implements OnInit {
   showConfirm(name: string, uuid: string): void{
     this.confirmModal = this.modal.confirm({
       nzTitle: "Voulez-vous supprimer "+name+"?",
-      nzOnOk: () => {
-        this.service.deletData(uuid)
+      nzOnOk: async() => {
+        await this.service.deletData(uuid)
         this.datatable.fetchData()
       }
     })

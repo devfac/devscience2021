@@ -27,8 +27,8 @@ def read_historic(
     """
     if crud.user.is_superuser(current_user):
         historic = crud.historic.get_all(db=db, limit=limit, skip=offset, college_year=college_year,
-                                         email=email, order_by=order_by, order=order, title=title)
-        count = len(crud.historic.get_count(db=db, college_year=college_year, email=email, title=title))
+                                         email=email, order_by=order_by, order=order, value=title)
+        count = len(crud.historic.get_count(db=db, college_year=college_year, email=email, value=title))
         response = schemas.ResponseData(**{'count':count, 'data':historic})
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
@@ -53,7 +53,7 @@ def read_my_historic(
     all_history = []
     histories = crud.historic.get_by_email(db=db, college_year=college_year, skip=offset,
                                           limit=limit, order_by=order_by, order=order,
-                                           email=current_user.email, title=title)
+                                           email=current_user.email, value=title)
     for historic in histories:
         if historic.action != "":
             action = json.loads(historic.action.replace("'",'"'))
@@ -61,7 +61,7 @@ def read_my_historic(
             action = []
         historic.action = action
         all_history.append(historic)
-    count = len(crud.historic.get_count(db=db, college_year=college_year, email=current_user.email, title=title))
+    count = len(crud.historic.get_count(db=db, college_year=college_year, email=current_user.email, value=title))
     response = schemas.ResponseData(**{'count': count, 'data': all_history})
     return response
 

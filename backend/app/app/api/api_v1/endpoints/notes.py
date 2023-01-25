@@ -1,14 +1,12 @@
 import json
-from datetime import datetime
-from typing import Any, List
-import logging
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
-from app.script_logging import ScriptLogging
 from app.utils import compare_list, max_value, get_credit, create_model, find_in_list
 
 router = APIRouter()
@@ -57,10 +55,11 @@ def create_table_note(
             if not test_note:
                 models.note.create_table_note(journey=journey.abbreviation, semester=semester,
                                               matiers=all_column, session=session)
-
+                table_name = f"note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}"
                 historic = schemas.HistoricCreate(email=current_user.email,
-                                                  action=f"Create table note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}",
-                                                  title="Create table",
+                                                  action=str({'name':table_name}),
+                                                  value="create_table",
+                                                  title="Create Table",
                                                   college_year=college_year)
                 crud.historic.create(db=db, obj_in=historic)
             else:
@@ -70,9 +69,11 @@ def create_table_note(
                 if len(column_) != 0:
                     models.note.update_table_note(journey=journey.abbreviation, semester=semester,
                                                   column=all_column, session=session)
+                table_name = f"note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}"
                 historic = schemas.HistoricCreate(email=current_user.email,
-                                                  action=f"Update table note_{journey.lower()}_{semester.lower()}_{session.lower()}",
-                                                  title="Update table",
+                                                  action=str({'name':table_name}),
+                                                  title="Update Table",
+                                                  value="update_table",
                                                   college_year=college_year)
                 crud.historic.create(db=db, obj_in=historic)
         test_note = crud.note.check_table_exist(semester=semester, journey=journey.abbreviation,
@@ -108,9 +109,11 @@ def delete_table_note(
         if test_note:
             if models.note.drop_table_note(journey=journey.abbreviation, session=session,
                                            semester=semester):
+                table_name = f"note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}"
                 historic = schemas.HistoricCreate(email=current_user.email,
-                                                  action=f"Delete table note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}",
-                                                  title="Delete table",
+                                                  action=str({'name':table_name}),
+                                                  title="Delete Table",
+                                                  value="delete_table",
                                                   college_year=college_year)
                 crud.historic.create(db=db, obj_in=historic)
                 return {"msg": "Succces"}
@@ -228,9 +231,11 @@ def inserts_student(
         )
 
     if session.lower() == "rattrapage":
+        table_name = f"note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}"
         historic = schemas.HistoricCreate(email=current_user.email,
-                                          action=f"Insert student in note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}",
-                                          title="Insert student",
+                                          action=str({'name':table_name}),
+                                          title="Insert Student",
+                                          value="insert_student",
                                           college_year=college_year)
         crud.historic.create(db=db, obj_in=historic)
         test_note = crud.note.check_table_exist(semester=semester, journey=journey.abbreviation, session="normal")
@@ -271,9 +276,11 @@ def inserts_student(
         students = crud.ancien_student.get_by_class(db=db,uuid_mention=uuid_mention,
                                                     uuid_journey= uuid_journey, semester=semester)
 
+        table_name = f"note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}"
         historic = schemas.HistoricCreate(email=current_user.email,
-                                          action=f"Insert student in note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}",
-                                          title="Insert student",
+                                          action=str({'name': table_name}),
+                                          title="Insert Student",
+                                          value="insert_student",
                                           college_year=college_year)
         crud.historic.create(db=db, obj_in=historic)
         for student in students:
@@ -456,6 +463,7 @@ def updates_note(
 
     historic = schemas.HistoricCreate(email=current_user.email,
                                       title="Update note",
+                                      value="update_note",
                                       action=f" {all_hist}",
                                       college_year=college_year)
     crud.historic.create(db=db, obj_in=historic)

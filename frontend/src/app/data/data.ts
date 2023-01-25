@@ -42,10 +42,20 @@ export const typePublication=[
     {label:"Other",value:"Other"},
 ]
 
-export const typeTitle=[
-        {label:"Update note",value:"Update note"},
-        {label:"Login system",value:"Login system"},
+
+
+export const typeTitleUser=[
+        {label:"Update note",value:"update_note"},
+        {label:"Login system",value:"login_system"},
     ]
+
+export const typeTitleAdmin=[
+    {label:"Insert student",value:"insert_student"},
+    {label:"Delete table",value:"delete_table"},
+    {label:"Update table",value:"update_table"},
+    {label:"Create table",value:"create_table"},
+    {label:"Login system",value:"login_system"},
+]
 
 export const typeSerie=[
     {label:"Serie A1",value:"Serie A1"},

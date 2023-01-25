@@ -29,6 +29,7 @@ import { JourneyService } from '../journey/journey.service';
 import { MentionService } from '../mention/mention.service';
 import { UeService } from '../ue/ue.service';
 import { NoteService } from './note.service';
+import { User } from '@app/models';
 
 
 const BASE_URL = environment.authApiURL;
@@ -110,6 +111,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
   msg!: string ;
   url: string | ArrayBuffer | null = "";
   uploadedFile: any;
+  user!: User
   disableCompense: boolean = true
 
   keyMention = CODE+"mention"
@@ -146,6 +148,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
     private serviceMention: MentionService,
     private serviceUe: UeService, 
     private serviceEc: EcService,) { 
+
     this.form = this.fb.group({
       mention: [null, [Validators.required]],
       journey: [null, [Validators.required]],
@@ -307,8 +310,8 @@ export class NoteComponent implements OnInit, AfterContentInit {
     let listRoom:ResponseModel = await this.serviceRoom.getDataPromisee().toPromise()
     this.listRoom = listRoom.data
     // get mention by permission
-    let permission: boolean = await  this.authService.getPermissionSuperuser()
-    if(permission){
+    this.user = await this.noteService.getMe().toPromise()
+    if(!this.user.is_superuser){
       this.allMention = await this.noteService.getMentionUser()
       if(this.testStorage(this.keyMention, this.allMention[0].uuid) && 
         this.testStorage(this.keyYear, this.allYears[0].title)){
@@ -828,7 +831,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
     localStorage.setItem('journey', this.form.value.journey)
     localStorage.setItem('semester', this.form.value.semester)
 
-    if(this.authService.getPermissionSuperuser()){
+    if(!this.user.is_superuser){
       this.router.navigate(['/user/note-details']);
     }
     else{

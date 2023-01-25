@@ -7,6 +7,7 @@ import { AuthService } from '@app/services/auth/auth.service';
 import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
 import { MentionService } from '../mention/mention.service';
+import { User } from '@app/models/user';
 
 
 const BASE_URL = environment.authApiURL;
@@ -120,6 +121,8 @@ export class NoteService {
                                       .append('college_year', college_year)
       return this.http.post<any>(`${BASE_URL}/save_data/upload_note_file/`,formData, {headers: this.headers, params:otherParams})
     }
-
   
+    getMe(){
+      return this.http.get<User>(`${BASE_URL}/users/me`, {headers: this.headers})
+    }
 }

@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Droit } from '@app/models/droit';
+import { User } from '@app/models/user';
 import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
 
@@ -31,5 +32,8 @@ export class HistoricService {
   deletData(uuid: string):Promise<Droit[]> {
     return this.http.delete<Droit[]>(`${BASE_URL}/historic/?uuid=`+uuid, this.options).toPromise()
   }
-
+  
+  getMe(){
+    return this.http.get<User>(`${BASE_URL}/users/me`, {headers: this.headers})
+  }
 }
