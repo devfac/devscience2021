@@ -21,16 +21,16 @@ export class AuthService{
     'Accept': 'application/json'
   })
 
-  constructor(private router: Router, private http: HttpClient, private socketService: SocketService, private cookieService: CookieService) {
+  constructor(private router: Router, private http: HttpClient, private socketService: SocketService) {
     this.userSubject = new BehaviorSubject<User | null>(
-      JSON.parse(this.cookieService.get('user') || 'null')
+      JSON.parse( window.sessionStorage.getItem('user') || 'null')
     );
     this.user = this.userSubject.asObservable();
   }
 
   public get userValue(): User | null {
     return this.userSubject.value;
-    //return this.cookieService.get("user")?
+   // return this.cookieService.get("user");
   }
 
   login(email: string, password: string) {
@@ -44,20 +44,18 @@ export class AuthService{
 
     return this.http.post<User>(`${BASE_URL}/login/access-token`, body.toString(), optionsLogin).pipe(
       map((user: any) => {
-          console.error(user)
-          localStorage.setItem('token', JSON.stringify(user.access_token));
-          let now = new Date();
-          now.setHours(now.getHours()+8)
-          this.cookieService.set("token", JSON.stringify(user.access_token),now)
-          //localStorage.setItem('user', JSON.stringify(user));
+          window.sessionStorage.removeItem('user')
+          window.sessionStorage.removeItem('token')
+          window.sessionStorage.setItem('user',JSON.stringify(user) )
+          window.sessionStorage.setItem('token',JSON.stringify(user.access_token) )
+          
           this.userSubject.next(user)
-          this.cookieService.set("user", JSON.stringify(user))
       }))
   }
 
   logout() {
     // remove user from local storage and set current user to null
-    localStorage.removeItem('user');
+    window.sessionStorage.clear()
     this.socketService.chatMessage = []
     this.userSubject.next(null);
     this.router.navigate(['/auth/login']);
@@ -83,8 +81,7 @@ export class AuthService{
         if (x) {
           // update local storage
           const user = { ...this.userValue, ...params };
-          localStorage.setItem('user', JSON.stringify(user));
-
+          window.sessionStorage.setItem('user', JSON.stringify(user));
           // publish updated user to subscribers
           this.userSubject.next(user);
         }

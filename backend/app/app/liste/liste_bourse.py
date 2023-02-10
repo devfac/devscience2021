@@ -80,5 +80,5 @@ class PDF(FPDF):
                         pdf.cell(160, 5, txt=name, border=1, align="L")
                         num_ += 1
 
-        pdf.output(f"files/list_bourse_{type_.lower()}_{mention}.pdf", "F")
-        return f"files/list_bourse_{type_.lower()}_{mention}.pdf"
+        pdf.output(f"files/pdf/liste/list_bourse_{type_.lower()}_{mention}.pdf", "F")
+        return f"files/pdf/liste/list_bourse_{type_.lower()}_{mention}.pdf"

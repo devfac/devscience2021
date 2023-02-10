@@ -25,7 +25,7 @@ export class UeComponent implements OnInit, AfterContentInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
   headers: TableHeader[] = [];
 
-  user = localStorage.getItem('user')
+  user = window.sessionStorage.getItem('user')
   allJourney: Journey[] = []
   allJourneyList: Journey[] = []
   allMention: Mention[] = []
@@ -108,7 +108,6 @@ export class UeComponent implements OnInit, AfterContentInit {
     this.allJourney = await this.serviceJourney.getDataByMention(this.form.get('mention')?.value).toPromise()
     let journey: ResponseModel = await this.serviceJourney.getDataPromise().toPromise()
     this.allJourneyList = journey.data
-    console.log(this.allJourney[0]);
     if (this.allJourney.length >0){
       this.testStorage('journey', this.allJourney[0].uuid)}
     
@@ -196,6 +195,7 @@ export class UeComponent implements OnInit, AfterContentInit {
   showModal(): void{
     this.isEdit = false;
     this.isvisible = true;
+    this.form.get('title')?.enabled 
     this.form.get('title')?.setValue('');
     this.form.get('credit')?.setValue('');
     this.form.get('journey')?.setValue('');
@@ -212,6 +212,7 @@ export class UeComponent implements OnInit, AfterContentInit {
     this.form.get('journey')?.setValue(data.journey.uuid),
     this.form.get('mention')?.setValue(data.journey.uuid_mention),
     this.form.get('semester')?.setValue(data.semester)
+    this.form.get('title')?.disabled 
     if(this.form.get('mention')?.value){
       this.allJourney = await this.serviceJourney.getDataByMention(this.form.get('mention')?.value).toPromise()
     }

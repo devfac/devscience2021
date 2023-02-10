@@ -7,7 +7,7 @@ from .role import Role, RoleCreate, RoleInDB, RoleUpdate
 from .journey import Journey, JourneyCreate, JourneyInDB, JourneyUpdate
 from .semester import Semester, SemesterCreate, SemesterInDB, SemesterUpdate
 from .college_year import CollegeYearCreate, CollegeYear, CollegeYearUpdate, CollegeYearInDB
-from .validation import Validation, ValidationCreate, ValidationUpdate
+from .validation import  ValidationUpdate
 from .etudiant import EtudiantAncien, EtudiantAncienCreate,EtudiantAncienUpdate,EtudiantAncienInDB, keys,EtudiantCarte
 from .etudiant import EtudiantNouveau, EtudiantNouveauCreate, EtudiantNouveauUpdate, EtudiantNouveauInDB, SelectEtudiantBase
 from .matier import MatierEC, MatierECCreate, MatierECInDB, MatierECUpdate
@@ -27,3 +27,4 @@ from .classroom import Classroom, ClassroomCreate, ClassroomUpdate
 from .response import ResponseData
 from .bacc_serie import BaccSerieCreate, BaccSerieUpdate, BaccSerie
 from .historic import Historic, HistoricCreate
+from .publication import PublicationCreate, ShowPublication, PublicationUpdate

@@ -34,7 +34,7 @@ export class SelectionComponent implements OnInit, AfterContentInit {
   @ViewChild('isSelected', { static: true }) isSelected!: TemplateRef<any>;
   headers: TableHeader[] = [];
 
-  user = localStorage.getItem('user')
+  user = window.sessionStorage.getItem('user')
   allYears: CollegeYear[] = []
   allStudents: AncienStudent[] = []
   allJourney: Journey[] = []
@@ -203,13 +203,10 @@ export class SelectionComponent implements OnInit, AfterContentInit {
   }
 
   addStudent():void{
-    console.log(this.form.get(this.keyMention.substring(CODE.length))?.value);
-    
     localStorage.setItem(this.keyYear, this.form.get(this.keyYear.substring(CODE.length))?.value)
     localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)
     localStorage.setItem(this.keyNum, '')
     this.router.navigate(['/user/selection_add'])
-    console.log(localStorage.getItem(this.keyMention));
     
   }
 

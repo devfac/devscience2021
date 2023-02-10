@@ -56,7 +56,15 @@ def read_my_historic(
                                            email=current_user.email, value=title)
     for historic in histories:
         if historic.action != "":
-            action = json.loads(historic.action.replace("'",'"'))
+            try:
+                action = historic.action.replace("'",'"')
+                action = json.dumps(action)
+                action = action.replace("None",'null')
+                action = json.loads(action)
+                action = json.loads(action)
+            except Exception as e:
+                print(e, historic.action)
+                continue
         else:
             action = []
         historic.action = action

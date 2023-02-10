@@ -14,7 +14,7 @@ export class UtilsService {
 
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
+    "Authorization": "Bearer "+window.sessionStorage.getItem("token")
   })
 
   convertNumber(value: string, precision: number): number | null {

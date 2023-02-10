@@ -259,18 +259,8 @@ def inserts_student(
                     crud.note.update_auto(semester=semester, journey=journey.abbreviation,
                                           session=session, num_carte=student.num_carte)
         all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation, session=session, year=college_year)
-        all_note_ = []
         count = len(all_note)
-        for note in all_note:
-            note = jsonable_encoder(note)
-            note['validation'] = False
-            validation = crud.validation.get_by_num_carte(db=db, num_carte=note['num_carte'])
-            if validation:
-                validation = jsonable_encoder(validation)
-                if validation[semester.lower()]:
-                    note['validation'] = True
-            all_note_.append(note)
-        response = schemas.ResponseData(**{'count':count, 'data':all_note_})
+        response = schemas.ResponseData(**{'count':count, 'data':all_note})
         return response
     else:
         students = crud.ancien_student.get_by_class(db=db,uuid_mention=uuid_mention,
@@ -300,18 +290,8 @@ def inserts_student(
                                           session=session_, num_carte=student.num_carte, year=college_year)
         all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation,
                                            session=session,  year=college_year)
-        all_note_ = []
         count = len(all_note)
-        for note in all_note:
-            note = jsonable_encoder(note)
-            note['validation'] = False
-            validation = crud.validation.get_by_num_carte(db=db, num_carte=note['num_carte'])
-            if validation:
-                validation = jsonable_encoder(validation)
-                if validation[semester.lower()]:
-                    note['validation'] = True
-            all_note_.append(note)
-    response = schemas.ResponseData(**{'count':count, 'data':all_note_})
+    response = schemas.ResponseData(**{'count':count, 'data':all_note})
     return response
 
 
@@ -338,18 +318,8 @@ def get_all_notes(
 
     all_note_count = crud.note.read_all_note_count(semester=semester, journey=journey.abbreviation,
                                        session=session, year=college_year)
-    all_note_ = []
-    for note in all_note:
-        note = jsonable_encoder(note)
-        note['validation'] = False
-        validation = crud.validation.get_by_num_carte(db=db, num_carte=note['num_carte'])
-        if validation:
-            validation = jsonable_encoder(validation)
-            if validation[semester.lower()]:
-                note['validation'] = True
-        all_note_.append(note)
     count = len(all_note_count)
-    response = schemas.ResponseData(**{'count':count, 'data':all_note_})
+    response = schemas.ResponseData(**{'count':count, 'data':all_note})
     return response
 
 
@@ -372,9 +342,10 @@ def updates_note(
     if not journey:
         raise HTTPException(status_code=400, detail="journey not found")
     test_note = crud.note.check_table_exist(semester=semester, journey=journey.abbreviation, session=session)
+    table_name = f"note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}"
     if not test_note:
         raise HTTPException(status_code=400,
-                            detail=f"note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()} not found.",
+                            detail=f"{table_name} not found.",
                             )
     interaction = crud.interaction.get_by_journey_and_year(
         db=db, uuid_journey=uuid_journey, college_year=college_year)
@@ -395,7 +366,7 @@ def updates_note(
     credit_fin = 0
     somme = 0
     #for note in all_notes_ue:
-    all_hist=[{"name":"num_carte", "note":all_notes_ue.num_carte}]
+    all_hist=[{"name":"table", "note":table_name.upper()},{"name":"num_carte", "note":all_notes_ue.num_carte}]
     for note in all_notes_ue.ue:
         for column_ in create_model(columns):
             if note.name == column_['name']:
@@ -489,18 +460,13 @@ def details_note(
     journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
 
     if student:
+        validation = False
         stud = schemas.AncienStudent(**jsonable_encoder(student))
         stud.journey = crud.journey.get_by_uuid(db=db, uuid=student.uuid_journey)
         mention = crud.mention.get_by_uuid(db=db, uuid=stud.journey.uuid_mention)
         stud.journey.mention = mention
         stud = jsonable_encoder(stud)
-        stud['validation'] = False
-        validation = crud.validation.get_by_num_carte(db=db, num_carte=num_carte)
-        if validation:
-            validation = jsonable_encoder(validation)
-            if validation[semester.lower()]:
-                stud['validation'] = True
-        result = {"info": stud}
+        result = {}
         sessions = ['Normal', 'Rattrapage']
 
         for session in sessions:
@@ -513,7 +479,13 @@ def details_note(
                                     )
             note_session = crud.note.read_by_num_carte(semester, journey.abbreviation, session,
                                                    num_carte)
+            if note_session:
+                if note_session.validation:
+                    validation = True
             result[session]= note_session
+
+        stud['validation'] = validation
+        result['info'] = stud
         return result
     else:
         raise HTTPException(status_code=400, detail="Student not found.")
@@ -525,6 +497,8 @@ def delete_note(
         *,
         db: Session = Depends(deps.get_db),
         college_year: str,
+        limit: int = 10,
+        offset: int = 1,
         semester: str,
         uuid_journey: str,
         num_carte: str,
@@ -546,18 +520,9 @@ def delete_note(
     et_un = crud.note.read_by_num_carte(semester, journey.abbreviation, session, num_carte)
     if et_un:
         crud.note.delete_by_num_carte(semester, journey.abbreviation, session, et_un.num_carte)
-    all_note = crud.note.read_all_note(semester, journey.abbreviation, session)
-    all_note_ = []
+    all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation, limit=limit, skip=offset,
+                                       session=session, year=college_year)
     count = len(all_note)
-    for note in all_note:
-        note = jsonable_encoder(note)
-        note['validation'] = False
-        validation = crud.validation.get_by_num_carte(db=db, num_carte=note['num_carte'])
-        if validation:
-            validation = jsonable_encoder(validation)
-            if validation[semester.lower()]:
-                note['validation'] = True
-        all_note_.append(note)
 
-    response = schemas.ResponseData(**{'count':count, 'data':all_note_})
+    response = schemas.ResponseData(**{'count':count, 'data':all_note})
     return response

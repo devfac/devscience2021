@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterContentChecked, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Menu } from '@app/models/menu';
 import { UserService } from './user.service';
@@ -8,7 +8,7 @@ import { UserService } from './user.service';
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.less']
 })
-export class UserComponent implements OnInit {
+export class UserComponent implements OnInit, AfterContentChecked {
   menu: Menu[] = [];
   collapsible = true;
   collapsed = false;
@@ -21,7 +21,7 @@ export class UserComponent implements OnInit {
   }
 
  
-  constructor(public router: Router, public service: UserService) {
+  constructor(public router: Router, public service: UserService,  private cdref: ChangeDetectorRef) {
 
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
@@ -43,6 +43,10 @@ export class UserComponent implements OnInit {
       this.showSider = showSider;
     });
    }
+
+ ngAfterContentChecked(): void {
+   this.cdref.detectChanges()
+ }
 
    checkSelected(item: any) {
     if (item.selected) {

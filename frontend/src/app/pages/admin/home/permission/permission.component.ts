@@ -19,7 +19,7 @@ export class PermissionComponent implements OnInit {
   
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
+    "Authorization": "Bearer "+window.sessionStorage.getItem('token')
   })
   form!: FormGroup;
   typePermission=typePermission

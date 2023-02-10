@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Ue, UeEc } from '@app/models/ue';
 import { environment } from '@environments/environment';
+import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 
 const BASE_URL = environment.authApiURL;
@@ -10,14 +11,14 @@ const BASE_URL = environment.authApiURL;
   providedIn: 'root'
 })
 export class UeService {
-
   constructor(
     private http: HttpClient,
+    private coockiService: CookieService
     ) { }
    
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
+    "Authorization": "Bearer "+window.sessionStorage.getItem("token")
   })
 
   options = {

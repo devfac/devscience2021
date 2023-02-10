@@ -33,7 +33,7 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
   headers: TableHeader[] = [];
 
-  user = localStorage.getItem('user')
+  user = window.sessionStorage.getItem('user')
   allYears: CollegeYear[] = []
   listOfSemester = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
   allStudents: AncienStudent[] = []
@@ -276,7 +276,7 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
 
 
   onDelete(row: any) {
-    this.showConfirm(row.title, row.uuid);
+    this.showConfirm(row.num_carte, row.uuid);
   }
 
   onEdit(row: any) {

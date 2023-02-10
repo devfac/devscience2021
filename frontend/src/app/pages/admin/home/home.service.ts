@@ -1,4 +1,4 @@
-import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { CollegeYear } from '@app/models/collegeYear';
@@ -20,7 +20,7 @@ export class HomeService {
    
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
+    "Authorization": "Bearer "+window.sessionStorage.getItem("token")
   })
 
   options = {
@@ -77,8 +77,12 @@ export class HomeService {
   }
 
 
-  createValidation(num_carte:string, data?:any, semester?: string | null){
-    return this.http.post<any[]>(`${BASE_URL}/validation/?semester=`+semester+`&num_carte=`+num_carte, data, this.options)
+  createValidation(num_carte:string, data:any, semester: string, session: string, uuidJourney: string){
+    let otherParams = new HttpParams().append('num_carte', num_carte)
+    .append('semester', semester)
+    .append('session', session)
+    .append('uuid_journey', uuidJourney)
+    return this.http.post<any[]>(`${BASE_URL}/validation/`, data, {headers: this.headers, params:otherParams})
   }
 
 
@@ -120,88 +124,90 @@ export class HomeService {
     {
     id: 1,
     title: 'admin.home.account',
-    route: 'historic',
+    route: '/',
     selected: '/home/historic',
     icon: 'account-book',
+    
     children: [
       {
-        id: 1,
+        id: 2,
         title: 'admin.home.users.title',
         route: 'users',
         selected: '/home/users',
         icon: 'user',
       },{
-        id: 2,
+        id: 3,
         title: 'admin.home.role.title',
         route: 'role',
         selected: '/home/role',
         icon: 'question-circle',
       },
       {
-        id: 3,
+        id: 4,
         title: 'admin.home.historic.title',
         route: 'historic',
         selected: '/home/historic',
         icon: 'history',
       },
       {
-        id: 4,
+        id: 5,
         title: 'admin.home.permission',
         route: 'permission',
         selected: '/home/permission',
         icon: 'setting',
       },
     ]
+    
   },{
-    id: 2,
+    id: 5,
     title: 'admin.home.service',
-    route: 'permission',
+    route: '/',
     selected: '/home/permission',
     icon: 'control',
     children:[
       {
-        id: 1,
+        id: 7,
         title: 'admin.home.mention.title',
         route: 'mention',
         selected: '/home/mention',
         icon: 'node-expand',
       },
       {
-        id: 2,
+        id: 8,
         title: 'admin.home.journey.title',
         route: 'journey',
         selected: '/home/journey',
         icon: 'apartment',
       },{
-        id: 3,
+        id: 9,
         title: 'admin.home.college_year.title',
         route: 'college-year',
         selected: '/home/college-year',
         icon: 'control',
       },
       {
-        id: 4,
+        id: 10,
         title: 'admin.home.droit.title',
         route: 'droit',
         selected: '/home/droit',
         icon: 'dollar',
       },
       {
-        id: 5,
+        id: 11,
         title: 'admin.home.classroom.title',
         route: 'classroom',
         selected: '/home/classroom',
         icon: 'home',
       },
       {
-        id: 6,
+        id: 12,
         title: 'admin.home.bacc_serie.title',
         route: 'bacc-serie',
         selected: '/home/bacc-serie',
         icon: 'database',
       },
       {
-        id: 6,
+        id: 13,
         title: 'admin.home.publication.title',
         route: 'publication',
         selected: '/home/publication',
@@ -211,28 +217,28 @@ export class HomeService {
   },
   
   {
-      id: 10,
+      id: 14,
       title: 'admin.home.teaching',
-      route: 'mention',
+      route: '/',
       selected: '/home/mention',
       icon: 'robot',
       children: [
         {
-          id: 11,
+          id: 15,
           title: 'admin.home.ue.title',
           route: 'ue',
           selected: '/home/ue',
           icon: 'folder',
         },
         {
-          id: 12,
+          id: 16,
           title: 'admin.home.ec.title',
           route: 'ec',
           selected: '/home/ec',
           icon: 'file-text',
         },
         {
-          id: 13,
+          id: 17,
           title: 'admin.home.note.title',
           route: 'note',
           selected: '/home/note',

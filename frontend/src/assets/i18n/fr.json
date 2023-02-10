@@ -261,7 +261,8 @@
       }
     },
     "toolpit":{
-      "detlete":"Supprimer",
+      "delete":"Supprimer",
+      "add":"Ajouter",
       "view":"Voir details",
       "edit":"Editer",
       "create":"Créer",

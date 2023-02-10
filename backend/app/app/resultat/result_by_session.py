@@ -166,5 +166,5 @@ class PDF(FPDF):
         pdf.cell(100, 5, txt="", align="L")
         pdf.cell(0, 5, txt=text_3, ln=1, align="L")
 
-        pdf.output(f"files/resultat_{sems}_{parcour}_{session}.pdf", "F")
-        return f"files/resultat_{sems}_{parcour}_{session}.pdf"
+        pdf.output(f"files/pdf/resultat/resultat_{sems}_{parcour}_{session}.pdf", "F")
+        return f"files/pdf/resultat/resultat_{sems}_{parcour}_{session}.pdf"

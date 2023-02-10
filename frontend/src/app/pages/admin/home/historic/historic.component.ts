@@ -152,7 +152,6 @@ testStorage(key: string, value: string): boolean{
   }
 
   onDelete(row: any) {
-    console.log(row);
     this.showConfirm(row.mention.abbreviation+" "+row.level+" "+row.year, row.uuid);
   }
 

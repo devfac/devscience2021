@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { AfterContentInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterContentInit, Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Message } from '@app/models/chatMessage';
@@ -53,6 +53,7 @@ interface DataItem {
 })
 export class NoteComponent implements OnInit, AfterContentInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
+  @ViewChild('isValidated', { static: true }) isValidated!: TemplateRef<any>;
   headers: TableHeader[] = [];
   headerSpan: TableHeader[] = [];
   headerData: TableHeader[] = [];
@@ -182,6 +183,16 @@ export class NoteComponent implements OnInit, AfterContentInit {
   createHeaders(){
     this.headers =[
       {
+        title: 'Validée',
+        selector: 'validation',
+        isSortable: false,
+        rowspan: 2,
+        template: this.isValidated,
+        type: TableHeaderType.LEFT,
+        width:"90px",
+        style: { 'text-align': 'center' },
+      },
+      {
         title: "Num Carte",
         selector: "num_carte",
         isSortable: false,
@@ -192,6 +203,15 @@ export class NoteComponent implements OnInit, AfterContentInit {
     ] 
     this.headerData =[
       {
+      title: 'Validée',
+      selector: 'validation',
+      isSortable: false,
+      rowspan: 2,
+      template: this.isValidated,
+      type: TableHeaderType.LEFT,
+      style: { 'text-align': 'center' },
+      },
+      {
         title: "Num Carte",
         selector: "num_carte",
         isSortable: false,
@@ -200,6 +220,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
         width:"130px"
         }
     ] 
+
    
     this.headerSpan = []
     for (let index = 0; index<this.allColumns.length; index++){
@@ -267,6 +288,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
         style: { 'text-align': 'center' },
       },
     ) 
+    
     this.headerData.push(
       {
         title: 'Moyenne',
@@ -284,8 +306,8 @@ export class NoteComponent implements OnInit, AfterContentInit {
         isSortable: false,
         type: TableHeaderType.ACTION,
         btnType: true,
+        width:"90px",
         rowspan: 2,
-        style: { 'text-align': 'center' },
       },
     ) 
     this.headerData.push(
@@ -295,8 +317,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
         isSortable: false,
         type: TableHeaderType.ACTION,
         btnType: true,
-
-        style: { 'text-align': 'center' },
+        width:"90px",
       },
     ) 
   }
@@ -338,7 +359,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
                       this.form.value.session,
                       this.form.value.collegeYear,
                     ).toPromise()
-                    console.log(this.allColumns);
                     
                     this.createHeaders()
                     this.showTable = true
@@ -486,6 +506,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
     this.current -= 1;
     this.totalEc = 0
     this.totalUe = 0
+    this.totalCredit = 0
   }
 
   async next() {
@@ -507,7 +528,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
       interaction["college_year"] = this.form.value.collegeYear
   
       let data = await this.noteService.addInteraction(this.form.value.semester, interaction).toPromise()
-      console.log("ito ilay izy", data);
       
       for (let index = 0; index< data.length; index++){
         this.interactionResult.push(data[index])
@@ -571,7 +591,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
         ue.push(modelUe)
       }
     let model = {"num_carte":note["num_carte"], "ue":ue}
-    console.log(model);
     
     await this.noteService.insertNote(this.form.value.semester, this.form.value.journey, 
       this.form.value.session, this.form.value.collegeYear, model).toPromise()
@@ -620,6 +639,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
   }
 
   onDelete(row: any) {
+    this.showConfirmStudent(row)
   }
 
   onEdit(row: any) {
@@ -661,8 +681,9 @@ export class NoteComponent implements OnInit, AfterContentInit {
     this.confirmModal = this.modal.confirm({
       nzTitle: "Voulez-vous supprimer "+numCarte+"?",
       nzOnOk: async () => {
-       await this.noteService.deleteNote(this.form.value.semester, this.form.value.journey
-       ,this.form.value.session,this.form.value.collegeYear, numCarte).toPromise()
+       await this.noteService.deleteNote(this.form.value.semester, this.form.value.journey,numCarte
+       ,this.form.value.session, this.form.value.collegeYear ).toPromise()
+       this.datatable.fetchData()
       }
     })
   }
@@ -738,7 +759,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
 
     localStorage.setItem(this.keySession, this.form.get('session')?.value)
         if(testNote){
-          console.log("tafiditra ato");
           this.matier = await this.serviceUe.getMatier(this.form.value.collegeYear, this.form.value.semester, this.form.value.journey).toPromise()
           this.getNoteMatier()
           this.showTable = true
@@ -832,6 +852,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
     localStorage.setItem('collegeYear', this.form.value.collegeYear)
     localStorage.setItem('journey', this.form.value.journey)
     localStorage.setItem('semester', this.form.value.semester)
+    localStorage.setItem('session', this.form.value.session)
 
     if(!this.user.is_superuser){
       this.router.navigate(['/user/note-details']);
@@ -842,7 +863,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
 }
 async startUpload(){
   const formData = new FormData();
-  console.log("Start upload");
   if (this.url !== "" && this.initialise && this.form.value.semester && this.form.value.session && this.form.value.journey && this.form.value.collegeYear){
     this.isConfirmLoading = true
     formData.append("uploaded_file", this.uploadedFile)

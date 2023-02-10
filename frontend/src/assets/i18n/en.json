@@ -223,7 +223,8 @@
       }
     },
     "toolpit":{
-      "detlete":"Delete",
+      "delete":"Delete",
+      "add":"Add",
       "view":"View details",
       "edit":"Update",
       "create":"Create",

@@ -8,24 +8,6 @@ from sqlalchemy.sql.sqltypes import ARRAY
 
 from app.db.base_class import Base
 
-
-class Validation(Base):
-    __tablename__ = "validation"
-    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    s1 = Column(String)
-    s2 = Column(String)
-    s3 = Column(String)
-    s4 = Column(String)
-    s5 = Column(String)
-    s6 = Column(String)
-    s7 = Column(String)
-    s8 = Column(String)
-    s9 = Column(String)
-    s10 = Column(String)
-    num_carte = Column(String, ForeignKey("student.num_carte"))
-    student = relationship("Student", foreign_keys=[num_carte])
-
-
 class Interaction(Base):
     __tablename__ = "interaction"
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

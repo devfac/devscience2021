@@ -201,6 +201,7 @@
 (delete)="onDelete($event)"
 (edit)="onEdit($event)"
 (add)="onAdd()"
+[tableTitle]="'Etudiants'"
 (detail)="viewNoteDetails($event)"
 [permissionNote]="permissionNote"
 [permission]="!user.is_superuser"
@@ -279,7 +280,7 @@ classNames="note"
             </nz-spin>
           </form>
           </nz-tab>
-          <nz-tab nzTitle="Importer des notes" [nzDisabled]="!permissionNote">
+          <nz-tab nzTitle="Importer des notes" >
             <form nz-form [formGroup]="form" class="form" (ngSubmit)="submitForm()" nzLayout="vertical">
               <div class="container" >
                 <input type="file" #fileDropRef id="fileDropRef" (change)="selectFile($event)" class="input" />
@@ -291,7 +292,7 @@ classNames="note"
               </button>
         </form>
           </nz-tab>
-          <nz-tab nzTitle="Télécharger un models" [nzDisabled]="!permissionNote"> 
+          <nz-tab nzTitle="Télécharger un models" > 
             <button nz-button nzType="primary" 
             [nzLoading]="isConfirmLoading"  class="button" (click)="startDownloadModel()">
               <span nz-icon nzType="download"></span>
@@ -299,7 +300,7 @@ classNames="note"
             </button>
           </nz-tab>
 
-          <nz-tab nzTitle="Résultat final" [nzDisabled]="!permissionNote"> 
+          <nz-tab nzTitle="Résultat final" > 
             <div nz-row>
             <div nz-col >
             <button nz-button nzType="primary" [disabled]="disableCompense"
@@ -324,4 +325,9 @@ classNames="note"
       </div>
       </nz-modal>
   </nz-spin>
+
+  <ng-template #isValidated let-value="value" let-row="row" >
+    <span *ngIf="value" nz-icon nzType="check-circle" style="font-size: 25px; color: green;"></span>
+    <span *ngIf="!value" nz-icon nzType="close-circle"  style="font-size: 25px; color: red;"></span>
+</ng-template>
     

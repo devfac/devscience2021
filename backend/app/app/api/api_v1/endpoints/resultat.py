@@ -186,7 +186,6 @@ def get_by_matier_pdf(
     student_admis = []
     student_admis_compense = []
     for note in jsonable_encoder(all_note):
-
         students = {'N° Carte': note["num_carte"], matier_ue.title: note[f"ue_{value_ue}"]}
         for ec in value_ec:
             students[ec.title] = note[f"ec_{ec.value}"]
@@ -206,7 +205,8 @@ def get_by_matier_pdf(
 
         if session.lower() == "rattrapage":
             if note[f"ue_{value_ue}"] is not None and note[f"ue_{value_ue}"] < 10:
-                validation = crud.validation.get_by_num_carte(db=db, num_carte=note["num_carte"])
+                print(note)
+                validation = note["validation"]
                 if validation:
                     info_students = {'N° Carte': note["num_carte"]}
                     un_student = crud.ancien_student.get_by_num_carte(db=db, num_carte=note['num_carte'])
@@ -242,17 +242,17 @@ def get_by_sessiondefinitive_pdf(
                                        session=session, year=college_year)
     student_admis = []
     for note in jsonable_encoder(all_note):
-        validation = jsonable_encoder(crud.validation.get_by_num_carte(db=db, num_carte=note["num_carte"]))
+        validation = note["validation"]
         if validation:
             if type_result == "definitive":
-                if validation[semester.lower()] and note['credit'] == credit:
+                if  note['credit'] == credit:
                     info_students = {'N° Carte': note["num_carte"]}
                     un_student = jsonable_encoder(crud.ancien_student.get_by_num_carte(db=db, num_carte=note['num_carte']))
                     info_students['last_name'] = un_student["last_name"]
                     info_students['first_name'] = un_student["first_name"]
                     student_admis.append(info_students)
             else:
-                if validation[semester.lower()]:
+                if  note['credit'] != credit:
                     info_students = {'N° Carte': note["num_carte"]}
                     un_student = jsonable_encoder(crud.ancien_student.get_by_num_carte(db=db, num_carte=note['num_carte']))
                     info_students['last_name'] = un_student["last_name"]

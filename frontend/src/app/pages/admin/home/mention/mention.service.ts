@@ -4,6 +4,7 @@ import { Mention } from '@app/models/mention';
 import { ResponseModel } from '@app/models/response';
 import { AuthService } from '@app/services/auth/auth.service';
 import { environment } from '@environments/environment';
+import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 
 const BASE_URL = environment.authApiURL;
@@ -12,17 +13,17 @@ const BASE_URL = environment.authApiURL;
   providedIn: 'root'
 })
 export class MentionService {
-
   constructor(
     private http: HttpClient,
-    public authService: AuthService
+    private authService: AuthService,
+    private coockiService: CookieService
     ) { }
    
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
+    "Authorization": "Bearer "+window.sessionStorage.getItem("token")
   })
-  
+
   getDataObservable(params_?: HttpParams): Observable<any> {
     return this.http.get<Mention[]>(`${BASE_URL}/mentions/`, {headers: this.headers, params: params_});
   }

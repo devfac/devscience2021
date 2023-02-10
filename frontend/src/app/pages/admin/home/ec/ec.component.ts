@@ -27,7 +27,7 @@ export class EcComponent implements OnInit, AfterContentInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
   headers: TableHeader[] = [];
 
-  user = localStorage.getItem('user')
+  user = window.sessionStorage.getItem('user')
   collegeYear = localStorage.getItem('collegeYear')
   allYears: CollegeYear[] = []
   allJourney: Journey[] = []

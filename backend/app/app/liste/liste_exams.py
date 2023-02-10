@@ -209,5 +209,5 @@ class PDF(FPDF):
             pdf.cell(160, 5, txt=name, border=1, align="L")
             num_ += 1
 
-        pdf.output(f"files/list_exam_{sems}_{journey}_{data['skip']}_à_{data['limit']}.pdf", "F")
-        return f"files/list_exam_{sems}_{journey}_{data['skip']}_à_{data['limit']}.pdf"
+        pdf.output(f"files/pdf/liste/list_exam_{sems}_{journey}_{data['skip']}_à_{data['limit']}.pdf", "F")
+        return f"files/pdf/liste/list_exam_{sems}_{journey}_{data['skip']}_à_{data['limit']}.pdf"

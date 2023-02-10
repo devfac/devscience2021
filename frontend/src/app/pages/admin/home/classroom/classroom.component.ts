@@ -25,7 +25,7 @@ export class ClassroomComponent implements OnInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
   headers: TableHeader[] = [];
 
-  user = localStorage.getItem('user')
+  user = window.sessionStorage.getItem('user')
   allYears: CollegeYear[] = []
   allJourney: Journey[] = []
   allMention: Mention[] = []

@@ -1,6 +1,7 @@
 from typing import Any, List
 from fpdf import FPDF
 from app.liste.header import header
+from app.schemas import Journey
 
 
 def set_orientation(nbr: int) -> str:
@@ -151,7 +152,7 @@ class PDF(FPDF):
         pdf.cell(100, 5, txt="")
         pdf.cell(0, 5, txt=text_3, ln=1, align="L")
 
-    def create_result_by_ue(sems: str, journey: str, data: Any, matiers: List[str], etudiants: Any, admis: Any,
+    def create_result_by_ue(sems: str, journey: Journey, data: Any, matiers: List[str], etudiants: Any, admis: Any,
                             admis_comp: Any):
         pdf = PDF(set_orientation(len(matiers)), "mm", "a4")
         pdf.add_page()
@@ -204,5 +205,5 @@ class PDF(FPDF):
         if len(admis_comp) != 0:
             PDF.add_corp(pdf=pdf, data=data, sems=sems, matiers=matiers, admis=admis_comp, type="compense")
 
-        pdf.output(f"files/resultat_{sems}_{journey.abbreviation}_{matiers[1]}.pdf", "F")
-        return f"files/resultat_{sems}_{journey.abbreviation}_{matiers[1]}.pdf"
+        pdf.output(f"files/pdf/resultat/resultat_{sems}_{journey.abbreviation}_{matiers[1]}.pdf", "F")
+        return f"files/pdf/resultat//resultat_{sems}_{journey.abbreviation}_{matiers[1]}.pdf"

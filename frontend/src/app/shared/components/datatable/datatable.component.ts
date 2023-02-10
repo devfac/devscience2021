@@ -21,6 +21,7 @@ export class DatatableComponent {
   @Input() dataStocks: any[] = [];
   @Input() width: number = 800;
   @Input() idSelector: string = 'id';
+  @Input() tableTitle?: string = 'items';
   @Input() loading: boolean = false;
   @Input() permissionNote: boolean = false;
   @Input() total = 0;
@@ -38,6 +39,7 @@ export class DatatableComponent {
   @Output() canceltEdit = new EventEmitter<void>();
   @Output() search = new EventEmitter<void>();
   @Output() viewNote = new EventEmitter<void>();
+  @Output() deleteNote = new EventEmitter<void>();
   @Output() saveEdit = new EventEmitter<any>();
   @Output() selectionChange = new EventEmitter<number | null>();
   @Output() queryParamsChange = new EventEmitter<any>();
@@ -46,6 +48,10 @@ export class DatatableComponent {
   isAdded: boolean = true;
 
   constructor() {
+  }
+
+  onDelete(numCarte: any){
+    this.deleteNote.emit(numCarte)
   }
 
   trackByIdSelector(_: number, item: any): string {

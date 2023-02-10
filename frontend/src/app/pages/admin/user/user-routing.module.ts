@@ -13,7 +13,8 @@ import { UploadComponent } from './upload/upload.component';
 import { UserComponent } from './user.component';
 import { HistoricComponent } from '../home/historic/historic.component';
 
-const routes: Routes = [{ path: '',
+const routes: Routes = [
+  { path: '',
 component: UserComponent,
 children: [
  {

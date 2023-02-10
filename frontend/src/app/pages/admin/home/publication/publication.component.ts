@@ -14,9 +14,10 @@ import { ClassroomService } from '../classroom/classroom.service';
 import { DatatableCrudComponent } from '@app/shared/components/datatable-crud/datatable-crud.component';
 import { PublicationService } from './publication.service';
 import { Publication } from '@app/models/publication';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { head } from 'lodash';
 
-const BASE_URL = environment.onlineAPI;
+const BASE_URL = environment.authApiURL;
 
 
 @Component({
@@ -27,8 +28,12 @@ const BASE_URL = environment.onlineAPI;
 export class PublicationComponent implements OnInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
   headers: TableHeader[] = [];
-
-  user = localStorage.getItem('user')
+   
+  private headersParams =  new HttpHeaders({
+    'Accept': 'application/json',
+    "Authorization": "Bearer "+window.sessionStorage.getItem("token")
+  })
+  user = window.sessionStorage.getItem('user')
   allYears: CollegeYear[] = []
   allJourney: Journey[] = []
   allMention: Mention[] = []
@@ -48,10 +53,12 @@ export class PublicationComponent implements OnInit {
   typePublicationn = typePublication;
   actualYear: string | null = ""
   titles: any[] = []
+  files: any[] = [];
+  validFiles: boolean = false
 
   msg!: string ;
   url: string | ArrayBuffer | null = "";
-  uploadedFile: any = null;
+  uploadedFile: any[] = [];
 
   actions = {
     add: true,
@@ -136,13 +143,15 @@ export class PublicationComponent implements OnInit {
   onAdd() {
     this.showModal();
   }
-changeFile(){
-  if(this.form.value.type == "Pdf" || this.form.value.type == "Image"){
-    this.isVisible = true
-  }else{
-    this.isVisible = false
+
+  changeFile(){
+    this.validFile()
+    if(this.form.value.type == "Pdf" || this.form.value.type == "Image"){
+      this.isVisible = true
+    }else{
+      this.isVisible = false
+    }
   }
-}
   async submitForm(){
     if (this.form.valid) {
       const data = {
@@ -161,26 +170,33 @@ changeFile(){
       }else{
         if(this.isVisible){
           let formData = new FormData();
-          formData.append("uploaded_file", this.uploadedFile)
-          this.http.post<any>(`${BASE_URL}/upload?namefile=`+this.form.value.title,formData).subscribe(
+          console.log(this.uploadedFile);
+          for(let i=0; i<this.uploadedFile.length; i++){
+            formData.append("uploaded_files", this.uploadedFile[i])
+          }
+          
+          this.http.post<any>(`${BASE_URL}/upload/?name_file=`+this.form.value.title,formData, {headers: this.headersParams}).subscribe(
             async(data) => {
               if(data){
+                console.log(data);
                 const body = {
                   title: this.form.value.title, 
                   auteur: this.form.value.auteur,
                   type: this.form.value.type,
-                  url_file: data.filename,
+                  url_file: data.filenames,
                   description: this.form.value.description,
                   expiration_date: this.form.value.expiration,
                 }
                 await this.service.addData(body).toPromise()
                 this.datatable.fetchData()
+                this.files = []
+                this.uploadedFile = []
               }
             }, 
             error => console.error("error as ", error)
             )
         }else{
-          await this.service.addData(data).toPromise()
+          await this.service.addData(data, ).toPromise()
           this.datatable.fetchData()
         }
       }
@@ -199,24 +215,40 @@ changeFile(){
 
   showModal(): void{
     this.isEdit = false;
+    this.form.get('title')?.setValue(''),
+    this.form.get('auteur')?.setValue(''),
+    this.form.get('description')?.setValue(''),
+    this.form.get('expiration')?.setValue(''),
+    this.form.get('type')?.setValue('')
+    this.changeFile()
     this.isvisible = true;
-    this.form.get('name')?.setValue('');
-    this.form.get('capacity')?.setValue('');
   }
 
   async showModalEdit(uuid: string){
     this.isEdit = true
     this.uuid = uuid
-    
+    this.uploadedFile = []
+    this.files = []
     let data: Publication = await this.service.getData(uuid).toPromise()
     this.form.get('title')?.setValue(data.title),
     this.form.get('auteur')?.setValue(data.auteur),
     this.form.get('description')?.setValue(data.description),
     this.form.get('expiration')?.setValue(data.expiration_date),
     this.form.get('type')?.setValue(data.type)
+    for (var file of data.url_file){
+      this.files.push(`${BASE_URL}/upload/?name_file=`+file)
+      this.uploadedFile.push(`${BASE_URL}/upload/?name_file=`+file)
+    }
+    this.changeFile()
     this.isvisible = true
   }
 
+  setName(name: string): string{
+    if(name?.length > 40){
+      return name.substring(0,40)+"..."+name.substring(name.length -5,name.length)
+    }
+    return name
+  }
 
   handleCancel(): void{
     this.isvisible = false
@@ -228,26 +260,95 @@ changeFile(){
       this.isConfirmLoading = false
     }, 3000);
   }
-  selectFile(event: any){
-    if(!event.target.files[0] || event.target.files[0].length == 0){
-      this.msg = "select a file"
-      this.disabled = true
-    }else{
-    this.disabled = false
-    }
-    var mineType = event.target.files[0].type;
-    if(mineType.match(/document\/*/) == null){
-      this.msg = "select image"
-    }
-    var reader = new FileReader();
-    reader.readAsDataURL(event.target.files[0])
+    /**
+   * on file drop handler
+   */
+  onFileDropped(event: any) {
+    this.prepareFilesList(event);
+  }
 
-    reader.onload = (_event) =>{
-      this.msg = ""
-      this.url = reader.result
-    } 
-    this.uploadedFile = event.target.files[0]
-    this.disabled = false
-   }
+  /**
+   * handle file from browsing
+   */
+  fileBrowseHandler(event: any) {
+    this.prepareUploadFile(event?.target.files[0]);
+    this.prepareFilesList(event?.target.files);
+    
+  }
+  validFile(){
+    if(this.form.value.type !== "Text" && this.form.value.type !== "Other"){
+      if(this.uploadedFile.length > 0)
+        this.validFiles= true
+      else
+      this.validFiles= false
+    }else{
+      this.validFiles= true
+    }
+    console.log(this.validFiles);
+    
+  }
+  /**
+   * Delete file from files list
+   * @param index (File index)
+   */
+  deleteFile(index: number) {
+    this.files.splice(index, 1);
+    this.uploadedFile.splice(index, 1);
+    this.validFile()
+  }
+
+  /**
+   * Simulate the upload process
+   */
+  uploadFilesSimulator(index: number) {
+  this.validFile()
+    setTimeout(() => {
+      if (index === this.files.length) {
+        return;
+      } else {
+        const progressInterval = setInterval(() => {
+          if (this.files[index].progress === 100) {
+            clearInterval(progressInterval);
+            this.uploadFilesSimulator(index + 1);
+          } else {
+            this.files[index].progress += 5;
+          }
+        }, 200);
+      }
+    }, 1000);
+  }
+
+  /**
+   * Convert Files list to normal array list
+   * @param files (Files List)
+   */
+  prepareFilesList(files: Array<any>) {
+    for (const item of files) {
+      item.progress = 0;
+      this.files.push(item);
+    }
+    this.uploadFilesSimulator(0);
+
+  }
+
+  prepareUploadFile(files: any){
+    this.uploadedFile.push(files)
+  }
+
+  /**
+   * format bytes
+   * @param bytes (File size in bytes)
+   * @param decimals (Decimals point)
+   */
+  formatBytes(bytes: number, decimals: number) {
+    if (bytes === 0) {
+      return '0 Bytes';
+    }
+    const k = 1024;
+    const dm = decimals <= 0 ? 0 : decimals || 2;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
 
 }

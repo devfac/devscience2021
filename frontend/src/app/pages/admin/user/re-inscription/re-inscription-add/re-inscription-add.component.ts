@@ -194,7 +194,6 @@ export class ReInscriptionAddComponent implements OnInit {
       this.formDialog.get('numReceipt')?.setValue(data.receipt.num)
       this.formDialog.get('dateReceipt')?.setValue(data.receipt.date)
       this.formDialog.get('priceRigth')?.setValue(data.receipt.price)
-      console.log(data);
       
     }
     else{

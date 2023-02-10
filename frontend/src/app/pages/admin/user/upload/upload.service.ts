@@ -11,7 +11,7 @@ export class UploadService {
 
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
+    "Authorization": "Bearer "+window.sessionStorage.getItem('token')
   })
   
   constructor(

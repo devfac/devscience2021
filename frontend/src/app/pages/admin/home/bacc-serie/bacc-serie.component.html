@@ -3,6 +3,7 @@
 [headers]="headers"
 [fetchDataFn]="fetchData"
 [actions]="actions"
+[tableTitle]="'Serie'"
 (delete)="onDelete($event)"
 (edit)="onEdit($event)"
 (add)="onAdd()"
@@ -19,7 +20,7 @@ classNames="table"
       <form nz-form [formGroup]="form" class="form" (ngSubmit)="submitForm()" nzLayout="vertical">
           <nz-form-item>
             <nz-form-label nzRequired>
-              {{ 'admin.home.bacc.title' | translate }}
+              {{ 'admin.home.bacc_serie.title' | translate }}
             </nz-form-label>
             <nz-form-control [nzErrorTip]="'admin.home.bacc_serie.bacc_serie_error' | translate">
               <nz-input-group>

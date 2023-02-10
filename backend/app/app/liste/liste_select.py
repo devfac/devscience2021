@@ -61,5 +61,5 @@ class PDF(FPDF):
                     pdf.cell(163, 5, txt=name, border=1, ln=0, align="L")
                     num_ += 1
 
-        pdf.output(f"files/list_select_{mention}.pdf", "F")
-        return f"files/list_select_{mention}.pdf"
+        pdf.output(f"files/pdf/liste/list_select_{mention}.pdf", "F")
+        return f"files/pdf/liste/list_select_{mention}.pdf"

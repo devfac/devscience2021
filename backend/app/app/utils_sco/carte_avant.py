@@ -166,6 +166,6 @@ class PDF(FPDF):
             PDF.boucle_carte(pdf, etudiant[l:l + 8], data)
             k += 1
             l += 8
-        pdf.output(f"files/carte_{data['mention']}.pdf", "F")
+        pdf.output(f"files/pdf/carte/carte_{data['mention']}.pdf", "F")
 
-        return f"files/carte_{data['mention']}.pdf"
+        return f"files/pdf/carte/carte_{data['mention']}.pdf"

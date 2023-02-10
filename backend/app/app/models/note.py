@@ -1,5 +1,5 @@
 
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, Boolean
 from sqlalchemy import MetaData, Table
 from sqlalchemy.sql.sqltypes import Float
 from app.db.session import engine
@@ -20,6 +20,8 @@ def create_table_note( journey, semester,session ,matiers) -> bool:
         add_column(table_name=f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", column=column_mean)
         column_credit = Column("credit",Integer,default=0)
         add_column(table_name=f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", column=column_credit)
+        column_validation = Column("validation",Boolean)
+        add_column(table_name=f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", column=column_validation)
         column_year = Column("year",String)
         add_column(table_name=f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", column=column_year)
         return True

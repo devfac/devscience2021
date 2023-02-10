@@ -39,6 +39,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   @Input() matierEc: Ec[] = [];
   @Input() width!: number;
   @Input() title: string = '';
+  @Input() tableTitle?: string;
   @Input() session: string = '';
   @Input() portList: any[] = [];
   @Input() isSelectable: boolean = false;
@@ -211,11 +212,8 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
               this.new_data = [];
               this.listOfData = [];
               //this.data = result
-
-              console.log(this.childrenDataHeader);
               if (this.childrenDataHeader?.length > 0) {
                 for (let i = 0; i < result.data.length; i++) {
-                  // console.log(result.data[i].stocks);
                   this.new_data.push({ ...result.data[i], expand: false, add: false });
                   this.listOfData.push({ ...result.data[i] });
                   
@@ -232,7 +230,6 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
               }
               this.total = result?.count || 0;
               this.data = [...this.new_data];
-              console.log(this.data);
               
               
             },

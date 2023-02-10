@@ -40,7 +40,7 @@ export class UploadComponent implements OnInit ,AfterContentInit{
   @ViewChild('situationTemplate',{static: true}) situation!: TemplateRef<any>;
   headers: TableHeader[] = [];
 
-  user = localStorage.getItem('user')
+  user = window.sessionStorage.getItem('user')
   allYears: CollegeYear[] = []
   listOfSemester = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
   allJourney: Journey[] = []
@@ -330,7 +330,6 @@ export class UploadComponent implements OnInit ,AfterContentInit{
     const requestData = this.listOfData.filter(data => this.setOfCheckedId.has(data.num_carte));
     let listOfData: ResponseModel  = await this.service.saveData(requestData, this.form.value.mention, this.form.value.journey, this.form.value.collegeYear).toPromise()
     this.listOfData = listOfData.data
-    console.log(requestData);
     setTimeout(() => {
       this.setOfCheckedId.clear();
       this.refreshCheckedStatus();

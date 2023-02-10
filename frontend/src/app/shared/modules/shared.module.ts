@@ -13,6 +13,7 @@ import { DatatableComponent } from '../components/datatable/datatable.component'
 import { DatatableCrudComponent } from '../components/datatable-crud/datatable-crud.component';
 import { NotificationDropdownComponent } from "@app/components/notification-dropdown/notification-dropdown.component";
 import { LocalizedDatePipe } from '../utils/localized-date.pipe'; 
+import { ProgressComponent } from "../components/progress/progress.component";
 @NgModule({
   imports: [
     CommonModule,
@@ -37,6 +38,7 @@ import { LocalizedDatePipe } from '../utils/localized-date.pipe';
     ScrollingModule,
     DatatableComponent,
     DatatableCrudComponent,
+    ProgressComponent,
     NotificationDropdownComponent,
     LocalizedDatePipe,
   ],
@@ -47,6 +49,7 @@ import { LocalizedDatePipe } from '../utils/localized-date.pipe';
     CustomBackgroundDirective,
     DatatableComponent,
     DatatableCrudComponent,
+    ProgressComponent,
     NotificationDropdownComponent,
     LocalizedDatePipe,
   ],

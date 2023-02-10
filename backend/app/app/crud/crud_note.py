@@ -36,7 +36,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         return columns
 
     def insert_note(self, semester: str, journey: str, session: str, num_carte: str, year: str):
-        obj_in_data = jsonable_encoder({"num_carte":num_carte, "year":year})
+        obj_in_data = jsonable_encoder({"num_carte":num_carte, "year":year, "validation":False})
         metadata = MetaData(bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
@@ -75,7 +75,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         metadata = MetaData(bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
-        result = conn.execute(f"SELECT num_carte, {value_matier} FROM {table} WHERE {value_matier} >= 10 ")
+        result = conn.execute(f"SELECT num_carte, {value_matier}, validation FROM {table} WHERE {value_matier} >= 10 ")
         out = result.fetchall()
         conn.close()
         return out
@@ -84,7 +84,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         metadata = MetaData(bind=engine)
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
-        result = conn.execute(f"SELECT num_carte, {list_ue} FROM {table} WHERE year = '{year}'")
+        result = conn.execute(f"SELECT num_carte, {list_ue}, validation FROM {table} WHERE year = '{year}'")
         out = result.fetchall()
         conn.close()
         return out
@@ -94,7 +94,7 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
         conn = engine.connect()
         result = conn.execute(
-            f"SELECT num_carte, {value_matier} FROM {table} WHERE {value_matier} < 10  OR {value_matier} IS NULL ")
+            f"SELECT num_carte, {value_matier}, validation FROM {table} WHERE {value_matier} < 10  OR {value_matier} IS NULL ")
         out = result.fetchall()
         conn.close()
         return out
