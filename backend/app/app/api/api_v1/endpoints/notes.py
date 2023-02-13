@@ -306,6 +306,12 @@ def get_all_notes(
         uuid_journey: str,
         limit: int = 100,
         offset: int = 0,
+        value_ue: str = "",
+        value_ec: str = "",
+        credit: str = "",
+        mean: str = "",
+        value: Any = 10,
+        type_:str = "success",
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
 
@@ -314,10 +320,12 @@ def get_all_notes(
         raise HTTPException(status_code=400, detail="journey not found")
 
     all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation,limit=limit, skip=offset,
-                                       session=session, year=college_year)
+                                       session=session, year=college_year, value_ue=value_ue, value_ec=value_ec,
+                                       type_=type_, credit=credit, mean=mean, value=value)
 
     all_note_count = crud.note.read_all_note_count(semester=semester, journey=journey.abbreviation,
-                                       session=session, year=college_year)
+                                       session=session, year=college_year, value_ue=value_ue, value_ec=value_ec,
+                                       type_=type_, credit=credit, mean=mean, value=value)
     count = len(all_note_count)
     response = schemas.ResponseData(**{'count':count, 'data':all_note})
     return response

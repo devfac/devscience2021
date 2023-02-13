@@ -11,22 +11,6 @@ from sqlalchemy.orm import Session
 
 router = APIRouter()
 
-
-@router.get("/get_all_notes", response_model=List[Any])
-def get_all_notes(
-        semester: str,
-        session: str,
-        uuid_journey: str,
-        db: Session = Depends(deps.get_db),
-        current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
-    journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
-    if not journey:
-        raise HTTPException(status_code=400, detail="journey not found")
-    all_note = crud.note.read_all_note(create_anne(schemas), semester, journey.abbreviation, session)
-    return all_note
-
-
 @router.get("/get_by_credit", response_model=List[Any])
 def get_by_credit(
         schemas: str,
@@ -43,6 +27,34 @@ def get_by_credit(
     all_note = crud.note.read_note_by_credit(schemas, semester, journey.abbreviation, session, credit)
     return all_note
 
+@router.get("/get_result_notes/", response_model=schemas.ResponseData)
+def get_result_notes(
+        *,
+        db: Session = Depends(deps.get_db),
+        college_year: str,
+        semester: str,
+        session: str,
+        uuid_journey: str,
+        limit: int = 100,
+        offset: int = 0,
+        value_ue: str,
+        type_: str =  "success",
+        current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+
+    journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
+    if not journey:
+        raise HTTPException(status_code=400, detail="journey not found")
+    if type_ == "success":
+        all_note = crud.note.read_note_succes(semester=semester, journey=journey.abbreviation,
+                                            session=session, year=college_year,limit=limit,
+                                            skip=offset, value_matier=value_ue)
+    else:
+        all_note = crud.note.read_note_failed(semester=semester, journey=journey.abbreviation,
+                                              session=session, year=college_year, limit=limit,
+                                              skip=offset, value_matier=value_ue)
+    response = schemas.ResponseData(**{'count':len(all_note), 'data':all_note})
+    return response
 
 @router.get("/get_by_moyenne", response_model=List[Any])
 def get_by_moyenne(

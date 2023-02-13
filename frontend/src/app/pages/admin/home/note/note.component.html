@@ -153,7 +153,7 @@
             <tr [nzExpand]="expandSet.has(data.uuid)">
               <ng-container *ngFor="let ec of data.ec">
                   <nz-input-group [nzAddOnBefore]="ec.title" >
-                      <input nz-input type="text" readonly  
+                      <input nz-input type="text" readonly
                       [placeholder]="ec.weight "/>
                   </nz-input-group>
               </ng-container>
@@ -186,10 +186,10 @@
     </div>
     </div>
   </div>
-     
+
 
 <nz-spin [nzSpinning]="isSpinning">
-  
+
 <app-datatable-crud
 *ngIf="showTable"
 [headers]="headers"
@@ -208,7 +208,13 @@
 (listExam)="showModal()"
 (deleteTable)="deleteTable()"
 (createTable)="createTable()"
+(resultUeSuccess)="resultUeSuccess($event)"
+(resultUeFaild)="resultUeFaild($event)"
+(resultEcSuccess)="resultEcSuccess($event)"
+(resultEcFailed)="resultEcFailed($event)"
+(listRattrapage)="rattrapageList($event)"
 (downloadResult)="resultat($event)"
+(resultByCreditSuccess)="resultByCreditSuccess($event)"
 (refresh)="refresh()"
 (insert)="insertStudent()"
 (demande)="demande()"
@@ -220,9 +226,9 @@
 classNames="note"
 ></app-datatable-crud>
 
-  <nz-modal [(nzVisible)]="visibleDialog" 
-      nzTitle="{{'admin.home.note.list' | translate}}" 
-      (nzOnCancel)="handleCancel()" 
+  <nz-modal [(nzVisible)]="visibleDialog"
+      nzTitle="{{'admin.home.note.list' | translate}}"
+      (nzOnCancel)="handleCancel()"
       nzMask="true"
       nzMaskClosable="false" >
       <div *nzModalContent>
@@ -255,8 +261,8 @@ classNames="note"
               </nz-form-label>
               <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
                 <nz-input-group>
-                  <input type="number" nz-input formControlName="from" 
-                    [min]="1" 
+                  <input type="number" nz-input formControlName="from"
+                    [min]="1"
                     appCustomAutoFocus
                     [placeholder]="'admin.home.note.from' | translate" />
                 </nz-input-group>
@@ -292,15 +298,15 @@ classNames="note"
               </button>
         </form>
           </nz-tab>
-          <nz-tab nzTitle="Télécharger un models" > 
-            <button nz-button nzType="primary" 
+          <nz-tab nzTitle="Télécharger un models" >
+            <button nz-button nzType="primary"
             [nzLoading]="isConfirmLoading"  class="button" (click)="startDownloadModel()">
               <span nz-icon nzType="download"></span>
               {{'admin.home.upload.get_model' | translate}}
             </button>
           </nz-tab>
 
-          <nz-tab nzTitle="Résultat final" > 
+          <nz-tab nzTitle="Résultat final" >
             <div nz-row>
             <div nz-col >
             <button nz-button nzType="primary" [disabled]="disableCompense"
@@ -311,7 +317,7 @@ classNames="note"
           </div>
           <div nz-col [nzSpan]="1"></div>
           <div nz-col >
-            <button nz-button nzType="primary" 
+            <button nz-button nzType="primary"
             [nzLoading]="isConfirmLoading"  class="button" (click)="startDownloadResultat('definitive')">
               <span nz-icon nzType="download"></span>
               {{"Définitive"}}
@@ -330,4 +336,3 @@ classNames="note"
     <span *ngIf="value" nz-icon nzType="check-circle" style="font-size: 25px; color: green;"></span>
     <span *ngIf="!value" nz-icon nzType="close-circle"  style="font-size: 25px; color: red;"></span>
 </ng-template>
-    

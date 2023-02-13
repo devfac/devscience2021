@@ -74,8 +74,8 @@ def list_examen(
         all_ue.append(ues_)
     matiers['ue'] = all_ue
 
-    students = crud.ancien_student.get_by_class_limit(db=db, uuid_journey=uuid_journey,uuid_mention=uuid_mention,
-                                                      semester=semester,skip=skip, limit=limit-skip)
+    students = crud.note.read_all_note(journey=journey.abbreviation,session=session,year=college_year,
+                                        semester=semester,skip=skip, limit=limit-skip)
     print(len(students))
 
     all_students = []
@@ -85,13 +85,13 @@ def list_examen(
             detail="Etudiants not found.",
         )
     for on_student in students:
-        un_et = crud.note.read_by_num_carte(semester, journey.abbreviation, session, on_student.num_carte)
-        if un_et and find_in_list(on_student.actual_years, college_year) != -1:
-            student = {"last_name": on_student.last_name,
-                       "first_name": on_student.first_name,
-                       "num_carte": on_student.num_carte}
+        un_et = crud.ancien_student.get_by_num_carte(db=db, num_carte=on_student.num_carte)
+        if un_et and find_in_list(un_et.actual_years, college_year) != -1:
+            student = {"last_name": un_et.last_name,
+                       "first_name": un_et.first_name,
+                       "num_carte": un_et.num_carte}
             all_students.append(student)
-
+    print(len(all_students))
     data['mention'] = mention.title
     data['journey'] = journey.title
     data['anne'] = college_year

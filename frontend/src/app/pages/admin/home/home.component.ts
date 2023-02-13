@@ -52,7 +52,7 @@ export class HomeComponent implements OnInit, AfterContentInit, AfterContentChec
       } else {
         regex = path;
       }
-      return (this.router.routerState.snapshot.url.match(regex)?.length || []) > 0;
+      return (this.router.routerState.snapshot.url.match(regex)?.length || 0) > 0;
     } else {
       if (item.fragment) {
         const _fragment = this.router.routerState.root.snapshot.fragment;

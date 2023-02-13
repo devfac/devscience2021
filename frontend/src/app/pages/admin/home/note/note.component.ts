@@ -51,7 +51,7 @@ interface DataItem {
   templateUrl: './note.component.html',
   styleUrls: ['./note.component.less']
 })
-export class NoteComponent implements OnInit, AfterContentInit {
+export class NoteComponent implements OnInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
   @ViewChild('isValidated', { static: true }) isValidated!: TemplateRef<any>;
   headers: TableHeader[] = [];
@@ -121,6 +121,12 @@ export class NoteComponent implements OnInit, AfterContentInit {
   keyJourney = CODE+"journey"
   keySemester = CODE+"semester"
   keySession = CODE+"session"
+  keyUe:string | null =null
+  keyEc:string | null =null
+  keyType:string | null =null
+  keyCredit:string | null =null
+  keyValue:number | null =null
+  keyMean:string | null =null
   isLoading: boolean = false
   permissionNote: boolean = false
   listRoom: Classroom[] = []
@@ -134,10 +140,10 @@ export class NoteComponent implements OnInit, AfterContentInit {
 
   matier: UeEc[] = []
   constructor(
-    private http: HttpClient, 
-    private modal: NzModalService, 
-    private fb: FormBuilder, 
-    public authService: AuthService, 
+    private http: HttpClient,
+    private modal: NzModalService,
+    private fb: FormBuilder,
+    public authService: AuthService,
     private translate: TranslateService,
     private router: Router,
     private downloadServices: UtilsService,
@@ -147,8 +153,8 @@ export class NoteComponent implements OnInit, AfterContentInit {
     private serviceRoom: ClassroomService,
     private serviceJourney: JourneyService,
     private serviceMention: MentionService,
-    private serviceUe: UeService, 
-    private serviceEc: EcService,) { 
+    private serviceUe: UeService,
+    private serviceEc: EcService,) {
 
     this.form = this.fb.group({
       mention: [null, [Validators.required]],
@@ -176,10 +182,6 @@ export class NoteComponent implements OnInit, AfterContentInit {
   expandSet = new Set<string>();
   interactionList: Interaction[] = []
 
-  async ngAfterContentInit() {
-   
-  }
-
   createHeaders(){
     this.headers =[
       {
@@ -200,13 +202,14 @@ export class NoteComponent implements OnInit, AfterContentInit {
         type: TableHeaderType.LEFT,
         width:"130px"
         }
-    ] 
+    ]
     this.headerData =[
       {
       title: 'Validée',
       selector: 'validation',
       isSortable: false,
       rowspan: 2,
+      width:"90px",
       template: this.isValidated,
       type: TableHeaderType.LEFT,
       style: { 'text-align': 'center' },
@@ -219,9 +222,9 @@ export class NoteComponent implements OnInit, AfterContentInit {
         type: TableHeaderType.LEFT,
         width:"130px"
         }
-    ] 
+    ]
 
-   
+
     this.headerSpan = []
     for (let index = 0; index<this.allColumns.length; index++){
       let column: TableHeader;
@@ -229,6 +232,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
           title: this.allColumns[index].title,
           selector: "ue_"+this.allColumns[index].name,
           isSortable: false,
+          width:`${100*this.allColumns[index].nbr_ec+ 90}`,
           colspan: this.allColumns[index].nbr_ec + 1,
       }
       this.headers.push(column)
@@ -238,6 +242,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
                 title: this.allColumns[index].ec[j].title,
                 selector: "ec_"+this.allColumns[index].ec[j].name,
                 isSortable: false,
+                width:"100px",
                 editable: true,
                 }
            this.headerData.push(column)
@@ -257,6 +262,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
           title: 'Note',
           selector: "ue_"+this.allColumns[index].name,
           isSortable: false,
+          width:"90px",
           style: { 'text-align': 'center' },
         },
       )
@@ -268,36 +274,40 @@ export class NoteComponent implements OnInit, AfterContentInit {
         selector: 'credit',
         isSortable: false,
         rowspan: 2,
+        width:"90px",
         style: { 'text-align': 'center' },
       },
-    ) 
+    )
     this.headerData.push(
       {
         title: 'Credit',
         selector: 'credit',
         isSortable: false,
+        width:"90px",
         style: { 'text-align': 'center' },
       },
-    ) 
+    )
     this.headers.push(
       {
         title: 'Moyenne',
         selector: 'mean',
         isSortable: false,
         rowspan: 2,
+        width:"90px",
         style: { 'text-align': 'center' },
       },
-    ) 
-    
+    )
+
     this.headerData.push(
       {
         title: 'Moyenne',
         selector: 'mean',
+        width:"90px",
         isSortable: false,
 
         style: { 'text-align': 'center' },
       },
-    ) 
+    )
 
     this.headers.push(
       {
@@ -309,7 +319,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
         width:"90px",
         rowspan: 2,
       },
-    ) 
+    )
     this.headerData.push(
       {
         title: 'Action',
@@ -319,7 +329,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
         btnType: true,
         width:"90px",
       },
-    ) 
+    )
   }
 
   async ngOnInit(){
@@ -334,7 +344,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
     this.user = await this.noteService.getMe().toPromise()
     if(!this.user.is_superuser){
       this.allMention = await this.noteService.getMentionUser()
-      if(this.testStorage(this.keyMention, this.allMention[0].uuid) && 
+      if(this.testStorage(this.keyMention, this.allMention[0].uuid) &&
         this.testStorage(this.keyYear, this.allYears[0].title)){
           let uuidMention = localStorage.getItem(this.keyMention)
           if(uuidMention !== null){
@@ -347,19 +357,19 @@ export class NoteComponent implements OnInit, AfterContentInit {
                 this.testStorage(this.keySession,'Normal') &&
                 this.testStorage(this.keySemester, this.allJourney[0].semester[0])){
                 let testNote: boolean = await this.noteService.testNote(
-                  this.form.value.semester, 
-                  this.form.value.journey, 
+                  this.form.value.semester,
+                  this.form.value.journey,
                   this.form.value.session
                   ).toPromise()
                   if(testNote){
                       this.getNoteMatier()
                       this.allColumns = await this.noteService.getAllColumns(
-                      this.form.value.semester, 
-                      this.form.value.journey, 
+                      this.form.value.semester,
+                      this.form.value.journey,
                       this.form.value.session,
                       this.form.value.collegeYear,
                     ).toPromise()
-                    
+
                     this.createHeaders()
                     this.showTable = true
                     this.isLoading = true
@@ -384,7 +394,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
       let allMention: ResponseModel = await this.serviceMention.getDataPromise().toPromise()
       this.allMention = allMention.data
 
-      if(this.testStorage(this.keyMention, this.allMention[0].uuid) && 
+      if(this.testStorage(this.keyMention, this.allMention[0].uuid) &&
         this.testStorage(this.keyYear, this.allYears[0].title)){
         let uuidMention = localStorage.getItem(this.keyMention)
 
@@ -401,19 +411,19 @@ export class NoteComponent implements OnInit, AfterContentInit {
                 this.testStorage(this.keySession,'Normal') &&
                 this.testStorage(this.keySemester, this.allJourney[0].semester[0])){
                 let testNote: boolean = await this.noteService.testNote(
-                  this.form.value.semester, 
-                  this.form.value.journey, 
+                  this.form.value.semester,
+                  this.form.value.journey,
                   this.form.value.session
                   ).toPromise()
                   if(testNote){
                       this.getNoteMatier()
                       this.allColumns = await this.noteService.getAllColumns(
-                      this.form.value.semester, 
-                      this.form.value.journey, 
+                      this.form.value.semester,
+                      this.form.value.journey,
                       this.form.value.session,
                       this.form.value.collegeYear,
                     ).toPromise()
-                    
+
                     this.createHeaders()
                     this.showTable = true
                     this.isLoading = true
@@ -427,13 +437,12 @@ export class NoteComponent implements OnInit, AfterContentInit {
         }
       }
       }
-
       this.initialise = true
     }
 
-  }   
-  
-    
+  }
+
+
   testStorage(key: string, value: string): boolean{
     if(localStorage.getItem(key)){
       this.form.get(key.substring(CODE.length))?.setValue(localStorage.getItem(key))
@@ -450,6 +459,12 @@ export class NoteComponent implements OnInit, AfterContentInit {
       session: localStorage.getItem(this.keySession),
       semester: localStorage.getItem(this.keySemester),
       uuid_journey: localStorage.getItem(this.keyJourney),
+      value_ue: this.keyUe,
+      value_ec: this.keyEc,
+      credit:this.keyCredit,
+      mean: this.keyMean,
+      value:this.keyValue,
+      type_: this.keyType,
     }
     return this.noteService.getDataObservable(parseQueryParams(params,otherParams))
   }
@@ -459,6 +474,100 @@ export class NoteComponent implements OnInit, AfterContentInit {
       this.expandSet.add(id);
     } else {
       this.expandSet.delete(id);
+    }
+  }
+
+  resultUeSuccess(valueUe: string){
+    if(valueUe){
+      this.keyEc =null
+      this.keyUe =valueUe
+      this.keyType="success"
+      this.keyCredit=null
+      this.keyValue=null
+      this.keyMean=null
+      this.datatable.fetchData()
+    }else{
+      this.reset()
+  }
+  }
+
+  resultUeFaild(valueUe: string){
+    if(valueUe){
+      this.keyEc =null
+      this.keyUe =valueUe
+      this.keyType="failed"
+      this.keyCredit=null
+      this.keyValue=null
+      this.keyMean=null
+      this.datatable.fetchData()
+    }else{
+      this.reset()
+  }
+  }
+
+  resultEcSuccess(valueEc: string){
+    if(valueEc){
+      this.keyEc =valueEc
+      this.keyUe =null
+      this.keyType="success"
+      this.keyCredit=null
+      this.keyValue=null
+      this.keyMean=null
+      this.datatable.fetchData()
+    }else{
+      this.reset()
+  }
+  }
+
+  resultEcFailed(valueEc: string){
+    if(valueEc){
+        this.keyEc =valueEc
+        this.keyUe =null
+        this.keyCredit=null
+        this.keyValue=null
+        this.keyMean=null
+        this.keyType="failed"
+        this.datatable.fetchData()
+      }else{
+        this.reset()
+    }
+  }
+
+  reset(){
+    this.keyEc =null
+    this.keyUe =null
+    this.keyCredit=null
+    this.keyValue=null
+    this.keyMean=null
+    this.keyType=null
+    this.datatable.fetchData()
+  }
+
+  resultByCreditSuccess(data: any){
+    if(data){
+        this.keyEc =null
+        this.keyUe =null
+        this.keyCredit=data.credit
+        this.keyValue=data.value
+        this.keyMean=data.mean
+        this.keyType="success"
+        this.datatable.fetchData()
+      }else{
+        this.reset()
+    }
+  }
+
+  rattrapageList(data: any){
+    if(data){
+      this.keyEc =data.valueEc
+      this.keyUe =data.valueUe
+      this.keyType=null
+      this.keyCredit=null
+      this.keyValue=null
+      this.keyMean=null
+      this.datatable.fetchData()
+    }else{
+      this.reset()
     }
   }
 
@@ -493,7 +602,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
   refreshCheckedStatus(): void {
     this.checked = this.listOfCurrentPageData.every(item => this.setOfCheckedId.has(item.value));
     this.indeterminate = this.listOfCurrentPageData.some(item => this.setOfCheckedId.has(item.value)) && !this.checked;
-    
+
   }
 
   demande(){
@@ -526,9 +635,9 @@ export class NoteComponent implements OnInit, AfterContentInit {
       }
       interaction["uuid_journey"] = this.form.value.journey
       interaction["college_year"] = this.form.value.collegeYear
-  
+
       let data = await this.noteService.addInteraction(this.form.value.semester, interaction).toPromise()
-      
+
       for (let index = 0; index< data.length; index++){
         this.interactionResult.push(data[index])
         if (data[index].type == "ue"){
@@ -536,16 +645,16 @@ export class NoteComponent implements OnInit, AfterContentInit {
           this.totalCredit += data[index].value
         }else{
           this.totalEc ++
-          
+
         }
       }
-      
+
     }else{
       if(this.interactionResult.length > 0){
         await this.noteService.createTableNote(this.form.value.semester, this.form.value.journey, this.form.value.collegeYear).toPromise()
       }
     }
-    
+
   }
 
   getEc(value_ue: string): void{
@@ -560,7 +669,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
   }
 
  async done() {
-    let testNote: boolean = await this.noteService.testNote( 
+    let testNote: boolean = await this.noteService.testNote(
       this.form.value.semester, this.form.value.journey, this.form.value.session).toPromise()
       if(testNote){
         this.submitForm()
@@ -591,8 +700,8 @@ export class NoteComponent implements OnInit, AfterContentInit {
         ue.push(modelUe)
       }
     let model = {"num_carte":note["num_carte"], "ue":ue}
-    
-    await this.noteService.insertNote(this.form.value.semester, this.form.value.journey, 
+
+    await this.noteService.insertNote(this.form.value.semester, this.form.value.journey,
       this.form.value.session, this.form.value.collegeYear, model).toPromise()
       this.datatable.fetchData()
     this.isSpinning = false
@@ -613,11 +722,11 @@ export class NoteComponent implements OnInit, AfterContentInit {
                 .append('semester', this.form.value.semester)
                 .append('session', this.form.value.session)
                 .append('value_ue', value_ue)
-    
+
     const journey = this.getTitle(this.allJourney, "uuid", this.form.get('journey')?.value)
     let name = "resultat"+this.form.value.matierUe+"_"+this.form.get('semester')?.value+"_"+journey.abbreviation+"_"+this.form.value.session+'.pdf';
     this.downloadServices.download(url, params, name)
-    
+
   }
   listExam(){
     let url = `${BASE_URL}/liste/list_exam/`
@@ -635,7 +744,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
     let name ="List_examen"+this.form.get('semester')?.value+"_"+journey.abbreviation+"salle"
     this.downloadServices.download(url, params, name)
     this.visibleDialog = false
-    
+
   }
 
   onDelete(row: any) {
@@ -687,7 +796,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
       }
     })
   }
-  
+
   deleteTable(): void{
     if(this.form.get('journey')?.value && this.form.get('semester')?.value && this.form.get('session')?.value){
       const journey = this.allJourney.find((item: Journey) => item.uuid === this.form.value.journey)
@@ -707,7 +816,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
 
   async insertStudent(){
     if(this.form.get('journey')?.value && this.form.get('mention')?.value && this.form.get('session')?.value && this.form.get('semester')?.value && this.initialise) {
-       await this.noteService.insertStudent( this.form.value.semester, this.form.value.journey, 
+       await this.noteService.insertStudent( this.form.value.semester, this.form.value.journey,
         this.form.value.session, this.form.value.collegeYear, this.form.value.mention).toPromise()
         this.datatable.fetchData()
       }
@@ -746,7 +855,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
     }
   }
   async getAllColumnsSession(){
-    
+
     if(this.form.get('journey')?.value && this.form.get('mention')?.value && this.form.get('semester')?.value && this.initialise){
       if(this.form.value.session == "Normal"){
         this.disableCompense = true
@@ -754,7 +863,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
         this.disableCompense = false
       }
 
-      let testNote: boolean = await this.noteService.testNote( 
+      let testNote: boolean = await this.noteService.testNote(
         this.form.value.semester, this.form.value.journey, this.form.value.session).toPromise()
 
     localStorage.setItem(this.keySession, this.form.get('session')?.value)
@@ -795,7 +904,7 @@ export class NoteComponent implements OnInit, AfterContentInit {
     localStorage.setItem(this.keySemester, this.form.get('semester')?.value)
     localStorage.setItem(this.keySession, this.form.get('session')?.value)
     localStorage.setItem(this.keyMention, this.form.get('mention')?.value)
-     
+
   }
   async refresh(){
     if(this.form.get('journey')?.value && this.form.get('mention')?.value && this.form.get('session')?.value && this.form.get('semester')?.value && this.initialise){
@@ -877,7 +986,7 @@ async startUpload(){
     this.disabled = true
  }else{
   console.log("Required parameters");
-  
+
  }
 }
 startDownloadModel(){
@@ -888,8 +997,8 @@ startDownloadModel(){
                                     .append('session', this.form.value.session )
                                     .append('uuid_journey', this.form.value.journey)
                                     .append('college_year', this.form.value.collegeYear)
-    let name: string = 'Model_note_'+this.form.value.semester+"_"+this.form.value.session 
-    this.downloadServices.download(url, otherParams, name, ".xlsx");  
+    let name: string = 'Model_note_'+this.form.value.semester+"_"+this.form.value.session
+    this.downloadServices.download(url, otherParams, name, ".xlsx");
     this.visibleDialog = false
   }
 }
@@ -904,7 +1013,7 @@ startDownloadResultat(typeResult: string){
                                     .append('college_year', this.form.value.collegeYear)
                                     .append('type_result', typeResult)
     let name: string = 'Resultat'+this.form.value.semester+"_"+this.form.value.session +"_"+typeResult
-    this.downloadServices.download(url, otherParams, name);  
+    this.downloadServices.download(url, otherParams, name);
     this.visibleDialog = false
   }
 }
@@ -925,7 +1034,7 @@ selectFile(event: any){
   reader.onload = (_event) =>{
     this.msg = ""
     this.url = reader.result
-  } 
+  }
   this.uploadedFile = event.target.files[0]
   this.disabled = false
  }
