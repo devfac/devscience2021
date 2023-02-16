@@ -12,9 +12,9 @@
 classNames="table"
 ></app-datatable-crud>
 
-    <nz-modal [(nzVisible)]="isvisible" 
-              nzTitle="{{'admin.home.journey.add_journey' | translate}}" 
-              (nzOnCancel)="handleCancel()" 
+    <nz-modal [(nzVisible)]="isvisible"
+              nzTitle="{{'admin.home.journey.add_journey' | translate}}"
+              (nzOnCancel)="handleCancel()"
               nzMask="true"
               nzMaskClosable="false" >
     <div *nzModalContent>
@@ -72,7 +72,6 @@ classNames="table"
                             formControlName="semesterList"
                             [nzMaxTagCount]="10"
                             nzMode="multiple"
-                            [(ngModel)]="listOfTagsOptions"
                             [nzPlaceHolder]="'admin.home.journey.semester' | translate"
                             >
                             <nz-option *ngFor="let item of listOfOptions"

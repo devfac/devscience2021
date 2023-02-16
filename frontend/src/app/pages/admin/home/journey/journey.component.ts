@@ -19,7 +19,7 @@ const BASE_URL = environment.authApiURL;
   templateUrl: './journey.component.html',
   styleUrls: ['./journey.component.less']
 })
-export class JourneyComponent implements OnInit, AfterContentInit { 
+export class JourneyComponent implements OnInit, AfterContentInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
   headers: TableHeader[] = [];
 
@@ -27,7 +27,7 @@ export class JourneyComponent implements OnInit, AfterContentInit {
   allMention: Mention[] = []
   listOfOptions = ['S1' ,'S2' ,'S3' ,'S4' ,'S5' ,'S6' ,'S7' ,'S8' ,'S9' ,'S10']
   semesterTitles: any[] = []
-  listOfTagsOptions =[] 
+  listOfTagsOptions =[]
   confirmModal?: NzModalRef;
   form!: FormGroup;
   isvisible = false;
@@ -43,15 +43,15 @@ export class JourneyComponent implements OnInit, AfterContentInit {
   };
 
   constructor(
-    private modal: NzModalService, 
-    private fb: FormBuilder, 
+    private modal: NzModalService,
+    private fb: FormBuilder,
     private service: JourneyService,
     private serviceMention: MentionService
     ) {  this.form = this.fb.group({
       title: [null, [Validators.required]],
       abbreviation: [null, [Validators.required]],
       uuidMention: [null, [Validators.required]],
-      semesterList: [[], [Validators.required]],
+      semesterList: [['S1'], [Validators.required]],
     });
 }
   ngAfterContentInit(): void {
@@ -112,7 +112,7 @@ export class JourneyComponent implements OnInit, AfterContentInit {
   onAdd() {
     this.showModal();
   }
-  
+
   async submitForm(){
     if (this.form.valid) {
       const data = {
@@ -130,7 +130,7 @@ export class JourneyComponent implements OnInit, AfterContentInit {
         await this.service.addData(data).toPromise()
         this.datatable.fetchData()
       }
-      
+
       this.isvisible = false,
       this.isConfirmLoading = false
     } else {
@@ -149,7 +149,7 @@ export class JourneyComponent implements OnInit, AfterContentInit {
     this.form.get('title')?.setValue('');
     this.form.get('abbreviation')?.setValue('');
     this.form.get('uuidMention')?.setValue('');
-    this.form.get('semesterList')?.setValue(['S1', 'S2']);
+    this.form.get('semesterList')?.setValue([]);
   }
 
   async showModalEdit(uuid: string){

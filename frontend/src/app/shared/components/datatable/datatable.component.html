@@ -8,6 +8,7 @@
   nzSize="small"
   [nzFrontPagination]="false"
   [nzShowPagination]="showPagination"
+  nzPaginationPosition="both"
   [nzTotal]="total"
   [nzShowTotal]="totalTemplate"
   [nzPageSize]="pageSize"
@@ -64,7 +65,7 @@
         ></td>
         <ng-container *ngIf="headerData.length > 0">
           <td
-            *ngFor="let header of headerData" 
+            *ngFor="let header of headerData"
             [nzRight]="header.type === TableHeaderType.ACTION || header.type === TableHeaderType.RIGHT"
             [nzLeft]="header.type === TableHeaderType.LEFT"
             [style]="header.style"
@@ -228,7 +229,7 @@
       <tr  *ngIf="childrenDataHeader.length > 0"[nzExpand]="row.expand">
         <div class="top-content-expand">
         </div>
-        <nz-descriptions *ngIf="row['action'].length > 0" [nzTitle]="'N°Carte '+row['action'][1].note+' '+row['action'][0].note" nzBordered 
+        <nz-descriptions *ngIf="row['action'].length > 0" [nzTitle]="'N°Carte '+row['action'][1].note+' '+row['action'][0].note" nzBordered
           nzLayout="horizontal">
           <nz-descriptions-item *ngFor="let head of row['action'].slice(2); let i= index" [nzTitle]="head.name">{{(
             head.note !== null
@@ -247,5 +248,5 @@
 </ng-template>
 
 <ng-template #messageTemplate>
-   {{ message }} 
+   {{ message }}
 </ng-template>

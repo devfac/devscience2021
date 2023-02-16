@@ -232,7 +232,7 @@ export class NoteComponent implements OnInit {
           title: this.allColumns[index].title,
           selector: "ue_"+this.allColumns[index].name,
           isSortable: false,
-          width:`${100*this.allColumns[index].nbr_ec+ 90}`,
+         // width:`${100*this.allColumns[index].nbr_ec+ 90}`,
           colspan: this.allColumns[index].nbr_ec + 1,
       }
       this.headers.push(column)
@@ -242,7 +242,6 @@ export class NoteComponent implements OnInit {
                 title: this.allColumns[index].ec[j].title,
                 selector: "ec_"+this.allColumns[index].ec[j].name,
                 isSortable: false,
-                width:"100px",
                 editable: true,
                 }
            this.headerData.push(column)
@@ -304,7 +303,6 @@ export class NoteComponent implements OnInit {
         selector: 'mean',
         width:"90px",
         isSortable: false,
-
         style: { 'text-align': 'center' },
       },
     )

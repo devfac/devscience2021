@@ -17,7 +17,7 @@ export class UsersService {
     private http: HttpClient,
     private coockiService: CookieService
     ) { }
-   
+
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
     "Authorization": "Bearer "+window.sessionStorage.getItem("token")
@@ -29,6 +29,10 @@ export class UsersService {
 
   getDataObservable(params_?: HttpParams): Observable<any> {
     return this.http.get<User[]>(`${BASE_URL}/users/get_all`, {headers: this.headers, params: params_});
+  }
+
+  getDataPromise() {
+    return this.http.get<any>(`${BASE_URL}/users/get_all`, {headers: this.headers});
   }
 
   deletData(uuid: string):Promise<User[]> {

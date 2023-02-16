@@ -2,11 +2,13 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { typePermission } from '@app/data/data';
+import { User } from '@app/models';
 import { Message } from '@app/models/chatMessage';
 import { Permission } from '@app/models/permission';
 import { AuthService } from '@app/services/auth/auth.service';
 import { SocketService } from '@app/socket.service';
 import { environment } from '@environments/environment';
+import { UsersService } from '../users/users.service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -16,18 +18,20 @@ const BASE_URL = environment.authApiURL;
   styleUrls: ['./permission.component.less']
 })
 export class PermissionComponent implements OnInit {
-  
+
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
     "Authorization": "Bearer "+window.sessionStorage.getItem('token')
   })
   form!: FormGroup;
+  allUsers:User[]=[]
   typePermission=typePermission
   constructor(
     private http: HttpClient,
     private fb: FormBuilder,
     private socketService: SocketService,
     private authUser: AuthService,
+    private service:UsersService,
     ) {
         this.form = this.fb.group({
       email: [null, [Validators.required]],
@@ -35,7 +39,9 @@ export class PermissionComponent implements OnInit {
       type: [null, [Validators.required]],
     }); }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+let allUsers=await this.service.getDataPromise().toPromise()
+this.allUsers=allUsers.data
   }
   async submitForm(){
     if (this.form.valid) {

@@ -11,7 +11,7 @@ import { HomeService } from './home.service';
 export class HomeComponent implements OnInit, AfterContentInit, AfterContentChecked {
   menu: Menu[] = [];
   collapsible = true;
-  collapsed = false;
+  collapsed = true;
   isSearchable = false;
   showSider: boolean = true;
   user!: { firstName: string; lastName: string };
