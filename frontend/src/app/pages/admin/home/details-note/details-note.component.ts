@@ -10,7 +10,6 @@ import { HomeService } from '../home.service';
 import { AuthService } from '@app/services/auth/auth.service';
 import { User } from '@app/models';
 import { NoteService } from '../note/note.service';
-import { CookieService } from 'ngx-cookie-service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -43,7 +42,6 @@ export class DetailsNoteComponent implements OnInit {
     private service: HomeService,
     private noteService: NoteService,
     public authService: AuthService,
-    private coockiService: CookieService,
     ) { 
       this.form = this.fb.group({
         name: [null],

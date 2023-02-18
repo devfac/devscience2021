@@ -4,7 +4,6 @@ import { Mention } from '@app/models/mention';
 import { ResponseModel } from '@app/models/response';
 import { AuthService } from '@app/services/auth/auth.service';
 import { environment } from '@environments/environment';
-import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 
 const BASE_URL = environment.authApiURL;
@@ -16,7 +15,6 @@ export class MentionService {
   constructor(
     private http: HttpClient,
     private authService: AuthService,
-    private coockiService: CookieService
     ) { }
    
   private headers =  new HttpHeaders({

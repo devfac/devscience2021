@@ -5,7 +5,6 @@ import { AuthService } from '@app/services/auth/auth.service';
 import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
 import { MentionService } from '../home/mention/mention.service';
-import { CookieService } from 'ngx-cookie-service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -16,7 +15,6 @@ export class DashboardService {
   
   constructor(
     private http: HttpClient,
-    private coockiService: CookieService
     ) { }
    
   private headers =  new HttpHeaders({

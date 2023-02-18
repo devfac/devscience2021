@@ -2,7 +2,6 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Role } from '@app/models/role';
 import { environment } from '@environments/environment';
-import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 
 const BASE_URL = environment.authApiURL;
@@ -14,7 +13,6 @@ export class RoleService {
 
   constructor(
     private http: HttpClient,
-    private coockiService: CookieService
     ) { }
    
   private headers =  new HttpHeaders({

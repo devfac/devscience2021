@@ -6,7 +6,6 @@ import { map } from 'rxjs/operators';
 import { environment } from '@environments/environment';
 import { User } from '@app/models';
 import { SocketService } from '@app/socket.service';
-import { CookieService } from 'ngx-cookie-service';
 
 const BASE_URL = environment.authApiURL;
 

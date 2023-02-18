@@ -4,7 +4,6 @@ import { otherQueryParams, QueryParams } from '@app/models/query';
 import { AncienStudent } from '@app/models/student';
 import { Ue } from '@app/models/ue';
 import { environment } from '@environments/environment';
-import { CookieService } from 'ngx-cookie-service';
 import { Observable, of } from 'rxjs';
 
 const BASE_URL = environment.authApiURL;
@@ -16,7 +15,6 @@ export class InscriptionService {
 
   constructor(
     private http: HttpClient,
-    private coockiService: CookieService
     ) { }
    
   private headers =  new HttpHeaders({

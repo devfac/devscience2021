@@ -2,7 +2,6 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BaccSerie } from '@app/models/bacc-serie';
 import { environment } from '@environments/environment';
-import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 
 const BASE_URL = environment.authApiURL;
@@ -11,7 +10,7 @@ const BASE_URL = environment.authApiURL;
 })
 export class BaccSerieService {
 
-  constructor(private http: HttpClient, private coockiService: CookieService) { }
+  constructor(private http: HttpClient) { }
    
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
