@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
-import { ChatMessage, Message } from './models/chatMessage'
+import { ChatMessage, Message } from './models/chatMessage';
+import { environment } from "@environments/environment";
 
-const CHAT_URL = "ws://localhost/api/v1/utils/ws/"
+const CHAT_URL = "ws://"+environment.socketApiURL;
 
 @Injectable()
 export class SocketService {

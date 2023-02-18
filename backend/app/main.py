@@ -14,8 +14,8 @@ app = FastAPI(
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
-        #allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
-        allow_origins = ["http://localhost:8070"],
+        allow_origins=["http://192.168.0.102:8070"],
+        #allow_origins = ["http://localhost:8070"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
