@@ -386,7 +386,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     }
   }
   resultat(){
-    this.downloadResult.emit(null)
+    this.downloadResult.emit(this.form.value.matierUe)
   }
   resetTableEc(){
     if (this.form.value.matierEc){

@@ -115,7 +115,7 @@ class PDF(FPDF):
         pdf.cell(1, 7, txt="", ln=1)
         pdf.set_font("arial", "BI", 10)
         pdf.cell(1, 5, txt="")
-        pdf.cell(18, 5, txt="N° Carte", border=1)
+        pdf.cell(20, 5, txt="N° Carte", border=1)
         pdf.cell(1, 5, txt="")
         pdf.cell(160, 5, txt="Nom et prénom", border=1, align="C")
         nbr = 0
@@ -126,7 +126,7 @@ class PDF(FPDF):
             pdf.cell(1, 7, txt="", ln=1)
             pdf.set_font("arial", "I", 10)
             pdf.cell(1, 5, txt="")
-            pdf.cell(18, 5, txt=num_carte_, border=1)
+            pdf.cell(20, 5, txt=num_carte_, border=1)
             pdf.cell(1, 5, txt="")
             pdf.set_font("arial", "I", 10)
             pdf.cell(160, 5, txt=name, border=1, align="L")

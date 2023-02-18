@@ -76,7 +76,6 @@ def list_examen(
 
     students = crud.note.read_all_note(journey=journey.abbreviation,session=session,year=college_year,
                                         semester=semester,skip=skip, limit=limit-skip)
-    print(len(students))
 
     all_students = []
     if len(students) == 0:
