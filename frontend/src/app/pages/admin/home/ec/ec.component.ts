@@ -27,7 +27,7 @@ export class EcComponent implements OnInit, AfterContentInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
   headers: TableHeader[] = [];
 
-  user = localStorage.getItem('user')
+  user = window.sessionStorage.getItem('user')
   collegeYear = localStorage.getItem('collegeYear')
   allYears: CollegeYear[] = []
   allJourney: Journey[] = []
@@ -151,15 +151,15 @@ export class EcComponent implements OnInit, AfterContentInit {
   showConfirm(name: string, uuid: string): void{
     this.confirmModal = this.modal.confirm({
       nzTitle: "Voulez-vous supprimer "+name+"?",
-      nzOnOk: () => {
-        this.service.deletData(uuid)
+      nzOnOk: async() => {
+        await this.service.deletData(uuid)
         this.datatable.fetchData()
         }
       })
     }
 
     onDelete(row: any) {
-      this.showConfirm(row.title, row.uuid);
+      this.showConfirm(row.title+" "+row.semester+" "+row.journey.abbreviation, row.uuid);
     }
 
     onEdit(row: any) {

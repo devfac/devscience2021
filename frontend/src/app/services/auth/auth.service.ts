@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
@@ -6,13 +6,14 @@ import { map } from 'rxjs/operators';
 import { environment } from '@environments/environment';
 import { User } from '@app/models';
 import { SocketService } from '@app/socket.service';
+import { CookieService } from 'ngx-cookie-service';
 
 const BASE_URL = environment.authApiURL;
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService {
+export class AuthService{
   private userSubject: BehaviorSubject<User | null>;
   public user: Observable<User | null >;
   private headersLogin =  new HttpHeaders({
@@ -22,13 +23,14 @@ export class AuthService {
 
   constructor(private router: Router, private http: HttpClient, private socketService: SocketService) {
     this.userSubject = new BehaviorSubject<User | null>(
-      JSON.parse(localStorage.getItem('user') || 'null')
+      JSON.parse( window.sessionStorage.getItem('user') || 'null')
     );
     this.user = this.userSubject.asObservable();
   }
 
   public get userValue(): User | null {
     return this.userSubject.value;
+   // return this.cookieService.get("user");
   }
 
   login(email: string, password: string) {
@@ -42,16 +44,18 @@ export class AuthService {
 
     return this.http.post<User>(`${BASE_URL}/login/access-token`, body.toString(), optionsLogin).pipe(
       map((user: any) => {
-          console.error(user)
-          localStorage.setItem('token', JSON.stringify(user.access_token));
-          localStorage.setItem('user', JSON.stringify(user));
+          window.sessionStorage.removeItem('user')
+          window.sessionStorage.removeItem('token')
+          window.sessionStorage.setItem('user',JSON.stringify(user) )
+          window.sessionStorage.setItem('token',JSON.stringify(user.access_token) )
+          
           this.userSubject.next(user)
       }))
   }
 
   logout() {
     // remove user from local storage and set current user to null
-    localStorage.removeItem('user');
+    window.sessionStorage.clear()
     this.socketService.chatMessage = []
     this.userSubject.next(null);
     this.router.navigate(['/auth/login']);
@@ -77,8 +81,7 @@ export class AuthService {
         if (x) {
           // update local storage
           const user = { ...this.userValue, ...params };
-          localStorage.setItem('user', JSON.stringify(user));
-
+          window.sessionStorage.setItem('user', JSON.stringify(user));
           // publish updated user to subscribers
           this.userSubject.next(user);
         }
@@ -99,16 +102,16 @@ export class AuthService {
     );
   }
   getPermissionSuperuser(): boolean{
-    const user = this.userSubject.value;
-    if(!user?.is_superuser){
+    const user = this.userValue
+    if(!user?.is_admin){
       return true
     }else{
       return false
     }
   }
 
-  getPermissionAdmin(): boolean{
-    const user = this.userSubject.value;
+  getPermissionAdmin(){
+    const user = this.userValue
     if(!user?.is_admin){
       return true
     }else{

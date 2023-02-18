@@ -177,6 +177,28 @@ def create_ancien_student(
         student = crud.ancien_student.update(db=db, db_obj=student, obj_in=student_in)
     return student
 
+@router.post("/list/", response_model=List[schemas.NewStudent])
+def create_new_student(
+        *,
+        db: Session = Depends(deps.get_db),
+        uuid_mention: str,
+        uuid_journey: str,
+        college_year: str,
+        students: List[schemas.NewStudentUploaded],
+        current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Create new student.
+    """
+    all_student = []
+    for student_in in students:
+        student_in.uuid_mention = uuid_mention
+        student_in.uuid_journey = uuid_journey
+        student_in.actual_years = [college_year]
+        student_in.receipt_list = []
+        student = crud.new_student.create(db=db, obj_in=student_in)
+        all_student.append(student)
+    return all_student
 
 @router.post("/new/", response_model=schemas.SelectStudentBase)
 def create_new_student(
@@ -458,7 +480,7 @@ def delete_student(
     return student
 
 
-@router.delete("/new/", response_model=List[schemas.NewStudent])
+@router.delete("/new/", response_model=Any)
 def delete_student(
         *,
         db: Session = Depends(deps.get_db),

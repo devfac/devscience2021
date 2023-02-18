@@ -1,4 +1,4 @@
-import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { HttpHeaders, HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { CollegeYear } from '@app/models/collegeYear';
@@ -20,7 +20,7 @@ export class HomeService {
    
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
+    "Authorization": "Bearer "+window.sessionStorage.getItem("token")
   })
 
   options = {
@@ -77,8 +77,12 @@ export class HomeService {
   }
 
 
-  createValidation(data?:any, semester?: string | null){
-    return this.http.post<any[]>(`${BASE_URL}/validation/?semester=`+semester, data, this.options)
+  createValidation(num_carte:string, data:any, semester: string, session: string, uuidJourney: string){
+    let otherParams = new HttpParams().append('num_carte', num_carte)
+    .append('semester', semester)
+    .append('session', session)
+    .append('uuid_journey', uuidJourney)
+    return this.http.post<any[]>(`${BASE_URL}/validation/`, data, {headers: this.headers, params:otherParams})
   }
 
 
@@ -118,78 +122,133 @@ export class HomeService {
   }
   public menu: Menu[] = [
     {
-      id: 1,
-      title: 'admin.home.users.title',
-      route: 'users',
-      selected: '/home/users',
-      icon: 'user',
-    },{
-      id: 2,
-      title: 'admin.home.mention.title',
-      route: 'mention',
+    id: 1,
+    title: 'admin.home.account',
+    route: '/',
+    selected: '/home/historic',
+    icon: 'account-book',
+    
+    children: [
+      {
+        id: 2,
+        title: 'admin.home.users.title',
+        route: 'users',
+        selected: '/home/users',
+        icon: 'user',
+      },{
+        id: 3,
+        title: 'admin.home.role.title',
+        route: 'role',
+        selected: '/home/role',
+        icon: 'question-circle',
+      },
+      {
+        id: 4,
+        title: 'admin.home.historic.title',
+        route: 'historic',
+        selected: '/home/historic',
+        icon: 'history',
+      },
+      {
+        id: 5,
+        title: 'admin.home.permission',
+        route: 'permission',
+        selected: '/home/permission',
+        icon: 'setting',
+      },
+    ]
+    
+  },{
+    id: 5,
+    title: 'admin.home.service',
+    route: '/',
+    selected: '/home/permission',
+    icon: 'control',
+    children:[
+      {
+        id: 7,
+        title: 'admin.home.mention.title',
+        route: 'mention',
+        selected: '/home/mention',
+        icon: 'node-expand',
+      },
+      {
+        id: 8,
+        title: 'admin.home.journey.title',
+        route: 'journey',
+        selected: '/home/journey',
+        icon: 'apartment',
+      },{
+        id: 9,
+        title: 'admin.home.college_year.title',
+        route: 'college-year',
+        selected: '/home/college-year',
+        icon: 'control',
+      },
+      {
+        id: 10,
+        title: 'admin.home.droit.title',
+        route: 'droit',
+        selected: '/home/droit',
+        icon: 'dollar',
+      },
+      {
+        id: 11,
+        title: 'admin.home.classroom.title',
+        route: 'classroom',
+        selected: '/home/classroom',
+        icon: 'home',
+      },
+      {
+        id: 12,
+        title: 'admin.home.bacc_serie.title',
+        route: 'bacc-serie',
+        selected: '/home/bacc-serie',
+        icon: 'database',
+      },
+      {
+        id: 13,
+        title: 'admin.home.publication.title',
+        route: 'publication',
+        selected: '/home/publication',
+        icon: 'radar-chart',
+      },
+    ]
+  },
+  
+  {
+      id: 14,
+      title: 'admin.home.teaching',
+      route: '/',
       selected: '/home/mention',
-      icon: 'solution',
-    },{
-      id: 3,
-      title: 'admin.home.journey.title',
-      route: 'journey',
-      selected: '/home/journey',
-      icon: 'apartment',
-    },{
-      id: 4,
-      title: 'admin.home.college_year.title',
-      route: 'college-year',
-      selected: '/home/college-year',
-      icon: 'control',
-    },{
-      id: 5,
-      title: 'admin.home.role.title',
-      route: 'role',
-      selected: '/home/role',
-      icon: 'question-circle',
+      icon: 'robot',
+      children: [
+        {
+          id: 15,
+          title: 'admin.home.ue.title',
+          route: 'ue',
+          selected: '/home/ue',
+          icon: 'folder',
+        },
+        {
+          id: 16,
+          title: 'admin.home.ec.title',
+          route: 'ec',
+          selected: '/home/ec',
+          icon: 'file-text',
+        },
+        {
+          id: 17,
+          title: 'admin.home.note.title',
+          route: 'note',
+          selected: '/home/note',
+          icon: 'file-done',
+        },
+      ]
     },
-    {
-      id: 10,
-      title: 'admin.home.droit.title',
-      route: 'droit',
-      selected: '/home/droit',
-      icon: 'dollar',
-    },
-    {
-      id: 11,
-      title: 'admin.home.classroom.title',
-      route: 'classroom',
-      selected: '/home/classroom',
-      icon: 'home',
-    },
-    {
-      id: 6,
-      title: 'admin.home.ue.title',
-      route: 'ue',
-      selected: '/home/ue',
-      icon: 'folder',
-    },
-    {
-      id: 7,
-      title: 'admin.home.ec.title',
-      route: 'ec',
-      selected: '/home/ec',
-      icon: 'file-text',
-    },
-    {
-      id: 8,
-      title: 'admin.home.note.title',
-      route: 'note',
-      selected: '/home/note',
-      icon: 'file-done',
-    },
-    {
-      id: 9,
-      title: 'admin.home.permission',
-      route: 'permission',
-      selected: '/home/permission',
-      icon: 'setting',
-    },
+   
+    
+  
   ]
   public menu$ = new Subject<any>();
   public showSider = true;

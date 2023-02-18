@@ -14,7 +14,7 @@ export class UtilsService {
 
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
+    "Authorization": "Bearer "+window.sessionStorage.getItem("token")
   })
 
   convertNumber(value: string, precision: number): number | null {
@@ -27,18 +27,18 @@ export class UtilsService {
     control?.patchValue(this.convertNumber(control.value, precision));
   }
 
-  download(url: string, params: HttpParams, name: string): void{
-    console.log(params);
-    
+  download(url: string, params: HttpParams, name: string, extention:string = ".pdf"): boolean{
     this.downloads
       .download(url, this.headers, params)
       .subscribe(blob => {
         const a = document.createElement('a')
         const objectUrl = URL.createObjectURL(blob)
         a.href = objectUrl
-        a.download = name+'.pdf';
+        a.download = name+extention;
         a.click();
         URL.revokeObjectURL(objectUrl);
+        return true
       })
+      return false
   }
 }

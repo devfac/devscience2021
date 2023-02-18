@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Role } from '@app/models/role';
 import { environment } from '@environments/environment';
+import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 
 const BASE_URL = environment.authApiURL;
@@ -11,11 +12,14 @@ const BASE_URL = environment.authApiURL;
 })
 export class RoleService {
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private coockiService: CookieService
+    ) { }
    
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
+    "Authorization": "Bearer "+window.sessionStorage.getItem("token")
   })
 
   options = {
@@ -35,7 +39,7 @@ export class RoleService {
   }
 
   getData(uuid: string){
-    return this.http.get<Role>(`${BASE_URL}/roles/`+uuid, this.options)
+    return this.http.get<Role>(`${BASE_URL}/roles/by_uuid/?uuid=`+uuid, this.options)
   }
 
   updateData(uuid: string, body: any){

@@ -33,7 +33,7 @@ def relever_note(num_carte: str, date: str, data: Any, note: Any) -> str:
     titre3_1 = "Service scolarité"
     titre4 = "et de la recherche scientifique"
     titre4_1 = f"Année universitaire {data['year']}"
-    titre5 = "releve de notes"
+    titre5 = "releve de note"
     titre6 = f"N° ___/{date}/UF/FAC.S/S.SCO"
 
     nom = "Nom:"

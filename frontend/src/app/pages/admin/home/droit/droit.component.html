@@ -4,6 +4,7 @@
   [headers]="headers"
   [fetchDataFn]="fetchData"
   [width]="500"
+  [tableTitle]="'Droit'"
   [actions]="actions"
   (delete)="onDelete($event)"
   (edit)="onEdit($event)"
@@ -20,7 +21,7 @@
         <form nz-form [formGroup]="form" class="form_years" (ngSubmit)="submitForm()" nzLayout="vertical">
             <nz-form-item>
               <nz-form-label nzRequired>
-                {{ 'admin.home.classroom.title' | translate }}
+                {{ 'admin.home.droit.title' | translate }}
               </nz-form-label>
               <nz-form-control [nzErrorTip]="'admin.home.value_error' | translate">
                 <nz-input-group>

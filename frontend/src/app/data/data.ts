@@ -19,7 +19,6 @@ export const  typeSex=[
 
 export const  typePermission=[
         {label:"note",value:"note"},
-        {label:"validation",value:"validation"},
     ]
 
 export const  typeSituation=[
@@ -35,6 +34,28 @@ export const  typeLevel=[
         {label:"M1",value:"M1"},
         {label:"M2",value:"M2"},
     ]
+
+export const typePublication=[
+    {label:"Text",value:"Text"},
+    {label:"Image",value:"Image"},
+    {label:"Pdf",value:"Pdf"},
+    {label:"Other",value:"Other"},
+]
+
+
+
+export const typeTitleUser=[
+        {label:"Update note",value:"update_note"},
+        {label:"Login system",value:"login_system"},
+    ]
+
+export const typeTitleAdmin=[
+    {label:"Insert student",value:"insert_student"},
+    {label:"Delete table",value:"delete_table"},
+    {label:"Update table",value:"update_table"},
+    {label:"Create table",value:"create_table"},
+    {label:"Login system",value:"login_system"},
+]
 
 export const typeSerie=[
     {label:"Serie A1",value:"Serie A1"},

@@ -79,9 +79,9 @@ class PDF(FPDF):
 
         mention = "MENTION:"
         mention_etudiant = f"{data['mention']}"
-        journey = "journey:"
+        journey = "Parcours:"
         journey_etudiant = f"{data['journey']}"
-        semester = "semester:"
+        semester = "Semestre:"
         semester_etudiant = f"{sems.upper()}"
         anne = "ANNÉE UNIVERSITAIRE:"
         anne_univ = f"{data['anne']}"
@@ -139,7 +139,7 @@ class PDF(FPDF):
         for i, etudiant in enumerate(admis):
             nbr += 1
             num_carte_ = etudiant['N° Carte']
-            name = f"{etudiant['nom']} {etudiant['prenom']}"
+            name = f"{etudiant['last_name']} {etudiant['first_name']}"
             pdf.cell(1, 7, txt="", ln=1)
             pdf.set_font("arial", "I", 10)
             pdf.cell(1, 5, txt="")
@@ -151,7 +151,7 @@ class PDF(FPDF):
         text_1 = f"ARRÉTÉE LA PRÉSENTE LISTE AU NOMBRE DE {nbr} ÉTUDIANT(S) AYANT VALIDÉS "
         text_2 = f"LES TRENTE CREDITS (30 Crédits) {get_type_response(session, type).upper()}"
 
-        text_3 = "Le PRÉSIDENT DU JURY"
+        text_3 = "LE PRÉSIDENT DU JURY"
         text_4 = "Fianarantsoa, le"
         pdf.set_font("arial", "BI", 10)
         pdf.cell(1, 7, txt="", ln=1)
@@ -161,10 +161,10 @@ class PDF(FPDF):
 
         pdf.set_font("arial", "BI", 10)
         pdf.cell(100, 5, txt="", align="L")
-        pdf.cell(0, 5, txt=text_3, ln=1, align="L")
+        pdf.cell(0, 5, txt=text_4, ln=1, align="L")
         pdf.cell(1, 22, txt="", ln=1)
         pdf.cell(100, 5, txt="", align="L")
-        pdf.cell(0, 5, txt=text_4, ln=1, align="L")
+        pdf.cell(0, 5, txt=text_3, ln=1, align="L")
 
-        pdf.output(f"files/resultat_{sems}_{parcour}_{session}.pdf", "F")
-        return f"files/resultat_{sems}_{parcour}_{session}.pdf"
+        pdf.output(f"files/pdf/resultat/resultat_{sems}_{parcour}_{session}.pdf", "F")
+        return f"files/pdf/resultat/resultat_{sems}_{parcour}_{session}.pdf"

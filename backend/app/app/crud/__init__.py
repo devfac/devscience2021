@@ -5,7 +5,6 @@ from .crud_role import role
 from .crud_journey import journey
 from .crud_semester import semester
 from .crud_college_years import college_year
-from .crud_validation import validation
 from .crud_matier import teaching_unit, constituent_element
 from .crud_note import note
 from .crud_save import save
@@ -16,6 +15,9 @@ from .crud_interaction import interaction
 from .crud_permission import permission
 from .crud_invitation import invitation
 from .crud_classroom import classroom
+from .crud_bacc_serie import bacc_serie
+from .crud_historic import historic
+from .crud_publication import publication
 # For a new basic set of CRUD operations you could just do
 
 # from .base import CRUDBase

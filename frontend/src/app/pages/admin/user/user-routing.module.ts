@@ -11,8 +11,10 @@ import { SelectionAddComponent } from './selection/selection-add/selection-add.c
 import { SelectionComponent } from './selection/selection.component';
 import { UploadComponent } from './upload/upload.component';
 import { UserComponent } from './user.component';
+import { HistoricComponent } from '../home/historic/historic.component';
 
-const routes: Routes = [{ path: '',
+const routes: Routes = [
+  { path: '',
 component: UserComponent,
 children: [
  {
@@ -68,6 +70,11 @@ children: [
   path: 'note-details',
   component: DetailsNoteComponent,
   data: { breadcrumb: 'admin.details.note.title' },
+}, 
+{
+  path: 'historic',
+  component: HistoricComponent,
+  data: { breadcrumb: 'admin.home.historic.title' },
 },
 ]
 },

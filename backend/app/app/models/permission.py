@@ -15,10 +15,10 @@ class Permission(Base):
     email = Column(String, ForeignKey("user.email"))
     type = Column(String)
     email_sender = Column(String, ForeignKey("user.email"))
-    expiration_date = Column(DateTime)
+    expiration_date = Column(DateTime(timezone=True))
     accepted = Column(Boolean)
-    created_at = Column(DateTime)
-    updated_at = Column(DateTime)
+    created_at = Column(DateTime(timezone=True))
+    updated_at = Column(DateTime(timezone=True))
 
     sender = relationship("User", foreign_keys=[email_sender])
     email_ = relationship("User", foreign_keys=[email])

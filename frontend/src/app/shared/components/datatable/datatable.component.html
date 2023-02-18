@@ -8,6 +8,7 @@
   nzSize="small"
   [nzFrontPagination]="false"
   [nzShowPagination]="showPagination"
+  nzPaginationPosition="both"
   [nzTotal]="total"
   [nzShowTotal]="totalTemplate"
   [nzPageSize]="pageSize"
@@ -64,7 +65,7 @@
         ></td>
         <ng-container *ngIf="headerData.length > 0">
           <td
-            *ngFor="let header of headerData" 
+            *ngFor="let header of headerData"
             [nzRight]="header.type === TableHeaderType.ACTION || header.type === TableHeaderType.RIGHT"
             [nzLeft]="header.type === TableHeaderType.LEFT"
             [style]="header.style"
@@ -109,7 +110,6 @@
               <ng-template #templateBtn>
                 <ng-container *ngIf="!editCache[row.num_carte].edit; else editTemplate1">
                   <button
-
                     *ngIf="permissionNote "
                     nz-button
                     nzType="text"
@@ -142,6 +142,20 @@
                       (click)="onView(row.num_carte)"
                     ></i>
                   </button>
+                  <button
+                      *ngIf="!permissionNote "
+                      nz-button
+                      nzType="text"
+                      nzShape="circle"
+                      nzSize="small"
+                      nz-tooltip
+                      [nzTooltipTitle]="'edit' | translate"
+                    >
+                      <i
+                        nz-icon nzType="delete" nzTheme="outline" style="color: #eb2f96"
+                        (click)="onDelete(row.num_carte)"
+                      ></i>
+                    </button>
                 </ng-container>
 
                 <ng-template #editTemplate1>
@@ -211,14 +225,28 @@
           </td>
         </ng-container>
       </tr>
+
+      <tr  *ngIf="childrenDataHeader.length > 0"[nzExpand]="row.expand">
+        <div class="top-content-expand">
+        </div>
+        <nz-descriptions *ngIf="row['action'].length > 0" [nzTitle]="'N°Carte '+row['action'][1].note+' '+row['action'][0].note" nzBordered
+          nzLayout="horizontal">
+          <nz-descriptions-item *ngFor="let head of row['action'].slice(2); let i= index" [nzTitle]="head.name">{{(
+            head.note !== null
+            ?head.note
+            : 'Absent'
+          ) | translate}}
+          </nz-descriptions-item>
+        </nz-descriptions>
+      </tr>
     </ng-template>
     <div style="height: 4px"></div>
   </tbody>
 </nz-table>
 <ng-template #totalTemplate let-total>
-  {{ 'total' | translate }}: {{ total }} {{ 'items' | translate }}
+  {{ 'total' | translate }}: {{ total }} {{ tableTitle }}
 </ng-template>
 
 <ng-template #messageTemplate>
-   {{ message }} 
+   {{ message }}
 </ng-template>

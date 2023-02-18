@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterContentChecked, AfterContentInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Menu } from '@app/models/menu';
 import { HomeService } from './home.service';
@@ -8,10 +8,10 @@ import { HomeService } from './home.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.less'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterContentInit, AfterContentChecked {
   menu: Menu[] = [];
   collapsible = true;
-  collapsed = false;
+  collapsed = true;
   isSearchable = false;
   showSider: boolean = true;
   user!: { firstName: string; lastName: string };
@@ -20,8 +20,13 @@ export class HomeComponent implements OnInit {
     this.user = { firstName: 'John', lastName: 'Shark' };
   }
 
-  constructor(public router: Router, public service: HomeService) {
+  constructor(public router: Router, public service: HomeService, private cdref: ChangeDetectorRef) {
 
+   }
+  ngAfterContentChecked(): void {
+    this.cdref.detectChanges()
+  }
+  ngAfterContentInit(): void {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.isSearchable = false;
@@ -36,7 +41,7 @@ export class HomeComponent implements OnInit {
     this.service.showSider$.subscribe((showSider) => {
       this.showSider = showSider;
     });
-   }
+  }
 
    checkSelected(item: any) {
     if (item.selected) {
@@ -47,7 +52,7 @@ export class HomeComponent implements OnInit {
       } else {
         regex = path;
       }
-      return (this.router.routerState.snapshot.url.match(regex)?.length || []) > 0;
+      return (this.router.routerState.snapshot.url.match(regex)?.length || 0) > 0;
     } else {
       if (item.fragment) {
         const _fragment = this.router.routerState.root.snapshot.fragment;

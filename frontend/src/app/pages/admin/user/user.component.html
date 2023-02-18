@@ -9,9 +9,7 @@
     [(nzCollapsed)]="collapsed">
     <nz-content class="sider-content">
       <ul nz-menu nzMode="inline">
-
         <ng-container *ngFor="let item of menu">
-
           <li
             nz-menu-item
             *ngIf="!item.children"
@@ -40,9 +38,11 @@
             <ul nz-menu [nzSelectable]="false">
               <ng-container *ngFor="let child of item.children">
                 <li *ngIf="!child.children" nz-menu-item [nzSelected]="checkSelected(child)">
+                  <i nz-icon *ngIf="child.icon" [nzType]="child.icon" class="icon-menu"></i>
+                  <span>
                   <a [routerLink]="child.route" [fragment]="child.fragment">
                     {{ child.title | translate }}
-                  </a>
+                  </a></span>
                 </li>
                 <li
                   *ngIf="child.children"

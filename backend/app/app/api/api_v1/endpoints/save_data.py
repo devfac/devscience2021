@@ -1,4 +1,5 @@
 import os
+import json
 from typing import Any, List
 
 from app import crud
@@ -7,10 +8,11 @@ from app import schemas
 from app.api import deps
 from app.excel_code import save_data
 from app.utils import check_table_info, check_columns_exist, decode_schemas, check_table_note, \
-    get_credit, max_value, excel_to_model, transpose
+    get_credit, max_value, excel_to_model, transpose, create_model
 from fastapi import APIRouter, Depends, File, UploadFile, HTTPException
 from sqlalchemy.orm import Session
 from starlette.responses import FileResponse
+from fastapi.encoders import jsonable_encoder
 
 router = APIRouter()
 
@@ -31,43 +33,55 @@ def get_models(
             columns = check_columns_exist("public", table)
             save_data.write_data_title(table, table, columns, "models")
 
-    return {"msg": "succes"}
+    file = f'files/excel/models/{model_name}.xlsx'
+    return FileResponse(path=file, media_type='application/octet-stream', filename=file)
 
 
 @router.get("/get_models_notes/")
 def get_models_notes(
         *,
         db: Session = Depends(deps.get_db),
-        schema: str,
+        college_year: str,
         uuid_journey: str,
+        semester: str,
         session: str,
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     """
-    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schema)} not found.", )
-    all_table_note = check_table_note(schema)
-    parcour = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
-    if not parcour:
+    all_table_note = check_table_note()
+    journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
+    if not journey:
         raise HTTPException(status_code=400, detail=f" journey not found.", )
     file = None
-    save_data.create_workbook(f"note_{parcour.abbreviation.lower()}_{session.lower()}", parcour.semester, "notes")
-    for sems in parcour.semester:
-        for table in all_table_note:
-            if f"note_{parcour.abbreviation.lower()}_{sems.lower()}_{session.lower()}" == table:
-                colums = check_columns_exist(schema, table)
-                save_data.write_data_title(f"note_{parcour.abbreviation.lower()}_{session.lower()}", sems, colums,
-                                           "notes")
-                all_data = crud.save.read_all_data(schema, table)
-                if all_data:
-                    file = save_data.insert_data_xlsx(f"note_{parcour.abbreviation.lower()}_{session.lower()}",
-                                                      sems, all_data, colums, "notes")
-                    print("file", file)
-                    return FileResponse(path=file, media_type='application/octet-stream', filename=file)
-                else:
-                    pass
+    for table in all_table_note:
+        if f"note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}" == table:
+
+            interaction = crud.interaction.get_by_journey_and_year(
+                db=db, uuid_journey=uuid_journey, college_year=college_year)
+            interaction_value = jsonable_encoder(interaction)
+            list_value = []
+            for value in interaction_value[semester.lower()]:
+                value = value.replace("'", '"')
+                value = json.loads(value)
+                list_value.append(value)
+            interaction = jsonable_encoder(interaction)
+            interaction[semester.lower()] = list_value
+            columns = interaction[semester.lower()]
+            all_column = ["num_carte"]
+            for column in columns:
+                all_column.append(f"{column['type']}_{column['name']}")
+            print(all_column)
+            save_data.create_workbook(f"note_{journey.abbreviation.lower()}_{session.lower()}", journey.semester, "note")
+            save_data.write_data_title(f"note_{journey.abbreviation.lower()}_{session.lower()}", semester, all_column,
+                                       "note")
+            all_data = crud.save.read_all_data("public", table)
+            if all_data:
+                file = save_data.insert_data_xlsx(f"note_{journey.abbreviation.lower()}_{session.lower()}", semester, all_data, all_column, "note")
+                print("file", file)
+                return FileResponse(path=file, media_type='application/octet-stream', filename=file)
+            else:
+                pass
 
 
 @router.post("/insert_data/", response_model=List[Any])
@@ -85,6 +99,10 @@ def insert_from_xlsx(*,
 async def create_upload_file(*,
                              uploaded_file: UploadFile = File(...),
                              model_name: str = "student",
+                             college_year: str,
+                             uuid_mention: str,
+                             uuid_journey: str = "",
+                             db: Session = Depends(deps.get_db),
                              current_user: models.User = Depends(deps.get_current_active_user)
                              ):
     file_location = f"files/excel/uploaded/{uploaded_file.filename}"
@@ -92,6 +110,7 @@ async def create_upload_file(*,
         file_object.write(uploaded_file.file.read())
 
     all_data = []
+    all_data_filter = []
     all_table = check_table_info("public")
     for table in all_table:
         if table == model_name:
@@ -102,8 +121,20 @@ async def create_upload_file(*,
                     detail=valid
                 )
             all_data = save_data.get_data_xlsx(file_location, table)
+    for data in all_data:
+        student = crud.ancien_student.get_by_num_carte(db=db, num_carte=data["num_carte"])
+        if not student:
+            data_ = jsonable_encoder(data)
+            data_["uuid_mention"] = uuid_mention
+            data_["uuid_journey"] = uuid_journey
+            data_["actual_years"] = [college_year]
+            data_["receipt"] = ""
+            data_["mean"] = 10
+            data_["receipt_list"] = []
+            new_student = schemas.NewStudentUploaded(**data_)
+            all_data_filter.append(new_student)
     os.remove(file_location)
-    response = schemas.ResponseData(**{'count': len(all_data), 'data': all_data})
+    response = schemas.ResponseData(**{'count': len(all_data_filter), 'data': all_data_filter})
     return response
 
 
@@ -112,16 +143,12 @@ async def create_upload_note_file(
         *,
         db: Session = Depends(deps.get_db),
         uploaded_file: UploadFile = File(...),
-        schema: str,
+        college_year: str,
         uuid_journey: str,
         session: str,
         semester: str,
         current_user: models.User = Depends(deps.get_current_active_user)
 ):
-    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
-    if not anne_univ:
-        raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schema)} not found.", )
-
     file_location = f"files/excel/uploaded/{uploaded_file.filename}"
     with open(file_location, "wb+") as file_object:
         file_object.write(uploaded_file.file.read())
@@ -133,114 +160,124 @@ async def create_upload_note_file(
             detail="journey not found"
         )
 
-    all_semester = journey.semester
-    all_sheet = save_data.get_all_sheet(file_location)
-    for i in range(len(all_semester)):
-        if str(all_semester[i]) != str(all_sheet[i]):
-            raise HTTPException(
-                status_code=400,
-                detail=f"invalide file {all_sheet[i]}",
-            )
-    test_note = crud.note.check_table_exist(schemas=schema, semester=semester, journey=journey.abbreviation,
-                                            session=session)
+    test_note = crud.note.check_table_exist(semester=semester, journey=journey.abbreviation, session=session)
     if test_note:
         table = f"note_{journey.abbreviation.lower()}_{semester.lower()}_{session.lower()}"
-        valid = save_data.validation_file_note(file_location, semester, table, schema)
+
+        interaction = crud.interaction.get_by_journey_and_year(
+            db=db, uuid_journey=uuid_journey, college_year=college_year)
+        interaction_value = jsonable_encoder(interaction)
+        list_value = []
+        for value in interaction_value[semester.lower()]:
+            value = value.replace("'", '"')
+            value = json.loads(value)
+            list_value.append(value)
+        interaction = jsonable_encoder(interaction)
+        interaction[semester.lower()] = list_value
+        columns = interaction[semester.lower()]
+        all_column = ["num_carte"]
+        for column in columns:
+            all_column.append(f"{column['type']}_{column['name']}")
+
+        valid = save_data.validation_file_note(file_location, semester, all_column)
         if valid != "valid":
             raise HTTPException(
                 status_code=400,
                 detail=valid
             )
+
         all_data = save_data.get_data_xlsx_note(file_location, semester)
         all_notes_ue = transpose(excel_to_model(all_data))
-        moy_cred_in = {}
-        moy_cred_in_fin = {}
-        for notes in all_notes_ue:
-            for note in notes:
+
+        all_note = []
+        print(all_notes_ue)
+        # return excel_to_model(all_data)
+        for note_ue_ in excel_to_model(all_data):
+            moy_cred_in = {}
+            moy_cred_in_fin = {}
+            moy = 0
+            credit = 0
+            moy_fin = 0
+            credit_fin = 0
+            somme = 0
+            for note in note_ue_:
                 try:
-                    note = schemas.Note(**note)
-                    et_un = crud.note.read_by_num_carte(schema, semester, journey.abbreviation, session, note.num_carte)
-                    et_un_final = crud.note.read_by_num_carte(schema, semester, journey.abbreviation, "final",
-                                                              note.num_carte)
-                    print("eto", et_un)
-                    if et_un:
-                        print("avy eo eto", et_un)
-                        ue_in = {}
-                        ue_in_final = {}
-                        ecs = crud.matier_ec.get_by_value_ue(schema, note.name, semester, uuid_journey)
-                        note_ue = 0
-                        note_ue_final = 0
-                        if len(note.ec) != len(ecs):
-                            raise HTTPException(status_code=400, detail="ivalide EC for UE",
-                                                )
-                        for i, ec in enumerate(ecs):
-                            ec_note = note.ec[i].note
-                            if ec_note == "":
-                                note.ec[i].note = None
-                                value_ec_note = 0
-                            else:
-                                value_ec_note = float(note.ec[i].note)
+                    print(note)
+                    note = schemas.NoteUE(**note)
+                    for column_ in create_model(columns):
+                        if note.name == column_['name']:
+                            et_un = crud.note.read_by_num_carte(semester=semester, journey=journey.abbreviation,
+                                                                session=session, num_carte=note.num_carte)
+                            et_un_final = crud.note.read_by_num_carte(semester=semester, journey=journey.abbreviation,
+                                                                      session='final', num_carte=note.num_carte)
+                            if et_un:
+                                ue_in = {}
+                                ue_in_final = {}
+                                note_ue = 0
+                                note_ue_final = 0
+                                if len(note.ec) != len(column_['ec']):
+                                    raise HTTPException(status_code=400, detail="Invalid EC for UE", )
+                                for i, ec in enumerate(column_['ec']):
+                                    ec_note = note.ec[i].note
+                                    if ec_note == "" or ec_note is None:
+                                        note.ec[i].note = None
+                                        value_ec_note = 0
+                                    else:
+                                        value_ec_note = float(note.ec[i].note)
 
-                            value_sess = et_un_final[f'ec_{note.ec[i].name}']
-                            if value_sess is None:
-                                value_sess = 0
-                            poids_ec = crud.matier_ec.get_by_value(schema, ecs[i][2], semester, uuid_journey)
-                            note_ue += value_ec_note * float(poids_ec.poids)
-                            note_ue_final += max_value(value_ec_note, value_sess) * float(poids_ec.poids)
+                                    value_sess = et_un_final[f"ec_{note.ec[i].name}"]
+                                    if value_sess is None:
+                                        value_sess = 0
+                                    note_ue += value_ec_note * float(ec['weight'])
+                                    note_ue_final += max_value(value_ec_note, value_sess) * float(ec['weight'])
 
-                        print("farany eto", ue_in)
-                        ue_in[f'ue_{note.name}'] = format(float(note_ue), '.30f')
-                        ue_in_final[f'ue_{note.name}'] = format(float(note_ue_final), '.30f')
-                        for note_ec in note.ec:
-                            value_sess = et_un_final[f'ec_{note_ec.name}']
-                            if value_sess is None:
-                                value_sess = 0
-                            ue_in[f'ec_{note_ec.name}'] = format(float(note_ec.note), '.30f')
-                            ue_in_final[f'ec_{note_ec.name}'] = format(float(max_value(note_ec.note, value_sess)),
-                                                                       '.30f')
-                        crud.note.update_note(schema, semester, journey.abbreviation, session, note.num_carte, ue_in)
-                        crud.note.update_note(schema, semester, journey.abbreviation, "final", note.num_carte,
-                                              ue_in_final)
-                        et_un = crud.note.read_by_num_carte(schema, semester, journey.abbreviation, session,
-                                                            note.num_carte)
-                        et_un_final = crud.note.read_by_num_carte(schema, semester, journey.abbreviation, "final",
-                                                                  note.num_carte)
-                        ues = crud.matier_ue.get_by_class(schema, uuid_journey, semester)
-                        moy = 0
-                        credit = 0
-                        moy_fin = 0
-                        credit_fin = 0
-                        somme = 0
-                        for ue in ues:
-                            value_sess = et_un[f'ue_{ue.value}']
-                            if value_sess is None:
-                                value_sess = 0
-                            value_fin = et_un_final[f'ue_{ue.value}']
-                            if value_fin is None:
-                                value_fin = 0
-                            somme += ue.credit
-                            moy += float(value_sess) * ue.credit
-                            credit += get_credit(float(value_sess), ue.credit)
+                                ue_in[f'ue_{note.name}'] =format(note_ue, '.3f')
+                                ue_in_final[f'ue_{note.name}'] = format(note_ue_final, '.3f')
+                                for note_ec in note.ec:
+                                    value_sess = et_un_final[f'ec_{note_ec.name}']
+                                    if value_sess is None:
+                                        value_sess = 0
+                                    ue_in[f'ec_{note_ec.name}'] = note_ec.note
+                                    ue_in_final[f'ec_{note_ec.name}'] = max_value(note_ec.note, value_sess)
 
-                            moy_fin += float(value_fin) * ue.credit
-                            credit_fin += get_credit(float(value_fin), ue.credit)
+                                crud.note.update_note(semester, journey.abbreviation, session, note.num_carte, ue_in)
+                                crud.note.update_note(semester, journey.abbreviation, "final", note.num_carte,
+                                                      ue_in_final)
+                                et_un = crud.note.read_by_num_carte(semester, journey.abbreviation, session,
+                                                                    note.num_carte)
+                                et_un_final = crud.note.read_by_num_carte(semester, journey.abbreviation, "final",
+                                                                          note.num_carte)
+                                value_sess = et_un[f'ue_{column_["name"]}']
+                                if value_sess is None:
+                                    value_sess = 0
+                                value_fin = et_un_final[f'ue_{column_["name"]}']
+                                if value_fin is None:
+                                    value_fin = 0
+                                somme += column_["credit"]
+                                moy += float(value_sess) * column_["credit"]
+                                credit += get_credit(float(value_sess), column_["credit"])
 
-                            moy_cred_in["moyenne"] = format(moy / somme, '.4f')
-                            moy_cred_in["credit"] = credit
+                                moy_fin += float(value_fin) * column_["credit"]
+                                credit_fin += get_credit(float(value_fin), column_["credit"])
 
-                            moy_cred_in_fin["moyenne"] = format(moy_fin / somme, '.4f')
-                            moy_cred_in_fin["credit"] = credit_fin
+                                moy_cred_in["mean"] = format(moy / somme, '.3f')
+                                moy_cred_in["credit"] = credit
 
-                            crud.note.update_note(schema, semester, journey.abbreviation, session, note.num_carte,
-                                                  moy_cred_in)
-                            crud.note.update_note(schema, semester, journey.abbreviation, "final", note.num_carte,
-                                                  moy_cred_in)
+                                moy_cred_in_fin["mean"] = format(moy_fin / somme, '.3f')
+                                moy_cred_in_fin["credit"] = credit_fin
+
+                                crud.note.update_note(semester, journey.abbreviation, session, note.num_carte,
+                                                      moy_cred_in)
+                                crud.note.update_note(semester, journey.abbreviation, "final", note.num_carte,
+                                                      moy_cred_in)
                 except Exception as e:
-                    print("error", e)
+                    print(e)
                     continue
-        all_note = crud.note.read_all_note(schema, semester, journey.abbreviation, session)
-    os.remove(file_location)
-    return all_note
+
+            note_student = crud.note.read_by_num_carte(semester, journey.abbreviation, session, note_ue_[0]["num_carte"])
+            all_note.append(note_student)
+        os.remove(file_location)
+        return all_note
 
 
 @router.get("/save_data/")
@@ -252,8 +289,8 @@ def save_data_to_excel(
 ) -> Any:
     """
     """
-    anne_univ = crud.anne_univ.get_by_title(db, decode_schemas(schema=schema))
-    if not anne_univ:
+    college_year = crud.college_year.get_by_title(db, decode_schemas(schema=schema))
+    if not college_year:
         raise HTTPException(status_code=400, detail=f"{decode_schemas(schema=schema)} not found.", )
     all_table = check_table_info(schema)
     save_data.create_workbook(decode_schemas(schema=schema), all_table, "data")

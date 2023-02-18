@@ -150,7 +150,7 @@ def relever(
     et_un_final = crud.note.read_by_num_carte(semester, journey.abbreviation, "final", num_carte)
 
     if et_un_final and student:
-        validation = crud.validation.get_by_num_carte(db=db, num_carte=num_carte)
+        validation = et_un_final['validation']
 
         interaction = crud.interaction.get_by_journey_and_year(
             db=db, uuid_journey=journey.uuid, college_year=college_year)
@@ -170,16 +170,14 @@ def relever(
 
         all_ue = []
         for ue in create_model(columns):
-            ues_ = {'name': crud.teaching_unit.get_by_value(db=db, value=ue['name'], uuid_journey=journey.uuid,
-                                                            semester=semester).title,
+            ues_ = {'name': ue['title'],
                     'note':et_un_final[f"ue_{ue['name']}"],
                     'credit': ue['credit']
                     }
             all_ec = []
             for ec in ue['ec']:
                 ecs_ = {
-                    'name': crud.constituent_element.get_by_value(db=db, value=ec['name'], uuid_journey=journey.uuid,
-                                                                  semester=semester).title,
+                    'name': ec['title'],
                     'note':et_un_final[f"ec_{ec['name']}"],
                     'weight': ec['weight']
                 }
@@ -190,8 +188,7 @@ def relever(
 
         test_validation = {}
         if validation:
-            validation = jsonable_encoder(validation)
-            test_validation = validation_semester(validation[semester.lower()], et_un_final['credit'], 30, anne)
+            test_validation = validation_semester(validation, et_un_final['credit'], 30, anne)
         else:
             test_validation['status'] = f"Étudiant(e) redoublé(e)."
             test_validation['code'] = False

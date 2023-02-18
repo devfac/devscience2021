@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { User } from '@app/models';
 import { CollegeYear } from '@app/models/collegeYear';
 import { environment } from '@environments/environment';
+import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 
 
@@ -12,12 +13,14 @@ const BASE_URL = environment.authApiURL;
   providedIn: 'root'
 })
 export class UsersService {
+  constructor(
+    private http: HttpClient,
+    private coockiService: CookieService
+    ) { }
 
-  constructor(private http: HttpClient) { }
-   
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
+    "Authorization": "Bearer "+window.sessionStorage.getItem("token")
   })
 
   options = {
@@ -26,6 +29,10 @@ export class UsersService {
 
   getDataObservable(params_?: HttpParams): Observable<any> {
     return this.http.get<User[]>(`${BASE_URL}/users/get_all`, {headers: this.headers, params: params_});
+  }
+
+  getDataPromise() {
+    return this.http.get<any>(`${BASE_URL}/users/get_all`, {headers: this.headers});
   }
 
   deletData(uuid: string):Promise<User[]> {

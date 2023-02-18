@@ -1,6 +1,7 @@
 from typing import Any, List
 from fpdf import FPDF
 from app.liste.header import header
+from app.schemas import Journey
 
 
 def set_orientation(nbr: int) -> str:
@@ -114,7 +115,7 @@ class PDF(FPDF):
         pdf.cell(1, 7, txt="", ln=1)
         pdf.set_font("arial", "BI", 10)
         pdf.cell(1, 5, txt="")
-        pdf.cell(18, 5, txt="N° Carte", border=1)
+        pdf.cell(20, 5, txt="N° Carte", border=1)
         pdf.cell(1, 5, txt="")
         pdf.cell(160, 5, txt="Nom et prénom", border=1, align="C")
         nbr = 0
@@ -125,7 +126,7 @@ class PDF(FPDF):
             pdf.cell(1, 7, txt="", ln=1)
             pdf.set_font("arial", "I", 10)
             pdf.cell(1, 5, txt="")
-            pdf.cell(18, 5, txt=num_carte_, border=1)
+            pdf.cell(20, 5, txt=num_carte_, border=1)
             pdf.cell(1, 5, txt="")
             pdf.set_font("arial", "I", 10)
             pdf.cell(160, 5, txt=name, border=1, align="L")
@@ -146,12 +147,12 @@ class PDF(FPDF):
 
         pdf.set_font("arial", "BI", 10)
         pdf.cell(100, 5, txt="", align="L")
-        pdf.cell(0, 5, txt=text_3, ln=1, align="L")
+        pdf.cell(0, 5, txt=text_4, ln=1, align="L")
         pdf.cell(1, 22, txt="", ln=1)
         pdf.cell(100, 5, txt="")
-        pdf.cell(0, 5, txt=text_4, ln=1, align="L")
+        pdf.cell(0, 5, txt=text_3, ln=1, align="L")
 
-    def create_result_by_ue(sems: str, journey: str, data: Any, matiers: List[str], etudiants: Any, admis: Any,
+    def create_result_by_ue(sems: str, journey: Journey, data: Any, matiers: List[str], etudiants: Any, admis: Any,
                             admis_comp: Any):
         pdf = PDF(set_orientation(len(matiers)), "mm", "a4")
         pdf.add_page()
@@ -204,5 +205,5 @@ class PDF(FPDF):
         if len(admis_comp) != 0:
             PDF.add_corp(pdf=pdf, data=data, sems=sems, matiers=matiers, admis=admis_comp, type="compense")
 
-        pdf.output(f"files/resultat_{sems}_{journey.abbreviation}_{matiers[1]}.pdf", "F")
-        return f"files/resultat_{sems}_{journey.abbreviation}_{matiers[1]}.pdf"
+        pdf.output(f"files/pdf/resultat/resultat_{sems}_{journey.abbreviation}_{matiers[1]}.pdf", "F")
+        return f"files/pdf/resultat//resultat_{sems}_{journey.abbreviation}_{matiers[1]}.pdf"

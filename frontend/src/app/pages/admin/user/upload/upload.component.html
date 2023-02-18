@@ -1,4 +1,5 @@
-<form nz-form [formGroup]="form" class="form"  nzLayout="vertical">
+
+  <form nz-form [formGroup]="form" class="form" nzLayout="vertical">
     <div class="header-title" nz-row>
         <nz-form-item>
             <nz-form-label>
@@ -42,18 +43,114 @@
             </nz-form-control>
           </nz-form-item>
 
+
+          <nz-form-item>
+            <nz-form-label style="margin-left: 30px;">
+              {{ 'admin.home.journey.title' | translate }}
+            </nz-form-label>
+            <nz-form-control >
+              <nz-input-group>
+                <nz-select style="margin-left: 30px;"
+                    formControlName="journey"
+                    [nzPlaceHolder]="'admin.home.journey.title' | translate"
+                    >
+                    <nz-option *ngFor="let item of allJourney"
+                        [nzLabel]="item.abbreviation"
+                        [nzValue]="item.uuid"
+                    >
+                    </nz-option>
+                </nz-select>
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+
       </div>
-  </form>
-  <app-datatable-crud
-  *ngIf="isLoading"
-  [title]="'admin.user.upload.title' | translate"
-  [headers]="headers"
-  [fetchDataFn]="fetchData"
-  [width]="(headers.length)*180"
-  (add)="showModal()"
-  [showPagination]="true"
-  classNames="table"
-  ></app-datatable-crud>
+ 
+<div class="top-content">
+    <div class="actions">
+      <button
+        nz-button
+        nzType="primary"
+        [disabled]="setOfCheckedId.size === 0"
+        [nzLoading]="loading"
+        (click)="sendRequest()"
+      >
+        Send Request
+      </button>
+      <span>Selected {{ setOfCheckedId.size }} items</span>
+      <button
+      nz-button
+      [disabled]="form.invalid"
+      nzType="primary"
+      (click)="showModal()"
+      style="padding: 0px 16px"
+    >
+      <i nz-icon nzType="plus"></i>
+      {{ 'add' | translate | titlecase }}
+    </button>
+    </div>
+  </div>
+
+    <nz-table
+      #rowSelectionTable
+      nzShowPagination
+      [nzScroll]="{ x: '500px'}"
+      nzShowSizeChanger
+      [nzData]="listOfData"
+      (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
+    >
+      <thead>
+        <tr>
+          <th nzWidth="100px" [nzChecked]="checked" [nzIndeterminate]="indeterminate" (nzCheckedChange)="onAllChecked($event)"></th>
+          <th
+          *ngFor="let header of headers; trackBy: trackByIdSelector"
+          [nzWidth]="header.width ? header.width : null"
+          [nzColumnKey]="header.selector"
+          [colSpan]="header.colspan ? header.colspan : 1"
+          [rowSpan]="header.rowspan ? header.rowspan : 1"
+          [nzSortFn]="header.isSortable || null"
+          [nzShowSort]="header.isSortable"
+        >
+          {{ header.title | translate }}
+        </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rowSelectionTable.data">
+          <td
+          [nzChecked]="setOfCheckedId.has(row.num_carte)"
+          (nzCheckedChange)="onItemChecked(row.num_carte, $event)"
+        ></td>
+          <ng-container *ngIf="headers.length > 0">
+            <td
+              *ngFor="let header of headers" 
+              [style]="header.style"
+            >
+              <ng-container *ngIf="header.template">
+                <ng-container
+                  *ngTemplateOutlet="
+                    header.template;
+                    context: { value: row[header.selector], row: row , key:header.selector}
+                  "
+                ></ng-container>
+
+              </ng-container>
+              <ng-container *ngIf="!header.template">
+                {{
+                 (row[header.selector] !== null
+                   ? header.formatter
+                     ? header.formatter(getValue(row, header.selector))
+                     : getValue(row, header.selector)
+                   : '-'
+                 ) | translate
+               }}
+             </ng-container>
+            </ng-container>
+         
+      </tbody>
+    </nz-table>
+  
+
   <nz-modal 
       [(nzVisible)]="isvisible" 
       nzTitle="{{'admin.home.upload.title' | translate}}"
@@ -61,27 +158,44 @@
       nzMask="true"
       nzMaskClosable="false">
   <div *nzModalContent>
-      <form nz-form [formGroup]="form" class="form" (ngSubmit)="submitForm()" nzLayout="vertical">
-          <div class="container" >
-            <input type="file" #fileDropRef id="fileDropRef" (change)="selectFile($event)" class="input" />
-            <img src="assets/images/ic-upload-file.svg" alt="">
-            <h3 class="title-h3">Click or drag file to this area to upload</h3>
-        </div>
-          <nz-spin [nzSpinning]="isConfirmLoading">
-              <button nz-button class="form-button form-margin" [nzType]="'primary'">
-                {{'general_data.save' | translate | uppercase}}
-              </button>
-          </nz-spin>
-      </form>
+    <nz-tabset>
+
+      <nz-tab nzTitle="{{'admin.home.upload.title' | translate}}">
+        <form nz-form [formGroup]="form" class="form" (ngSubmit)="submitForm()" nzLayout="vertical">
+              <div class="container" >
+                <input type="file" #fileDropRef id="fileDropRef" (change)="selectFile($event)" class="input" />
+                <img src="assets/images/ic-upload-file.svg" alt="">
+                <h3 class="title-h3">Click or drag file to this area to upload</h3>
+            </div>
+                  <button nz-button class="form-button form-margin" [nzLoading]="isConfirmLoading" [nzType]="'primary'" [disabled]="disabled">
+                    {{'general_data.save' | translate | uppercase}}
+                  </button>
+        </form>
+      </nz-tab>
+
+      <nz-tab nzTitle="{{'admin.home.upload.get_model' | translate}}">
+        <div nz-col  class="card">
+          <img [src]="url_excel" alt="" *ngIf="url_excel">
+            <button nz-button nzType="primary" 
+            [nzLoading]="isConfirmLoading"  class="button" (click)="startDownloadFace()">
+              <span nz-icon nzType="download"></span>
+              {{'admin.home.upload.get_model' | translate}}
+            </button>
+          </div>
+      </nz-tab>
+    </nz-tabset>
   </div>
   <div *nzModalFooter>
       </div>
 
-  <ng-template #sexTemplate let-value="value" let-row="row" >
+<form nz-form [formGroup]="formTemplate" class="form"  nzLayout="vertical">
+  <ng-template #sexTemplate let-value="value" let-row="row" let-key="key">
     <nz-select
     nzAllowClear
     [ngModel]="value"
+    [formControlName]="key"
     [nzPlaceHolder]="'admin.student.sex' | translate"
+    (ngModelChange)="changeTemplate(row,key)"
     style="width: 100%;"
     >
     <nz-option *ngFor="let item of typeSex"
@@ -92,11 +206,13 @@
   </nz-select>
   </ng-template>
 
-  <ng-template #nationTemplate let-value="value" let-row="row" >
+  <ng-template #nationTemplate let-value="value" let-row="row" let-key="key">
     <nz-select
     nzAllowClear
     [ngModel]="value"
+    [formControlName]="key"
     [nzPlaceHolder]="'admin.student.nation' | translate"
+    (ngModelChange)="changeTemplate(row,key)"
     style="width: 100%;"
     >
     <nz-option *ngFor="let item of typeNation"
@@ -107,26 +223,30 @@
   </nz-select>
   </ng-template>
   
-  <ng-template #baccTemplate let-value="value" let-row="row" >
+  <ng-template #baccTemplate let-value="value" let-row="row" let-key="key">
     <nz-select
     nzAllowClear
     [ngModel]="value"
+    [formControlName]="key"
     [nzPlaceHolder]="'admin.student.bacc_serie' | translate"
+    (ngModelChange)="changeTemplate(row,key)"
     style="width: 100%;"
     >
     <nz-option *ngFor="let item of typeSerie"
-        [nzLabel]="item.label"
+        [nzLabel]="item.title"
         [nzValue]="item.value"
     >
     </nz-option>
   </nz-select>
   </ng-template>
 
-  <ng-template #semesterTemplate let-value="value" let-row="row" >
+  <ng-template #semesterTemplate let-value="value" let-row="row" let-key="key">
     <nz-select
     nzAllowClear
     [ngModel]="value"
+    [formControlName]="key"
     [nzPlaceHolder]="'admin.home.journey.semester' | translate"
+    (ngModelChange)="changeTemplate(row,key)"
     style="width: 100%;"
     >
     <nz-option *ngFor="let item of listOfSemester"
@@ -137,11 +257,13 @@
   </nz-select>
   </ng-template>
 
-  <ng-template #typeTemplate let-value="value" let-row="row" >
+  <ng-template #typeTemplate let-value="value" let-row="row" let-key="key">
     <nz-select
     nzAllowClear
     [ngModel]="value"
+    [formControlName]="key"
     [nzPlaceHolder]="'admin.student.type' | translate"
+    (ngModelChange)="changeTemplate(row,key)"
     style="width: 100%;"
     >
     <nz-option *ngFor="let item of typeEtudiant"
@@ -152,11 +274,13 @@
   </nz-select>
   </ng-template>
 
-  <ng-template #situationTemplate let-value="value" let-row="row" >
+  <ng-template #situationTemplate let-value="value" let-row="row" let-key="key">
     <nz-select
     nzAllowClear
     [ngModel]="value"
+    [formControlName]="key"
     [nzPlaceHolder]="'admin.student.situation' | translate"
+    (ngModelChange)="changeTemplate(row,key)"
     style="width: 100%;"
     >
     <nz-option *ngFor="let item of typeSituation"
@@ -166,3 +290,4 @@
     </nz-option>
   </nz-select>
   </ng-template>
+</form>

@@ -1,11 +1,11 @@
-<nz-alert nzCloseable nzType="warning" [nzDescription]="actionTemplate3" *ngIf="!permissionNote && isNote && !getPermission()" >
+<nz-alert nzCloseable nzType="warning" [nzDescription]="actionTemplate3" *ngIf="!permissionNote && isNote && permission" >
   <ng-template #actionTemplate3>
     <div class="message">
         <p> {{'admin.notification.not_permited' | translate}} <a (click)="onDemande()"> {{'admin.notification.link' | translate}}</a></p>
     </div>
   </ng-template>
 </nz-alert>
-    
+
 <form nz-form [formGroup]="form" class="form" nzLayout="vertical">
 <div class="top-content" *ngIf="actions.add || title">
   <span
@@ -23,7 +23,7 @@
     </ng-container>
     <div *ngIf="isNote">
     <nz-select
-        *ngIf="permission && !isVisible"
+        *ngIf="!permission && !isVisible"
         [ngModel]="'Credit'"
         formControlName="filter"
         [nzPlaceHolder]="'admin.home.note.filter' | translate"
@@ -38,7 +38,7 @@
         </nz-option>
       </nz-select>
       <nz-input-number
-        *ngIf="permission && !isVisible"
+        *ngIf="!permission && !isVisible"
         [nzPrecision]="3"
         [ngModel]="10"
         formControlName="meanCredit"
@@ -46,20 +46,20 @@
         [nzMax]="30"
         >
       </nz-input-number>
-      <button nz-button nzType="primary" (click)="filterSup()" *ngIf="permission && !isVisible "
+      <button nz-button nzType="primary" (click)="filterSup()" *ngIf="!permission && !isVisible "
           nz-tooltip
           nzTooltipTitle="{{'admin.toolpit.sup' | translate}}">
         <span nz-icon nzType="caret-up" nzTheme="outline"></span>
       </button>
-      <button nz-button nzType="primary" (click)="filterInf()" *ngIf="permission && !isVisible "
+      <button nz-button nzType="primary" (click)="filterInf()" *ngIf="!permission && !isVisible "
           nz-tooltip
           nzTooltipTitle="{{'admin.toolpit.inf' | translate}}">
         <span nz-icon nzType="caret-down" nzTheme="outline"></span>
       </button>
 
-      <label *ngIf="permission && isVisible ">UE: </label>
+      <label *ngIf="!permission && isVisible ">UE: </label>
       <nz-select
-        *ngIf="permission && isVisible"
+        *ngIf="!permission && isVisible"
         formControlName="matierUe"
         [nzPlaceHolder]="'admin.home.note.matier' | translate"
         (ngModelChange)="resetTableUe()"
@@ -73,28 +73,28 @@
         </nz-option>
       </nz-select>
 
-      <label *ngIf="permission && isVisible "> : </label>
-      <button nz-button nzType="primary" (click)="compareNoteSupUe()" *ngIf="permission && isVisible "
+      <label *ngIf="!permission && isVisible "> : </label>
+      <button nz-button nzType="primary" (click)="compareNoteSupUe()" *ngIf="!permission && isVisible "
           nz-tooltip
           nzTooltipTitle="{{'admin.toolpit.sup' | translate}}">
         <span nz-icon nzType="caret-up" nzTheme="outline"></span>
       </button>
-      <label *ngIf="permission && isVisible "> | </label>
-      <button nz-button nzType="primary" (click)="compareNoteInfUe()" *ngIf="permission && isVisible "
+      <label *ngIf="!permission && isVisible "> | </label>
+      <button nz-button nzType="primary" (click)="compareNoteInfUe()" *ngIf="!permission && isVisible "
           nz-tooltip
           nzTooltipTitle="{{'admin.toolpit.inf' | translate}}">
         <span nz-icon nzType="caret-down" nzTheme="outline"></span>
       </button>
-      <label *ngIf="permission && isVisible && isResult"> | </label>
-      <button nz-button nzType="primary" (click)="resultat()" *ngIf="permission && isVisible && isResult"
+      <label *ngIf="!permission && isVisible && isResult"> | </label>
+      <button nz-button nzType="primary" (click)="resultat()" *ngIf="!permission && isVisible && isResult"
           nz-tooltip
           nzTooltipTitle="{{'admin.toolpit.download' | translate:{result: result} }}">
         <span nz-icon nzType="download" nzTheme="outline"></span>
       </button>
-      <label *ngIf="permission && isVisible "> {{'admin.home.note.or' | translate}} </label>
-      <label *ngIf="permission && isVisible ">EC: </label>
+      <label *ngIf="!permission && isVisible "> {{'admin.home.note.or' | translate}} </label>
+      <label *ngIf="!permission && isVisible ">EC: </label>
       <nz-select
-        *ngIf="permission && isVisible"
+        *ngIf="!permission && isVisible"
         formControlName="matierEc"
         [nzPlaceHolder]="'admin.home.note.matier' | translate"
         (ngModelChange)="resetTableEc()"
@@ -107,20 +107,20 @@
         >
         </nz-option>
       </nz-select>
-      <label *ngIf="permission && isVisible "> : </label>
-      <button nz-button nzType="primary" (click)="compareNoteSupEc()" *ngIf="permission && isVisible"
+      <label *ngIf="!permission && isVisible "> : </label>
+      <button nz-button nzType="primary" (click)="compareNoteSupEc()" *ngIf="!permission && isVisible"
           nz-tooltip
           nzTooltipTitle="{{'admin.toolpit.sup' | translate}}">
         <span nz-icon nzType="caret-up" nzTheme="outline"></span>
       </button>
-      <label *ngIf="permission && isVisible "> | </label>
-      <button nz-button nzType="primary" (click)="compareNoteInfEc()" *ngIf="permission && isVisible "
+      <label *ngIf="!permission && isVisible "> | </label>
+      <button nz-button nzType="primary" (click)="compareNoteInfEc()" *ngIf="!permission && isVisible "
           nz-tooltip
           nzTooltipTitle="{{'admin.toolpit.inf' | translate}}">
         <span nz-icon nzType="caret-down" nzTheme="outline"></span>
       </button>
-      <label *ngIf="permission && isVisible && isRattrape"> | </label>
-      <button nz-button nzType="primary" (click)="rattrapageList()" *ngIf="permission && isVisible && isRattrape"
+      <label *ngIf="!permission && isVisible && isRattrape"> | </label>
+      <button nz-button nzType="primary" (click)="rattrapageList()" *ngIf="!permission && isVisible && isRattrape"
           nz-tooltip
           nzTooltipTitle="{{'admin.toolpit.rattrapage' | translate}}">
         <span nz-icon nzType="unordered-list" nzTheme="outline"></span>
@@ -138,16 +138,21 @@
       <i nz-icon nzType="plus"></i>
       {{ 'add' | translate | titlecase }}
     </button>
-    <button 
+    <button
     *ngIf="actions.print"
-    nz-button 
-    nzType="primary" 
+    nz-button
+    nzType="primary"
     (click)="onDownload()">
       <i nz-icon nzType="printer" nzTheme="outline"></i>
       {{ 'print' | translate | titlecase }}
   </button>
 
   <div  class="actions" *ngIf="isNote">
+    <button nz-button nzType="primary" (click)="setVisible()"  *ngIf="!permission"
+        nz-tooltip
+        nzTooltipTitle="{{'admin.toolpit.result' | translate}}">
+      <span nz-icon nzType="ordered-list" nzTheme="outline"></span>
+    </button>
     <button nz-button nzType="primary" (click)="onCreateTable()" *ngIf="!permission"
     nz-tooltip
     nzTooltipTitle="{{'admin.toolpit.create' | translate}}">
@@ -158,25 +163,23 @@
     nzTooltipTitle="{{'admin.toolpit.add' | translate}}">
       <span nz-icon nzType="usergroup-add" nzTheme="outline"></span>
     </button>
-    <button nz-button nzType="primary" (click)="setVisible()"  *ngIf="permission" 
-        nz-tooltip
-        nzTooltipTitle="{{'admin.toolpit.result' | translate}}">
-      <span nz-icon nzType="ordered-list" nzTheme="outline"></span>
+
+    <button nz-button nzType="primary" (click)="onDeleteTable()"  *ngIf="!permission"
+    nz-tooltip
+    nzTooltipTitle="{{'admin.toolpit.delete' | translate}}">
+      <span nz-icon nzType="delete" nzTheme="outline" ></span>
     </button>
-    <button nz-button nzType="primary" (click)="onRefresh()" 
+
+    <button nz-button nzType="primary" (click)="onRefresh()"
         nz-tooltip
         nzTooltipTitle="{{'admin.toolpit.refresh' | translate}}">
       <span nz-icon nzType="reload" nzTheme="outline"></span>
     </button>
-    <button nz-button nzType="primary" (click)="onExamList()" *ngIf="permission" 
+
+    <button nz-button nzType="primary" (click)="onExamList()" *ngIf="!permission"
         nz-tooltip
         nzTooltipTitle="{{'admin.toolpit.list_examen' | translate}}">
-      <span nz-icon nzType="usergroup-add" nzTheme="outline"></span>
-    </button>
-    <button nz-button nzType="primary" (click)="onDeleteTable()"  *ngIf="!permission" 
-    nz-tooltip
-    nzTooltipTitle="{{'admin.toolpit.list_examen' | translate}}">
-      <span nz-icon nzType="delete" nzTheme="outline"></span>
+        <span nz-icon nzType="reconciliation" nzTheme="outline"></span>
     </button>
     </div>
   </div>
@@ -185,6 +188,7 @@
 <app-datatable
   [tableId]="tableId"
   [headers]="headers"
+  [childrenDataHeader]="childrenDataHeader"
   [headerSpan]="headerSpan"
   [headerData]="headerData"
   [data]="data"
@@ -195,6 +199,7 @@
   [pageSize]="pageSize"
   [idSelector]="'id'"
   [total]="total"
+  [tableTitle]="tableTitle"
   [editCache]="editCache"
   [classNames]="classNames"
   [classExpand]="classExpand"
@@ -203,6 +208,7 @@
   [portList]="portList"
   (startEdit)="startEdit($event)"
   (saveEdit)="saveEdit($event)"
+  (deleteNote)="onDelete($event)"
   [permissionNote]="permissionNote"
   (canceltEdit)="cancelEdit($event, data)"
   (search)="onSearch($event)"
@@ -234,7 +240,7 @@
     nz-tooltip
     [nzTooltipTitle]="'delete' | translate"
   >
-    <i nz-icon nzType="delete" nzTheme="outline" style="color: #eb2f96" (click)="onDelete(row)"></i>
+   <i nz-icon nzType="delete" nzTheme="outline" style="color: #eb2f96" (click)="onDelete(row)"></i>
   </button>
   <button
     *ngIf="!isDeletedRow(row) && actions.detail"

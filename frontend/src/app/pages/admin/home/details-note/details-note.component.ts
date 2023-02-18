@@ -7,6 +7,10 @@ import { environment } from '@environments/environment';
 import { DownloadService } from '../../download.service';
 import { UtilsService } from '../../utils.service';
 import { HomeService } from '../home.service';
+import { AuthService } from '@app/services/auth/auth.service';
+import { User } from '@app/models';
+import { NoteService } from '../note/note.service';
+import { CookieService } from 'ngx-cookie-service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -17,27 +21,29 @@ const BASE_URL = environment.authApiURL;
 })
 export class DetailsNoteComponent implements OnInit {
 
-  private headers =  new HttpHeaders({
-    'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
-  })
-  options = {
-    headers: this.headers
-  }
+
+
   infoStudent: StudentInfo = {info:null, Normal: null, Rattrapage: null}
   matier: UeEc[] = []
   allColumns: any[] = []
   form!: FormGroup;
-  semester!: string | null;
-  isSpinning: boolean = false
+  semester: string  = "";
+  session: string  = "";
+  journey: string  = "";
+  isSpinning: boolean = true
   check: boolean = false
   initialise: boolean = false
+  disabled: boolean = false
+  user!: User
   constructor(
     private http: HttpClient,
     private fb: FormBuilder, 
     public utils: UtilsService,
     private utilsService: UtilsService,
-    private service: HomeService
+    private service: HomeService,
+    private noteService: NoteService,
+    public authService: AuthService,
+    private coockiService: CookieService,
     ) { 
       this.form = this.fb.group({
         name: [null],
@@ -48,7 +54,11 @@ export class DetailsNoteComponent implements OnInit {
         isSelected: [null]
       })
     }
-
+    private headers =  new HttpHeaders({
+      'Accept': 'application/json',
+      "Authorization": "Bearer "+window.sessionStorage.getItem("token")
+    }
+    )
 
   getColumsType(str: string): string{
     return str.substring(0,3)
@@ -68,55 +78,41 @@ export class DetailsNoteComponent implements OnInit {
       return ''
     }
   }
+
   async ngOnInit(){
-    this.isSpinning = true 
-    if(localStorage.getItem('semester') !== null){
-      this.semester = localStorage.getItem('semester')
-    }
+    this.user = await this.noteService.getMe().toPromise()
+    this.disabled = !this.user.is_superuser
+    this.semester = localStorage.getItem('semester') || ""
+    this.session = localStorage.getItem('session') || ""
+    this.journey = localStorage.getItem('journey') || ""
+    
 
     this.matier = await this.service.getMatier(localStorage.getItem('collegeYear'), this.semester, localStorage.getItem('journey')).toPromise()
 
-    this.http.get<any>(`${BASE_URL}/notes/view_details?schema=`+localStorage.getItem('collegeYear')+
+    const data = await this.http.get<any>(`${BASE_URL}/notes/view_details?schema=`+localStorage.getItem('collegeYear')+
     `&semester=`+localStorage.getItem('semester')+
     `&uuid_journey=`+localStorage.getItem('journey')+
-    `&num_carte=`+localStorage.getItem('numDetails'), this.options).subscribe(
-      data => {
-        this.infoStudent = data
-        this.form.get('name')?.setValue(data.info.last_name+" "+data.info.first_name)
-        this.form.get('mention')?.setValue(data.info.journey.mention.title)
-        this.form.get('journey')?.setValue(data.info.journey.title)
-        this.form.get('semester')?.setValue(data.info.inf_semester+" | " +data.info.sup_semester)
-        this.form.get('isSelected')?.setValue(data.info.validation)
-        this.check = data.info.validation
-        this.isSpinning = false 
-        this.initialise = true
-    },
-      error => {console.error("error as ", error)
+    `&num_carte=`+localStorage.getItem('numDetails'), {headers: this.headers}).toPromise()
+    if(data){
+      this.infoStudent = data
+      this.form.get('name')?.setValue(data.info.last_name+" "+data.info.first_name)
+      this.form.get('mention')?.setValue(data.info.journey.mention.title)
+      this.form.get('journey')?.setValue(data.info.journey.title)
+      this.form.get('semester')?.setValue(data.info.inf_semester+" | " +data.info.sup_semester)
+      this.form.get('isSelected')?.setValue(data.info.validation)
+      this.check = data.info.validation
+      this.isSpinning = false 
+      this.initialise = true
     }
-    )
-
   }
+
   async changeValidation(){
-  let validation: any = {}
   if (this.initialise){
-    if (this.check){
-      for (let index = 1; index<= 10; index++){
-        if ("S"+index === this.semester) {
-            validation["s"+index] = 'null'; 
-            break;
-        }
-      }
-    }else{
-      for (let index = 1; index<= 10; index++){
-        if ("S"+index === this.semester) {
-            validation["s"+index] = localStorage.getItem('collegeYear');
-            break;
-        }
-      }
-    }
+    const validation: any = {num_carte:localStorage.getItem('numDetails') ,validation: this.form.get('isSelected')?.value}
+    console.log(validation);
+    
     this.check = !this.check
-    validation['num_carte'] = this.infoStudent.info.num_carte
-     await this.service.createValidation(validation, this.semester).toPromise()
+     await this.service.createValidation(this.infoStudent.info.num_carte, validation, this.semester, this.session, this.journey).toPromise()
   }
   }
 async relever(){
@@ -133,24 +129,6 @@ async relever(){
   this.utilsService.download(url, params, name)
 }
   }
-/*
-  relever(): void{
-    const url: string = `${BASE_URL}/scolarites/relever?num_carte=`+this.infoStudent.info.num_carte+
-    `&college_year=`+localStorage.getItem('collegeYear')+`&uuid_journey=`+localStorage.getItem('journey')+
-    `&semester=`+this.semester
-    this.downloads
-      .download(url, this.options)
-      .subscribe(blob => {
-        const a = document.createElement('a')
-        const objectUrl = URL.createObjectURL(blob)
-        a.href = objectUrl
-        a.download = "relever"+this.infoStudent.info.num_carte+'.pdf';
-        a.click();
-        URL.revokeObjectURL(objectUrl);
-      })
-  }
-*/
-
   expandSet = new Set<string>();
   onExpandChange(id: string, checked: boolean): void {
     if (checked) {
@@ -159,31 +137,5 @@ async relever(){
       this.expandSet.delete(id);
     }
   }
-  listOfData = [
-    {
-      id: 1,
-      name: 'John Brown',
-      age: 32,
-      expand: false,
-      address: 'New York No. 1 Lake Park',
-      description: 'My name is John Brown, I am 32 years old, living in New York No. 1 Lake Park.'
-    },
-    {
-      id: 2,
-      name: 'Jim Green',
-      age: 42,
-      expand: false,
-      address: 'London No. 1 Lake Park',
-      description: 'My name is Jim Green, I am 42 years old, living in London No. 1 Lake Park.'
-    },
-    {
-      id: 3,
-      name: 'Joe Black',
-      age: 32,
-      expand: false,
-      address: 'Sidney No. 1 Lake Park',
-      description: 'My name is Joe Black, I am 32 years old, living in Sidney No. 1 Lake Park.'
-    }
-  ];
 
 }

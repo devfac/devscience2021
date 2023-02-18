@@ -49,6 +49,7 @@ class CRUDSave():
         table = Table(table_name, metadata, autoload=True)
         conn = engine.connect()
         sel = table.select()
+        sel = sel.order_by("num_carte")
         result = conn.execute(sel)
         out = result.fetchall()
         conn.close()

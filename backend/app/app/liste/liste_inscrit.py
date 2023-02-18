@@ -74,5 +74,5 @@ class PDF(FPDF):
             pdf.set_font("arial", "I", 10)
             pdf.cell(163, 5, txt=name, border=1, ln=0, align="L")
             num_ += 1
-        pdf.output(f"files/list_inscit_{sems}_{parcour}.pdf", "F")
-        return f"files/list_inscit_{sems}_{parcour}.pdf"
+        pdf.output(f"files/pdf/liste/list_inscit_{sems}_{parcour}.pdf", "F")
+        return f"files/pdf/liste/list_inscit_{sems}_{parcour}.pdf"

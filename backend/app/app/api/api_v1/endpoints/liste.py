@@ -7,7 +7,7 @@ from app.api import deps
 from fastapi.responses import FileResponse
 from app.liste import liste_exams, liste_inscrit, liste_bourse, liste_select
 from app import crud
-from app.utils import decode_schemas, get_niveau, create_model, find_in_list
+from app.utils import decode_schemas, get_niveau, create_model, find_in_list, get_last_year
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
 
@@ -23,7 +23,7 @@ def list_examen(
         session: str,
         salle: str,
         skip: int = 1,
-        limit: int = 100,
+        limit: int = 1000,
         db: Session = Depends(deps.get_db),
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -62,13 +62,11 @@ def list_examen(
         )
     all_ue = []
     for ue in create_model(columns):
-        ues_ = {'name': crud.teaching_unit.get_by_value(db=db, value=ue['name'],uuid_journey=uuid_journey,
-                                                        semester=semester).title}
+        ues_ = {'name': ue['title']}
         nbr = 0
         all_ec = []
         for ec in ue['ec']:
-            ecs_ = {'name': crud.constituent_element.get_by_value(db=db, value=ec['name'],uuid_journey=uuid_journey,
-                                                        semester=semester).title}
+            ecs_ = {'name': ec['title']}
             nbr += 1
             all_ec.append(ecs_)
         ues_['nbr_ec'] = nbr
@@ -76,8 +74,9 @@ def list_examen(
         all_ue.append(ues_)
     matiers['ue'] = all_ue
 
-    students = crud.ancien_student.get_by_class_limit(db=db, uuid_journey=uuid_journey,uuid_mention=uuid_mention,
-                                                      semester=semester,skip=skip, limit=limit)
+    students = crud.note.read_all_note(journey=journey.abbreviation,session=session,year=college_year,
+                                        semester=semester,skip=skip, limit=limit-skip)
+
     all_students = []
     if len(students) == 0:
         raise HTTPException(
@@ -85,19 +84,19 @@ def list_examen(
             detail="Etudiants not found.",
         )
     for on_student in students:
-        un_et = crud.note.read_by_num_carte(semester, journey.abbreviation, session, on_student.num_carte)
-        if un_et and find_in_list(on_student.actual_years, college_year) != -1:
-            student = {"last_name": on_student.last_name,
-                       "first_name": on_student.first_name,
-                       "num_carte": on_student.num_carte}
+        un_et = crud.ancien_student.get_by_num_carte(db=db, num_carte=on_student.num_carte)
+        if un_et and find_in_list(un_et.actual_years, college_year) != -1:
+            student = {"last_name": un_et.last_name,
+                       "first_name": un_et.first_name,
+                       "num_carte": un_et.num_carte}
             all_students.append(student)
-
+    print(len(all_students))
     data['mention'] = mention.title
     data['journey'] = journey.title
     data['anne'] = college_year
     data['session'] = session
     data['salle'] = salle
-    data['skip'] = skip
+    data['skip'] = skip + 1
     data['limit'] = limit
     file = liste_exams.PDF.create_list_examen(semester, journey.abbreviation, data, matiers, all_students)
     return FileResponse(path=file, media_type='application/octet-stream', filename=file)
@@ -217,7 +216,8 @@ def list_bourse_passant(
                 students = {"last_name": student.last_name, "first_name": student.first_name, "num_carte": student.num_carte}
                 level = get_niveau(student.inf_semester, student.sup_semester)
                 if level == "L1":
-                    l1.append(students)
+                    if get_last_year(student.baccalaureate_years, college_year):
+                        l1.append(students)
                 if level == "L2":
                     l2.append(students)
                 if level == "L3":

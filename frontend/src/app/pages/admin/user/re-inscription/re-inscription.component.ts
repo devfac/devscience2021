@@ -33,7 +33,7 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
   headers: TableHeader[] = [];
 
-  user = localStorage.getItem('user')
+  user = window.sessionStorage.getItem('user')
   allYears: CollegeYear[] = []
   listOfSemester = ["S1" ,"S2" ,"S3" ,"S4" ,"S5" ,"S6" ,"S7" ,"S8" ,"S9" ,"S10"]
   allStudents: AncienStudent[] = []
@@ -226,6 +226,16 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
         this.isLoading = true
     }
   }
+  async getAllJourney(){
+    localStorage.setItem(this.keyMention, this.form.get(this.keyMention.substring(CODE.length))?.value)
+    let uuidMention = localStorage.getItem(this.keyMention)
+      if(uuidMention !== null){
+        this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()}
+        this.fetchData = this.fetchData.bind(this)
+        this.isLoading = true
+    
+  }
+
   testStorage(key: string, value: string): boolean{
     if(localStorage.getItem(key)){
       this.form.get(key.substring(CODE.length))?.setValue(localStorage.getItem(key))
@@ -266,7 +276,7 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
 
 
   onDelete(row: any) {
-    this.showConfirm(row.title, row.uuid);
+    this.showConfirm(row.num_carte, row.uuid);
   }
 
   onEdit(row: any) {
@@ -361,6 +371,7 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
   }
 
   startDownloadFace(){
+    this.isConfirmLoading= true
     let url: string = `${BASE_URL}/carte/carte_student/`;
 
     let params = new HttpParams()
@@ -371,10 +382,12 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
     const mention = this.allMention.find((item: Mention) => item.uuid === this.form.value.mention);
     let name: string = 'Face_carte'+mention?.abbreviation
     this.utlisService.download(url, params, name);
+    this.isConfirmLoading= false
     this.isvisible = false;
   }
 
   startDownloadPile(){
+    this.isConfirmLoading= true
     let url: string = `${BASE_URL}/carte/carte_after/`;
 
     let params = new HttpParams()
@@ -386,9 +399,11 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
     let name: string = 'Arriere_carte'+mention?.abbreviation;
     this.utlisService.download(url, params, name);
     this.isvisible = false;
+    this.isConfirmLoading= false
   }
 
-  startDownloadPassant(){
+  async startDownloadPassant(){
+    this.isConfirmLoading= true
     let url: string = `${BASE_URL}/liste/list_bourse_passant/`;
 
     let params = new HttpParams()
@@ -397,8 +412,11 @@ export class ReInscriptionComponent implements OnInit, AfterContentInit {
 
     const mention = this.allMention.find((item: Mention) => item.uuid === this.form.value.mention);
     let name: string = 'Bourse_Passant'+mention?.abbreviation
-    this.utlisService.download(url, params, name);
-    this.isvisible = false;
+    const data= this.utlisService.download(url, params, name);
+    if (data){
+      this.isvisible = false;
+      this.isConfirmLoading= false
+    }
   }
 
   startDownloadRedoublant(){

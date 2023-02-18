@@ -41,7 +41,7 @@ class UserInDBBase(UserBase):
 # Additional properties to return via API
 class User(UserInDBBase):
     mention: Optional[List[Mention]]
-    role: Optional[str]
+    role: Optional[str]=""
 
 
 # Additional properties stored in DB

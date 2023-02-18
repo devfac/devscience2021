@@ -4,14 +4,15 @@ from pydantic import BaseModel
 
 class NoteEC(BaseModel):
     name: str
-    note: Optional[float]
+    note: Optional[str]
 
 
 class NoteUE(BaseModel):
-    name: str
-    ec: List[NoteEC]
+    num_carte:  Optional[str]
+    name:  Optional[str]
+    ec: Optional[List[NoteEC]]
 
 
 class Note(BaseModel):
-    num_carte: str
-    ue: List[NoteUE]
+    num_carte:  Optional[str]
+    ue: Optional[List[NoteUE]]

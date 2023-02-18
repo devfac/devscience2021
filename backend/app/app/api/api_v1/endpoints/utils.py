@@ -101,7 +101,6 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str,
     db: Session = Depends(deps.get_db),):
     client= schemas.SocketModel(**{'id':client_id, 'wb':websocket})
     invitation = crud.invitation.get_by_email(db=db, email=client_id)
-    user = get_list_user(db=db, client_id=client_id)
     await manager.connect(client, jsonable_encoder(invitation))
     try:
         while True:

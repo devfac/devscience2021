@@ -4,6 +4,7 @@ import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
 import { CollegeYear } from '@app/models/collegeYear';
 import { ResponseModel } from '@app/models/response';
+import { CookieService } from 'ngx-cookie-service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -12,12 +13,14 @@ const BASE_URL = environment.authApiURL;
 })
 export class CollegeYearService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private coockiService: CookieService) { }
    
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
-    "Authorization": "Bearer "+localStorage.getItem("token")
-  })
+    "Authorization": "Bearer "+window.sessionStorage.getItem("token")
+  }
+  )
+
 
   options = {
     headers: this.headers

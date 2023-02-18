@@ -128,14 +128,14 @@ def update_user_me(
     return user
 
 
-@router.get("/me/", response_model=schemas.User)
+@router.get("/me", response_model=Any)
 def read_user_me(
-    db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get current user.
     """
+    print(current_user)
     return current_user
 
 #
@@ -250,7 +250,7 @@ def delete_user(
     if not crud.user.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     crud.user.remove_uuid(db=db, uuid=uuid)
-    users = crud.user.get_multi(db=db)
+    users = crud.user.get_multi(db=db, order_by="last_name")
     all_users = []
     for on_user in users:
         user = schemas.User(**jsonable_encoder(on_user))

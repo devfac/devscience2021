@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class ValueUEEC(BaseModel):
     name: str
+    title: str
     value: float
     type: str
 

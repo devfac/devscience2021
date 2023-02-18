@@ -128,6 +128,11 @@ def create_year(year: str):
     return ann
 
 
+def get_last_year(year: str, bacc_year: str) -> bool:
+    if year[0:4] != bacc_year:
+        return False
+    return True
+
 def create_num_carte(plugged: str, num: str):
     key: str = plugged[0:1]
     nbr_zero: int = 6 - len(num)
@@ -297,7 +302,7 @@ def check_table_info(schemas: str) -> list:
     return all_table
 
 
-def check_table_note(schemas: str) -> list:
+def check_table_note(schemas: str ="public") -> list:
     all_table = []
     metadata = MetaData(schema=schemas)
     metadata.reflect(bind=engine)
@@ -425,28 +430,31 @@ def convert_date(date: str) -> str:
     month = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet",
             "Aout", "Séptembre", "Octobre", "Novembre","Décembre", ""]
     # 1995-10-20
-    if not date:
+    if not date :
         return ""
-    days = date[8:10]
-    year = date[0:4]
-    month_ = int(date[5:7])
-
-    return f"{days} {month[month_ - 1]} {year}"
+    try:
+        days = date[8:10]
+        year = date[0:4]
+        month_ = int(date[5:7])
+        return f"{days} {month[month_ - 1]} {year}"
+    except Exception as e:
+        print(e , date)
+        return  ""
 
 def create_model(interactions: List[schemas.ValueUEEC]):
     result = []
     last_ue = {}
-    ue = {'name':None, 'credit':None, 'ec':[], 'type':'ue', 'value':0.0}
+    ue = {'name':None, 'title':None, 'credit':None, 'ec':[], 'type':'ue', 'value':0.0}
     ecs  = []
     name = ''
     interactions.append(ue)
     for interaction in interactions:
         if interaction['type'] == "ue":
-            last_ue = {'name':ue['name'], 'credit':ue['credit'], 'ec':ecs}
-            ue = {'name': interaction['name'], 'credit': interaction['value'], 'ec': ecs}
+            last_ue = {'name':ue['name'],'title':ue['title'], 'credit':ue['credit'], 'ec':ecs}
+            ue = {'name': interaction['name'], 'title': interaction['title'],'credit': interaction['value'], 'ec': ecs}
             ecs  = []
         else:
-            ec = {'name':interaction['name'], 'weight':interaction['value']}
+            ec = {'name':interaction['name'],'title':interaction['title'], 'weight':interaction['value']}
             ecs.append(ec)
         if last_ue['name'] and last_ue['name'] != name:
             result.append(last_ue)
@@ -459,8 +467,17 @@ def clear_name(name: str, nbr: int = 50) -> str :
     else:
         return name[0:nbr]+" ..."
 
+
+def format_date(date_: datetime = ""):
+    if date_ == "":
+        date_= datetime.now()
+    d2 = date_.astimezone()
+    return format(d2.strftime("%Y-%m-%d %H:%M:%S"))
+
+
 class UUIDEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, UUID):
             return obj.hex
         return json.JSONEncoder.default(self, obj)
+

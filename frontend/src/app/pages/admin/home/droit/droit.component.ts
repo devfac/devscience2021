@@ -27,7 +27,7 @@ export class DroitComponent implements OnInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
   headers: TableHeader[] = [];
 
-  user = localStorage.getItem('user')
+  user = window.sessionStorage.getItem('user')
   allYears: CollegeYear[] = []
   allJourney: Journey[] = []
   allMention: Mention[] = []
@@ -132,7 +132,7 @@ export class DroitComponent implements OnInit {
   }
 
   onDelete(row: any) {
-    this.showConfirm(row.title, row.uuid);
+    this.showConfirm(row.mention.abbreviation+" "+row.level+" "+row.year, row.uuid);
   }
 
   onEdit(row: any) {

@@ -22,6 +22,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '@app/services/auth/auth.service';
 import { NoteService } from '@app/pages/admin/home/note/note.service';
+import { User } from '@app/models';
 
 @Component({
   selector: 'app-datatable-crud',
@@ -33,14 +34,17 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   @Input() headers: TableHeader[] = [];
   @Input() headerSpan: TableHeader[] = [];
   @Input() headerData: TableHeader[] = [];
+  @Input() childrenDataHeader: TableHeader[] = [];
   @Input() matierUe: Ue[] = [];
   @Input() matierEc: Ec[] = [];
   @Input() width!: number;
   @Input() title: string = '';
+  @Input() tableTitle?: string;
   @Input() session: string = '';
   @Input() portList: any[] = [];
   @Input() isSelectable: boolean = false;
   @Input() permission: boolean = true;
+  @Input() permissionUser: boolean = true;
   @Input() permissionNote: boolean = false;
   @Input() isNote: boolean = false
   @Input() selectedId: number | null = null;
@@ -68,6 +72,12 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   @Output() compareUesup = new EventEmitter<{ue: string, value_ue: string}>();
   @Output() startSearch = new EventEmitter<any>();
   @Output() demande = new EventEmitter<any>();
+  @Output() resultUeSuccess = new EventEmitter<any>();
+  @Output() resultUeFaild = new EventEmitter<any>();
+  @Output() resultEcSuccess = new EventEmitter<any>();
+  @Output() resultEcFailed = new EventEmitter<any>();
+  @Output() listRattrapage = new EventEmitter<any>();
+  @Output() resultByCreditSuccess = new EventEmitter<any>();
   @Output() selectionChange = new EventEmitter<number | null>();
   @ViewChild('actionsTemplate', { static: true }) actionsTemplate!: TemplateRef<any>;
 
@@ -78,10 +88,6 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   @Output() deleteTable = new EventEmitter<any>();
   @Output() createTable = new EventEmitter<any>();
   @Output() insert = new EventEmitter<any>();
-
-
-
-
 
   data: any[] = [];
   new_data: any[] = [];
@@ -98,17 +104,17 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   isResult: boolean = false
   isRattrape: boolean = false
   result: string = ""
-
+  user!: User;
   form!: FormGroup;
   listOfFilter = ["Moyenne" ,"Credit"]
   message: string = "FacSciences"
   constructor(
     private nzMessage: NzMessageService,
-    private location: Location, 
+    private location: Location,
     private translate: TranslateService,
     private authService: AuthService,
     private noteService: NoteService,
-    private fb: FormBuilder, ) { 
+    private fb: FormBuilder, ) {
     this.form = this.fb.group({
     matierUe: [null],
     matierEc: [null],
@@ -121,13 +127,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     this.fetchData();
   }
 
-  getPermission(): boolean{
-    if (this.authService.getPermissionSuperuser() || this.authService.getPermissionAdmin()){
-      return false
-    }else{
-      return true
-    }
-  }
+
   ngAfterContentInit(): void {
     setTimeout(() => {
       if (this.getActionsNumber() > 0) {
@@ -156,7 +156,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
           if (permission){
             this.permissionNote = permission.accepted
           }
-          
+
           if (permission.accepted){
             this.editCache[id].edit = true;
           }
@@ -218,6 +218,13 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
               this.new_data = [];
               this.listOfData = [];
               //this.data = result
+              if (this.childrenDataHeader?.length > 0) {
+                for (let i = 0; i < result.data.length; i++) {
+                  this.new_data.push({ ...result.data[i], expand: false, add: false });
+                  this.listOfData.push({ ...result.data[i] });
+
+                }
+              } else {
                 for (let i = 0; i < result.data.length; i++) {
                   this.new_data.push({ ...result.data[i]});
                   this.listOfData.push({ ...result.data[i] });
@@ -226,12 +233,14 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
                     data: { ...result.data[i] },
                   };
                 }
+              }
               this.total = result?.count || 0;
               this.data = [...this.new_data];
-              
+
+
             },
             error: (err) => {
-              console.error(err);
+              console.error("erroe as", err);
               this.nzMessage.error('Fetching error');
               this.loading = false;
             },
@@ -299,15 +308,12 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
 
   compareNoteSupUe(): void{
     if (this.form.value.matierUe){
-      this.data = this.new_data.filter((item: any) => item["ue_"+this.form.value.matierUe] >= 10);
-      const name = this.matierUe.find((item:Ue) => item.value === this.form.value.matierUe)
-      this.message = this.data.length+" "+
-      this.translate.instant('admin.home.note.message_ue_admis')+" "+name?.title
+      this.resultUeSuccess.emit(this.form.value.matierUe)
     }else{
-      this.data = this.new_data;
-      this.message = ""
+      this.resultUeSuccess.emit(null)
     }
   }
+
   insertStudent(){
     this.insert.emit()
   }
@@ -332,12 +338,22 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
       let value = this.form.value.meanCredit
       localStorage.setItem('lastBtn', 'sup')
         if (localStorage.getItem('filter') === 'Moyenne' ){
-          this.data = this.new_data.filter((item: any) => item['mean']  >= Number(value) )
+          const data ={
+            credit:null,
+            mean:"mean",
+            value:value
+          }
+          this.resultByCreditSuccess.emit(data)
         }else{
-          this.data = this.new_data.filter((item: any) => item['credit']  >= Number(value) )
+          const data ={
+            credit:"credit",
+            mean:null,
+            value:value
+            }
+        this.resultByCreditSuccess.emit(data)
         }
     }else{
-      this.data = this.new_data
+      this.resultByCreditSuccess.emit(null)
     }
   }
   filterInf(){
@@ -364,13 +380,9 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   }
   compareNoteInfUe(){
     if (this.form.value.matierUe){
-      this.data = this.new_data.filter((item: any) => item["ue_"+this.form.value.matierUe] < 10);
-      const name = this.matierUe.find((item:Ue) => item.value === this.form.value.matierUe)
-      this.message = this.data.length+" "+
-      this.translate.instant('admin.home.note.message_ue_echec')+" "+name?.title
+      this.resultUeFaild.emit(this.form.value.matierUe)
     }else{
-      this.data = this.new_data;
-      this.message = ""
+      this.resultUeFaild.emit(this.form.value.matierUe)
     }
   }
   resultat(){
@@ -387,36 +399,26 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   }
   compareNoteSupEc(){
     if (this.form.value.matierEc){
-      this.data = this.new_data.filter((item: any) => item["ec_"+this.form.value.matierEc] >= 10);
-      const name = this.matierEc.find((item:Ec) => item.value === this.form.value.matierEc)
-      this.message = this.data.length+" "+
-      this.translate.instant('admin.home.note.message_ec_admis')+" "+name?.title
+      this.resultEcSuccess.emit(this.form.value.matierEc)
     }else{
-      this.data = this.new_data;
-      this.message = ""
+      this.resultEcSuccess.emit(null)
     }
   }
   compareNoteInfEc(){
     if (this.form.value.matierEc){
-      this.data = this.new_data.filter((item: any) => item["ec_"+this.form.value.matierEc] < 10);
-      const name = this.matierEc.find((item:Ec) => item.value === this.form.value.matierEc)
-      this.message = this.data.length+" "+
-      this.translate.instant('admin.home.note.message_ec_echec')+" "+name?.title
+      this.resultEcFailed.emit(this.form.value.matierEc)
     }else{
-      this.data = this.new_data;
-      this.message = ""
+      this.resultEcFailed.emit(null)
     }
 
   }
   rattrapageList(){
     if (this.form.value.matierEc && this.session === 'Normal'){
       const name = this.matierEc.find((item:Ec) => item.value === this.form.value.matierEc)
-      this.data = this.new_data.filter((item: any) => item["ec_"+this.form.value.matierEc] < 10 && item["ue_"+name?.value_ue] < 10 )
-      this.message = this.data.length+" "+
-        this.translate.instant('admin.home.note.message_ec_refaire')+" "+name?.title
+      const data ={valueEc:this.form.value.matierEc, valueUe:name?.value_ue}
+      this.listRattrapage.emit(data)
   }else{
-    this.data = this.new_data;
-    this.message = ""
+    this.listRattrapage.emit(null)
   }
   }
   changeFilter(){

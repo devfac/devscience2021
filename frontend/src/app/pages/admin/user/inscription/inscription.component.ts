@@ -30,7 +30,7 @@ export class InscriptionComponent implements OnInit, AfterContentInit {
   headers: TableHeader[] = [];
 
 
-  user = localStorage.getItem('user')
+  user = window.sessionStorage.getItem('user')
   allYears: CollegeYear[] = []
   allStudents: AncienStudent[] = []
   allJourney: Journey[] = []
@@ -160,7 +160,7 @@ export class InscriptionComponent implements OnInit, AfterContentInit {
   }
 
   onDelete(row: any) {
-    this.showConfirm(row.title, row.uuid);
+    this.showConfirm(row.num_select, row.uuid);
   }
 
   onEdit(row: any) {

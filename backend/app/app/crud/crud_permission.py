@@ -8,6 +8,7 @@ from sqlalchemy import and_, or_, text
 from app.crud.base import CRUDBase
 from app.models.permission  import Permission
 from app.schemas.permission import PermissionCreate, PermissionUpdate
+from app.utils import format_date
 
 
 class CRUDPermission(CRUDBase[Permission, PermissionCreate, PermissionUpdate]):
@@ -20,7 +21,7 @@ class CRUDPermission(CRUDBase[Permission, PermissionCreate, PermissionUpdate]):
             self, db: Session, *, obj_in: PermissionCreate, email_sender: str
     ) -> Permission:
         obj_in_data = jsonable_encoder(obj_in)
-        db_obj = self.model(**obj_in_data, email_sender=email_sender, created_at=datetime.now())
+        db_obj = self.model(**obj_in_data, email_sender=email_sender, created_at=format_date())
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)

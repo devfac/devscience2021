@@ -30,6 +30,7 @@
                     [nzCheckedChildren]="checkedTemplate"
                     [nzUnCheckedChildren]="unCheckedTemplate"
                     (ngModelChange)="changeValidation()"
+                    [nzDisabled]="disabled"
                 >
                 </nz-switch>
                 <ng-template #checkedTemplate><span nz-icon nzType="check"></span></ng-template>
