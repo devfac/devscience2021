@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { ChatMessage, Message } from './models/chatMessage';
 import { environment } from "@environments/environment";
+import { NzNotificationPlacement, NzNotificationService } from "ng-zorro-antd/notification";
 
 const CHAT_URL = "ws://"+environment.socketApiURL;
 
