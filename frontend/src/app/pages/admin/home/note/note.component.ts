@@ -117,7 +117,7 @@ export class NoteComponent implements OnInit {
 
   keyMention = CODE+"mention"
   keyYear = CODE+"collegeYear"
-  keyNum = CODE+"numCarte"
+  keyNum: string | null =null
   keyJourney = CODE+"journey"
   keySemester = CODE+"semester"
   keySession = CODE+"session"
@@ -463,6 +463,7 @@ export class NoteComponent implements OnInit {
       mean: this.keyMean,
       value:this.keyValue,
       type_: this.keyType,
+      num_carte:this.keyNum
     }
     return this.noteService.getDataObservable(parseQueryParams(params,otherParams))
   }
@@ -483,6 +484,7 @@ export class NoteComponent implements OnInit {
       this.keyCredit=null
       this.keyValue=null
       this.keyMean=null
+      this.keyNum=null
       this.datatable.fetchData()
     }else{
       this.reset()
@@ -497,6 +499,7 @@ export class NoteComponent implements OnInit {
       this.keyCredit=null
       this.keyValue=null
       this.keyMean=null
+      this.keyNum=null
       this.datatable.fetchData()
     }else{
       this.reset()
@@ -511,6 +514,7 @@ export class NoteComponent implements OnInit {
       this.keyCredit=null
       this.keyValue=null
       this.keyMean=null
+      this.keyNum=null
       this.datatable.fetchData()
     }else{
       this.reset()
@@ -525,6 +529,22 @@ export class NoteComponent implements OnInit {
         this.keyValue=null
         this.keyMean=null
         this.keyType="failed"
+        this.keyNum=null
+        this.datatable.fetchData()
+      }else{
+        this.reset()
+    }
+  }
+
+  searchByNum(numCarte: any){
+    if(numCarte){
+        this.keyEc =null
+        this.keyUe =null
+        this.keyCredit=null
+        this.keyValue=null
+        this.keyMean=null
+        this.keyType=null
+        this.keyNum=numCarte
         this.datatable.fetchData()
       }else{
         this.reset()
@@ -538,6 +558,7 @@ export class NoteComponent implements OnInit {
     this.keyValue=null
     this.keyMean=null
     this.keyType=null
+    this.keyNum=null
     this.datatable.fetchData()
   }
 
@@ -549,6 +570,7 @@ export class NoteComponent implements OnInit {
         this.keyValue=data.value
         this.keyMean=data.mean
         this.keyType="success"
+        this.keyNum=null
         this.datatable.fetchData()
       }else{
         this.reset()
@@ -563,6 +585,7 @@ export class NoteComponent implements OnInit {
       this.keyCredit=null
       this.keyValue=null
       this.keyMean=null
+      this.keyNum=null
       this.datatable.fetchData()
     }else{
       this.reset()

@@ -312,6 +312,41 @@ def get_all_notes(
         mean: str = "",
         value: Any = 10,
         type_:str = "success",
+        num_carte: str = "",
+        current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+
+    journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
+    if not journey:
+        raise HTTPException(status_code=400, detail="journey not found")
+    if num_carte != "" and num_carte is not None and num_carte != "null":
+        all_note = crud.note.search_notes(semester=semester, journey=journey.abbreviation, limit=limit, skip=offset,
+                                          session=session, year=college_year, num_carte=num_carte)
+        count = len(all_note)
+    else:
+        all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation,limit=limit, skip=offset,
+                                           session=session, year=college_year, value_ue=value_ue, value_ec=value_ec,
+                                           type_=type_, credit=credit, mean=mean, value=value)
+
+        all_note_count = crud.note.read_all_note_count(semester=semester, journey=journey.abbreviation,
+                                           session=session, year=college_year, value_ue=value_ue, value_ec=value_ec,
+                                           type_=type_, credit=credit, mean=mean, value=value)
+        count = len(all_note_count)
+    response = schemas.ResponseData(**{'count':count, 'data':all_note})
+    return response
+
+
+@router.get("/search", response_model=schemas.ResponseData)
+def get_all_notes(
+        *,
+        db: Session = Depends(deps.get_db),
+        college_year: str,
+        semester: str,
+        session: str,
+        uuid_journey: str,
+        limit: int = 100,
+        offset: int = 0,
+        num_carte: str = "",
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
 
@@ -319,14 +354,9 @@ def get_all_notes(
     if not journey:
         raise HTTPException(status_code=400, detail="journey not found")
 
-    all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation,limit=limit, skip=offset,
-                                       session=session, year=college_year, value_ue=value_ue, value_ec=value_ec,
-                                       type_=type_, credit=credit, mean=mean, value=value)
-
-    all_note_count = crud.note.read_all_note_count(semester=semester, journey=journey.abbreviation,
-                                       session=session, year=college_year, value_ue=value_ue, value_ec=value_ec,
-                                       type_=type_, credit=credit, mean=mean, value=value)
-    count = len(all_note_count)
+    all_note = crud.note.search_notes(semester=semester, journey=journey.abbreviation,limit=limit, skip=offset,
+                                       session=session, year=college_year, num_carte=num_carte)
+    count = len(all_note)
     response = schemas.ResponseData(**{'count':count, 'data':all_note})
     return response
 

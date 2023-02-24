@@ -50,12 +50,13 @@
   <h3> {{ 'admin.home.details.title_note' | translate:{semester: semester} }}  </h3>
   <div nz-row *ngIf="!isSpinning">
         <div nz-col nzSpan="11">
-            <nz-table #nzTable 
-                [nzData]="matier" 
-                nzTableLayout="fixed" 
-                [nzBordered]="true" 
+            <nz-table #nzTable
+                [nzData]="matier"
+                nzTableLayout="fixed"
+                [nzBordered]="true"
                 [nzScroll]="{ y:'300px'}"
                 nzSize="small"
+                class="note"
                 [nzShowPagination]="false"
                 nzTitle="Session Normal"
                 [nzFooter]="' Credit: '+infoStudent['Normal']['credit']+' Moyenne: '+infoStudent['Normal']['mean']"
@@ -73,16 +74,16 @@
                       <td [nzExpand]="expandSet.has(data.uuid)" (nzExpandChange)="onExpandChange(data.uuid, $event)"></td>
                       <td>{{ data.title }}</td>
                       <td >
-                        <input type="number" nz-input 
-                        [placeholder]="infoStudent['Normal']['ue_'+data.value]" 
-                        [min]="0" readonly 
+                        <input type="number" nz-input
+                        [placeholder]="infoStudent['Normal']['ue_'+data.value]"
+                        [min]="0" readonly
                         [nzBorderless]="true"/>
                       </td>
                     </tr>
                     <tr [nzExpand]="expandSet.has(data.uuid)">
                         <ng-container *ngFor="let ec of data.ec">
                             <nz-input-group [nzAddOnBefore]="ec.title" *ngIf="!isSpinning">
-                                <input nz-input type="text" readonly  
+                                <input nz-input type="text" readonly
                                 [placeholder]="infoStudent['Normal']['ec_'+ec.value]" />
                             </nz-input-group>
                         </ng-container>
@@ -93,12 +94,13 @@
             </div>
         <div nz-col nzSpan="1"></div>
         <div nz-col nzSpan="11" *ngIf="infoStudent['Rattrapage'] !== null">
-            <nz-table #nzTable 
-                [nzData]="matier" 
-                nzTableLayout="fixed" 
-                [nzBordered]="true" 
+            <nz-table #nzTable
+                [nzData]="matier"
+                nzTableLayout="fixed"
+                [nzBordered]="true"
                 [nzScroll]="{ y:'300px'}"
                 nzSize="small"
+                class="note"
                 [nzShowPagination]="false"
                 nzTitle="Session Rattrapage"
                 [nzFooter]="' Credit: '+infoStudent['Rattrapage']['credit']+' Moyenne: '+infoStudent['Rattrapage']['mean']"
@@ -117,25 +119,28 @@
                       <td [nzExpand]="expandSet.has(data.uuid)" (nzExpandChange)="onExpandChange(data.uuid, $event)"></td>
                       <td>{{ data.title }}</td>
                       <td >
-                        <input type="number" nz-input 
-                        [placeholder]="infoStudent['Rattrapage']['ue_'+data.value]" 
-                        [min]="0" readonly 
-                        [nzBorderless]="true"/>
+                        <input
+                        type="number"
+                        nz-input
+                        [placeholder]="infoStudent['Rattrapage']['ue_'+data.value]"
+                        readonly
+                        [nzBorderless]="true"
+                        class="input"/>
                       </td>
 
                       <td>
-                        <span nz-icon nzType="arrow-down" nzTheme="outline" style="font-size: 20px; color: red;" 
+                        <span nz-icon nzType="arrow-down" nzTheme="outline" style="font-size: 20px; color: red;"
                         *ngIf="getStatus(infoStudent['Normal']['ue_'+data.value], infoStudent['Rattrapage']['ue_'+data.value]) === 'inf'"></span>
-                        <span nz-icon nzType="arrow-right" nzTheme="outline" style="font-size: 20px; color: #9a4545;" 
+                        <span nz-icon nzType="arrow-right" nzTheme="outline" style="font-size: 20px; color: #9a4545;"
                         *ngIf="getStatus(infoStudent['Normal']['ue_'+data.value], infoStudent['Rattrapage']['ue_'+data.value]) === 'egal'"></span>
-                        <span nz-icon nzType="arrow-up" nzTheme="outline" style="font-size: 20px; color: green;" 
+                        <span nz-icon nzType="arrow-up" nzTheme="outline" style="font-size: 20px; color: green;"
                         *ngIf="getStatus(infoStudent['Normal']['ue_'+data.value], infoStudent['Rattrapage']['ue_'+data.value]) === 'sup'"></span>
                       </td>
                     </tr>
                     <tr [nzExpand]="expandSet.has(data.uuid)">
                         <ng-container *ngFor="let ec of data.ec">
                             <nz-input-group [nzAddOnBefore]="ec.title" *ngIf="!isSpinning">
-                                <input nz-input type="number" readonly 
+                                <input nz-input type="number" readonly
                                 [placeholder]="infoStudent['Rattrapage']['ec_'+ec.value]" />
                             </nz-input-group>
                         </ng-container>
