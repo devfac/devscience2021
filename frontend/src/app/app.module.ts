@@ -13,7 +13,6 @@ import { ErrorInterceptor, JwtInterceptor } from './helpers';
 //import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 import { fakeApiProvider } from './providers/fake-api-provider.module';
 import { SocketService } from './socket.service';
-import { CookieService } from 'ngx-cookie-service';
 import { FilterComponent } from './shared/components/filter/filter.component';
 //import { environment } from '@environments/environment';
 
@@ -37,7 +36,6 @@ import { FilterComponent } from './shared/components/filter/filter.component';
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     fakeApiProvider,
     SocketService,
-    CookieService,
   ],
   bootstrap: [AppComponent],
 })

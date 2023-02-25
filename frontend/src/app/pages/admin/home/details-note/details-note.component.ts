@@ -10,7 +10,6 @@ import { HomeService } from '../home.service';
 import { AuthService } from '@app/services/auth/auth.service';
 import { User } from '@app/models';
 import { NoteService } from '../note/note.service';
-import { CookieService } from 'ngx-cookie-service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -37,14 +36,13 @@ export class DetailsNoteComponent implements OnInit {
   user!: User
   constructor(
     private http: HttpClient,
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     public utils: UtilsService,
     private utilsService: UtilsService,
     private service: HomeService,
     private noteService: NoteService,
     public authService: AuthService,
-    private coockiService: CookieService,
-    ) { 
+    ) {
       this.form = this.fb.group({
         name: [null],
         mention: [null],
@@ -85,7 +83,7 @@ export class DetailsNoteComponent implements OnInit {
     this.semester = localStorage.getItem('semester') || ""
     this.session = localStorage.getItem('session') || ""
     this.journey = localStorage.getItem('journey') || ""
-    
+
 
     this.matier = await this.service.getMatier(localStorage.getItem('collegeYear'), this.semester, localStorage.getItem('journey')).toPromise()
 
@@ -101,7 +99,7 @@ export class DetailsNoteComponent implements OnInit {
       this.form.get('semester')?.setValue(data.info.inf_semester+" | " +data.info.sup_semester)
       this.form.get('isSelected')?.setValue(data.info.validation)
       this.check = data.info.validation
-      this.isSpinning = false 
+      this.isSpinning = false
       this.initialise = true
     }
   }
@@ -110,7 +108,7 @@ export class DetailsNoteComponent implements OnInit {
   if (this.initialise){
     const validation: any = {num_carte:localStorage.getItem('numDetails') ,validation: this.form.get('isSelected')?.value}
     console.log(validation);
-    
+
     this.check = !this.check
      await this.service.createValidation(this.infoStudent.info.num_carte, validation, this.semester, this.session, this.journey).toPromise()
   }

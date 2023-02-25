@@ -2,7 +2,6 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Role } from '@app/models/role';
 import { environment } from '@environments/environment';
-import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 
 const BASE_URL = environment.authApiURL;
@@ -14,9 +13,8 @@ export class RoleService {
 
   constructor(
     private http: HttpClient,
-    private coockiService: CookieService
     ) { }
-   
+
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
     "Authorization": "Bearer "+window.sessionStorage.getItem("token")
@@ -25,7 +23,7 @@ export class RoleService {
   options = {
     headers: this.headers
   }
-  
+
   getDataObservable(params_?: HttpParams): Observable<any> {
     return this.http.get<Role[]>(`${BASE_URL}/roles/`, {headers: this.headers, params: params_});
   }

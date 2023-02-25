@@ -4,7 +4,6 @@ import { Classroom } from '@app/models/classroom';
 import { Publication } from '@app/models/publication';
 import { ResponseModel } from '@app/models/response';
 import { environment } from '@environments/environment';
-import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 
 const BASE_URL = environment.authApiURL;
@@ -15,9 +14,8 @@ const BASE_URL = environment.authApiURL;
 export class PublicationService {
   constructor(
     private http: HttpClient,
-    private coockiService: CookieService
     ) { }
-   
+
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
     "Authorization": "Bearer "+window.sessionStorage.getItem("token")
@@ -50,5 +48,5 @@ export class PublicationService {
   addData(body: any){
     return this.http.post<Publication[]>(`${BASE_URL}/publication/`,body, {headers: this.headers})
   }
-   
+
 }
