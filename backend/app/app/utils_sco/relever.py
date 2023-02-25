@@ -1,8 +1,6 @@
-import random
 from typing import Any
-from fpdf import FPDF
+from .PDFMark import PDFMark as FPDF
 from app.utils import convert_date
-import unidecode
 
 
 def validation(ue: float, code: bool) -> str:
@@ -17,7 +15,11 @@ def validation(ue: float, code: bool) -> str:
 
 def relever_note(num_carte: str, date: str, data: Any, note: Any) -> str:
 
-    pdf = PDF('P', 'mm', 'A4')
+    pdf = PDF()
+
+    # set watermark prior to calling add_page()
+    pdf.watermark('Fac.Sciences', font_style='BI')
+
     pdf.add_page()
     pdf.l_margin = 0
     pdf.rect(5, 5, 200, 287)
@@ -25,10 +27,10 @@ def relever_note(num_carte: str, date: str, data: Any, note: Any) -> str:
     pdf.l_margin = 8
 
     titre1 = "REPOBLIKAN'I MADAGASIKARA"
-    titre1_2 = "Universtité de fianarantsoa"
+    titre1_2 = " Universtité de fianarantsoa"
 
     titre2 = "Fitiavana - Tanindrazana - Fandrosoana"
-    titre2_1 = "Faculté des sciences"
+    titre2_1 = " Faculté des sciences"
     titre3 = "Ministère de l'Enseignement Supérieur"
     titre3_1 = "Service scolarité"
     titre4 = "et de la recherche scientifique"
@@ -36,6 +38,20 @@ def relever_note(num_carte: str, date: str, data: Any, note: Any) -> str:
     titre5 = "releve de note"
     titre6 = f"N° ___/{date}/UF/FAC.S/S.SCO"
 
+    txt2 = '------------------------------------------------------------------------------------------'
+
+    pdf.set_font("helvetica", "B", 8)
+    pdf.set_text_color(250, 0, 0)
+
+    pdf.text_360(172, 67, titre2_1, 25)
+    pdf.text_360(172, 67, txt2, 30)
+
+    pdf.set_font("times", "IU", 6)
+    pdf.set_text_color(0, 0, 250)
+
+    pdf.text_360(172, 67, titre1_2, 19)
+
+    pdf.set_text_color(0, 0, 0)
     nom = "Nom:"
     nom_etudiant = f"{data['last_name']}"
     prenom = "Prénom:"
@@ -71,6 +87,7 @@ def relever_note(num_carte: str, date: str, data: Any, note: Any) -> str:
 
     pdf.set_font("arial", "B", 12)
     pdf.cell(0, 5, txt=titre1_2.upper(), ln=1)
+
 
     pdf.set_font("arial", "", 8)
     pdf.cell(20, 6, txt="", ln=0, align="L")
@@ -242,9 +259,9 @@ def relever_note(num_carte: str, date: str, data: Any, note: Any) -> str:
     pdf.cell(120, 10, txt="", ln=0)
     pdf.cell(0, 8, txt=text_7, ln=1)
 
-    pdf.output(f"files/{num_carte}_relever.pdf", "F")
+    pdf.output(f"files/pdf/relever/{num_carte}_relever.pdf", "F")
 
-    return f"files/{num_carte}_relever.pdf"
+    return f"files/pdf/relever/{num_carte}_relever.pdf"
 
 
 class PDF(FPDF):

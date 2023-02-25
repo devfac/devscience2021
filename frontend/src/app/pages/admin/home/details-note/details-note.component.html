@@ -49,7 +49,7 @@
   </div>
   <h3> {{ 'admin.home.details.title_note' | translate:{semester: semester} }}  </h3>
   <div nz-row *ngIf="!isSpinning">
-        <div nz-col nzSpan="11">
+        <div nz-col nzSpan="10">
             <nz-table #nzTable
                 [nzData]="matier"
                 nzTableLayout="fixed"
@@ -64,7 +64,7 @@
                 <thead>
                   <tr>
                     <th nzWidth="60px"></th>
-                    <th nzWidth="300px">U.E</th>
+                    <th nzWidth="200px">U.E</th>
                     <th nzWidth="80px">Note</th>
                   </tr>
                 </thead>
@@ -74,10 +74,7 @@
                       <td [nzExpand]="expandSet.has(data.uuid)" (nzExpandChange)="onExpandChange(data.uuid, $event)"></td>
                       <td>{{ data.title }}</td>
                       <td >
-                        <input type="number" nz-input
-                        [placeholder]="infoStudent['Normal']['ue_'+data.value]"
-                        [min]="0" readonly
-                        [nzBorderless]="true"/>
+                        {{infoStudent['Rattrapage']['ue_'+data.value]}}
                       </td>
                     </tr>
                     <tr [nzExpand]="expandSet.has(data.uuid)">
@@ -108,7 +105,7 @@
                 <thead>
                   <tr>
                     <th nzWidth="60px"></th>
-                    <th nzWidth="250px">U.E</th>
+                    <th nzWidth="200px">U.E</th>
                     <th nzWidth="80px">Note</th>
                     <th nzWidth="50px">Status</th>
                   </tr>
@@ -119,13 +116,7 @@
                       <td [nzExpand]="expandSet.has(data.uuid)" (nzExpandChange)="onExpandChange(data.uuid, $event)"></td>
                       <td>{{ data.title }}</td>
                       <td >
-                        <input
-                        type="number"
-                        nz-input
-                        [placeholder]="infoStudent['Rattrapage']['ue_'+data.value]"
-                        readonly
-                        [nzBorderless]="true"
-                        class="input"/>
+                        {{infoStudent['Rattrapage']['ue_'+data.value]}}
                       </td>
 
                       <td>

@@ -9,7 +9,7 @@ from app.api import deps
 from fastapi.responses import FileResponse
 from datetime import date
 from app.utils_sco.scolarite import create_certificat_scolarite
-from app.utils_sco.relever import PDF, relever_note
+from app.utils_sco.relever import FPDF, relever_note
 from app.utils_sco.inscription import attestation_inscription
 from app.utils_sco.credit import attestation_validation_credit
 from app.utils_sco.assiduite import create_certificat_assidute
