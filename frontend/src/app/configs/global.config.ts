@@ -1,8 +1,8 @@
 export const globalConfig = {
   appURL: 'https://',
-  appLogo: 'assets/images/fac.png',
-  appTitle: 'FacSience',
-  footerCopyright: 'FacSience ©2022',
+  appLogo: 'assets/images/science-logo.webp',
+  appTitle: 'FacSciences',
+  footerCopyright: 'FacSciences©2022',
   currencyList: ['USD', 'EUR'],
   defaultCurrency: 'USD',
   defaultMultiplier: 1,

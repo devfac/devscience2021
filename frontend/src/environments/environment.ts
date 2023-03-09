@@ -4,9 +4,10 @@
 
 export const environment = {
   production: false,
-  authApiURL: 'http://192.168.0.102/api/v1',
-  notificationApiURL: 'http://192.168.0.102:3000',
-  socketApiURL: "192.168.0.102/api/v1/utils/ws/",
+  authApiURL: 'http://localhost/api/v1',
+  notificationApiURL: 'http://localhost:3000',
+  socketApiURL: "ws://localhost/api/v1/utils/ws/",
+  onlineAPI:'http://localhost:8988/api',
 };
 
 /*
