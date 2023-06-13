@@ -17,7 +17,7 @@ import { Publication } from '@app/models/publication';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { head } from 'lodash';
 
-const BASE_URL = environment.authApiURL;
+const BASE_URL = environment.externalApi;
 
 
 @Component({
@@ -28,7 +28,7 @@ const BASE_URL = environment.authApiURL;
 export class PublicationComponent implements OnInit {
   @ViewChild(DatatableCrudComponent) datatable!: DatatableCrudComponent;
   headers: TableHeader[] = [];
-   
+
   private headersParams =  new HttpHeaders({
     'Accept': 'application/json',
     "Authorization": "Bearer "+window.sessionStorage.getItem("token")
@@ -66,13 +66,13 @@ export class PublicationComponent implements OnInit {
     delete: true,
     detail: false,
   };
-  
+
   isInit: boolean = false
   constructor(private http: HttpClient,
-    private modal: NzModalService, 
+    private modal: NzModalService,
     private fb: FormBuilder,
     private service: PublicationService,
-    ) { 
+    ) {
       this.form = this.fb.group({
         title: [null, [Validators.required]],
         type: [null, [Validators.required]],
@@ -155,7 +155,7 @@ export class PublicationComponent implements OnInit {
   async submitForm(){
     if (this.form.valid) {
       const data = {
-        title: this.form.value.title, 
+        title: this.form.value.title,
         auteur: this.form.value.auteur,
         type: this.form.value.type,
         url_file: this.uploadedFile,
@@ -174,13 +174,13 @@ export class PublicationComponent implements OnInit {
           for(let i=0; i<this.uploadedFile.length; i++){
             formData.append("uploaded_files", this.uploadedFile[i])
           }
-          
+
           this.http.post<any>(`${BASE_URL}/upload/?name_file=`+this.form.value.title,formData, {headers: this.headersParams}).subscribe(
             async(data) => {
               if(data){
                 console.log(data);
                 const body = {
-                  title: this.form.value.title, 
+                  title: this.form.value.title,
                   auteur: this.form.value.auteur,
                   type: this.form.value.type,
                   url_file: data.filenames,
@@ -192,7 +192,7 @@ export class PublicationComponent implements OnInit {
                 this.files = []
                 this.uploadedFile = []
               }
-            }, 
+            },
             error => console.error("error as ", error)
             )
         }else{
@@ -200,7 +200,7 @@ export class PublicationComponent implements OnInit {
           this.datatable.fetchData()
         }
       }
-      
+
       this.isvisible = false,
       this.isConfirmLoading = false
     } else {
@@ -273,7 +273,7 @@ export class PublicationComponent implements OnInit {
   fileBrowseHandler(event: any) {
     this.prepareUploadFile(event?.target.files[0]);
     this.prepareFilesList(event?.target.files);
-    
+
   }
   validFile(){
     if(this.form.value.type !== "Text" && this.form.value.type !== "Other"){
@@ -285,7 +285,7 @@ export class PublicationComponent implements OnInit {
       this.validFiles= true
     }
     console.log(this.validFiles);
-    
+
   }
   /**
    * Delete file from files list

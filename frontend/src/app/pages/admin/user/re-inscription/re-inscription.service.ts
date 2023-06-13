@@ -50,4 +50,9 @@ export class ReInscriptionService {
     return this.http.post<AncienStudent>(`${BASE_URL}/student/ancien/`,body, {headers: this.headers, params: otherParams})
   }
 
+
+  updatePhoto(body: any, numCarte:string ){
+    let otherParams = new HttpParams().append('num_carte', numCarte)
+    return this.http.put<AncienStudent>(`${BASE_URL}/student/update_photo/`,body, {headers: this.headers, params: otherParams})
+  }
 }

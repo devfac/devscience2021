@@ -8,12 +8,12 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/inst
 # Copy poetry.lock* in case it doesn't exist in the repo
 COPY app/pyproject.toml ./app/poetry.lock* /app/
 
-RUN pip install "poetry==1.0.0"
+RUN pip install poetry
 RUN pip install tenacity
 # Allow installing dev dependencies to run tests
 ARG INSTALL_DEV=false
-RUN poetry config virtualenvs.create false \
-  && poetry install --no-interaction --no-ansi
+RUN poetry config virtualenvs.create false && \
+    poetry install --no-interaction --no-ansi
   
 # For development, Jupyter remote kernel, Hydrogen
 # Using inside the container:

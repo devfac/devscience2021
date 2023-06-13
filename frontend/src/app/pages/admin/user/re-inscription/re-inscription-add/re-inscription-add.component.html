@@ -3,6 +3,21 @@
   <div nz-row>
     <nz-form-item nz-col nzSpan="8">
       <nz-form-label>
+        {{ 'admin.student.image' | translate }}
+      </nz-form-label>
+        <div class="container" >
+            <img [src]="url" alt="" *ngIf="url">
+            <div [innerHtml]="msg" *ngIf="msg" style="color: red;"></div>
+            <input type="file" #fileDropRef id="fileDropRef"  (change)="selectFile($event)"/>
+          </div>
+          <button nz-button nzType="primary" [nzLoading]="isImageLoading" [disabled]="url ==='assets/images/profil.png'" (click)="uploadImage()">
+            {{ 'save' | translate }}
+          </button>
+    </nz-form-item>
+    </div >
+      <div nz-row>
+    <nz-form-item nz-col nzSpan="8">
+      <nz-form-label>
         {{ 'admin.student.num_carte' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate" >
@@ -123,7 +138,7 @@
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>
-    <div nz-col nzSpan="1"></div> 
+    <div nz-col nzSpan="1"></div>
     <nz-form-item nz-col nzSpan="6">
       <nz-form-label>
         {{ 'admin.student.receipt' | translate }}
@@ -137,7 +152,7 @@
           <a nz-icon nzType="plus"  class="button" (click)="showModal()"></a>
       </ng-template>
       </nz-form-control>
-    </nz-form-item> 
+    </nz-form-item>
   </div>
 
   <div nz-row>
@@ -163,7 +178,7 @@
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>
-    <div nz-col nzSpan="1"></div> 
+    <div nz-col nzSpan="1"></div>
     <nz-form-item nz-col nzSpan="6">
       <nz-form-label>
         {{ 'admin.student.sex' | translate }}
@@ -183,7 +198,7 @@
       </nz-form-control>
     </nz-form-item>
   </div>
-  
+
   <div nz-row>
     <nz-form-item nz-col nzSpan="8">
       <nz-form-label>
@@ -207,7 +222,7 @@
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>
-    <div nz-col nzSpan="1"></div> 
+    <div nz-col nzSpan="1"></div>
     <nz-form-item nz-col nzSpan="6">
       <nz-form-label>
         {{ 'admin.student.num_cin' | translate }}
@@ -244,7 +259,7 @@
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>
-    <div nz-col nzSpan="1"></div> 
+    <div nz-col nzSpan="1"></div>
     <nz-form-item nz-col nzSpan="6">
       <nz-form-label>
         {{ 'admin.student.type' | translate }}
@@ -264,9 +279,9 @@
       </nz-form-control>
     </nz-form-item>
   </div>
-  <nz-modal [(nzVisible)]="isvisible" 
-              nzTitle="{{'admin.student.add_receipt' | translate}}" 
-              (nzOnCancel)="handleCancel()" 
+  <nz-modal [(nzVisible)]="isvisible"
+              nzTitle="{{'admin.student.add_receipt' | translate}}"
+              (nzOnCancel)="handleCancel()"
               nzMask="true"
               nzMaskClosable="false" >
         <div *nzModalContent>

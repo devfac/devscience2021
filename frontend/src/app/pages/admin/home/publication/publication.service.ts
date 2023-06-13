@@ -5,8 +5,7 @@ import { Publication } from '@app/models/publication';
 import { ResponseModel } from '@app/models/response';
 import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
-
-const BASE_URL = environment.authApiURL;
+const BASE_URL = environment.externalApi;
 
 @Injectable({
   providedIn: 'root'
@@ -26,27 +25,27 @@ export class PublicationService {
   }
 
   getDataObservable(params_?: HttpParams): Observable<any> {
-    return this.http.get<Publication[]>(`${BASE_URL}/publication/admin`, {headers: this.headers, params: params_});
+    return this.http.get<Publication[]>(`${BASE_URL}/publications/admin`, {headers: this.headers, params: params_});
   }
 
   getDataPromisee() {
-    return this.http.get<ResponseModel>(`${BASE_URL}/publication/`, {headers: this.headers});
+    return this.http.get<ResponseModel>(`${BASE_URL}/publications/`, {headers: this.headers});
   }
 
   deletData(uuid: string):Promise<Publication[]> {
-    return this.http.delete<Publication[]>(`${BASE_URL}/publication/?uuid=`+uuid, {headers: this.headers}).toPromise()
+    return this.http.delete<Publication[]>(`${BASE_URL}/publications/?uuid=`+uuid, {headers: this.headers}).toPromise()
   }
 
   getData(uuid: string){
-    return this.http.get<Publication>(`${BASE_URL}/publication/?uuid=`+uuid, {headers: this.headers})
+    return this.http.get<Publication>(`${BASE_URL}/publications/?uuid=`+uuid, {headers: this.headers})
   }
 
   updateData(uuid: string, body: any){
-    return this.http.put<Publication[]>(`${BASE_URL}/publication/?uuid=`+uuid, body, {headers: this.headers})
+    return this.http.put<Publication[]>(`${BASE_URL}/publications/?uuid=`+uuid, body, {headers: this.headers})
   }
 
   addData(body: any){
-    return this.http.post<Publication[]>(`${BASE_URL}/publication/`,body, {headers: this.headers})
+    return this.http.post<Publication[]>(`${BASE_URL}/publications/`,body, {headers: this.headers})
   }
 
 }

@@ -28,18 +28,19 @@ const BASE_URL = environment.authApiURL;
 })
 export class ReInscriptionAddComponent implements OnInit {
 
-  licence = [{label:"S1", value:"S1", checked:false, disabled:false}, {label:"S2", value:"S2",checked:false, disabled:false}, 
-                 {label:"S3", value:"S3",checked:false, disabled:false},{label:"S4", value:"S4",checked:false, disabled:false}, 
+  licence = [{label:"S1", value:"S1", checked:false, disabled:false}, {label:"S2", value:"S2",checked:false, disabled:false},
+                 {label:"S3", value:"S3",checked:false, disabled:false},{label:"S4", value:"S4",checked:false, disabled:false},
                  {label:"S5", value:"S5",checked:false, disabled:false},{label:"S6", value:"S6",checked:false, disabled:false}]
 
-  master_1 = [{label:"S7", value:"S7",checked:false, disabled:false}, {label:"S8", value:"S8",checked:false, disabled:false}] 
-  master_2 = [{label:"S9", value:"S9",checked:false, disabled:false}, {label:"S10", value:"S10",checked:false, disabled:false}] 
+  master_1 = [{label:"S7", value:"S7",checked:false, disabled:false}, {label:"S8", value:"S8",checked:false, disabled:false}]
+  master_2 = [{label:"S9", value:"S9",checked:false, disabled:false}, {label:"S10", value:"S10",checked:false, disabled:false}]
   allYear: CollegeYear[] = []
   confirmModal?: NzModalRef;
   form!: FormGroup;
   formDialog!: FormGroup
   isvisible = false;
   isConfirmLoading = false;
+  isImageLoading = false;
   isEdit = false;
   title = '';
   uuid= "";
@@ -55,13 +56,14 @@ export class ReInscriptionAddComponent implements OnInit {
   typeNation = typeNation
   isReady: boolean = false
 
+  uploadedFile: any[] = [];
   keyMention = CODE+"mention"
   keyYear = CODE+"collegeYear"
   keyNum = CODE+"numCarte"
 
   defaultValue = {
       licence: this.licence,
-      master1: this.master_1, 
+      master1: this.master_1,
       master2: this.master_2,
       mention:"54928ac0-af4f-419e-abc0-09fd3a400597",
       journey:"6b877d4c-dd5b-4efa-9a2e-3871027067e8",
@@ -83,13 +85,17 @@ export class ReInscriptionAddComponent implements OnInit {
   blob = new Blob(["assets/images/profil.png"])
   uploadedImage: File = new File([this.blob], 'profile.png');
 
+  private headersParams =  new HttpHeaders({
+    'Accept': 'application/json',
+    "Authorization": "Bearer "+window.sessionStorage.getItem("token")
+  })
   constructor(
-    private http: HttpClient, 
-    private fb: FormBuilder, 
+    private http: HttpClient,
+    private fb: FormBuilder,
     private service: UserService,
     private reinscriptionService: ReInscriptionService,
     private serviceJourney: JourneyService,
-    private serviceMention: MentionService, 
+    private serviceMention: MentionService,
     public router: Router ) {
 
     this.form = this.fb.group({
@@ -128,7 +134,32 @@ export class ReInscriptionAddComponent implements OnInit {
 
    }
 
+    uploadImage(){
+      this.isImageLoading =true
+      let formData = new FormData();
+      for(let i=0; i<this.uploadedFile.length; i++){
+        formData.append("uploaded_files", this.uploadedFile[i])
+      }
+      this.http.post<any>(`${BASE_URL}/upload/?directory=photo`, formData, {headers: this.headersParams}).subscribe(
+        async(data) => {
+          if(data){
+            const body =
+              {
+                photo: data.filenames[0],
+              }
+            await this.reinscriptionService.updatePhoto( body, this.form.value.numCarte).toPromise()
+            this.isImageLoading =false
+
+          }
+        },
+        error => {
+          console.error("error as ", error);
+          this.isImageLoading =false}
+        )
+    }
+
    selectFile(event: any){
+    this.uploadedFile =[]
     if(!event.target.files[0] || event.target.files[0].length == 0){
       this.msg = "select image"
     }
@@ -143,14 +174,15 @@ export class ReInscriptionAddComponent implements OnInit {
     reader.onload = (_event) =>{
       this.msg = ""
       this.url = reader.result
-    } 
+    }
     this.uploadedImage = event.target.files[0]
+    this.uploadedFile.push(event.target.files[0])
    }
 
   async ngOnInit(){
     const numCarte = localStorage.getItem(this.keyNum)
     let year = localStorage.getItem(this.keyYear)
-    
+
     let uuidMention = localStorage.getItem(this.keyMention)
     if (uuidMention !== null){
       this.allJourney = await this.serviceJourney.getDataByMention(uuidMention).toPromise()
@@ -160,14 +192,16 @@ export class ReInscriptionAddComponent implements OnInit {
 
     this.http.get<Droit[]>(`${BASE_URL}/droit/by_mention?uuid_mention=`+
       localStorage.getItem(this.keyMention)+'&year='+localStorage.getItem(this.keyYear)).subscribe(
-      data =>{ 
+      data =>{
         this.allPrice=data
       },
       error => console.error("error as ", error)
     );
     if(numCarte && numCarte.length>0 && year){
+
       this.isEdit = true
       let  data = await this.reinscriptionService.getStudentByNumCarte(numCarte, year).toPromise()
+      console.log(data);
       this.form.get('numCarte')?.setValue(data.num_carte)
       this.form.get('mention')?.setValue(data.uuid_mention)
       this.form.get('journey')?.setValue(data.journey.uuid)
@@ -190,11 +224,12 @@ export class ReInscriptionAddComponent implements OnInit {
       this.form.get('type')?.setValue(data.type)
       this.form.get('nation')?.setValue(data.nation)
       this.form.get('phone')?.setValue(data.telephone)
-      this.form.get('receipt')?.setValue(data.receipt.num)
-      this.formDialog.get('numReceipt')?.setValue(data.receipt.num)
-      this.formDialog.get('dateReceipt')?.setValue(data.receipt.date)
-      this.formDialog.get('priceRigth')?.setValue(data.receipt.price)
-      
+      this.form.get('receipt')?.setValue(data.receipt?.num)
+      this.formDialog.get('numReceipt')?.setValue(data.receipt?.num)
+      this.formDialog.get('dateReceipt')?.setValue(data.receipt?.date)
+      this.formDialog.get('priceRigth')?.setValue(data.receipt?.price)
+
+      this.url = `${BASE_URL}/upload/?name_file=${data.photo}&directory=photo`
     }
     else{
       this.isEdit=false
@@ -219,12 +254,12 @@ export class ReInscriptionAddComponent implements OnInit {
       });
     }
   }
-  
+
   async submitForm() {
     if (this.form.valid) {
       this.isConfirmLoading = true
       let photo = this.form.value.numCarte+".jpg"
-      const body = 
+      const body =
         {
           last_name: this.form.value.lastName,
           first_name: this.form.value.firstName,
@@ -352,7 +387,7 @@ export class ReInscriptionAddComponent implements OnInit {
         this.form.get('infSemester')?.setValidators(Validators.required)
       }
   }
-  
+
   validation(indexCheck1: number, indexCheck2: number): void{
     if(indexCheck1 != -1){
       this.form.get('infSemester')?.setValue('S'+indexCheck1)
