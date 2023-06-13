@@ -1,5 +1,5 @@
 from typing import Any
-from fpdf import FPDF
+from app.pdf.PDFMark import PDFMark as FPDF
 
 from app.liste import header
 from app.utils import get_niveau_long, clear_name
@@ -39,6 +39,7 @@ class PDF(FPDF):
 
     def create_list_bourse( mention: str, all_data: Any, type_: str):
         pdf = PDF("P", "mm", "a4")
+        pdf.watermark('Faculté des Sciences',  font_style='BI')
         pdf.add_page()
         data = {'mention': all_data['mention'], 'anne': all_data['year']}
 

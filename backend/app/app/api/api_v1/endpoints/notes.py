@@ -278,11 +278,25 @@ def inserts_student(
                 et_un = crud.note.read_by_num_carte(semester=semester, journey=journey.abbreviation,
                                                     session=session,num_carte=student.num_carte)
                 if et_un:
-                    sessions = ['normal', 'final']
-                    for session_ in sessions:
-                        year = {'year': college_year}
+                    if student.type == 'Redoublant':
+                        et_un_final = crud.note.read_by_num_carte(semester=semester, journey=journey.abbreviation,
+                                                            session='final', num_carte=student.num_carte)
+                        crud.note.delete_by_num_carte(semester, journey.abbreviation, 'Rattrapage', student.num_carte)
                         crud.note.update_note(semester=semester, journey=journey.abbreviation,
-                                          session=session_, num_carte=student.num_carte, ue_in=year)
+                                              session='normal',
+                                              num_carte=student.num_carte,
+                                              ue_in={**et_un_final, 'year':college_year})
+                        crud.note.update_note(semester=semester, journey=journey.abbreviation,
+                                              session='final',
+                                              num_carte=student.num_carte,
+                                              ue_in={'year': college_year}
+                                              )
+                    else:
+                        sessions = ['normal', 'final']
+                        for session_ in sessions:
+                            year = {'year': college_year}
+                            crud.note.update_note(semester=semester, journey=journey.abbreviation,
+                                              session=session_, num_carte=student.num_carte, ue_in=year)
                 else:
                     sessions = ['normal', 'final']
                     for session_ in sessions:

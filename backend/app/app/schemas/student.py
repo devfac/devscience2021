@@ -26,6 +26,8 @@ keys = [
     "uuid_journey"
 ]
 
+class StudentUpdatePhoto(BaseModel):
+    photo: Optional[str] = None
 
 # Shared properties
 class StudentBase(BaseModel):
@@ -39,6 +41,7 @@ class StudentBase(BaseModel):
     num_cin: Optional[str] = None
     date_cin: Optional[str] = None
     place_cin: Optional[str] = None
+    photo: Optional[str] = None
     uuid_mention: Optional[UUID]
     actual_years: Optional[List[str]]
 

@@ -1,4 +1,5 @@
-from fpdf import FPDF
+
+from app.pdf.PDFMark import PDFMark as FPDF
 
 
 def header(pdf: FPDF):

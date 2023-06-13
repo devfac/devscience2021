@@ -1,5 +1,5 @@
 from typing import Any
-from .PDFMark import PDFMark as FPDF
+from app.pdf.PDFMark import PDFMark as FPDF
 from app.utils import convert_date
 
 
@@ -18,8 +18,7 @@ def relever_note(num_carte: str, date: str, data: Any, note: Any) -> str:
     pdf = PDF()
 
     # set watermark prior to calling add_page()
-    pdf.watermark('Fac.Sciences', font_style='BI')
-
+    pdf.watermark('Faculté des Sciences', y=175 ,font_style='BI')
     pdf.add_page()
     pdf.l_margin = 0
     pdf.rect(5, 5, 200, 287)
@@ -27,29 +26,16 @@ def relever_note(num_carte: str, date: str, data: Any, note: Any) -> str:
     pdf.l_margin = 8
 
     titre1 = "REPOBLIKAN'I MADAGASIKARA"
-    titre1_2 = " Universtité de fianarantsoa"
+    titre1_2 = "Universtité de Fianarantsoa"
 
     titre2 = "Fitiavana - Tanindrazana - Fandrosoana"
-    titre2_1 = " Faculté des sciences"
+    titre2_1 = "Faculté des sciences"
     titre3 = "Ministère de l'Enseignement Supérieur"
     titre3_1 = "Service scolarité"
     titre4 = "et de la recherche scientifique"
     titre4_1 = f"Année universitaire {data['year']}"
     titre5 = "releve de note"
     titre6 = f"N° ___/{date}/UF/FAC.S/S.SCO"
-
-    txt2 = '------------------------------------------------------------------------------------------'
-
-    pdf.set_font("helvetica", "B", 8)
-    pdf.set_text_color(250, 0, 0)
-
-    pdf.text_360(172, 67, titre2_1, 25)
-    pdf.text_360(172, 67, txt2, 30)
-
-    pdf.set_font("times", "IU", 6)
-    pdf.set_text_color(0, 0, 250)
-
-    pdf.text_360(172, 67, titre1_2, 19)
 
     pdf.set_text_color(0, 0, 0)
     nom = "Nom:"

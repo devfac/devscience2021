@@ -4,8 +4,14 @@
 # License: FPDF
 # http://www.fpdf.org/en/script/script74.php
 
+import hashlib
+import io
+import warnings
+
+from PIL import Image
 from fpdf import FPDF, util
-from math import pi, cos, sin, radians
+from math import pi, cos, sin, tan, radians
+from .image_parsing import get_img_info, load_image, SUPPORTED_IMAGE_FILTERS
 
 
 class AlphaFPDF(FPDF):
@@ -154,9 +160,9 @@ class AlphaFPDF(FPDF):
         self.scale(s, s, x, y)
 
     def scale(self, s_x, s_y, x='', y=''):
-        if (x == ''): x = self.x
-        if (y == ''): y = self.y
-        if (s_x == 0 or s_y == 0):
+        if x == '': x = self.x
+        if y == '': y = self.y
+        if s_x == 0 or s_y == 0:
             raise ValueError(
                 'Please use values unequal to zero for Scaling'
             )
@@ -282,15 +288,15 @@ class AlphaFPDF(FPDF):
         # run through the string
         # for(i=0 i<strlen(text) i++):
         for i in range(0, len(text)):
-            if (align == 'top'):
+            if align == 'top':
                 # rotate matrix half of the width of current letter + half of the width of preceding letter
-                if (i == 0):
+                if i == 0:
                     self.t_rotate(-((w[i] / 2) / u) * 360, x, y)
 
                 else:
                     self.t_rotate(-((w[i] / 2 + w[i - 1] / 2) / u) * 360, x, y)
 
-                if (fontwidth != 1):
+                if fontwidth != 1:
                     self.start_transform()
                     self.scale_X(fontwidth * 100, x, y)
 
@@ -298,20 +304,170 @@ class AlphaFPDF(FPDF):
 
             else:
                 # rotate matrix half of the width of current letter + half of the width of preceding letter
-                if (i == 0):
+                if i == 0:
                     self.t_rotate(((w[i] / 2) / u) * 360, x, y)
 
                 else:
                     self.t_rotate(((w[i] / 2 + w[i - 1] / 2) / u) * 360, x, y)
 
-                if (fontwidth != 1):
+                if fontwidth != 1:
                     self.start_transform()
                     self.scale_X(fontwidth * 100, x, y)
 
-                self.set_xy(x - w[i] / 2, y + r - (self.font_size))
+                self.set_xy(x - w[i] / 2, y + r - self.font_size)
 
             self.cell(w[i], self.font_size, text[i], 0, 0, 'C')
-            if (fontwidth != 1):
+            if fontwidth != 1:
                 self.stop_transform()
 
         self.stop_transform()
+
+    def sinus_text_transform(self, x, y, txt, vs=1, hs=1, rota=0, kipp=0):
+
+        if vs >= 0 and vs <= 1: vs = cos(rota) + 0.45
+        if hs >= 0 and hs <= 1: hs = cos(kipp) + 0.45
+
+        rota *= pi / 180
+        rota = sin(rota)
+        kipp *= pi / 180
+        kipp = sin(kipp)
+
+        s = 'BT %.2f %.2f %.2f %.2f %.2f %.2f Tm (%s) Tj ET' % (
+            vs,
+            rota,
+            kipp,
+            hs,
+            x * self.k,
+            (self.h - y) * self.k,
+            util.escape_parens(txt)
+        )
+
+        if self.underline and txt != '': s += ' ' + self._do_underline(x, y, txt)
+        s = f"q {self.text_color}  {s}  Q"
+        self._out(s)
+
+    def sinus_text(self, x, y, text, amplitude=20, phase_shift=1, width_strech=1.5):
+        start_x = x
+        start_y = y
+        bb = self.get_string_width(text)
+        step = '%.2f' % (bb / len(text))
+
+        for i in range(0, len(text)):
+            if i <= len(text):
+                val = text[i]
+                y = sin(start_x * phase_shift * (pi / 180)) * amplitude
+                self.sinus_text_transform(start_x, y + start_y, val)
+                start_x = start_x + (self.get_string_width(val) * width_strech)
+
+    def image(
+            self,
+            name,
+            x=None,
+            y=None,
+            w=0,
+            h=0,
+            type="",
+            link="",
+            title=None,
+            alt_text=None,
+            is_mask=False,
+            mask_image=None
+    ):
+        """
+        Put an image on the page.
+        The size of the image on the page can be specified in different ways:
+        * explicit width and height (expressed in user units)
+        * one explicit dimension, the other being calculated automatically
+          in order to keep the original proportions
+        * no explicit dimension, in which case the image is put at 72 dpi.
+        **Remarks**:
+        * if an image is used several times, only one copy is embedded in the file.
+        * when using an animated GIF, only the first frame is used.
+        Args:
+            name: either a string representing a file path to an #!/usr/bin/python3inate is used.
+                After the call, the current ordinate is moved to the bottom of the image
+            w (int): optional width of the image. If not specified or equal to zero,
+                it is automatically calculated from the image size.
+                Pass `pdf.epw` to scale horizontally to the full page width.
+            h (int): optional height of the image. If not specified or equal to zero,
+                it is automatically calculated from the image size.
+                Pass `pdf.eph` to scale horizontally to the full page height.
+            type (str): [**DEPRECATED**] unused, will be removed in a later version.
+            link (str): optional link to add on the image, internal
+                (identifier returned by `add_link`) or external URL.
+            title (str): optional. Currently, never seem rendered by PDF readers.
+            alt_text (str): optional alternative text describing the image,
+                for accessibility purposes. Displayed by some PDF readers on hover.
+
+        """
+        if type:
+            warnings.warn(
+                '"type" is unused and will soon be deprecated',
+                PendingDeprecationWarning,
+            )
+        if isinstance(name, str):
+            img = None
+        elif isinstance(name, Image.Image):
+            name, img = hashlib.md5(name.tobytes()).hexdigest(), name
+        elif isinstance(name, io.BytesIO):
+            name, img = hashlib.md5(name.getvalue()).hexdigest(), name
+        else:
+            name, img = str(name), name
+        info = self.images.get(name)
+        if info:
+            info["usages"] += 1
+        else:
+            if not img:
+                img = load_image(name)
+            info = get_img_info(img, self.image_filter)
+            info["i"] = len(self.images) + 1
+            info["usages"] = 1
+            self.images[name] = info
+
+        if mask_image != None:
+            info['smask'] = self.images.get(mask_image)['data']
+        # Set PDF Version to at least 1.4 to enable transparency
+        if is_mask:
+            if float(self.pdf_version) < 1.4:
+                self.pdf_version = '1.4'
+
+        # Automatic width and height calculation if needed
+        if w == 0 and h == 0:  # Put image at 72 dpi
+            w = info["w"] / self.k
+            h = info["h"] / self.k
+        elif w == 0:
+            w = h * info["w"] / info["h"]
+        elif h == 0:
+            h = w * info["h"] / info["w"]
+
+        # workarount fpdf 2.4.5 in pip seems to be different from git version ???
+        try:
+            if self.oversized_images and info["usages"] == 1:
+                info = self._downscale_image(name, img, info, w, h)
+        except:
+            pass
+
+        # Flowing mode
+        if y is None:
+            self._perform_page_break_if_need_be(h)
+            y = self.y
+            self.y += h
+
+        if x is None:
+            x = self.x
+
+        stream_content = (
+            f"q {w * self.k:.2f} 0 0 {h * self.k:.2f} {x * self.k:.2f} "
+            f"{(self.h - y - h) * self.k:.2f} cm /I{info['i']} Do Q"
+        )
+
+        if not is_mask:
+            if title or alt_text:
+                with self._marked_sequence(title=title, alt_text=alt_text):
+                    self._out(stream_content)
+            else:
+                self._out(stream_content)
+        if link:
+            self.link(x, y, w, h, link)
+
+        return info

@@ -12,14 +12,14 @@ app = FastAPI(
 )
 
 # Set all CORS enabled origins
-# if settings.BACKEND_CORS_ORIGINS:
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost", "http://localhost:4200", "http://localhost:8070"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+if settings.BACKEND_CORS_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost", "http://localhost:4200", "http://localhost:8070"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 async def job_function():
     my_files = [f for f in glob.glob("files/*.pdf")]
 

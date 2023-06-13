@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-from PDFMark import PDFMark as FPDF
-from random import randint
+from app.pdf.PDFMark import PDFMark as FPDF
 
 
 # some random text to fill the pages
