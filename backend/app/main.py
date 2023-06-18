@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
-import tzlocal
 import uvicorn
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from app.api.api_v1.api import api_router
 from app.core.config import settings
 
