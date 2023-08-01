@@ -28,7 +28,7 @@ class Student(Base):
     type = Column(String) # passant , redoublant
     receipt_list = Column(ARRAY(String))
     receipt = Column(String)
-    photo = Column(String, unique=True)
+    photo = Column(String)
     baccalaureate_num = Column(String)
     baccalaureate_center = Column(String)
     baccalaureate_years = Column(String)
