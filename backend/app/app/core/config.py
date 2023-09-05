@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
     LEVEL: List[str] = ["L1", "L2", "L3", "M1", "M2"]
-    """
+    
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
         if isinstance(v, str) and not v.startswith("["):
@@ -26,7 +26,7 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    """
+    
     PROJECT_NAME: str
     SENTRY_DSN: Optional[HttpUrl] = None
     @validator("SENTRY_DSN", pre=True)
