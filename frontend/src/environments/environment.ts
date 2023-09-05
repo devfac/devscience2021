@@ -8,6 +8,7 @@ export const environment = {
   notificationApiURL: 'http://localhost:3000',
   socketApiURL: "ws://localhost/api/v1/utils/ws/",
   onlineAPI:'http://localhost:8988/api',
+  externalApi:"http://localhost:8988/api",
 };
 
 /*

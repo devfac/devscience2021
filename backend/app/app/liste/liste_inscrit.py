@@ -1,5 +1,5 @@
 from typing import Any
-from fpdf import FPDF
+from app.pdf.PDFMark import PDFMark as FPDF
 from .header import header
 from ..utils import clear_name
 
@@ -48,8 +48,8 @@ class PDF(FPDF):
 
     def create_list_inscrit(sems: str, parcour: str, data: Any, etudiants: Any):
         pdf = PDF("P", "mm", "a4")
+        pdf.watermark('Faculté des Sciences',  font_style='BI')
         pdf.add_page()
-
         titre = "LISTE DES ÉTUDIANTS INSCRITS"
         PDF.add_title(pdf=pdf, data=data, sems=sems, title=titre)
 

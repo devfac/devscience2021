@@ -1,5 +1,5 @@
 from typing import Any
-from fpdf import FPDF
+from app.pdf.PDFMark import PDFMark as FPDF
 from .header import header
 from ..utils import clear_name
 
@@ -121,6 +121,7 @@ class PDF(FPDF):
     def create_list_examen(sems: str, journey: str, data: Any, matiers: Any, etudiants: Any):
         pdf = PDF("P", "mm", "a4")
         pdf.add_page()
+        pdf.watermark('Faculté des Sciences',  font_style='BI')
 
         titre = "FICHE DE PRÉSENCE PAR U.E"
         PDF.add_title(pdf=pdf, data=data, sems=sems, title=titre)

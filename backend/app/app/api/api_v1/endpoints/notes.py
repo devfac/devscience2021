@@ -278,11 +278,25 @@ def inserts_student(
                 et_un = crud.note.read_by_num_carte(semester=semester, journey=journey.abbreviation,
                                                     session=session,num_carte=student.num_carte)
                 if et_un:
-                    sessions = ['normal', 'final']
-                    for session_ in sessions:
-                        year = {'year': college_year}
+                    if student.type == 'Redoublant':
+                        et_un_final = crud.note.read_by_num_carte(semester=semester, journey=journey.abbreviation,
+                                                            session='final', num_carte=student.num_carte)
+                        crud.note.delete_by_num_carte(semester, journey.abbreviation, 'Rattrapage', student.num_carte)
                         crud.note.update_note(semester=semester, journey=journey.abbreviation,
-                                          session=session_, num_carte=student.num_carte, ue_in=year)
+                                              session='normal',
+                                              num_carte=student.num_carte,
+                                              ue_in={**et_un_final, 'year':college_year})
+                        crud.note.update_note(semester=semester, journey=journey.abbreviation,
+                                              session='final',
+                                              num_carte=student.num_carte,
+                                              ue_in={'year': college_year}
+                                              )
+                    else:
+                        sessions = ['normal', 'final']
+                        for session_ in sessions:
+                            year = {'year': college_year}
+                            crud.note.update_note(semester=semester, journey=journey.abbreviation,
+                                              session=session_, num_carte=student.num_carte, ue_in=year)
                 else:
                     sessions = ['normal', 'final']
                     for session_ in sessions:
@@ -312,6 +326,41 @@ def get_all_notes(
         mean: str = "",
         value: Any = 10,
         type_:str = "success",
+        num_carte: str = "",
+        current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+
+    journey = crud.journey.get_by_uuid(db=db, uuid=uuid_journey)
+    if not journey:
+        raise HTTPException(status_code=400, detail="journey not found")
+    if num_carte != "" and num_carte is not None and num_carte != "null":
+        all_note = crud.note.search_notes(semester=semester, journey=journey.abbreviation, limit=limit, skip=offset,
+                                          session=session, year=college_year, num_carte=num_carte)
+        count = len(all_note)
+    else:
+        all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation,limit=limit, skip=offset,
+                                           session=session, year=college_year, value_ue=value_ue, value_ec=value_ec,
+                                           type_=type_, credit=credit, mean=mean, value=value)
+
+        all_note_count = crud.note.read_all_note_count(semester=semester, journey=journey.abbreviation,
+                                           session=session, year=college_year, value_ue=value_ue, value_ec=value_ec,
+                                           type_=type_, credit=credit, mean=mean, value=value)
+        count = len(all_note_count)
+    response = schemas.ResponseData(**{'count':count, 'data':all_note})
+    return response
+
+
+@router.get("/search", response_model=schemas.ResponseData)
+def get_all_notes(
+        *,
+        db: Session = Depends(deps.get_db),
+        college_year: str,
+        semester: str,
+        session: str,
+        uuid_journey: str,
+        limit: int = 100,
+        offset: int = 0,
+        num_carte: str = "",
         current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
 
@@ -319,14 +368,9 @@ def get_all_notes(
     if not journey:
         raise HTTPException(status_code=400, detail="journey not found")
 
-    all_note = crud.note.read_all_note(semester=semester, journey=journey.abbreviation,limit=limit, skip=offset,
-                                       session=session, year=college_year, value_ue=value_ue, value_ec=value_ec,
-                                       type_=type_, credit=credit, mean=mean, value=value)
-
-    all_note_count = crud.note.read_all_note_count(semester=semester, journey=journey.abbreviation,
-                                       session=session, year=college_year, value_ue=value_ue, value_ec=value_ec,
-                                       type_=type_, credit=credit, mean=mean, value=value)
-    count = len(all_note_count)
+    all_note = crud.note.search_notes(semester=semester, journey=journey.abbreviation,limit=limit, skip=offset,
+                                       session=session, year=college_year, num_carte=num_carte)
+    count = len(all_note)
     response = schemas.ResponseData(**{'count':count, 'data':all_note})
     return response
 

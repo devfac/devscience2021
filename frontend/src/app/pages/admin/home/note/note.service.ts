@@ -8,7 +8,6 @@ import { environment } from '@environments/environment';
 import { Observable } from 'rxjs';
 import { MentionService } from '../mention/mention.service';
 import { User } from '@app/models/user';
-import { CookieService } from 'ngx-cookie-service';
 
 
 const BASE_URL = environment.authApiURL;
@@ -22,7 +21,6 @@ export class NoteService {
     private http: HttpClient,
     private serviceMention: MentionService,
     private authUser: AuthService,
-    private coockiService: CookieService
     ) { }
 
     private headers =  new HttpHeaders({

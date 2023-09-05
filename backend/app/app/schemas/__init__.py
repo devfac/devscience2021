@@ -17,7 +17,7 @@ from .note import Note, NoteUE
 from .resultat import Resultat
 from .diploma import Diploma, DiplomaCreate, DiplomaUpdate, DiplomaInDB
 from .droit import Droit, DroitUpdate, DroitCreate, DroitInDB
-from .student import AncienStudentCreate, AncienStudentUpdate, AncienStudent, AncienStudentInDB, CarteStudent
+from .student import AncienStudentCreate, AncienStudentUpdate, AncienStudent, AncienStudentInDB, CarteStudent, StudentUpdatePhoto
 from .student import NewStudent, NewStudentCreate, NewStudentUpdate, NewStudentInDB, SelectStudentBase, SelectStudentCreate, NewStudentUploaded
 from .interaction import InteractionInDBBase, InteractionUpdate, Interaction, InteractionInDB,  InteractionCreate, ValueUEEC
 from .socket import SocketModel

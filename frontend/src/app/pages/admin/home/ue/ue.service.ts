@@ -2,7 +2,6 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Ue, UeEc } from '@app/models/ue';
 import { environment } from '@environments/environment';
-import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 
 const BASE_URL = environment.authApiURL;
@@ -13,9 +12,8 @@ const BASE_URL = environment.authApiURL;
 export class UeService {
   constructor(
     private http: HttpClient,
-    private coockiService: CookieService
     ) { }
-   
+
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
     "Authorization": "Bearer "+window.sessionStorage.getItem("token")
@@ -54,7 +52,7 @@ export class UeService {
         `&semester=`+semester+
         `&uuid_journey=`+uuidJourney, this.options)
   }
-   
+
   getUe( semester: string, uuidJourney: string){
     return this.http.get<Ue[]>(`${BASE_URL}/matier_ue/get_by_class?semester=`+semester+
                               `&uuid_journey=`+uuidJourney, this.options)

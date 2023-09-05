@@ -6,7 +6,6 @@ import { map } from 'rxjs/operators';
 import { environment } from '@environments/environment';
 import { User } from '@app/models';
 import { SocketService } from '@app/socket.service';
-import { CookieService } from 'ngx-cookie-service';
 
 const BASE_URL = environment.authApiURL;
 
@@ -48,7 +47,7 @@ export class AuthService{
           window.sessionStorage.removeItem('token')
           window.sessionStorage.setItem('user',JSON.stringify(user) )
           window.sessionStorage.setItem('token',JSON.stringify(user.access_token) )
-          
+
           this.userSubject.next(user)
       }))
   }

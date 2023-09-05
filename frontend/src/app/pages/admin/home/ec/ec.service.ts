@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { Ec } from '@app/models/ec';
 import { ResponseModel } from '@app/models/response';
 import { environment } from '@environments/environment';
-import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 
 const BASE_URL = environment.authApiURL;
@@ -15,9 +14,8 @@ export class EcService {
 
   constructor(
     private http: HttpClient,
-    private coockiService: CookieService
     ) { }
-   
+
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
     "Authorization": "Bearer "+window.sessionStorage.getItem("token")
@@ -49,10 +47,10 @@ export class EcService {
   addData(body: any){
     return this.http.post<Ec[]>(`${BASE_URL}/matier_ec/`,body, {headers: this.headers})
   }
-  
+
   getEc( semester: string, uuidJourney: string){
     let otherParams = new HttpParams().append('semester', semester).append('uuid_journey', uuidJourney)
     return this.http.get<Ec[]>(`${BASE_URL}/matier_ec/get_by_class`, {headers: this.headers, params: otherParams})
   }
-   
+
 }

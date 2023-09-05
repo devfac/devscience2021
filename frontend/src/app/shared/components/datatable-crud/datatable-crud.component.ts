@@ -79,6 +79,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   @Output() listRattrapage = new EventEmitter<any>();
   @Output() resultByCreditSuccess = new EventEmitter<any>();
   @Output() selectionChange = new EventEmitter<number | null>();
+  @Output() search = new EventEmitter<string | null>();
   @ViewChild('actionsTemplate', { static: true }) actionsTemplate!: TemplateRef<any>;
 
 
@@ -120,6 +121,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     matierEc: [null],
     meanCredit: [null],
     filter: [null],
+    search:[]
     })
   }
 
@@ -282,9 +284,13 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     this.edit.emit(row);
   }
 
-  onSearch(row: any) {
-    this.startSearch.emit(row);
-  }
+  onSearch() {
+    if(this.form.value.search){
+      this.search.emit(this.form.value.search);
+    }else{
+      this.search.emit(null);
+    }
+    }
 
   saveEditData(row: any) {
     this.edit.emit(row);

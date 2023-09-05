@@ -87,7 +87,6 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
 
                 if value_ec != "" and value_ec is not None and value_ec != "null":
                     filter_.append(or_(table.columns[f'ec_{value_ec}'] < 10, table.columns[f'ec_{value_ec}'] is None))
-        print(filter_)
         conn = engine.connect()
         sel = table.select()
         sel = sel.where(and_(*filter_))
@@ -119,7 +118,6 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
                                 table.columns[f'ue_{value_ue}'] < 10))
 
         else:
-            print("", credit)
             if type_ == "success":
                 if credit != "" and credit is not None and credit != "null":
                     filter_.append(or_(table.columns[credit] > value, table.columns[credit] == value))
@@ -170,6 +168,27 @@ class CRUDNote(CRUDBase[MatierEC, MatierECCreate, MatierECUpdate]):
         result = result.where(table.columns.year == year)
         result = result.offset(skip)
         result = result.limit(limit)
+        out = result.fetchall()
+        conn.close()
+        return out
+
+
+    def search_notes(self, semester: str,
+                         journey: str,
+                         session: str,
+                         year: str,
+                         num_carte: str,
+                         limit: int = 1000,
+                         skip: int = 0):
+        metadata = MetaData(bind=engine)
+        table = Table(f"note_{journey.lower()}_{semester.lower()}_{session.lower()}", metadata, autoload=True)
+        conn = engine.connect()
+        sel = table.select()
+        sel = sel.where(and_(table.columns["year"] == year, table.columns["num_carte"] == num_carte))
+        sel = sel.order_by(table.columns.num_carte.asc())
+        sel = sel.offset(skip)
+        sel = sel.limit(limit)
+        result = conn.execute(sel)
         out = result.fetchall()
         conn.close()
         return out

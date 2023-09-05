@@ -1,5 +1,5 @@
 from typing import Any
-from fpdf import FPDF
+from app.pdf.PDFMark import PDFMark as FPDF
 from .header import header
 from ..utils import clear_name
 
@@ -37,6 +37,7 @@ class PDF(FPDF):
             if len(etudiants[niv]) != 0:
                 titre = f"LISTE DES ÉTUDIANTS ADMIS PAR SÉLÉCTION DE DOSSIER EN {niv}"
                 pdf.add_page()
+                pdf.watermark('Faculté des Sciences',  font_style='BI')
                 PDF.add_title(pdf=pdf, data=data, title=titre)
 
                 num = "N°"

@@ -24,6 +24,7 @@ export class DatatableComponent {
   @Input() tableTitle?: string = 'items';
   @Input() loading: boolean = false;
   @Input() permissionNote: boolean = false;
+  @Input() permission: boolean = false;
   @Input() total = 0;
   @Input() pageSize = 10;
   @Input() pageIndex = 1;

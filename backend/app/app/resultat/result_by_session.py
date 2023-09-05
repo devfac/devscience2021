@@ -1,5 +1,5 @@
 from typing import Any, List
-from fpdf import FPDF
+from app.pdf.PDFMark import PDFMark as FPDF
 from app.liste.header import header
 
 
@@ -124,6 +124,8 @@ class PDF(FPDF):
 
     def create_result_by_session(sems: str, parcour: str, data: Any, admis: Any, type: str):
         pdf = PDF("P", "mm", "a4")
+
+        pdf.watermark('Faculté des Sciences', font_style='BI')
         pdf.add_page()
         session = str(data["session"])
         titre = f"RÉSULTAT {get_title_session(session).upper()}"

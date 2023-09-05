@@ -3,4 +3,5 @@
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
   },
+  "workbench.colorCustomizations": {}
 }

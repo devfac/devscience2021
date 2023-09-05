@@ -18,10 +18,21 @@
   ></span>
   <h2>{{ title }}</h2>
   <div class="search" >
-    <ng-container *ngIf="searchTemplate">
-      <ng-container *ngTemplateOutlet="searchTemplate"></ng-container>
-    </ng-container>
     <div *ngIf="isNote">
+  <div
+  class="search-note">
+    <nz-input-group [nzSuffix]="suffixIconSearch">
+      <input
+          type="text"
+          nz-input
+          placeholder="search"
+          formControlName="search"
+          />
+    </nz-input-group>
+<ng-template #suffixIconSearch>
+  <span nz-icon nzType="search" (click)="onSearch()"></span>
+</ng-template></div>
+
     <nz-select
         *ngIf="!permission && !isVisible"
         [ngModel]="'Credit'"
@@ -211,10 +222,10 @@
   (deleteNote)="onDelete($event)"
   [permissionNote]="permissionNote"
   (canceltEdit)="cancelEdit($event, data)"
-  (search)="onSearch($event)"
   (viewNote)="onDetail($event)"
   [showPagination]="showPagination"
   [message]="message"
+[permission]="permission"
   (selectionChange)="onSelectionChange($event)"
   (queryParamsChange)="onQueryParamsChange($event)"
 ></app-datatable>

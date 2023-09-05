@@ -1,5 +1,5 @@
 from typing import Any, List
-from fpdf import FPDF
+from app.pdf.PDFMark import PDFMark as FPDF
 from app.liste.header import header
 from app.schemas import Journey
 
@@ -155,6 +155,8 @@ class PDF(FPDF):
     def create_result_by_ue(sems: str, journey: Journey, data: Any, matiers: List[str], etudiants: Any, admis: Any,
                             admis_comp: Any):
         pdf = PDF(set_orientation(len(matiers)), "mm", "a4")
+
+        pdf.watermark('Faculté des Sciences', font_style='BI')
         pdf.add_page()
 
         titre = f"RÉSULTAT PROVISOIR DE L'UNITÉ D'ENSEIGNEMENT {matiers[1].upper()}"

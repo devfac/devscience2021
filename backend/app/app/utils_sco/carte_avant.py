@@ -1,4 +1,5 @@
-from fpdf import FPDF
+
+from app.pdf.PDFMark import PDFMark as FPDF
 from typing import Any
 import qrcode
 import os
@@ -33,8 +34,9 @@ class PDF(FPDF):
             num_carte = f"{deux_et[i]['num_carte']}"
             niveau = f"{deux_et[i]['level']}"
             image_fac = f"images/{niveau.lower()}_avant.jpg"
-            profile = deux_et[i]['sex']
-            image = f"images/{profile.lower()}.png"
+            profile = f"files/photo/{deux_et[i]['photo']}"
+            image = profile if os.path.exists(profile) else f"images/profil.png"
+            mask = "images/mask.png"
 
             info = f"Nom: {clear_name(deux_et[i]['last_name'].upper())}\n"
             info += f"Prénom: {deux_et[i]['first_name']}\n"
@@ -56,9 +58,13 @@ class PDF(FPDF):
             qr = qrcode.make(f"{data_et}")
 
             pdf.set_font('Times', '', 8.0)
+
+            # pdf.image(f"images/mask.png", is_mask=True)
             pdf.image(image_fac, x=pos_init_x, y=pos_init_y, w=long_init_x, h=long_init_y)
+            # pdf.image(mask,x=pos_init_x+0.05, y=pos_init_y+0.05,w=1, is_mask=True)
+
             pdf.rect(pos_init_x, pos_init_y, w=long_init_x, h=long_init_y)
-            pdf.image(image, x=pos_init_x+0.05, y=pos_init_y+0.05, w=1, h=1.18)
+            pdf.image(image, x=pos_init_x + 0.05, y=pos_init_y + 0.05, w=1, h=1.18)
             pdf.set_text_color(0, 0, 0)
 
             pdf.set_font('Times', 'B', 7.0)
@@ -153,6 +159,7 @@ class PDF(FPDF):
     def parcourir_et(etudiant: list, data: Any):
 
         pdf = PDF("P", "in", "a4")
+
         nbr: int = 0
 
         if len(etudiant) % 8 == 0:

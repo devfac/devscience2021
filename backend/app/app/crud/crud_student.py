@@ -16,9 +16,9 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
         return db.query(Student).filter(Student.num_carte == num_carte).first()
 
     def get_by_mention(self, db: Session, *, uuid_mention: UUID, limit:int, skip: int,
-                       uuid_journey: str = "", semester: str = "",
+                       uuid_journey: str = "", semester: str = "", year: str,
                        order: str = 'asc', order_by: str = "last_name") -> Optional[List[Student]]:
-        filter_ = [Student.uuid_mention == uuid_mention]
+        filter_ = [Student.uuid_mention == uuid_mention, Student.actual_years.any(year)]
         if uuid_journey != "" and uuid_journey != "null":
             filter_.append(Student.uuid_journey == uuid_journey)
         if semester != "" and semester != "null":

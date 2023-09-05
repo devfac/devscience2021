@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { AncienStudent } from '@app/models/student';
 import { Ue } from '@app/models/ue';
 import { environment } from '@environments/environment';
-import { CookieService } from 'ngx-cookie-service';
 import { Observable, of } from 'rxjs';
 
 const BASE_URL = environment.authApiURL;
@@ -14,20 +13,19 @@ const BASE_URL = environment.authApiURL;
 export class ReInscriptionService {
   constructor(
     private http: HttpClient,
-    private coockiService: CookieService
     ) { }
-   
+
   private headers =  new HttpHeaders({
     'Accept': 'application/json',
     "Authorization": "Bearer "+window.sessionStorage.getItem("token")
   })
 
   getDataObservable(params_?: HttpParams): Observable<any> {
-    return this.http.get<AncienStudent[]>(`${BASE_URL}/student/ancien/`, {headers: this.headers, 
+    return this.http.get<AncienStudent[]>(`${BASE_URL}/student/ancien/`, {headers: this.headers,
       params: params_});
   }
 
-  getDataPromise(semester: string,  uuid_journey: string){ 
+  getDataPromise(semester: string,  uuid_journey: string){
     let otherParams = new HttpParams().append('semester', semester).append('uuid_journey', uuid_journey)
     return this.http.get<AncienStudent>(`${BASE_URL}/matier_ue/get_by_class/`,{headers: this.headers, params: otherParams})
   }
@@ -51,5 +49,10 @@ export class ReInscriptionService {
     let otherParams = new HttpParams().append('college_year', collegeYear)
     return this.http.post<AncienStudent>(`${BASE_URL}/student/ancien/`,body, {headers: this.headers, params: otherParams})
   }
-   
+
+
+  updatePhoto(body: any, numCarte:string ){
+    let otherParams = new HttpParams().append('num_carte', numCarte)
+    return this.http.put<AncienStudent>(`${BASE_URL}/student/update_photo/`,body, {headers: this.headers, params: otherParams})
+  }
 }

@@ -34,15 +34,16 @@ def read_ancien_student(
     Retrieve ancien student.
     """
     students = crud.ancien_student.get_by_mention(db=db, order_by=order_by, order=order, uuid_journey=uuid_journey,
-                                                  semester=semester, uuid_mention=uuid_mention, limit=limit, skip=offset)
+                                                  semester=semester, uuid_mention=uuid_mention,
+                                                  limit=limit, skip=offset, year=college_year)
     all_student = []
     count = 0
     for student in crud.ancien_student.count_by_mention(db=db, uuid_mention=uuid_mention, uuid_journey=uuid_journey,
                                                         semester=semester):
-        if find_in_list(current_user.uuid_mention, str(student.uuid_mention)) != -1 and \
-                find_in_list(student.actual_years, college_year) != -1 and student.uuid_journey:
+        if find_in_list(current_user.uuid_mention, str(student.uuid_mention)) != -1 and student.uuid_journey:
             count += 1
     for on_student in students:
+        print(on_student.actual_years, on_student.num_carte)
         if on_student.uuid_journey:
             for receipt in on_student.receipt_list:
                 receipt = receipt.replace("'",'"')
@@ -52,8 +53,7 @@ def read_ancien_student(
                     break
             stud = schemas.AncienStudent(**jsonable_encoder(on_student))
             stud.journey = crud.journey.get_by_uuid(db=db, uuid=on_student.uuid_journey)
-            if find_in_list(current_user.uuid_mention, str(stud.uuid_mention)) != -1 and \
-                    find_in_list(on_student.actual_years, college_year) != -1:
+            if find_in_list(current_user.uuid_mention, str(stud.uuid_mention)) != -1:
                 all_student.append(stud)
     response = schemas.ResponseData(**{'count': count, 'data': all_student})
     return response
@@ -231,6 +231,20 @@ def create_new_student(
         student = crud.new_student.update(db=db, db_obj=student, obj_in=student_in)
     return student
 
+@router.put("/update_photo/",  response_model=schemas.NewStudent)
+def update_student_selected(
+        *,
+        db: Session = Depends(deps.get_db),
+        student_in: schemas.StudentUpdatePhoto,
+        num_carte: str,
+        current_user: models.User = Depends(deps.get_current_active_user),
+):
+    one_student = crud.ancien_student.get_by_num_carte(db=db, num_carte=num_carte)
+    if one_student:
+        print(one_student, student_in)
+        return crud.new_student.update(db=db, db_obj=one_student, obj_in=student_in)
+    else:
+        raise HTTPException(status_code=404, detail="Student not found")
 
 @router.put("/new/",  response_model=schemas.NewStudent)
 def update_student_selected(
