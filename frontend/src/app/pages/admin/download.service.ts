@@ -6,10 +6,17 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class DownloadService {
-  constructor(private http: HttpClient) {}
-  download(url: string, headers:HttpHeaders, params: HttpParams): Observable<Blob> {
+  constructor(private http: HttpClient) { }
+  download(url: string, headers: HttpHeaders, params: HttpParams): Observable<Blob> {
     return this.http.get(url, {
       responseType: 'blob', headers: headers, params: params
     })
+  }
+  DocumentsDownload(fileUrl: string) {
+    return this.http.get(fileUrl, {
+      reportProgress: true,
+      observe: 'events',
+      responseType: 'blob'
+    });
   }
 }
