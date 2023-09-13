@@ -3,7 +3,7 @@ import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.utils import decode_text
+from app.utils import decode_text, decode_
 from app import crud, models, schemas
 from fastapi.encoders import jsonable_encoder
 from app.api import deps

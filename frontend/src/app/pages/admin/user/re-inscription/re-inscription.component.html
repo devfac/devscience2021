@@ -1,23 +1,16 @@
-<form nz-form [formGroup]="form" class="form"  nzLayout="vertical">
+<form nz-form [formGroup]="form" class="form" nzLayout="vertical">
   <div nz-row>
     <nz-form-item nz-col nzSpan="3">
       <nz-form-label>
         {{ 'admin.home.college_year.title' | translate }}
       </nz-form-label>
-      <nz-form-control >
+      <nz-form-control>
         <nz-input-group>
-          <nz-select
-              [ngModel]="data"
-              formControlName="collegeYear"
-              [nzPlaceHolder]="'admin.home.college_year.title' | translate"
-              (ngModelChange)="getAllStudents()"
-              style="width: 100%;"
-              >
-              <nz-option *ngFor="let item of allYears"
-                  [nzLabel]="item.title"
-                  [nzValue]="item.title"
-              >
-              </nz-option>
+          <nz-select [ngModel]="data" formControlName="collegeYear"
+            [nzPlaceHolder]="'admin.home.college_year.title' | translate" (ngModelChange)="getAllStudents()"
+            style="width: 100%;">
+            <nz-option *ngFor="let item of allYears" [nzLabel]="item.title" [nzValue]="item.title">
+            </nz-option>
           </nz-select>
         </nz-input-group>
       </nz-form-control>
@@ -28,18 +21,11 @@
         {{ 'admin.home.mention.title' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-          <nz-select
-              nzAllowClear
-              formControlName="mention"
-              [nzPlaceHolder]="'admin.home.mention.title' | translate"
-              (ngModelChange)="getAllJourney()"
-              >
-              <nz-option *ngFor="let item of allMention"
-                  [nzLabel]="item.title"
-                  [nzValue]="item.uuid"
-              >
-              </nz-option>
-          </nz-select>
+        <nz-select nzAllowClear formControlName="mention" [nzPlaceHolder]="'admin.home.mention.title' | translate"
+          (ngModelChange)="getAllJourney()">
+          <nz-option *ngFor="let item of allMention" [nzLabel]="item.title" [nzValue]="item.uuid">
+          </nz-option>
+        </nz-select>
       </nz-form-control>
     </nz-form-item>
     <div nz-col nzSpan="1"></div>
@@ -48,18 +34,11 @@
         {{ 'admin.home.journey.title' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-          <nz-select
-              nzAllowClear
-              formControlName="journey"
-              [nzPlaceHolder]="'admin.home.journey.title' | translate"
-              (ngModelChange)="changeJourneyList()"
-              >
-              <nz-option *ngFor="let item of allJourney"
-                  [nzLabel]="item.abbreviation"
-                  [nzValue]="item.uuid"
-              >
-              </nz-option>
-          </nz-select>
+        <nz-select nzAllowClear formControlName="journey" [nzPlaceHolder]="'admin.home.journey.title' | translate"
+          (ngModelChange)="changeJourneyList()">
+          <nz-option *ngFor="let item of allJourney" [nzLabel]="item.abbreviation" [nzValue]="item.uuid">
+          </nz-option>
+        </nz-select>
       </nz-form-control>
     </nz-form-item>
     <div nz-col nzSpan="1"></div>
@@ -68,133 +47,102 @@
         {{ 'admin.home.journey.semester' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-          <nz-select
-              nzAllowClear
-              formControlName="semester"
-              [nzPlaceHolder]="'admin.home.journey.semester' | translate"
-              (ngModelChange)="changeSemester()"
-              >
-              <nz-option *ngFor="let item of listOfSemester"
-                  [nzLabel]="item"
-                  [nzValue]="item"
-              >
-              </nz-option>
-          </nz-select>
+        <nz-select nzAllowClear formControlName="semester" [nzPlaceHolder]="'admin.home.journey.semester' | translate"
+          (ngModelChange)="changeSemester()">
+          <nz-option *ngFor="let item of listOfSemester" [nzLabel]="item" [nzValue]="item">
+          </nz-option>
+        </nz-select>
       </nz-form-control>
     </nz-form-item>
   </div>
 </form>
 
-<app-datatable-crud
-*ngIf="isLoading"
-[title]="'admin.user.reinscription.title' | translate"
-[headers]="headers"
-[fetchDataFn]="fetchData"
-[width]="500"
-[actions]="actions"
-(delete)="onDelete($event)"
-(edit)="onEdit($event)"
-[tableTitle]="'Etudiants'"
-(add)="onAdd()"
-(download)="download()"
-[showPagination]="true"
-classNames="table"
-></app-datatable-crud>
-  <nz-modal
-    [(nzVisible)]="isvisible"
-    nzTitle="{{'admin.home.journey.add_journey' | translate}}"
-    (nzOnCancel)="handleCancel()"
-    nzMask="true"
-    nzMaskClosable="false" >
-    <div *nzModalContent>
-      <nz-tabset>
-        <nz-tab nzTitle="Liste des etudiants">
-          <form nz-form [formGroup]="formList" class="form" (ngSubmit)="startDownload()" nzLayout="vertical">
-            <nz-form-item>
-              <nz-form-label nzRequired>
-                {{ 'admin.home.journey.title' | translate }}
-              </nz-form-label>
-              <nz-form-control [nzErrorTip]="'admin.home.journey.journey_error' | translate">
-                <nz-input-group>
-                  <nz-select  style="width: 100%;"
-                      [ngModel]="data"
-                      formControlName="journey"
-                      (ngModelChange)="changeJourney()"
-                      [nzPlaceHolder]="'admin.home.journey.title' | translate"
-                      >
-                      <nz-option *ngFor="let item of allJourney"
-                          [nzLabel]="item.title"
-                          [nzValue]="item.uuid"
-                      >
-                      </nz-option>
-                  </nz-select>
-                </nz-input-group>
-              </nz-form-control>
-            </nz-form-item>
-            <nz-form-item>
-              <nz-form-label nzRequired>
-                {{ 'admin.home.journey.semester' | translate }}
-              </nz-form-label>
-              <nz-form-control [nzErrorTip]="'admin.home.journey.semester_error' | translate">
-                  <nz-input-group>
-                      <nz-select  style="width: 100%;"
-                          formControlName="semester"
-                          [ngModel]="data"
-                          [nzPlaceHolder]="'admin.home.journey.semester' | translate"
-                          >
-                          <nz-option *ngFor="let item of listOfSemester"
-                              [nzLabel]="item"
-                              [nzValue]="item"
-                          >
-                          </nz-option>
-                      </nz-select>
-                  </nz-input-group>
-              </nz-form-control>
-            </nz-form-item>
-                  <button nz-button class="form-button form-margin"  [nzLoading]="isConfirmLoading" [nzType]="'primary'">
-                    {{'general_data.save' | translate | uppercase}}
-                  </button>
-          </form>
+<app-datatable-crud *ngIf="isLoading" [title]="'admin.user.reinscription.title' | translate" [headers]="headers"
+  [fetchDataFn]="fetchData" [width]="500" [actions]="actions" (delete)="onDelete($event)" (edit)="onEdit($event)"
+  [isSearch]="true" [tableTitle]="'Etudiants'" (add)="onAdd()" (search)="searchByNum($event)" (download)="download()"
+  [showPagination]="true" classNames="table"></app-datatable-crud>
+<nz-modal [(nzVisible)]="isvisible" nzTitle="{{'admin.home.journey.add_journey' | translate}}"
+  (nzOnCancel)="handleCancel()" nzMask="true" nzMaskClosable="false">
+  <div *nzModalContent>
+    <nz-tabset>
+      <nz-tab nzTitle="Liste des etudiants">
+        <form nz-form [formGroup]="formList" class="form" (ngSubmit)="startDownload()" nzLayout="vertical">
+          <nz-form-item>
+            <nz-form-label nzRequired>
+              {{ 'admin.home.journey.title' | translate }}
+            </nz-form-label>
+            <nz-form-control [nzErrorTip]="'admin.home.journey.journey_error' | translate">
+              <nz-input-group>
+                <nz-select style="width: 100%;" [ngModel]="data" formControlName="journey"
+                  (ngModelChange)="changeJourney()" [nzPlaceHolder]="'admin.home.journey.title' | translate">
+                  <nz-option *ngFor="let item of allJourney" [nzLabel]="item.title" [nzValue]="item.uuid">
+                  </nz-option>
+                </nz-select>
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label nzRequired>
+              {{ 'admin.home.journey.semester' | translate }}
+            </nz-form-label>
+            <nz-form-control [nzErrorTip]="'admin.home.journey.semester_error' | translate">
+              <nz-input-group>
+                <nz-select style="width: 100%;" formControlName="semester" [ngModel]="data"
+                  [nzPlaceHolder]="'admin.home.journey.semester' | translate">
+                  <nz-option *ngFor="let item of listOfSemester" [nzLabel]="item" [nzValue]="item">
+                  </nz-option>
+                </nz-select>
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <button nz-button class="form-button form-margin" [nzLoading]="isConfirmLoading" [nzType]="'primary'">
+            {{'general_data.save' | translate | uppercase}}
+          </button>
+        </form>
 
-        </nz-tab>
-        <nz-tab nzTitle="Carte des etudiants">
-          <div nz-row>
-            <div nz-col [nzSpan]="11" class="card">
-              <img [src]="url_face" alt="" *ngIf="url_face">
-                <button nz-button nzType="primary" [nzLoading]="isConfirmLoading" class="button" (click)="startDownloadFace()">
-                  <span nz-icon nzType="download"></span>
-                  En face
-                </button>
-              </div>
-            <div nz-col [nzSpan]="1"></div>
-            <div nz-col [nzSpan]="11" class="card">
-              <img [src]="url_pile" alt="" *ngIf="url_pile">
-                <button nz-button nzType="primary"  [nzLoading]="isConfirmLoading" class="button" (click)="startDownloadPile()">
-                  <span nz-icon nzType="download"></span>
-                  Arrière
-                </button>
-              </div>
+      </nz-tab>
+      <nz-tab nzTitle="Carte des etudiants">
+        <div nz-row>
+          <div nz-col [nzSpan]="11" class="card">
+            <img [src]="url_face" alt="" *ngIf="url_face">
+            <button nz-button nzType="primary" [nzLoading]="isConfirmLoading" class="button"
+              (click)="startDownloadFace()">
+              <span nz-icon nzType="download"></span>
+              En face
+            </button>
           </div>
-        </nz-tab>
-        <nz-tab nzTitle="Bourse des etudiants">
-          <div nz-row>
-            <div nz-col [nzSpan]="11" class="card">
-                <button nz-button nzType="primary"  [nzLoading]="isConfirmLoading" class="button" (click)="startDownloadPassant()">
-                  <span nz-icon nzType="download"></span>
-                  Passant
-                </button>
-              </div>
-            <div nz-col [nzSpan]="1"></div>
-            <div nz-col [nzSpan]="11" class="card">
-                <button nz-button nzType="primary"  [nzLoading]="isConfirmLoading" class="button" (click)="startDownloadRedoublant()">
-                  <span nz-icon nzType="download"></span>
-                  Rédoublant
-                </button>
-              </div>
+          <div nz-col [nzSpan]="1"></div>
+          <div nz-col [nzSpan]="11" class="card">
+            <img [src]="url_pile" alt="" *ngIf="url_pile">
+            <button nz-button nzType="primary" [nzLoading]="isConfirmLoading" class="button"
+              (click)="startDownloadPile()">
+              <span nz-icon nzType="download"></span>
+              Arrière
+            </button>
           </div>
-        </nz-tab>
-      </nz-tabset>
-
-    </div>
-    <div *nzModalFooter>
         </div>
+      </nz-tab>
+      <nz-tab nzTitle="Bourse des etudiants">
+        <div nz-row>
+          <div nz-col [nzSpan]="11" class="card">
+            <button nz-button nzType="primary" [nzLoading]="isConfirmLoading" class="button"
+              (click)="startDownloadPassant()">
+              <span nz-icon nzType="download"></span>
+              Passant
+            </button>
+          </div>
+          <div nz-col [nzSpan]="1"></div>
+          <div nz-col [nzSpan]="11" class="card">
+            <button nz-button nzType="primary" [nzLoading]="isConfirmLoading" class="button"
+              (click)="startDownloadRedoublant()">
+              <span nz-icon nzType="download"></span>
+              Rédoublant
+            </button>
+          </div>
+        </div>
+      </nz-tab>
+    </nz-tabset>
+
+  </div>
+  <div *nzModalFooter>
+  </div>

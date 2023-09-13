@@ -152,8 +152,13 @@ def creaate_registre(schema: str):
 
 def decode_text(text: str) -> str:
     str_ = text.replace(" ", "_")
+    str_ = str_.replace("'", "_")
     return unidecode(str_.replace("-", "_"))
 
+
+def decode_(text: str) -> str:
+    str_ = text.replace("'", "\\'")
+    return str_
 
 def get_max(sems_a: str, sems_b: str) -> str:
     if not sems_a:

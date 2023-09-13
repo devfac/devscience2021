@@ -6,7 +6,7 @@
     <nz-spin [nzSpinning]="isSpinning">
       <nz-form-item nz-col nzSpan="12">
         <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-          <nz-input-group nzAddOnBefore="Nom et Prénom">
+          <nz-input-group nzAddOnBefore="Nom et Prénom" *ngIf="!disabled">
             <input nz-input type="text" readonly [nzBorderless]="true" formControlName="name">
           </nz-input-group>
           <nz-divider nzType="vertical"></nz-divider>

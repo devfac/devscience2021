@@ -1,3 +1,5 @@
+import ast
+
 from app import crud
 from app.core.config import settings
 from app.utils import get_niveau, decode_schemas, creaate_registre, validation_semester, create_model
@@ -157,8 +159,7 @@ def relever(
         interaction_value = jsonable_encoder(interaction)
         list_value = []
         for value in interaction_value[semester.lower()]:
-            value = value.replace("'", '"')
-            value = json.loads(value)
+            value = ast.literal_eval(value)
             list_value.append(value)
         interaction = jsonable_encoder(interaction)
         interaction[semester.lower()] = list_value

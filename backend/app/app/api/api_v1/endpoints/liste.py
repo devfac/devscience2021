@@ -1,3 +1,4 @@
+import ast
 from typing import Any
 import json
 from fastapi import APIRouter, Depends, HTTPException
@@ -44,8 +45,7 @@ def list_examen(
     interaction_value = jsonable_encoder(interaction)
     list_value = []
     for value in interaction_value[semester.lower()]:
-        value = value.replace("'", '"')
-        value = json.loads(value)
+        value = ast.literal_eval(value)
         list_value.append(value)
     interaction = jsonable_encoder(interaction)
     interaction[semester.lower()] = list_value

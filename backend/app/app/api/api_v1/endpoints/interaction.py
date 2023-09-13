@@ -1,3 +1,4 @@
+import ast
 from typing import Any, List
 from uuid import UUID
 import json
@@ -21,6 +22,7 @@ def create_interaction(
     """
     Create new interaction.
     """
+    print(interaction_in)
     if crud.user.is_superuser(current_user):
         interaction = crud.interaction.get_by_journey_and_year(
             db=db, uuid_journey=interaction_in.uuid_journey,
@@ -51,8 +53,7 @@ def create_interaction(
         interaction_value = jsonable_encoder(interaction)
         list_value = []
         for value in interaction_value[semester.lower()]:
-            value = value.replace("'", '"')
-            value = json.loads(value)
+            value = ast.literal_eval(value)
             list_value.append(value)
         interaction = jsonable_encoder(interaction)
         interaction[semester.lower()] = list_value
@@ -82,8 +83,7 @@ def get_by_journey_year(
     interaction_value = jsonable_encoder(interaction)
     list_value = []
     for value in interaction_value[semester.lower()]:
-        value = value.replace("'", '"')
-        value = json.loads(value)
+        value = ast.literal_eval(value)
         list_value.append(value)
     interaction = jsonable_encoder(interaction)
     interaction[semester.lower()] = list_value

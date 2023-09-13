@@ -6,6 +6,13 @@ from .AlphaFPDF import AlphaFPDF
 
 
 class PDFMark(AlphaFPDF):
+    def set_opacity(self, alpha):
+        """Set the current alpha (transparency) level."""
+        if alpha < 0:
+            alpha = 0
+        elif alpha > 1:
+            alpha = 1
+        self._out(f'1 gs {alpha:g} gs')
     _watermark_data = []
     _stamp_data = []
 

@@ -11,8 +11,8 @@ class PDF(FPDF):
     def create_carte(pdf: FPDF, pos_init_y: int, long_init_y: int, deux_et: list, data: Any):
 
         image_fac = f"images/arriere.jpg"
-        logo_univ = "images/logo_univ.jpg"
-        logo_fac = "images/logo_science.jpg"
+        # logo_univ = "images/logo_univ.jpg"
+        # logo_fac = "images/logo_science.jpg"
 
         titre_1 = "Faculté des Sciences \n"
         titre_1 += "Visites médicale \n"
@@ -63,18 +63,18 @@ class PDF(FPDF):
                 pdf.set_xy(absci + pos_init_x - 0.2 - 1, pos_init_y + ordon + 1.3)
             pdf.cell(1.8, 0.15, txt=titre_3, border=0, ln=0, align="C")
 
-            pdf.set_font('Times', 'B', 8.0)
-            if i == 0:
-                pdf.set_xy(absci - 0.7, pos_init_y + ordon)
-            else:
-                pdf.set_xy(absci + pos_init_x - 0.2 - 0.7, pos_init_y + ordon)
-            pdf.image(logo_univ, w=0.5, h=0.5)
-
-            if i == 0:
-                pdf.set_xy(absci + 2, pos_init_y + ordon)
-            else:
-                pdf.set_xy(absci + pos_init_x - 0.2 + 2, pos_init_y + ordon)
-            pdf.image(logo_fac, w=0.5, h=0.5)
+            # pdf.set_font('Times', 'B', 8.0)
+            # if i == 0:
+            #     pdf.set_xy(absci - 0.7, pos_init_y + ordon)
+            # else:
+            #     pdf.set_xy(absci + pos_init_x - 0.2 - 0.7, pos_init_y + ordon)
+            # pdf.image(logo_univ, w=0.5, h=0.5)
+            #
+            # if i == 0:
+            #     pdf.set_xy(absci + 2, pos_init_y + ordon)
+            # else:
+            #     pdf.set_xy(absci + pos_init_x - 0.2 + 2, pos_init_y + ordon)
+            # pdf.image(logo_fac, w=0.5, h=0.5)
 
             pdf.set_font('Times', 'B', 7.0)
             if i == 0:

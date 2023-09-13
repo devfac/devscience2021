@@ -1,4 +1,3 @@
-
 from app.pdf.PDFMark import PDFMark as FPDF
 from typing import Any
 import qrcode
@@ -9,12 +8,14 @@ from app.utils import convert_date, clear_name
 
 class PDF(FPDF):
     def footer(self) -> None:
-        self.set_y(-6)
+        self.set_y(-0.1)
+        self.cell(0, 10, 'Page %s' % self.page_no(), 0, 0, 'C')
 
     def create_carte(pdf: FPDF, pos_init_y: int, long_init_y: int, deux_et: list, data: Any):
         j: int = 0
 
-        # logo_fac = "images/logo_science.jpg"
+        logo_univ = "images/logo_univ.jpg"
+        logo_fac = "images/logo_science.jpg"
 
         titre_1 = "Université de Fanarantsoa \n"
         titre_1 += "Faculté des Sciences \n"
@@ -48,6 +49,7 @@ class PDF(FPDF):
             info_ += f"Parcours: {deux_et[i]['journey'].upper()}\n"
             info_ += f"Mention: {data['mention']}\n"
 
+
             data_et = [deux_et[i]['num_carte'], data['key']]
             #
             # if {deux_et[i]['num_cin']}:
@@ -64,43 +66,73 @@ class PDF(FPDF):
             # pdf.image(mask,x=pos_init_x+0.05, y=pos_init_y+0.05,w=1, is_mask=True)
 
             pdf.rect(pos_init_x, pos_init_y, w=long_init_x, h=long_init_y)
-            pdf.image(image, x=pos_init_x + 0.05, y=pos_init_y + 0.05, w=1, h=1.18)
+            pdf.image(image, x=pos_init_x + 0.05, y=pos_init_y + 0.7, w=1, h=1.18)
             pdf.set_text_color(0, 0, 0)
+
+            pdf.set_font('Times', 'B', 8.0)
+            with pdf.local_context(fill_opacity=0.35):
+                pdf.set_fill_color(255, 255, 255)
+                if i == 0:
+                    pdf.set_xy(absci - 1, pos_init_y + ordon - 0.02)
+                else:
+                    pdf.set_xy(absci + pos_init_x - 0.2 - 1, pos_init_y + ordon - 0.02)
+                pdf.cell(3.8, 0.63, txt="", border=0, fill=True, align="L")
+
+            if i == 0:
+                pdf.set_xy(absci - 0.7, pos_init_y + ordon + 0.05)
+            else:
+                pdf.set_xy(absci + pos_init_x - 0.2 - 0.7, pos_init_y + ordon+0.05)
+            pdf.image(logo_univ, w=0.5, h=0.5)
+
+            if i == 0:
+                pdf.set_xy(absci + 2, pos_init_y + ordon + 0.05)
+            else:
+                pdf.set_xy(absci + pos_init_x - 0.2 + 2, pos_init_y + ordon + 0.05)
+            pdf.image(logo_fac, w=0.5, h=0.5)
+
+            pdf.set_font('Times', 'B', 9)
+            if i == 0:
+                pdf.set_xy(absci - 0.35, pos_init_y + ordon + 0.08)
+            else:
+                pdf.set_xy(absci + pos_init_x - 0.2 - 0.35, pos_init_y + ordon + 0.08)
+
+            pdf.multi_cell(2.5, 0.15, titre_1.upper(), border=0, ln=0, fill=False, align='C')
+            pdf.ln(0.1)
 
             pdf.set_font('Times', 'B', 7.0)
             if i == 0:
-                pdf.set_xy(absci, pos_init_y + ordon)
+                pdf.set_xy(absci + 0.02, pos_init_y + ordon + 0.7)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2, pos_init_y + ordon)
+                pdf.set_xy(absci + pos_init_x - 0.2 + 0.02, pos_init_y + ordon + 0.7)
 
             pdf.multi_cell(2.16, 0.15, info, 0, fill=0, align='L')
             pdf.ln(0.1)
 
             pdf.set_font('Times', '', 8.0)
             if i == 0:
-                pdf.set_xy(absci, pos_init_y + ordon + 0.9)
+                pdf.set_xy(absci, pos_init_y + ordon + 1.7)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2, pos_init_y + ordon + 0.9)
+                pdf.set_xy(absci + pos_init_x - 0.2, pos_init_y + ordon + 1.7)
             pdf.cell(2.5, 0.15, txt=titre_2, ln=1, align="L")
 
             if i == 0:
-                pdf.set_xy(absci + 0.1, pos_init_y + ordon + 1.1)
+                pdf.set_xy(absci + 0.1, pos_init_y + ordon + 1.9)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2 + 0.1, pos_init_y + ordon + 1.1)
+                pdf.set_xy(absci + pos_init_x - 0.2 + 0.1, pos_init_y + ordon + 1.9)
             pdf.cell(2.5, 0.15, txt=titre_3, ln=0, align="L")
 
             pdf.set_font('Times', '', 10)
             pdf.set_fill_color(255, 255, 255)
             if i == 0:
-                pdf.set_xy(absci + 1.9, pos_init_y + ordon + 1)
+                pdf.set_xy(absci + 2.1, pos_init_y + ordon + 1)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2 + 1.9, pos_init_y + ordon + 1)
-            pdf.cell(0.8, 0.4, txt="", border=1, fill=True, align="L")
+                pdf.set_xy(absci + pos_init_x - 0.2 + 2.1, pos_init_y + ordon + 1)
+            pdf.cell(0.7, 0.4, txt="", border=1, fill=True, align="L")
 
             if i == 0:
-                pdf.set_xy(absci + 1.9, pos_init_y + ordon + 0.8)
+                pdf.set_xy(absci + 2.1, pos_init_y + ordon + 0.8)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2 + 1.9, pos_init_y + ordon + 0.8)
+                pdf.set_xy(absci + pos_init_x - 0.2 + 2.1, pos_init_y + ordon + 0.8)
             pdf.cell(0.9, 0.15, txt="Signature", align="L")
 
             # if i == 0:
@@ -110,18 +142,18 @@ class PDF(FPDF):
             # pdf.cell(0, 0.15, txt=titre_4, ln=0, align="L")
 
             if i == 0:
-                pdf.set_xy(0.3, pos_init_y + ordon + 1.4)
+                pdf.set_xy(0.3, pos_init_y + ordon + 2)
             else:
-                pdf.set_xy(0.9 + pos_init_x - 0.2 - 0.6, pos_init_y + ordon + 1.4)
+                pdf.set_xy(0.9 + pos_init_x - 0.2 - 0.6, pos_init_y + ordon + 2)
 
             pdf.set_font('Times', '', 9.0)
             pdf.multi_cell(2.2, 0.15, info_, 0, fill=0, align='J')
 
             pdf.set_font('Times', 'B', 14.0)
             if i == 0:
-                pdf.set_xy(absci + 2.23, pos_init_y + ordon + 0.03)
+                pdf.set_xy(absci + 2.2, pos_init_y + ordon + 1.9)
             else:
-                pdf.set_xy(absci + pos_init_x - 0.2 + 2.23, pos_init_y + ordon + 0.03)
+                pdf.set_xy(absci + pos_init_x - 0.2 + 2.2, pos_init_y + ordon + 1.9)
             # pdf.cell(1, 0.15, txt=num_carte, ln=1, align="C")
             pdf.image(qr.get_image(), w=0.6, h=0.6)
 
@@ -139,7 +171,7 @@ class PDF(FPDF):
     def boucle_carte(pdf: FPDF, huit_etudiant: list, data: Any):
         pdf.add_page()
         pos_init_y: int = 0.2
-        long_init_y: int = 2.5
+        long_init_y: int = 2.6
         nbr: int = 0
         if len(huit_etudiant) % 2 == 0:
             nbr = len(huit_etudiant) // 2

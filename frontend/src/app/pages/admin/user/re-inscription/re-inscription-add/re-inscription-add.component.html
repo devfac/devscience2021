@@ -5,29 +5,30 @@
       <nz-form-label>
         {{ 'admin.student.image' | translate }}
       </nz-form-label>
-        <div class="container" >
-            <img [src]="url" alt="" *ngIf="url">
-            <div [innerHtml]="msg" *ngIf="msg" style="color: red;"></div>
-            <input type="file" #fileDropRef id="fileDropRef"  (change)="selectFile($event)"/>
-          </div>
-          <button nz-button nzType="primary" [nzLoading]="isImageLoading" [disabled]="url ==='assets/images/profil.png'" (click)="uploadImage()">
-            {{ 'save' | translate }}
-          </button>
+      <div class="container">
+        <img [src]="url" alt="" *ngIf="url">
+        <div [innerHtml]="msg" *ngIf="msg" style="color: red;"></div>
+        <input type="file" #fileDropRef id="fileDropRef" (change)="selectFile($event)" />
+      </div>
+      <button nz-button nzType="primary" [nzLoading]="isImageLoading" [disabled]="url ==='assets/images/profil.png'"
+        (click)="uploadImage()">
+        {{ 'save' | translate }}
+      </button>
     </nz-form-item>
-    </div >
-      <div nz-row>
+  </div>
+  <div nz-row>
     <nz-form-item nz-col nzSpan="8">
       <nz-form-label>
         {{ 'admin.student.num_carte' | translate }}
       </nz-form-label>
-      <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate" >
-        <nz-input-group nzAddOnBefore="N°CE"  [nzAddOnAfter]="iconButton" >
+      <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+        <nz-input-group nzAddOnBefore="N°CE" [nzAddOnAfter]="iconButton">
           <input nz-input type="text" formControlName="numCarte" [readonly]="isEdit"
-            [placeholder]="'admin.student.num_carte' | translate" nz-icon="plus"  />
+            [placeholder]="'admin.student.num_carte' | translate" nz-icon="plus" />
         </nz-input-group>
-      <ng-template #iconButton>
-        <i nz-icon nzType="import"  class="button" (click)="getByNumCarte()"></i>
-      </ng-template>
+        <ng-template #iconButton>
+          <i nz-icon nzType="import" class="button" (click)="getByNumCarte()"></i>
+        </ng-template>
       </nz-form-control>
     </nz-form-item>
     <nz-form-item nz-col nzSpan="20">
@@ -35,7 +36,8 @@
         {{ 'admin.home.journey.semester' | translate }}
       </nz-form-label>
       <nz-form-control>
-        <nz-checkbox-group formControlName="licence" (ngModelChange)="checkLicence()"></nz-checkbox-group>
+        <nz-checkbox-group formControlName="licence" (ngModelChange)="checkLicence()"
+          [ngModel]="licence"></nz-checkbox-group>
         <nz-checkbox-group formControlName="master1" (ngModelChange)="checkMasterOne()"></nz-checkbox-group>
         <nz-checkbox-group formControlName="master2" (ngModelChange)="checkMasterTwo()"></nz-checkbox-group>
       </nz-form-control>
@@ -47,17 +49,10 @@
         {{ 'admin.home.mention.title' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-          <nz-select
-              nzAllowClear
-              formControlName="mention"
-              [nzPlaceHolder]="'admin.home.mention.title' | translate"
-              >
-              <nz-option *ngFor="let item of allMention"
-                  [nzLabel]="item.title"
-                  [nzValue]="item.uuid"
-              >
-              </nz-option>
-          </nz-select>
+        <nz-select nzAllowClear formControlName="mention" [nzPlaceHolder]="'admin.home.mention.title' | translate">
+          <nz-option *ngFor="let item of allMention" [nzLabel]="item.title" [nzValue]="item.uuid">
+          </nz-option>
+        </nz-select>
       </nz-form-control>
     </nz-form-item>
     <div nz-col nzSpan="1"></div>
@@ -66,17 +61,10 @@
         {{ 'admin.home.journey.title' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-          <nz-select
-              nzAllowClear
-              formControlName="journey"
-              [nzPlaceHolder]="'admin.home.journey.title' | translate"
-              >
-              <nz-option *ngFor="let item of allJourney"
-                  [nzLabel]="item.title"
-                  [nzValue]="item.uuid"
-              >
-              </nz-option>
-          </nz-select>
+        <nz-select nzAllowClear formControlName="journey" [nzPlaceHolder]="'admin.home.journey.title' | translate">
+          <nz-option *ngFor="let item of allJourney" [nzLabel]="item.title" [nzValue]="item.uuid">
+          </nz-option>
+        </nz-select>
       </nz-form-control>
     </nz-form-item>
   </div>
@@ -87,7 +75,7 @@
         {{ 'admin.student.last_name' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-input-group >
+        <nz-input-group>
           <input nz-input type="text" formControlName="lastName"
             [placeholder]="'admin.student.last_name' | translate" />
         </nz-input-group>
@@ -99,7 +87,7 @@
         {{ 'admin.student.first_name' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-input-group >
+        <nz-input-group>
           <input nz-input type="text" formControlName="firstName"
             [placeholder]="'admin.student.first_name' | translate" />
         </nz-input-group>
@@ -112,15 +100,8 @@
         {{ 'admin.student.nation' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-select
-          nzAllowClear
-          formControlName="nation"
-          [nzPlaceHolder]="'admin.student.nation' | translate"
-          >
-          <nz-option *ngFor="let item of typeNation"
-              [nzLabel]="item.label"
-              [nzValue]="item.value"
-          >
+        <nz-select nzAllowClear formControlName="nation" [nzPlaceHolder]="'admin.student.nation' | translate">
+          <nz-option *ngFor="let item of typeNation" [nzLabel]="item.label" [nzValue]="item.value">
           </nz-option>
         </nz-select>
       </nz-form-control>
@@ -132,9 +113,8 @@
         {{ 'admin.student.address' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-input-group >
-          <input nz-input type="text" formControlName="address"
-            [placeholder]="'admin.student.address' | translate" />
+        <nz-input-group>
+          <input nz-input type="text" formControlName="address" [placeholder]="'admin.student.address' | translate" />
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>
@@ -144,13 +124,13 @@
         {{ 'admin.student.receipt' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-input-group nzAddOnBefore="N°" [nzAddOnAfter]="iconButtonAdd" >
+        <nz-input-group nzAddOnBefore="N°" [nzAddOnAfter]="iconButtonAdd">
           <input nz-input type="text" formControlName="receipt" readonly
             [placeholder]="'admin.student.receipt' | translate" />
         </nz-input-group>
-      <ng-template #iconButtonAdd>
-          <a nz-icon nzType="plus"  class="button" (click)="showModal()"></a>
-      </ng-template>
+        <ng-template #iconButtonAdd>
+          <a nz-icon nzType="plus" class="button" (click)="showModal()"></a>
+        </ng-template>
       </nz-form-control>
     </nz-form-item>
   </div>
@@ -161,8 +141,8 @@
         {{ 'admin.student.date_birth' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-input-group >
-          <nz-date-picker  formControlName="dateBirth" ></nz-date-picker>
+        <nz-input-group>
+          <nz-date-picker formControlName="dateBirth"></nz-date-picker>
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>
@@ -172,7 +152,7 @@
         {{ 'admin.student.place_birth' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-input-group >
+        <nz-input-group>
           <input nz-input type="text" formControlName="placeBirth"
             [placeholder]="'admin.student.place_birth' | translate" />
         </nz-input-group>
@@ -184,15 +164,8 @@
         {{ 'admin.student.sex' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-select
-          nzAllowClear
-          formControlName="sex"
-          [nzPlaceHolder]="'admin.student.sex' | translate"
-          >
-          <nz-option *ngFor="let item of typeSex"
-              [nzLabel]="item.label"
-              [nzValue]="item.value"
-          >
+        <nz-select nzAllowClear formControlName="sex" [nzPlaceHolder]="'admin.student.sex' | translate">
+          <nz-option *ngFor="let item of typeSex" [nzLabel]="item.label" [nzValue]="item.value">
           </nz-option>
         </nz-select>
       </nz-form-control>
@@ -205,8 +178,8 @@
         {{ 'admin.student.date_cin' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-input-group >
-          <nz-date-picker  formControlName="dateCin" ></nz-date-picker>
+        <nz-input-group>
+          <nz-date-picker formControlName="dateCin"></nz-date-picker>
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>
@@ -216,7 +189,7 @@
         {{ 'admin.student.place_cin' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-input-group >
+        <nz-input-group>
           <input nz-input type="text" formControlName="placeCin"
             [placeholder]="'admin.student.place_cin' | translate" />
         </nz-input-group>
@@ -228,9 +201,8 @@
         {{ 'admin.student.num_cin' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-input-group >
-          <input nz-input type="text" formControlName="numCin"
-            [placeholder]="'admin.student.num_cin' | translate" />
+        <nz-input-group>
+          <input nz-input type="text" formControlName="numCin" [placeholder]="'admin.student.num_cin' | translate" />
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>
@@ -242,9 +214,8 @@
         {{ 'admin.student.mean' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-input-group >
-          <input nz-input type="number" formControlName="mean"
-            [placeholder]="'admin.student.mean' | translate" />
+        <nz-input-group>
+          <input nz-input type="number" formControlName="mean" [placeholder]="'admin.student.mean' | translate" />
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>
@@ -254,8 +225,8 @@
         {{ 'admin.student.bacc_year' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-input-group >
-          <nz-date-picker nzMode="year" formControlName="baccYear" ></nz-date-picker>
+        <nz-input-group>
+          <nz-date-picker nzMode="year" formControlName="baccYear"></nz-date-picker>
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>
@@ -265,79 +236,62 @@
         {{ 'admin.student.type' | translate }}
       </nz-form-label>
       <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-        <nz-select
-          nzAllowClear
-          formControlName="type"
-          [nzPlaceHolder]="'admin.student.type' | translate"
-          >
-          <nz-option *ngFor="let item of typeEtudiant"
-              [nzLabel]="item.label"
-              [nzValue]="item.value"
-          >
+        <nz-select nzAllowClear formControlName="type" [nzPlaceHolder]="'admin.student.type' | translate">
+          <nz-option *ngFor="let item of typeEtudiant" [nzLabel]="item.label" [nzValue]="item.value">
           </nz-option>
         </nz-select>
       </nz-form-control>
     </nz-form-item>
   </div>
-  <nz-modal [(nzVisible)]="isvisible"
-              nzTitle="{{'admin.student.add_receipt' | translate}}"
-              (nzOnCancel)="handleCancel()"
-              nzMask="true"
-              nzMaskClosable="false" >
-        <div *nzModalContent>
-            <form nz-form [formGroup]="formDialog" class="form" (ngSubmit)="validReceipt()" nzLayout="vertical">
-                <nz-form-item>
-                  <nz-form-label nzRequired>
-                    {{ 'admin.student.receipt' | translate }}
-                  </nz-form-label>
-                  <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-                      <nz-select
-                          nzAllowClear
-                          formControlName="priceRigth"
-                          [nzPlaceHolder]="'admin.student.receipt' | translate"
-                          >
-                          <nz-option *ngFor="let item of allPrice"
-                              [nzLabel]="item.droit+' | '+item.level"
-                              [nzValue]="item.droit"
-                          >
-                          </nz-option>
-                      </nz-select>
-                  </nz-form-control>
+  <nz-modal [(nzVisible)]="isvisible" nzTitle="{{'admin.student.add_receipt' | translate}}"
+    (nzOnCancel)="handleCancel()" nzMask="true" nzMaskClosable="false">
+    <div *nzModalContent>
+      <form nz-form [formGroup]="formDialog" class="form" (ngSubmit)="validReceipt()" nzLayout="vertical">
+        <nz-form-item>
+          <nz-form-label nzRequired>
+            {{ 'admin.student.receipt' | translate }}
+          </nz-form-label>
+          <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+            <nz-select nzAllowClear formControlName="priceRigth" [nzPlaceHolder]="'admin.student.receipt' | translate">
+              <nz-option *ngFor="let item of allPrice" [nzLabel]="item.droit+' | '+item.level" [nzValue]="item.droit">
+              </nz-option>
+            </nz-select>
+          </nz-form-control>
 
-                </nz-form-item>
-                <nz-form-item>
-                  <nz-form-label nzRequired>
-                    {{ 'admin.student.num_receipt' | translate }}
-                  </nz-form-label>
-                  <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-                    <nz-input-group>
-                      <input type="text" nz-input formControlName="numReceipt" appCustomAutoFocus
-                        [placeholder]="'admin.student.num_receipt' | translate" />
-                    </nz-input-group>
-                  </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label nzRequired>
+            {{ 'admin.student.num_receipt' | translate }}
+          </nz-form-label>
+          <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+            <nz-input-group>
+              <input type="text" nz-input formControlName="numReceipt" appCustomAutoFocus
+                [placeholder]="'admin.student.num_receipt' | translate" />
+            </nz-input-group>
+          </nz-form-control>
 
-                </nz-form-item>
-                <nz-form-item>
-                  <nz-form-label nzRequired>
-                    {{ 'admin.student.date_receipt' | translate }}
-                  </nz-form-label>
-                  <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
-                    <nz-input-group>
-                      <nz-date-picker  formControlName="dateReceipt" ></nz-date-picker>
-                    </nz-input-group>
-                  </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label nzRequired>
+            {{ 'admin.student.date_receipt' | translate }}
+          </nz-form-label>
+          <nz-form-control [nzErrorTip]="'admin.student.champ_error' | translate">
+            <nz-input-group>
+              <nz-date-picker formControlName="dateReceipt"></nz-date-picker>
+            </nz-input-group>
+          </nz-form-control>
 
-                </nz-form-item>
-                <nz-spin [nzSpinning]="isConfirmLoading">
-                    <button nz-button class="form-button form-margin" [nzType]="'primary'">
-                      {{'general_data.save' | translate | uppercase}}
-                    </button>
-                </nz-spin>
-            </form>
-        </div>
-        <div *nzModalFooter>
-            </div>
-    </nz-modal>
+        </nz-form-item>
+        <nz-spin [nzSpinning]="isConfirmLoading">
+          <button nz-button class="form-button form-margin" [nzType]="'primary'">
+            {{'general_data.save' | translate | uppercase}}
+          </button>
+        </nz-spin>
+      </form>
+    </div>
+    <div *nzModalFooter>
+    </div>
+  </nz-modal>
   <nz-form-item class="max-width">
     <nz-form-control class="max-width flex align-items-end">
       <button nz-button style="margin-right: 8px" (click)="setDefaultValueForm()" [disabled]="isEdit">

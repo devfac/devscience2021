@@ -47,6 +47,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   @Input() permissionUser: boolean = true;
   @Input() permissionNote: boolean = false;
   @Input() isNote: boolean = false
+  @Input() isSearch: boolean = false
   @Input() selectedId: number | null = null;
   @Input() searchTemplate?: TemplateRef<any>;
   @Input() showPagination: boolean = true;
@@ -69,7 +70,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   @Output() edit = new EventEmitter<any>();
   @Output() delete = new EventEmitter<any>();
   @Output() detail = new EventEmitter<any>();
-  @Output() compareUesup = new EventEmitter<{ue: string, value_ue: string}>();
+  @Output() compareUesup = new EventEmitter<{ ue: string, value_ue: string }>();
   @Output() startSearch = new EventEmitter<any>();
   @Output() demande = new EventEmitter<any>();
   @Output() resultUeSuccess = new EventEmitter<any>();
@@ -107,7 +108,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   result: string = ""
   user!: User;
   form!: FormGroup;
-  listOfFilter = ["Moyenne" ,"Credit"]
+  listOfFilter = ["Moyenne", "Credit"]
   message: string = "FacSciences"
   constructor(
     private nzMessage: NzMessageService,
@@ -115,13 +116,13 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     private translate: TranslateService,
     private authService: AuthService,
     private noteService: NoteService,
-    private fb: FormBuilder, ) {
+    private fb: FormBuilder,) {
     this.form = this.fb.group({
-    matierUe: [null],
-    matierEc: [null],
-    meanCredit: [null],
-    filter: [null],
-    search:[]
+      matierUe: [null],
+      matierEc: [null],
+      meanCredit: [null],
+      filter: [null],
+      search: []
     })
   }
 
@@ -150,18 +151,18 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     }, 0);
   }
 
-  editCache: { [key: string]: { edit: boolean; data: any;} } = {};
+  editCache: { [key: string]: { edit: boolean; data: any; } } = {};
   listOfData: any[] = [];
 
   async startEdit(id: any) {
     let permission = await this.noteService.getPermission(this.authService.userValue?.email, 'note').toPromise()
-          if (permission){
-            this.permissionNote = permission.accepted
-          }
+    if (permission) {
+      this.permissionNote = permission.accepted
+    }
 
-          if (permission.accepted){
-            this.editCache[id].edit = true;
-          }
+    if (permission.accepted) {
+      this.editCache[id].edit = true;
+    }
   }
 
   cancelEdit(id: any, listOfData: any[]): void {
@@ -228,7 +229,7 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
                 }
               } else {
                 for (let i = 0; i < result.data.length; i++) {
-                  this.new_data.push({ ...result.data[i]});
+                  this.new_data.push({ ...result.data[i] });
                   this.listOfData.push({ ...result.data[i] });
                   this.editCache[result.data[i].num_carte] = {
                     edit: false,
@@ -285,12 +286,12 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
   }
 
   onSearch() {
-    if(this.form.value.search){
+    if (this.form.value.search) {
       this.search.emit(this.form.value.search);
-    }else{
+    } else {
       this.search.emit(null);
     }
-    }
+  }
 
   saveEditData(row: any) {
     this.edit.emit(row);
@@ -308,133 +309,133 @@ export class DatatableCrudComponent implements OnInit, AfterContentInit {
     this.location.back();
   }
 
-  onDownload(){
+  onDownload() {
     this.download.emit();
   }
 
-  compareNoteSupUe(): void{
-    if (this.form.value.matierUe){
+  compareNoteSupUe(): void {
+    if (this.form.value.matierUe) {
       this.resultUeSuccess.emit(this.form.value.matierUe)
-    }else{
+    } else {
       this.resultUeSuccess.emit(null)
     }
   }
 
-  insertStudent(){
+  insertStudent() {
     this.insert.emit()
   }
-  setVisible(){
+  setVisible() {
     this.isVisible = !this.isVisible
   }
-  onRefresh(){
+  onRefresh() {
     this.refresh.emit()
   }
-  onExamList(){
+  onExamList() {
     this.listExam.emit()
   }
-  onDeleteTable(){
+  onDeleteTable() {
     this.deleteTable.emit()
   }
 
-  onCreateTable(){
+  onCreateTable() {
     this.createTable.emit()
   }
-  filterSup(){
-    if (this.form.value.filter){
+  filterSup() {
+    if (this.form.value.filter) {
       let value = this.form.value.meanCredit
       localStorage.setItem('lastBtn', 'sup')
-        if (localStorage.getItem('filter') === 'Moyenne' ){
-          const data ={
-            credit:null,
-            mean:"mean",
-            value:value
-          }
-          this.resultByCreditSuccess.emit(data)
-        }else{
-          const data ={
-            credit:"credit",
-            mean:null,
-            value:value
-            }
-        this.resultByCreditSuccess.emit(data)
+      if (localStorage.getItem('filter') === 'Moyenne') {
+        const data = {
+          credit: null,
+          mean: "mean",
+          value: value
         }
-    }else{
+        this.resultByCreditSuccess.emit(data)
+      } else {
+        const data = {
+          credit: "credit",
+          mean: null,
+          value: value
+        }
+        this.resultByCreditSuccess.emit(data)
+      }
+    } else {
       this.resultByCreditSuccess.emit(null)
     }
   }
-  filterInf(){
-    if (this.form.value.filter){
+  filterInf() {
+    if (this.form.value.filter) {
       let value = this.form.value.meanCredit
       localStorage.setItem('lastBtn', 'sup')
-        if (localStorage.getItem('filter') === 'Moyenne' ){
-          this.data = this.new_data.filter((item: any) => item['mean']  < Number(value) )
-        }else{
-          this.data = this.new_data.filter((item: any) => item['credit']  < Number(value) )
-        }
-    }else{
+      if (localStorage.getItem('filter') === 'Moyenne') {
+        this.data = this.new_data.filter((item: any) => item['mean'] < Number(value))
+      } else {
+        this.data = this.new_data.filter((item: any) => item['credit'] < Number(value))
+      }
+    } else {
       this.data = this.new_data
     }
   }
-  resetTableUe(){
-    if (this.form.value.matierUe){
+  resetTableUe() {
+    if (this.form.value.matierUe) {
       this.result = this.form.value.matierUe
       this.isResult = true
-    }else{
+    } else {
       this.data = this.new_data;
       this.isResult = false
     }
   }
-  compareNoteInfUe(){
-    if (this.form.value.matierUe){
+  compareNoteInfUe() {
+    if (this.form.value.matierUe) {
       this.resultUeFaild.emit(this.form.value.matierUe)
-    }else{
+    } else {
       this.resultUeFaild.emit(this.form.value.matierUe)
     }
   }
-  resultat(){
+  resultat() {
     this.downloadResult.emit(this.form.value.matierUe)
   }
-  resetTableEc(){
-    if (this.form.value.matierEc){
+  resetTableEc() {
+    if (this.form.value.matierEc) {
       this.result = this.form.value.matierEc
       this.isRattrape = true
-    }else{
+    } else {
       this.data = this.new_data;
       this.isRattrape = false
     }
   }
-  compareNoteSupEc(){
-    if (this.form.value.matierEc){
+  compareNoteSupEc() {
+    if (this.form.value.matierEc) {
       this.resultEcSuccess.emit(this.form.value.matierEc)
-    }else{
+    } else {
       this.resultEcSuccess.emit(null)
     }
   }
-  compareNoteInfEc(){
-    if (this.form.value.matierEc){
+  compareNoteInfEc() {
+    if (this.form.value.matierEc) {
       this.resultEcFailed.emit(this.form.value.matierEc)
-    }else{
+    } else {
       this.resultEcFailed.emit(null)
     }
 
   }
-  rattrapageList(){
-    if (this.form.value.matierEc && this.session === 'Normal'){
-      const name = this.matierEc.find((item:Ec) => item.value === this.form.value.matierEc)
-      const data ={valueEc:this.form.value.matierEc, valueUe:name?.value_ue}
+  rattrapageList() {
+    if (this.form.value.matierEc && this.session === 'Normal') {
+      const name = this.matierEc.find((item: Ec) => item.value === this.form.value.matierEc)
+      const data = { valueEc: this.form.value.matierEc, valueUe: name?.value_ue }
       this.listRattrapage.emit(data)
-  }else{
-    this.listRattrapage.emit(null)
+    } else {
+      this.listRattrapage.emit(null)
+    }
   }
-  }
-  changeFilter(){
-    if (this.form.value.filter){
+  changeFilter() {
+    if (this.form.value.filter) {
       localStorage.setItem('filter', this.form.value.filter)
-    }else{
+    } else {
       localStorage.setItem('filter', '')
     }
   }
-  onDemande(){
+  onDemande() {
     this.demande.emit()
   }
 }

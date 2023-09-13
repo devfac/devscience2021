@@ -16,11 +16,13 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
         return db.query(Student).filter(Student.num_carte == num_carte).first()
 
     def get_by_mention(self, db: Session, *, uuid_mention: UUID, limit:int, skip: int,
-                       uuid_journey: str = "", semester: str = "", year: str,
+                       uuid_journey: str = "", semester: str = "", year: str, num_carte: str = "",
                        order: str = 'asc', order_by: str = "last_name") -> Optional[List[Student]]:
         filter_ = [Student.uuid_mention == uuid_mention, Student.actual_years.any(year)]
         if uuid_journey != "" and uuid_journey != "null":
             filter_.append(Student.uuid_journey == uuid_journey)
+        if num_carte != "" and num_carte != "null":
+            filter_.append(Student.num_carte.like('%'+num_carte+'%'))
         if semester != "" and semester != "null":
             filter_.append(or_(Student.inf_semester == semester, Student.sup_semester == semester))
         return (
@@ -32,10 +34,12 @@ class CRUDAncienStudent(CRUDBase[Student, AncienStudentCreate, AncienStudentUpda
             .all())
 
     def count_by_mention(self, db: Session, *, uuid_mention: UUID,
-                         uuid_journey: str = "", semester: str = "", ) -> Optional[List[Student]]:
+                         uuid_journey: str = "", semester: str = "", num_carte: str = "") -> Optional[List[Student]]:
         filter_ = [Student.uuid_mention == uuid_mention]
         if uuid_journey != "" and uuid_journey != "null":
             filter_.append(Student.uuid_journey == uuid_journey)
+        if num_carte != "" and num_carte != "null":
+            filter_.append(Student.num_carte.like('%'+num_carte+'%'))
         if semester != "" and semester != "null":
             filter_.append(or_(Student.inf_semester == semester, Student.sup_semester == semester))
         return (

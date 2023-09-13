@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import deps
-from app.utils import decode_text
+from app.utils import decode_text, decode_
 
 router = APIRouter()
 
@@ -27,7 +27,7 @@ def read_ec(
     Retrieve élément constitutif.
     """
     ecs = crud.constituent_element.get_multi(db=db, limit=limit, skip=offset, order_by=order_by, order=order,
-                                       uuid_journey=uuid_journey, semester = semester)
+                                             uuid_journey=uuid_journey, semester=semester)
     list_ec = []
     count = len(crud.constituent_element.get_count(db=db, uuid_journey=uuid_journey, semester=semester))
     for on_ec in ecs:
@@ -37,8 +37,9 @@ def read_ec(
             ec.journey = journey
             ec.abbreviation_journey = journey.abbreviation
         list_ec.append(ec)
-    response = schemas.ResponseData(**{'count':count, 'data':list_ec})
+    response = schemas.ResponseData(**{'count': count, 'data': list_ec})
     return response
+
 
 @router.get("/get_by_class/"
             "", response_model=List[schemas.MatierEC])
@@ -68,7 +69,6 @@ def get_by_class(
     return list_ec
 
 
-
 @router.get("/value_ue/", response_model=List[schemas.MatierEC])
 def read_by_value_ue(
         *,
@@ -81,7 +81,7 @@ def read_by_value_ue(
     """
     Retrieve élément constitutif by value_ue.
     """
-    ecs = crud.constituent_element.get_by_value_ue(db=db,value_ue=value_ue,
+    ecs = crud.constituent_element.get_by_value_ue(db=db, value_ue=value_ue,
                                                    semester=semester, uuid_journey=uuid_journey)
     list_ec = []
     for on_ec in ecs:
@@ -107,7 +107,8 @@ def read_by_value(
     Retrieve élément constitutif by value_ue.
     """
     constituent_element = crud.constituent_element.get_by_value(db=db,
-                                               value=value, semester=semester, uuid_journey=uuid_journey)
+                                                                value=value, semester=semester,
+                                                                uuid_journey=uuid_journey)
     return constituent_element
 
 
@@ -147,7 +148,7 @@ def create_ec(
     if not journey:
         raise HTTPException(status_code=400, detail=f"Journey not found.", )
 
-    ec_in.value= decode_text(ec_in.title).lower()
+    ec_in.value = decode_text(ec_in.title).lower()
     ec_in.key_unique = decode_text(f"{ec_in.value}_{ec_in.semester}_{journey.abbreviation}").lower()
     constituent_element = crud.constituent_element.get_by_key_unique(db=db, key_unique=ec_in.key_unique)
     if constituent_element:
