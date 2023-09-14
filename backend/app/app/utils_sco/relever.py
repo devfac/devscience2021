@@ -37,10 +37,8 @@ def relever_note(num_carte: str, date: str, data: Any, note: Any) -> str:
     titre6 = f"N° ___/{date}/UF/FAC.S/S.SCO"
 
     pdf.set_text_color(0, 0, 0)
-    nom = "Nom:"
-    nom_etudiant = f"{data['last_name']}"
-    prenom = "Prénom:"
-    prenom_etudiant = f"{data['first_name'] if data['first_name'] != 'None' else '-'}"
+    nom = "Nom et prénom:"
+    nom_etudiant = f"{data['last_name']} {data['first_name'] if data['first_name'] != 'None' else ''} "
     naiss = "Né(e) le:"
     naiss_etudiant = f"{convert_date(data['date_birth'])} à {data['place_birth']}"
     numero = "N° carte:"
@@ -104,57 +102,44 @@ def relever_note(num_carte: str, date: str, data: Any, note: Any) -> str:
 
     pdf.set_font("arial", "BI", 11)
     pdf.cell(18, 5, txt="", ln=0, align="L")
-    pdf.cell(18, 5, txt=nom, ln=0, align="L")
+    pdf.cell(32, 5, txt=nom, ln=0, align="L")
 
     pdf.set_font("aparaj", "", 11)
-    pdf.cell(50, 5, txt=nom_etudiant, ln=0)
+    pdf.cell(100, 5, txt=nom_etudiant, ln=1)
 
     pdf.set_font("arial", "BI", 11)
     pdf.cell(18, 5, txt="", ln=0, align="L")
-    pdf.cell(21, 5, txt=mention, ln=0, align="L")
-
+    pdf.cell(21, 5, txt=naiss, ln=0, align="L")
     pdf.set_font("aparaj", "", 12)
-    pdf.cell(0, 5, txt=mention_etudiant, ln=1)
+    pdf.cell(100, 5, txt=naiss_etudiant, ln=0)
 
-    pdf.set_font("arial", "BI", 10)
+    pdf.set_font("arial", "BI", 11)
     pdf.cell(18, 5, txt="", ln=0, align="L")
-    pdf.cell(18, 5, txt=prenom, ln=0, align="L")
-
-    pdf.set_font("aparaj", "", 11)
-    pdf.cell(50, 5, txt=prenom_etudiant, ln=0)
+    pdf.cell(21, 5, txt=numero, ln=0, align="L")
+    pdf.set_font("aparaj", "", 12)
+    pdf.cell(0, 5, txt=num_carte, ln=1)
 
     pdf.set_font("arial", "BI", 11)
     pdf.cell(18, 5, txt="", ln=0, align="L")
     pdf.cell(21, 5, txt=journey, ln=0, align="L")
-
     pdf.set_font("aparaj", "", 12)
-    pdf.cell(0, 5, txt=journey_etudiant, ln=1)
-
-    pdf.set_font("arial", "BI", 11)
-    pdf.cell(18, 5, txt="", ln=0, align="L")
-    pdf.cell(18, 5, txt=naiss, ln=0, align="L")
-
-    pdf.set_font("aparaj", "", 12)
-    pdf.cell(50, 5, txt=naiss_etudiant, ln=0)
+    pdf.cell(100, 5, txt=journey_etudiant, ln=0)
 
     pdf.set_font("arial", "BI", 11)
     pdf.cell(18, 5, txt="", ln=0, align="L")
     pdf.cell(21, 5, txt=semester, ln=0, align="L")
-
     pdf.set_font("aparaj", "", 12)
     pdf.cell(0, 5, txt=semester_etudiant, ln=1)
 
     pdf.set_font("arial", "BI", 11)
     pdf.cell(18, 5, txt="", ln=0, align="L")
-    pdf.cell(18, 5, txt=numero, ln=0, align="L")
-
+    pdf.cell(21, 5, txt=mention, ln=0, align="L")
     pdf.set_font("aparaj", "", 12)
-    pdf.cell(50, 5, txt=num_carte, ln=0)
+    pdf.cell(100, 5, txt=mention_etudiant, ln=0)
 
     pdf.set_font("arial", "BI", 11)
     pdf.cell(18, 5, txt="", ln=0, align="L")
     pdf.cell(21, 5, txt=session, ln=0, align="L")
-
     pdf.set_font("aparaj", "", 12)
     pdf.cell(0, 5, txt=sessionetudiant, ln=1)
 

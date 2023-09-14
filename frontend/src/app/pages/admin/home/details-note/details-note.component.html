@@ -117,4 +117,31 @@
       </nz-table>
     </div>
   </div>
+  <div>
+    <div nz-col nzSpan="10">
+      <nz-table #nzTable [nzData]="allValidation" nzTableLayout="fixed" [nzBordered]="true" [nzScroll]="{ y:'300px'}"
+        nzSize="small" class="note" [nzShowPagination]="false" nzTitle="Semestre validé">
+        <thead>
+          <tr>
+            <th nzWidth="60px">Semestre</th>
+            <th nzWidth="200px">Session</th>
+            <th nzWidth="80px">Moyenne</th>
+            <th nzWidth="80px">Crédit</th>
+            <th nzWidth="80px">Année</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let data of nzTable.data">
+            <tr>
+              <td>{{ data.semester }}</td>
+              <td>{{ data.session }}</td>
+              <td>{{ data.mean }}</td>
+              <td>{{ data.credit }}</td>
+              <td>{{ data.year }}</td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </nz-table>
+    </div>
+  </div>
 </form>

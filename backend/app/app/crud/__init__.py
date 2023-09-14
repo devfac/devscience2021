@@ -18,6 +18,7 @@ from .crud_classroom import classroom
 from .crud_bacc_serie import bacc_serie
 from .crud_historic import historic
 from .crud_publication import publication
+from .crud_validation import validation
 # For a new basic set of CRUD operations you could just do
 
 # from .base import CRUDBase

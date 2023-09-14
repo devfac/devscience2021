@@ -285,10 +285,10 @@ def validation_semester(sems_i: str, credit: int, total_cred: int, year: str):
     response = {"year": year}
     if sems_i:
         if credit == total_cred:
-            response["status"] = f"Étudiant(e) ayant validé(e) la {total_cred} crédit définitive."
+            response["status"] = f"Étudiant(e) ayant validé(e) les {total_cred} crédit définitive."
             response["code"] = True
         else:
-            response["status"] = f"Étudiant(e) ayant validé(e) la {total_cred} crédit par compensation."
+            response["status"] = f"Étudiant(e) ayant validé(e) les {total_cred} crédit par compensation."
             response["code"] = True
     else:
         response["status"] = "Étudiant(e) redoublé(e)"

@@ -13,29 +13,29 @@ router = APIRouter()
 
 @router.get("/", response_model=schemas.ResponseData)
 def read_mentions(
-    db: Session = Depends(deps.get_db),
-    *,
-    limit: int = 100,
-    offset: int = 0,
-    order: str = "asc",
-    order_by: str = "title",
-    current_user: models.User = Depends(deps.get_current_active_user),
+        db: Session = Depends(deps.get_db),
+        *,
+        limit: int = 100,
+        offset: int = 0,
+        order: str = "asc",
+        order_by: str = "title",
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve mentions.
     """
     mentions = crud.mention.get_multi(db=db, limit=limit, skip=offset, order=order, order_by=order_by)
     count = len(crud.mention.get_count(db=db))
-    response = schemas.ResponseData(**{'count':count, 'data':mentions})
+    response = schemas.ResponseData(**{'count': count, 'data': mentions})
     return response
 
 
 @router.post("/", response_model=List[schemas.Mention])
 def create_mention(
-    *,
-    db: Session = Depends(deps.get_db),
-    mention_in: schemas.MentionCreate,
-    current_user: models.User = Depends(deps.get_current_active_user),
+        *,
+        db: Session = Depends(deps.get_db),
+        mention_in: schemas.MentionCreate,
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create new mention.
@@ -55,23 +55,23 @@ def create_mention(
 
 @router.put("/", response_model=List[schemas.Mention])
 def update_mention(
-    *,
-    db: Session = Depends(deps.get_db),
-    uuid: str,
-    mention_in: schemas.MentionUpdate,
-    current_user: models.User = Depends(deps.get_current_active_user),
+        *,
+        db: Session = Depends(deps.get_db),
+        uuid: str,
+        mention_in: schemas.MentionUpdate,
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Update an mention.
     """
     mention_oj = {}
     if mention_in.title:
-        mention_oj['title']=mention_in.title
-        mention_oj['value']=decode_text(mention_in.title).lower()
+        mention_oj['title'] = mention_in.title
+        mention_oj['value'] = decode_text(mention_in.title).lower()
     if mention_in.last_num_carte:
-        mention_oj['last_num_carte']=mention_in.last_num_carte
+        mention_oj['last_num_carte'] = mention_in.last_num_carte
     if mention_in.plugged:
-        mention_oj['plugged']=decode_text(mention_in.plugged)
+        mention_oj['plugged'] = decode_text(mention_in.plugged)
     mention = crud.mention.get_by_uuid(db=db, uuid=uuid)
     if not mention:
         raise HTTPException(status_code=404, detail="Mention not found")
@@ -83,10 +83,10 @@ def update_mention(
 
 @router.get("/by_uuid/", response_model=schemas.Mention)
 def read_mention(
-    *,
-    db: Session = Depends(deps.get_db),
-    uuid: str,
-    current_user: models.User = Depends(deps.get_current_active_user),
+        *,
+        db: Session = Depends(deps.get_db),
+        uuid: str,
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Get mention by ID.
@@ -99,10 +99,10 @@ def read_mention(
 
 @router.delete("/", response_model=List[schemas.Mention])
 def delete_mention(
-    *,
-    db: Session = Depends(deps.get_db),
-    uuid: str,
-    current_user: models.User = Depends(deps.get_current_active_user),
+        *,
+        db: Session = Depends(deps.get_db),
+        uuid: str,
+        current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Delete an mention.

@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 
 from app.api.api_v1.endpoints import login, users, utils, mentions, roles, journey, \
-    semesters, college_year, validation,matier_ue, matier_ec, \
+    semesters, college_year,matier_ue, matier_ec, \
     scolarites, notes, liste, save_data, resultat, statistic, diploma, droit, carte, drive_action,\
-    student, interaction, invitation, permission, classroom, bacc_serie, historic, publication, upload
+    student, interaction, invitation, permission, classroom, bacc_serie, historic, publication, upload, validation
 
 api_router = APIRouter()
 api_router.include_router(interaction.router, prefix="/interaction", tags=["interaction"])

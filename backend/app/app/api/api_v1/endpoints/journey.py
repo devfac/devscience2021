@@ -11,7 +11,7 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.get("/", response_model=schemas.ResponseData)
+@router.get("/", response_model=schemas.ResponseJourney)
 def read_journey(
         db: Session = Depends(deps.get_db),
         *,
@@ -25,15 +25,8 @@ def read_journey(
     Retrieve paarcours.
     """
     journeys = crud.journey.get_multi(db=db, limit=limit, skip=offset, order_by=order_by, order=order)
-    list_journey = []
     count = len(crud.journey.get_count(db=db))
-    for on_journey in journeys:
-        journey = schemas.Journey(**jsonable_encoder(on_journey))
-        mention = crud.mention.get_by_uuid(db=db, uuid=on_journey.uuid_mention)
-        journey.mention = mention
-        journey.mention_title = mention.title
-        list_journey.append(journey)
-    response = schemas.ResponseData(**{'count':count, 'data':list_journey})
+    response = schemas.ResponseJourney(**{'count':count, 'data':journeys})
     return response
 
 
@@ -52,14 +45,7 @@ def create_journey(
     else:
         raise HTTPException(status_code=400, detail="Not enough permissions")
     journeys = crud.journey.get_multi(db=db)
-    list_journey = []
-    for on_journey in journeys:
-        journey = schemas.Journey(**jsonable_encoder(on_journey))
-        mention = crud.mention.get_by_uuid(db=db, uuid=on_journey.uuid_mention)
-        journey.mention = mention
-        journey.mention_title = mention.title
-        list_journey.append(journey)
-    return list_journey
+    return journeys
 
 
 @router.put("/", response_model=List[schemas.Journey])
@@ -80,14 +66,7 @@ def update_journey(
         raise HTTPException(status_code=400, detail="Not enough permissions")
     crud.journey.update(db=db, db_obj=journey, obj_in=journey_in)
     journeys = crud.journey.get_multi(db=db)
-    list_journey = []
-    for on_journey in journeys:
-        journey = schemas.Journey(**jsonable_encoder(on_journey))
-        mention = crud.mention.get_by_uuid(db=db, uuid=on_journey.uuid_mention)
-        journey.mention = mention
-        journey.mention_title = mention.title
-        list_journey.append(journey)
-    return list_journey
+    return journeys
 
 
 @router.get("/by_uuid/", response_model=schemas.Journey)
@@ -103,10 +82,6 @@ def read_journey_by_uuid(
     journey = crud.journey.get_by_uuid(db=db, uuid=uuid)
     if not journey:
         raise HTTPException(status_code=404, detail="journey not found")
-    journey = schemas.Journey(**jsonable_encoder(journey))
-    mention = crud.mention.get_by_uuid(db=db, uuid=journey.uuid_mention)
-    journey.mention = mention
-    journey.mention_title = mention.title
     return journey
 
 
@@ -123,14 +98,7 @@ def read_journey_by_mention(
     journeys = crud.journey.get_by_mention(db=db, uuid_mention=uuid_mention)
     if not journeys:
         return []
-    list_journey = []
-    for on_journey in journeys:
-        journey = schemas.Journey(**jsonable_encoder(on_journey))
-        mention = crud.mention.get_by_uuid(db=db, uuid=journey.uuid_mention)
-        journey.mention = mention
-        journey.mention_title = mention.title
-        list_journey.append(journey)
-    return list_journey
+    return journeys
 
 
 @router.delete("/", response_model=List[schemas.Journey])
@@ -150,11 +118,4 @@ def delete_journey(
         raise HTTPException(status_code=400, detail="Not enough permissions")
     journey = crud.journey.remove_uuid(db=db, uuid=uuid)
     journeys = crud.journey.get_multi(db=db)
-    list_journey = []
-    for on_journey in journeys:
-        journey = schemas.Journey(**jsonable_encoder(on_journey))
-        mention = crud.mention.get_by_uuid(db=db, uuid=on_journey.uuid_mention)
-        journey.mention = mention
-        journey.mention_title = mention.title
-        list_journey.append(journey)
-    return list_journey
+    return journeys

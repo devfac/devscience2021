@@ -11,7 +11,7 @@ from app.db.base_class import Base
 
 class Student(Base):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    num_carte = Column(String, unique=True)
+    num_carte = Column(String, unique=True, primary_key=True)
     num_select = Column(String, nullable=True, unique=True)
     last_name = Column(String)
     first_name = Column(String)

@@ -16,3 +16,4 @@ from .classroom import Classroom
 from .bacc_serie import BaccSerie
 from .historic import Historic
 from .publication import Publication
+from .validation import Validation
